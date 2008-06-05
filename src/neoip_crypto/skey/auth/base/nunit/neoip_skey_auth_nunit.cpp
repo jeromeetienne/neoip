@@ -67,7 +67,7 @@ nunit_res_t	skey_auth_testclass_t::md5_hmac(const nunit_testclass_ftor_t &testcl
 nunit_res_t	skey_auth_testclass_t::md5_nokey(const nunit_testclass_ftor_t &testclass_ftor) throw()
 {	
 	skey_auth_t	skey_auth("md5/nokey/16");
-	char		*testvect[]={
+	const char *	testvect[]={
 	  "\xd4\x1d\x8c\xd9\x8f\x00\xb2\x04\xe9\x80\x09\x98\xec\xf8\x42\x7e", ""
 	, "\x0c\xc1\x75\xb9\xc0\xf1\xb6\xa8\x31\xc3\x99\xe2\x69\x77\x26\x61", "a"
 	, "\x90\x01\x50\x98\x3c\xd2\x4f\xb0\xd6\x96\x3f\x7d\x28\xe1\x7f\x72", "abc"
@@ -104,7 +104,7 @@ nunit_res_t	skey_auth_testclass_t::sha1_nokey(const nunit_testclass_ftor_t &test
 {	
 	skey_auth_t	skey_auth("sha1/nokey/20");
 	int		failed;
-	char		*testvect[]={
+	const char *	testvect[]={
 	// from rfc3174.7.3
 	  "\xA9\x99\x3E\x36\x47\x06\x81\x6A\xBA\x3E\x25\x71\x78\x50\xC2\x6C\x9C\xD0\xD8\x9D", "abc"
 	, "\x84\x98\x3E\x44\x1C\x3B\xD2\x6E\xBA\xAE\x4A\xA1\xF9\x51\x29\xE5\xE5\x46\x70\xF1", "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"

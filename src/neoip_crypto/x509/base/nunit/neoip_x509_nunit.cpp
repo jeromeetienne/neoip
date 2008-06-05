@@ -53,7 +53,7 @@ nunit_res_t	x509_testclass_t::general(const nunit_testclass_ftor_t &testclass_ft
 	x509_request_t	user_request;
 	x509_cert_t	user_cert;
 	crypto_err_t	crypto_err;
-	char *		data = "bonjour";
+	const char *	data	= "bonjour";
 	datum_t		data_datum = datum_t(data, strlen(data));
 	datum_t		encrypted_data, decrypted_data;
 	datum_t		signature;

@@ -18,8 +18,8 @@
 NEOIP_NAMESPACE_BEGIN
 
 struct bt_peerid_record_t {
-	char *			progname;
-	char *			tag;
+	const char *		progname;
+	const char *		tag;
 	bt_peerid_style_t	style;
 };
 
