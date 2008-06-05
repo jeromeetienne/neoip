@@ -1,0 +1,10 @@
+# jme- list of all the known file extensions of the built package
+*.deb
+*.rpm
+*.exe
+
+# jme- remove the temporary .build_dir
+*.build_dir
+
+
+*.epm_list
