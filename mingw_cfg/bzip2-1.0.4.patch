@@ -1,0 +1,36 @@
+diff -ruN bzip2-1.0.4/bzip2.c bzip2-1.0.4.modif/bzip2.c
+--- bzip2-1.0.4/bzip2.c	2007-01-03 03:00:55.000000000 +0100
++++ bzip2-1.0.4.modif/bzip2.c	2007-06-25 14:35:07.000000000 +0200
+@@ -128,7 +128,7 @@
+ #if BZ_LCCWIN32
+ #   include <io.h>
+ #   include <fcntl.h>
+-#   include <sys\stat.h>
++#   include <sys/stat.h>
+ 
+ #   define NORETURN       /**/
+ #   define PATH_SEP       '\\'
+diff -ruN bzip2-1.0.4/Makefile bzip2-1.0.4.modif/Makefile
+--- bzip2-1.0.4/Makefile	2007-01-03 04:49:21.000000000 +0100
++++ bzip2-1.0.4.modif/Makefile	2007-06-25 14:33:18.000000000 +0200
+@@ -15,16 +15,16 @@
+ SHELL=/bin/sh
+ 
+ # To assist in cross-compiling
+-CC=gcc
+-AR=ar
+-RANLIB=ranlib
++CC=i586-mingw32msvc-gcc
++AR=i586-mingw32msvc-ar
++RANLIB=i586-mingw32msvc-ranlib
+ LDFLAGS=
+ 
+ BIGFILES=-D_FILE_OFFSET_BITS=64
+ CFLAGS=-Wall -Winline -O2 -g $(BIGFILES)
+ 
+ # Where you want it installed when you do 'make install'
+-PREFIX=/usr/local
++PREFIX=$(PWD)/inst
+ 
+ 
+ OBJS= blocksort.o  \

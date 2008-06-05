@@ -1,0 +1,18 @@
+set -e
+# build the data if needed
+make -f Makefile
+
+echo 0 >/proc/sys/kernel/core_uses_pid
+ulimit -c unlimited
+
+
+# ask the dynamic library linker to put file debug
+#export LD_DEBUG=files
+
+# put the current directory into the library path
+export LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH
+
+# launch a dns request thru ping
+ping  gloglo
+#host jerome.neoip
+#ping6 -c 1 jerome.neoip

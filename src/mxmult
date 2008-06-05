@@ -1,0 +1,28 @@
+# !/bin/sh
+
+# parse the parameter
+if [ $# == 0 ]; then
+	idx_begin=0;
+	idx_end=9;
+elif [ $# == 1 ]; then
+	idx_begin=0;
+	idx_end=$1;
+else
+	idx_begin=$1;
+	idx_end=$2;
+fi
+
+# kill previous instance
+# killall neoip_netcat
+
+# make the exe and generate 10 instance of it
+./m && for i in `seq $idx_begin $idx_end`; 
+do
+	# compute parameter for this instance
+	name=slota$i
+	port=`expr 10000 + $i`
+	# loggin
+	echo Launching an instance with name $name and http port $port
+	# launch a single instance and generate parameters
+	./neoip_netcat -c conf_netcat1/ -p nodeidx=$i -p name=$name -p lib_httpd_listen=127.0.0.1:$port > /dev/null &
+done

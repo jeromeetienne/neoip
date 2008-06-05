@@ -1,0 +1,125 @@
+.\" -*- nroff -*-
+.TH NEOIP_FILEFORMAT_PLAYLIST_JSPF 8 "Dec 2006" "jspf playlist file format(1)" "jspf playlist file format's Manual"
+.SH NAME
+neoip playlist jspf format extension
+.SH DESCRIPTION
+TODO write a better description.
+
+.SH Playlist meta
+This is the list of meta at the playlist level:
+.TP
+.I "may_loop bool"
+true if this playlist may loop, false otherwise.
+TODO this is old and obsolete. to remove ?
+.TP
+.I "trackdidx_beg integer_value"
+It is used to "shift" the index of the tracks.
+this is used for the "infinitly long playlist". TODO poor comment
+It may be present zero or one time. if not present, it default to 0.
+.TP
+.I "instance_nonce string_value"
+It is used to identify the instance of this playlist.
+this is used for the "infinitly long playlist". TODO poor comment 
+It may be present zero or one time. if not present, it default to "none".
+.TP
+.I "reload_delay delay_ms"
+delay at which the playlist must be reloaded. It may be different
+after each reload. 
+this is used for the "infinitly long playlist". TODO poor comment 
+It may be present zero or one time. if not present, it default to null aka no reload.
+
+.SH Playlist extension
+This is the list of extension at the playlist level:
+
+.SH Track meta
+This is the list of meta at the track level:
+.TP
+.I "content_type [static|stream]"
+The type of the content. currently valid value are "static" or "stream".
+It may be present zero or one time. if not present, it default to "static".
+NOTE: poor name. may easily be confused with the http content-type which is a 
+mime-type.
+.TP
+.I "start_time delay_ms"
+time, in millisecond, at which this track start in relation to the begining of the original 
+file. It may be present zero or one time. if not present, it default to "0".
+.TP
+.I "prefetch_delay delay_ms"
+Time before the begining of this track one may start prefetch it.
+It may be present zero or one time. if not present, it default to "0".
+.TP
+.I "location_rangereq_byuri_varname value"
+Specify the variable name to use to perform rangereq_byuri on the 'location'.
+If this field is not specified, it is assumed that it is not possible to 
+perform rangereq_byuri on the 'location' field.
+
+.SH Track extension
+This is the list of extension at the track level:
+.TP
+.I "oload hash"
+Opaque set of parameters which gonna be passed directly to handle neoip-oload.
+This field may be present or not.
+This field is valid IIF the content_type is static.
+.TP
+.I "casto hash"
+Opaque set of parameters which gonna be passed directly to handle neoip-casto.
+This field MUST be present if "content_type" field is "stream"
+This field is valid IIF the "content_type" field is "stream".
+.TP
+.I "flv_mdata_info hash"
+Opaque set of parameters about the flv metadata. 
+This field may be present or not.
+This field is valid IIF if the location points to a flv file.
+
+
+.SH Track Extension oload details
+Currently this is only a list of outter_var which need to be used if the track
+is read thru neoip-oload.   
+
+.SH Track Extension casto details
+TODO see the neoip-casto doc about those variable
+.TP
+.I "cast_name value"
+This field MUST be present. It indicate the cast_name to use if this stream 
+is read thru neoip-casto.
+.TP
+.I "mdata_srv_uri value"
+TODO to code
+
+
+.SH Track Extension flv_mdata_info details
+.TP
+.I "type value"
+The type of metadata for this tracks. This field MUST be present.
+The valid values are "internal" if the metadata
+are inside the flv file, at the begining, "external" if the metadata are stored in
+another file or "maybeint" if the metadata may be present or not as internal.
+.TP
+.I "kframe_index_present value"
+This field may be present or not.
+This field is valid for type == "internal" or type = "external" 
+If value is 1, then the flv_mdata contains 
+a kframe_index (so may be seekable). If value is 0, the flv_mdata does not
+contains a kframe_index and so is not seekable.
+.TP
+.I "intmdata_len size_in_byte"
+This field may be present or not. It is valid IIF type = "internal".
+If not present, there is no default value.
+If present, its value indicates how many byte of the file needs to be read in order 
+to obtains the internal metadata.
+.TP
+.I "extmdata_uri value"
+This field MUST be present if type = "external". It is valid IIF type = "external".
+Its value indicates the uri pointing to the location of the external metadata file.
+
+.SH EXAMPLES
+TODO write example
+
+.SH AUTHOR
+.B neoip-playlist-jpsf
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.

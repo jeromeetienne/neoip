@@ -1,0 +1,192 @@
+.\" -*- nroff -*-
+.TH NEOIP-CASTI 8 "Dec 2006" "neoip-casti(1)" "neoip-casti's Manual"
+.SH NAME
+neoip-casti - tools to import http stream into the neoip cast system
+.SH SYNOPSIS
+.B neoip-casti
+[--config_dir dirname] [--help] [--version] [url of external http stream]*
+.SH DESCRIPTION
+neoip-casti is a command line tools which allow to write an external http stream
+into the neoip cast system.
+
+The input stream may be specified directly in the command line or it can 
+be commanded by a webpage.
+
+If the input stream is specified in the command line, neoip-casti will always
+try to stream it. If neoip-casti got disconnected from it, it will periodically
+retry to connect the input stream.
+
+Typical usage for debugging: -c to specify a given configuration directory
+-d for nodaemon and the remaining parameters to specify the url of the 
+external http stream (here http://jmehost2:8080, which is the default port
+for the vlc streamer)
+./neoip-casti -c config_dir_debug1 -m raw -d http://jmehost2:8080
+
+./neoip-casti -c config_dir_debug1 -m flv -d http://jmehost2:8080/stream.flv
+
+neoip-casto currently do a plain transfert of the stream, without any special
+treatment, so some video/audio format wont work as they requires to forward
+some specific header. one video format which works is mpeg1 in mpeg/ps.
+
+.SH About the webdetect process
+The webdetect process is used by several neoip applications. It aims to make 
+the application presence detectable from a webpage i.e. a web server can determine
+if the client browser runs on a box which run this application too.
+Each type of application got a range of port assigned to it. Those are setup
+in their respective configuration file.
+.TP 
+.I "neoip-oload"
+has the port from 4550 to 4559. 
+.TP 
+.I "neoip-casto"
+has the port from 4560 to 4569. 
+.TP 
+.I "neoip-casti"
+has the port from 4570 to 4579. 
+
+Taking neoip-oload as example, ehen a webpage is trying to detect if the apps is 
+running, it probes TODO to complete
+TODO to put the webdetect process in a separate page.
+
+.SH About swarm access in general
+neoip-casti is able to handle multiple swarm at the same time.
+each swarm is uniquely identify by the couple mdata_srv_uri and cast_name.
+.TP
+.I "cast_name"
+A string which uniquely identify a broadcast within the mdata_srv_uri.
+This parameter is required to be explicitly set.
+.TP
+.I "mdata_srv_uri"
+A http uri which points to a bt_cast_mdata_t echo server.
+This parameter is optionnal, and defaults to the value found in neoip-casti.conf.
+.TP
+.I "httpi_uri"
+A http uri which points to the input of this broadcast. aka a http stream which
+would be forwarded without modification to all neoip-casto.
+This parameter is required to be explicitly set.
+.TP
+.I "httpi_mod"
+The mode is how the input stream is parsed. Current there are two modes: flv and raw.
+it defaults to raw.
+.I "flv:"
+The flv mode is when the input stream is encoded in flv (flash video) format (technically
+this is called a 'muxer' or a 'container').
+.I "raw:"
+The raw mode is when the input stream is not using an encoding 
+format known by neoip-casti. The mpeg ps and asf enter in this category.
+.TP
+.I "http_peersrc_uri"
+An http uri which points to a source of peers.
+This parameter is optionnal, and defaults to the value found in neoip-casti.conf.
+
+.SH About swarm access from a webpage
+It is possible to command neoip-casti from a webpage. There is a javascript which 
+does it automatically called neoip_casti_ctrl.js.
+When trying to connect the neoip-casti application, it periodically trigger
+a <script> toward the webdetect uri of the neoip-casti application. The url
+used as script src contains the variable to determine the swarm access.
+It uses a <script> and not a usual xmlrpc to overcome the 'single domain'
+limitation of xmlrpc (TODO get details on this limitation).
+
+The returned content of this <script> is a valid javascript containing a 
+single variable .I casti_swarm_current_state. This variable is the
+current state of the accessed swarm. The currently valid values are 
+.I stopped
+if the accessed swarm is currently not running.
+or 
+.I starting
+if the accessed swarm is currently running but is not yet usable by any neoip-casto.
+or started
+if the accessed swarm is currently running and is currently by any neoip-casto.
+
+
+The <script> source url variables are :
+.TP
+.I "swarm access variable"
+The url variable names is exactly the same as the ones used in this manpage.
+.TP
+.I "event"
+It specify the type of event to apply to this swarm. The currently valid
+value are 
+.I request
+to notify that the webpage request this swarm to be running 
+and
+.I release
+to notify that the webpage release the need for this swarm.
+
+
+.SH About swarm access from a command line
+It is possible to command neoip-casti from the command line. 
+This type of access is triggered IIF the option --httpi_uri is explicitly 
+specified in the command line.
+All the mandatory variables for the swarm access MUST be specified.
+
+Differences with the access from a webpage:
+.TP
+- It is only possible to get a single swarm from the command line.
+.TP
+- Additionnaly if the connection httpi_uri is disconnected during the 
+broadcast, neoip-casti will periodically retry to connect it. This 
+makes it more robust to error.
+
+The related command line options are:
+.TP
+.I "--cast_name"
+exact same meaning of the usual swarm access variable.
+.TP
+.I "--mdata_srv_uri"
+exact same meaning of the usual swarm access variable.
+.TP
+.I "--httpi_uri"
+exact same meaning of the usual swarm access variable.
+.TP
+.I "--httpi_mod"
+exact same meaning of the usual swarm access variable.
+.TP
+.I "--http_peersrc_uri"
+exact same meaning of the usual swarm access variable.
+
+.SH OPTIONS
+.I "-c, --config_dir dirname"
+set the configuration directory.
+If not specified, it uses /etc/neoip-casti.
+.TP
+.I "-h, --help"
+display the inlined help
+.TP
+.I "-v, --version"
+display the version string
+
+.SH EXAMPLES
+To launch a http stream on jmehost2. it launchs vlc to endlessly stream ntv002.mpg
+on port 8080. ntv002.mpg is a MPEGv1 in a mpegps container
+  vlc -vvv ntv002.mpg --sout-keep --loop --sout '#standard{access=http,mux=ps,dst=:8080/blabla.mpg}' 
+
+To launch it from yavipin/src directory and read the http://jmehost2:8080 http stream
+  ./neoip-casti -c config_dir_debug1 -d  http://jmehost2:8080/blabla.mpg
+
+To launch a neoip-casto on jmehost1
+  ./m neoip-casto && ./neoip-casto -c config_dir_debug2 -d
+
+To read the video 
+  mplayer http://localhost:4001/http/jmehost2:8080/blabla.mpg
+
+To launch a neoip-btrelay on this cast
+  ./m neoip-btrelay && ./neoip-btrelay -c  config_dir_debug2  -t cast http://jmehost2:8080
+
+.SH FILES
+\fI/etc/neoip-casti\fR
+default configuration directory
+
+.SH LICENSE
+The license is proprietary and this programm should be used for testing purpose only
+
+.SH AUTHOR
+.B neoip-casti
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP's homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.
+Note that the metalink support is experimental.

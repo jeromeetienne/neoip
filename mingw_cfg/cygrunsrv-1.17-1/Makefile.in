@@ -1,0 +1,79 @@
+# Makefile.in for cygrunsrv.
+
+# Place to install target
+DESTDIR=
+
+SHELL:=@SHELL@
+VPATH:=@srcdir@
+srcdir:=@srcdir@
+objdir:=.
+
+target_alias:=@target_alias@
+build_alias:=@build_alias@
+host_alias:=@host_alias@
+
+prefix:=@prefix@
+exec_prefix:=@exec_prefix@
+bindir:=@bindir@
+datadir:=@datadir@
+docdir:=$(datadir)/doc/Cygwin
+
+INSTALL:=@INSTALL@
+INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+INSTALL_DATA:=@INSTALL_DATA@
+
+CXX=@CXX@
+CXXFLAGS=@CXXFLAGS@
+LDFLAGS=
+
+TARGET=cygrunsrv
+
+OBJ=	cygrunsrv.o \
+	crit.o \
+	utils.o \
+	waitanypid.o
+
+all: $(srcdir)/configure Makefile $(TARGET).exe
+
+$(TARGET).exe: $(OBJ)
+	$(CXX) -o $@ $(LDFLAGS) $(OBJ)
+
+install-bin: all
+	mkdir -p $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) $(TARGET).exe $(DESTDIR)$(bindir)/$(TARGET).exe
+
+install-bin-strip: all
+	mkdir -p $(DESTDIR)$(bindir)
+	$(INSTALL_PROGRAM) -s $(TARGET).exe $(DESTDIR)$(bindir)/$(TARGET).exe
+
+install-doc:
+	mkdir -p $(DESTDIR)$(docdir)
+	$(INSTALL_DATA) $(srcdir)/$(TARGET).README $(DESTDIR)$(docdir)/$(TARGET).README
+
+install: install-doc install-bin
+
+install-strip: install-doc install-bin-strip
+
+uninstall-doc:
+	-rm -f $(DESTDIR)$(docdir)/$(TARGET).README
+
+uninstall-bin:
+	-rm -f $(DESTDIR)$(bindir)/$(TARGET).exe
+
+uninstall: uninstall-doc uninstall-bin
+
+clean:
+	rm -f *.exe *.o *.stackdump
+
+distclean: clean
+	rm -f Makefile config.cache config.status config.log
+
+Makefile: $(srcdir)/Makefile.in config.status
+	CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+config.status: configure $(gcc_version_trigger)
+	$(SHELL) ./config.status --recheck
+
+$(srcdir)/configure: $(srcdir)/configure.in
+	cd $(srcdir) && autoconf
+

@@ -1,0 +1,13 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>test uri rewrite</title></head>
+<script src="../../base/javascript/neoip_core.js"></script>
+<body>
+
+<script>
+	// get the inner_uri from the page location url
+	var	playlist_name	= neoip.core.doc_urivar_get('playlist_name');
+	document.write("playlist_name=" + playlist_name);
+</script>
+</body>
+</html>

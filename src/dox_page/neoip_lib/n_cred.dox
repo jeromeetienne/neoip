@@ -1,0 +1,33 @@
+/*! \page n-cred NeoIP Credential
+
+TODDODODODODODOD
+- unify all the \ref n-acl, \ref n-key and \ref n-cred
+  - explain typical scenario
+  - unify the concepts
+  - understand and describe how to use them
+  - as \ref ns-realm is a lot about right management to understand the \ref n-cred
+    is primordial.
+  - potential application are 
+
+\ref n-cread is a general concept which allows to handle credential in \ref neoip-lib.
+
+- a credential is an \ref n-acl signed by a \ref n-key-private
+
+\section n-cread-todo TODO
+- define how to allows network connections with it
+- how to use certificate to identify people
+  - to identify somebody is to check he has a credentials to use a given name
+- how to allow/deny access to \ref ns-realm
+- 
+- i would like to be able to upload files in this directory
+- i would like to put you in my buddy list
+
+- how to handle the credential ala ssh/buddy list
+- how to handle the credential for a company with only a few can issue credential
+
+\section n-cread-op NeoIP Credentials Operation
+- how a credential is issued
+- how a credential issue is requested
+- how a credential is presented to its verifier
+- how a credential is verified
+*/

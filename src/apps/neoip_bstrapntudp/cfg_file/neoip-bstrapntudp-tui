@@ -1,0 +1,5 @@
+#!/bin/sh
+# tools to launch the neoip-bstrapntudp tui
+/var/lib/neoip-bstrapntudp/neoip-ui-launcher.sh -ui tui 	\
+		-urlfile_dir /var/lib/neoip-bstrapntudp/tmp	\
+		`pidof neoip-bstrapntudp`

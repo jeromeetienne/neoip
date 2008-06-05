@@ -1,0 +1,30 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(src/cert.c)
+
+dnl Checks for programs.
+AC_PROG_CC
+
+dnl Checks for libraries.
+dnl Replace `main' with a function in -lcrypto:
+AC_CHECK_LIB(crypto, main)
+dnl Replace `main' with a function in -lglib:
+AC_CHECK_LIB(glib, main)
+dnl Replace `main' with a function in -lz:
+AC_CHECK_LIB(z, main)
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h sys/ioctl.h syslog.h unistd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+
+dnl Checks for library functions.
+AC_PROG_GCC_TRADITIONAL
+AC_FUNC_MEMCMP
+AC_TYPE_SIGNAL
+AC_CHECK_FUNCS(socket strdup strerror)
+
+AC_OUTPUT(.protect/Makefile src/Makefile)

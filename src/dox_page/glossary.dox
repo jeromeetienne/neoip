@@ -1,0 +1,43 @@
+/*! \page glossary NeoIP glossary
+
+This page defines the terms used in \ref neoip  
+
+\htmlonly<hr>\endhtmlonly
+
+\section nipid NipId
+This is an opaque data of fixed size identifying a rescource.
+   - It may be garanteed to be unique
+   - It may be statistically unique
+   - it may be random
+
+\htmlonly<hr>\endhtmlonly
+
+\section peerid PeerId
+a \ref peerid is a \ref nipid which identifes a peer
+  - It may be seen as an IP address, as it allows to locate a \ref neoip-peer on the network
+
+\htmlonly<hr>\endhtmlonly
+\section portid PortId
+- <b>PortId</b>: It identify a connection port for a given \ref peerid
+
+\htmlonly<hr>\endhtmlonly
+\section rdvpt Rendez-vous Point
+- ablablalkkj
+
+\htmlonly<hr>\endhtmlonly
+\section churn-rate Churn-Rate
+A churn rate is blahlblah
+- how p2p network are more subject to it
+- relation with \ref ns-record-age to estimate the stability of a \ref neoip-peer or \ref ns-record
+
+\htmlonly<hr>\endhtmlonly
+\section horizon Horizon
+In the context of \ref neoip, an \ref horizon is the number of \ref ns-server a given \ref ns-get can
+go thru before expiring.
+
+TODO this definition is shit
+
+*/
+
+
+

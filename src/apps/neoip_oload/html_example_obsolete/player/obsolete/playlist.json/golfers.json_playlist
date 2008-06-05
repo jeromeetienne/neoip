@@ -1,0 +1,13 @@
+{
+	base_date	: "Fri, 17 Aug 2007 20:07:25 GMT",
+	item_arr	: [
+			{	address		: "http://192.168.1.3/~jerome/output.flv",
+				duration	: 88.52,
+				meta : {
+			       		oload:	{
+						mod		: "flv",
+			       		},
+			       	}
+			},
+		]
+}

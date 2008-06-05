@@ -1,0 +1,3 @@
+this is an obsolete implementation of the feature:
+- delaygen_t is much better
+- it is kept here for backward compatibility and should not be used for new code

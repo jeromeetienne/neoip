@@ -1,0 +1,51 @@
+.TH NEOIP_FILEFORMAT_PLAYLIST_ARR 8 "Dec 2006" "playlist_arr file format(1)" "playlist_arr file format's Manual"
+.SH NAME
+neoip playlist_arr format extension
+.SH DESCRIPTION
+playlist_arr is the array of jspf playlist which is read by the track player.
+playlist_arr is a fileformat stored in json. this is a array of object, each object
+being the description of a playlist.
+
+
+.SH plistgen_info object
+This is the description of each playlist item found in the playlist_arr
+.TP
+.I "playlist_title string"
+playlist_title is a human readable string which describes the title of the playlist.
+It should allow a human to know what the playlist is about.
+.TP
+.I "playlist_id string"
+playlist_id is a string which is unique among all playlists and thus uniquely
+identify this playlist.. This is not intended to be human readable.
+.TP
+.I "trackgen_info object"
+trackgen_info is an object describing how to generate the tracks for this specific
+playlist.
+
+
+.SH EXAMPLES
+
+{	"playlist_title": "Conference",
+	"playlist_id"	: "conference",
+	"trackgen_info"	: [
+		{	"cmd"	: "concat",
+			"arg"	: {	"space"	: "bliptv",
+					"desc"	: {
+						"base_uri"	: "http://tedtalks.blip.tv/rss"
+						}
+				}
+		},
+		{	"cmd"	: "select_random_contiguous",
+			"arg"	: { "nb_contiguous"	: 3	}
+		}
+		]
+}
+
+.SH AUTHOR
+.B neoip-playlist-
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.

@@ -1,0 +1,53 @@
+/*! \page neoip-socket NeoIP Socket
+
+This is the main page specification of the socket layer.
+
+\par Things to specify
+- the API common to all 
+  - its behaviour
+  - see \ref neoip-socket-api
+- the address space: the listen address and the connect address
+  - how to express it in text and code
+  - multicast address
+    - currently support only of udp
+    - maybe neoip_socket_mail to mailing could handle multicast
+- the various \ref neoip-socket-type
+  - all \ref neoip-socket-domain will support all \ref neoip-socket-type
+- the parameters on the \ref neoip-socket
+  - the cost-function pressure for the responder
+  - the cost-function pressure for the full connection
+  - the priority of the full connection
+    - with a queuing policy
+  - the security options
+    - the identity to use
+    - the ACL to use
+    - the ACL to accept
+    - the mac/enc parameters
+    - etc...
+- how to handle the pmtu from a upper point of view for \ref neoip-socket-type-dgram
+- how to handle the pmtu for the outter transport socket
+- how to handle the linger in the congestion layer
+- see \ref socket-swlayer to see how the layers organized themselves
+
+
+\section neoip-socket-domain NeoIP Socket Domain
+- \ref neoip-socket-tcp which ensure that the connection is done on top of tcp.
+- \ref neoip-socket-udp which ensure that the connection is done on top of udp.
+- \ref neoip-socket-omni which may perform connections on top of various 
+  \ref neoip-socket-domain.
+- we can imagine various type of socket for example
+  - neoip_socket_http which perform the connection on top of http
+  - neoip_socket_https which perform the connection on top of https
+  - neoip_socket_tls which perform the connection on top of tls
+  - neoip_socket_dns which perform the connection on top of dns
+  - neoip_socket_mail which perform the connection on top of email
+  - most being usefull mainly for \ref neoip-socket-omni to adapt in all situations
+
+*/
+
+
+
+
+
+
+

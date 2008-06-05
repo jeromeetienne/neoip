@@ -1,0 +1,55 @@
+/*! \file
+    \brief Definition of the \ref lib_session_profile_t
+
+*/
+
+
+/* system include */
+/* local include */
+#include "neoip_lib_session_profile.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+
+// definition of \ref lib_session_profile_t constant
+const delay_t	lib_session_profile_t::EXIT_EXPIRE_DELAY	= delay_t::from_sec(20);
+// end of constants definition
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                              ctor/dtor
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+lib_session_profile_t::lib_session_profile_t()	throw()
+{
+	// set the constant fields
+	exit_expire_delay	( EXIT_EXPIRE_DELAY	);	
+	// sanity check - the profile MUST succeed check() by default
+	DBG_ASSERT( check().succeed() );
+}
+/** \brief Destructor
+ */
+lib_session_profile_t::~lib_session_profile_t()	throw()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+//                     check function
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+
+/** \brief Check the validity of the profile
+ */
+libsess_err_t	lib_session_profile_t::check()	const throw()
+{
+	// return no error
+	return libsess_err_t::OK;
+}
+
+NEOIP_NAMESPACE_END
+

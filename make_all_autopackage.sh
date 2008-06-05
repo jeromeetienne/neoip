@@ -1,0 +1,3 @@
+# !/bin/sh
+makeinstaller autopackage/neoip_buddy.apspec
+makeinstaller autopackage/neoip_kad_daemon.apspec

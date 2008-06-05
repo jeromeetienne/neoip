@@ -1,0 +1,38 @@
+[
+  {
+    "playlist_uri": "..\/..\/cgi-bin\/get_playlist.rb?playlist_id=youporn_random",
+    "playlist_title": "youporn"
+  },
+  {
+    "playlist_uri": "..\/..\/cgi-bin\/get_playlist.rb?playlist_id=youtube_ufo",
+    "playlist_title": "youtube UFO"
+  },
+  {
+    "playlist_uri": "..\/..\/cgi-bin\/get_playlist.rb?playlist_id=linux",
+    "playlist_title": "Linux"
+  },
+  {
+    "playlist_uri": "..\/..\/cgi-bin\/get_playlist.rb?playlist_id=conference",
+    "playlist_title": "Conference"
+  },
+  {
+    "playlist_uri": "..\/..\/cgi-bin\/get_playlist.rb?playlist_id=howto_diy",
+    "playlist_title": "Howto DIY"
+  },
+  {
+    "playlist_uri": "..\/..\/cgi-bin\/get_playlist.rb?playlist_id=video_on_lan",
+    "playlist_title": "Videos on lan"
+  },
+  {
+    "playlist_uri": "..\/..\/cgi-bin\/get_playlist.rb?playlist_id=video_game",
+    "playlist_title": "Video Game"
+  },
+  {
+    "playlist_uri": "..\/..\/cgi-bin\/get_playlist.rb?playlist_id=sample_stream",
+    "playlist_title": "Sample Stream"
+  },
+  {
+    "playlist_uri": "..\/..\/cgi-bin\/get_playlist.rb?playlist_id=sample_static",
+    "playlist_title": "Sample Static"
+  }
+]

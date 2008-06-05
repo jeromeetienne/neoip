@@ -1,0 +1,5 @@
+[debug]
+tun_stub=true
+no_daemon=true
+no_dnsgrab=true
+#no_clean_shutdown=true

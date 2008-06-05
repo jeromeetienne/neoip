@@ -1,0 +1,28 @@
+/*! \page otsp Outter Transport
+
+- this run on top of UDP/IPv4 and TCP/ipv4.
+  - support for http and dns will be added later
+
+- it is assume to act like a connected datagram socket ala UDP
+  - if the otsp connection is on top of a different type of socket, i.e. a stream socket ala TCP.
+    it should provide the same API and functionnality.
+  - Obviously the performance will be differents.
+- if the connection established by the \ref otsp is a byte stream, it is up to it to provide a 
+  datagram layer on top of it.
+
+\section Definition of the API
+- otsp_fd = otsp_connect_full( otsp_addr_t *local_addr, otsp_addr_t *remote_addr, read_cb, err_cb, userptr )
+- otsp_fd = otsp_connect( otsp_addr_t *remote_addr, read_cb, err_cb, userptr ) 
+- void otsp_close( otsp_fd )
+- otsp_fd = otsp_server( otsp_addr_t *listen_addr, accept_cb, userptr )
+  - accept_cb( userptr, otsp_fd of the connected socket )
+- STREAM/DGRAM = otsp_get_type( otsp_fd )
+- otsp_get_mtu( otsp_fd )
+- otsp_is_reliable( otsp_fd )
+
+\section slota
+- there is a special case is the use of otsp to handle the tcp socket in the httpd layer
+  - it is ugly and should not happen.
+  - it would be better to have a separate stuff for this tcp
+
+*/

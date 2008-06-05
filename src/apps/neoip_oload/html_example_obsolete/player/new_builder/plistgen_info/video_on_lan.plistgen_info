@@ -1,0 +1,22 @@
+{	"playlist_title": "Videos on lan",
+	"playlist_id"	: "video_on_lan",
+	"trackgen_info"	: [
+		{	"cmd"	: "concat",
+			"arg"	: {	"space"	: "direct",
+					"desc"	: [{	"title"	: "me in front of webcam",
+							"uri"	: "http://jmehost2/~jerome/output.flv"
+						},
+						{	"title"	: "Elephant dream",
+							"uri"	: "http://jmehost2/~jerome/flash/elephantsdream_420_v4.flv"
+						},
+						{	"title"	: "frank dixon",
+							"uri"	: "http://jmehost2/~jerome/flash/0021_frankdixon.flv"
+						},
+						{	"title"	: "3rd planete from the sun 6x01",
+							"uri"	: "http://jmehost2/~jerome/flash/3rd_planete_6x01_40k.flv"
+						}
+						]
+				}
+		}
+		]
+}

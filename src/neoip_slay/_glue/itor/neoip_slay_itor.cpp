@@ -1,0 +1,63 @@
+/*! \file
+    \brief Definition of the slay_itor_t
+
+*/
+
+
+/* system include */
+/* local include */
+#include "neoip_slay_itor.hpp"
+#include "neoip_log.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+// define the factory plant for slay_itor_t
+FACTORY_PLANT_DEFINITION (slay_itor_factory	, slay_domain_t, slay_itor_vapi_t);
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                       CTOR/DTOR
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+slay_itor_t::slay_itor_t() throw()
+{
+	// zero some fields
+	m_itor_vapi	= NULL;
+}
+
+/** \brief Desstructor
+ */
+slay_itor_t::~slay_itor_t() throw()
+{
+	if( m_itor_vapi )	itor_vapi()->destroy();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			Setup function
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Start the operation
+ */
+slay_err_t	slay_itor_t::start(const slay_itor_arg_t &arg)	throw()
+{
+	// sanity check
+	DBG_ASSERT( is_null() );
+
+	// create the itoronder thru the factory
+	m_itor_vapi	= slay_itor_factory->create(arg.domain());
+	DBG_ASSERT( m_itor_vapi );
+	
+	// then setup the itor_vapi
+	return itor_vapi()->start(arg);
+}
+
+
+
+
+NEOIP_NAMESPACE_END
+

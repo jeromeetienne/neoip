@@ -1,0 +1,1288 @@
+
+
+
+Network Working Group                                      C. de Launois
+Internet-Draft                                                  UCL/INGI
+Expires: January 8, 2006                                    July 7, 2005
+
+
+        Synthetic Location Information in the Domain Name System
+                   draft-de-launois-dnsext-sloc-rr-00
+
+Status of this Memo
+
+   By submitting this Internet-Draft, each author represents that any
+   applicable patent or other IPR claims of which he or she is aware
+   have been or will be disclosed, and any of which he or she becomes
+   aware will be disclosed, in accordance with Section 6 of BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on January 8, 2006.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2005).
+
+Abstract
+
+   This memo defines a new Resource Record (RR) for the Domain Name
+   System (DNS), for experimental purposes.  It describes a mechanism to
+   allow the DNS to carry synthetic coordinates about hosts, networks,
+   and subnets.  The new resource record, called SLOC, can express
+   synthetic locations in different coordinate spaces.
+
+   This draft defines the format of the new SLOC RR for the DNS, and
+   reserves a corresponding DNS type mnemonic (SLOC) and numerical code
+   (TBD).
+
+
+
+de Launois               Expires January 8, 2006                [Page 1]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+   This RFC assumes that the reader is familiar with the DNS [1] [2].
+
+Table of Contents
+
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
+
+   2.  RDATA Format . . . . . . . . . . . . . . . . . . . . . . . . .  3
+     2.1   SLOC_ALG values  . . . . . . . . . . . . . . . . . . . . .  5
+     2.2   SLOC_SPACE values  . . . . . . . . . . . . . . . . . . . .  5
+     2.3   SLOC_DIM values  . . . . . . . . . . . . . . . . . . . . .  6
+     2.4   SLOC RDATA Examples  . . . . . . . . . . . . . . . . . . .  6
+
+   3.  Master File Format . . . . . . . . . . . . . . . . . . . . . .  7
+
+   4.  Examples of Master Files . . . . . . . . . . . . . . . . . . .  8
+
+   5.  Application use of the SLOC RR . . . . . . . . . . . . . . . .  8
+     5.1   Suggested Uses . . . . . . . . . . . . . . . . . . . . . .  8
+     5.2   Search Algorithms  . . . . . . . . . . . . . . . . . . . .  9
+       5.2.1   Searching by Name  . . . . . . . . . . . . . . . . . .  9
+       5.2.2   Searching by Address . . . . . . . . . . . . . . . . . 10
+       5.2.3   Searching by Network or Subnet . . . . . . . . . . . . 10
+     5.3   Applicability to non-IN Classes and non-IP Addresses . . . 11
+
+   6.  Implementation of the SLOC RR for the Bind Name Server . . . . 12
+     6.1   The sloc.h file  . . . . . . . . . . . . . . . . . . . . . 12
+     6.2   The sloc.c file  . . . . . . . . . . . . . . . . . . . . . 12
+
+   7.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 21
+
+   8.  Security Considerations  . . . . . . . . . . . . . . . . . . . 21
+
+   9.  References . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+
+       Author's Address . . . . . . . . . . . . . . . . . . . . . . . 22
+
+       Intellectual Property and Copyright Statements . . . . . . . . 23
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+de Launois               Expires January 8, 2006                [Page 2]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+1.  Introduction
+
+   Geographical location informations can be expressed using the LOC DNS
+   resource record defined in [3].  Geographical locations are useful to
+   generates maps of routers or to perform "visual" traceroutes.  They
+   are however of little help for predicting round-trip times in the
+   Internet, since the round-trip times between two hosts are poorly
+   correlated with their geographical distances.  Hence several
+   synthetic coordinates were developed so that the distance in the
+   synthetic coordinate space between hosts x and y actually reflects
+   the round-trip time between x and y.  These synthetic coordinates are
+   usually not expressed in terms of latitude/longitude, and are
+   sometimes defined in other coordinate spaces than the traditional
+   two- or three-dimensional euclidean spaces.
+
+   This memo defines a new Resource Record (RR) for the Domain Name
+   System (DNS), for experimental purposes.  It describes a mechanism to
+   allow the DNS to carry synthetic coordinates about hosts, networks,
+   and subnets.  The new resource record, called SLOC, can express
+   synthetic locations for different coordinate spaces.
+
+   This draft defines the format of the new SLOC RR for the DNS, and
+   reserves a corresponding DNS type mnemonic (SLOC) and numerical code
+   (TBD).
+
+2.  RDATA Format
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |   SLOC_CLASS  |                   SLOC_ID                     |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                            LOCATION                           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   :                            LOCATION                           :
+   :                               :                               :
+
+
+   SLOC_CLASS  An 8-bit value that specifies if the coordinate is
+               standard (1), vendor-specific (2), or private (3)
+               Standard identifications are destined for coordinates
+               that are supposed to be used by hosts in the global
+               Internet. For instance, a standard identification can
+               be used to express geographical coordinates.
+               Vendor-Specific identifications aim to be used by
+               vendors wishing to define their own proprietary
+               coordinates. They can also be used to experiment new
+               coordinates. Typically, vendor-specific coordinates
+
+
+
+de Launois               Expires January 8, 2006                [Page 3]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+               are useful to only a fraction of hosts in the Internet.
+               Finally, private identifications can be used by anyone
+               who wants to express coordinates that do not have any
+               meaning outside the network where they are used.
+
+   SLOC_ID     The format of the SLOC_ID field depends on the
+               SLOC_CLASS value, i.e. the format of the field is
+               different for standard, vendor-specific, and private
+               coordinates. The value of the SLOC_ID field specifies
+               both the nature of the coordinates, and the algorithm
+               that can interpret and possibly compute these
+               coordinates.
+
+               If the coordinate is standard (SLOC_CLASS=1), then this
+               field is divided into a a 8-bit value SLOC_ALG, a 8-bit
+               value SLOC_SPACE, and a 8-bit value SLOC_DIM:
+
+                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 |   SLOC_ALG    |   SLOC_SPACE  |   SLOC_DIM    |
+                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+               The SLOC_ALG field specifies the algorithm that
+               interprets and computes the coordinates. The SLOC_SPACE
+               field uniquely identifies the nature of the space where
+               the coordinates are defined, for instance an Euclidean,
+               a spherical, or an hyperbolic space. Finally, the
+               SLOC_DIM defines the number of dimensions of the space.
+
+               When the identification is vendor-specific (SLOC_CLASS
+               = 2), the SLOC_ID field contains the vendor-specific ID
+               assigned by IANA (24-bit value encoded in network
+               standard byte order). If a vendor implements several
+               algorithms, or use several coordinate spaces, then the
+               SLOC_ID field may not suffice to uniquely identify a
+               couple (algorithm, coordinate space).
+               Therefore, it is suggested that the vendor uses the
+               first dimension(s) of its coordinates to identify the
+               type of coordinates. However, in any cases, this
+               implementation choice is left to the vendor.
+
+                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                 |                    VENDOR_ID                  |
+                 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+               If the coordinates are private (SLOC_CLASS = 3), then
+               the semantic and meaning of the SLOC_ID field depends
+               on the domain where it is found. Such coordinates
+               SHOULD NOT be transmitted to a hosts that is not inside
+
+
+
+de Launois               Expires January 8, 2006                [Page 4]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+               the network where the coordinates are defined.
+
+   LOCATION    A sequence of 1 or more 32-bit unsigned integers, most
+               significant octet first (network standard byte order).
+               These integers express the coordinates of a node.
+               The exact meaning of these integers depends on the
+               SLOC_CLASS and SLOC_ID fields.
+
+   The remaining of this document focus only on standard coordinates
+   (SLOC_CLASS=1)
+
+2.1  SLOC_ALG values
+
+   For standard coordinates, the 8-bit SLOC_ALG value specifies the
+   algorithm that interprets and computes the coordinates.  The
+   SLOC_SPACE field uniquely identifies the nature of the space where
+   the coordinates are defined, for instance an Euclidean, a spherical,
+   or an hyperbolic space.  Finally, the SLOC_DIM defines the number of
+   dimensions of the space.
+
+   Some SLOC_ALG field values currently defined for some synthetic
+   coordinate algorithms are:
+
+    SLOC_ALG     Description
+   --------------------------------------------------
+       0         Reserved
+       1         Geographical coordinates [3]
+       2         GNP synthetic coordinates [4]
+       3         Lighthouse synthetic coordinates [5]
+       4         Vivaldi synthetic coordinates [6]
+       5         SVivaldi synthetic coordinates [7]
+       6         BBS synthetic coordinates [8]
+       7         NPS synthetic coordinates [9]
+       8         PIC synthetic coordinates [10]
+       9 - 255   Unassigned
+
+
+2.2  SLOC_SPACE values
+
+   Values currently defined for the SLOC_SPACE field are shown belown.
+   It assigns values to popular coordinate spaces.  When the algorithm
+   does not make use of one these coordinate spaces, it may use the
+   "uninterpreted" coordinate space (SLOC_SPACE = 1), or use one of the
+   algorithm-specific values in the range [128..255].
+
+
+
+
+
+
+
+de Launois               Expires January 8, 2006                [Page 5]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+    SLOC_SPACE   Description
+   --------------------------------------------------
+       0         Reserved
+       1         Uninterpreted
+       2         Euclidean
+       3         Spherical
+       4         Cylindric
+       5         Hyperbolic
+       6         Height Vector
+       7-127     Unassigned
+       128-255   Algorithm-Specific
+
+
+2.3  SLOC_DIM values
+
+   The table below shows the values for the SLOC_DIM field.  Values in
+   the range [1..63] indicate the number of dimensions of the coordinate
+   space.  Value 0 is reserved and MUST NOT be used.
+
+    SLOC_DIM     Description       Min Size of LOCATION field
+   -----------------------------------------------------------
+        0        Reserved          Undefined
+        1        1 dimension       1
+        2        2 dimensions      2
+        3        3 dimensions      3
+        :        :                 :
+        63       63 dimensions     63
+        64-254   Reserved
+        255      Variable          1
+
+   If SLOC_DIM equals 255, the LOCATION field contains a variable-length
+   sequence of one or more 32-bits numbers.  This value is typically
+   used when SLOC_SPACE = 1, i.e. an uninterpreted coordinate space, or
+   when the size of the LOCATION field suffice to indicate the number of
+   dimensions used.
+
+   The third column defines the minimum number of 32-bit values required
+   in the LOCATION field for this type of dimensions.  The LOCATION
+   field MAY contain more than this minimum number of 32-bit values.  In
+   this case the meaning of the additional values is algorithm-specific.
+
+   The tuple (SLOC_ALG, SLOC_SPACE, SLOC_DIM), i.e. the whole SLOC_ID
+   field, uniquely defines a coordinate space and how to interpret it.
+
+2.4  SLOC RDATA Examples
+
+   The table below shows some examples that illustrate the use of
+   standard coordinates (SLOC_CLASS = 1).  It presents some meaningful
+
+
+
+de Launois               Expires January 8, 2006                [Page 6]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+   combinations of SLOC_ALG, SLOC_SPACE and SLOC_DIM values.  The
+   content of the LOCATION field is written here as a sequence of 32-bit
+   values separated by a colon ":".
+
+    SLOC_ALG SLOC_SPACE SLOC_DIM LOCATION      Description
+   -----------------------------------------------------------
+       3         2         3     25:35:2       Lighthouse Euclidean 3-D
+       3         2         255   25:35:2       Same as above
+       4         6         3     5:3:1:100     Vivaldi 2D+H + error
+       4         2         3     5:3:1:100     Vivaldi 3D + error
+       5         6         3     5:3:1:100     SVivaldi 2D+H + error
+       1         3         3     0:0:0:1184274 Lat+Long+Alt+Extra field
+
+   In the table above, the examples that uses the Vivaldi network
+   coordinate system (3d and 4th lines) illustrate the need for the
+   SLOC_SPACE field.  In these cases, the same algorithm (SLOC_ALG = 4)
+   and the same number of dimensions (SLOC_DIM = 3) are used, with an
+   identical number of 32-bit values in the LOCATION field.  The meaning
+   of the coordinates is then given by the SLOC_SPACE field.
+
+   The 3rd and 5th examples illustrate the need for the SLOC_ALG field.
+   They both contain the same values in the SLOC_SPACE, SLOC_DIM and
+   LOCATION fields.  However, the coordinates of the 3rd example are
+   computed by the Vivaldi algorithm, while the coordinates of the 5th
+   example are computed by the SVivaldi algorithm.
+
+   The 6th example illustrates the coding of geographical coordinates in
+   the SLOC RDATA.  The extra field is used to encode the size and
+   precision values for the coordinates, as detailed in RFC 1876.
+
+3.  Master File Format
+
+   The SLOC record is expressed in a master file in the following
+   format:
+
+   <owner> <TTL> <class> SLOC
+            {1 sl_alg sl_space sl_dim | sl_class sl_id} coord
+
+   where:
+
+      sl_class:   [1 .. 3]           (unsigned 8-bit value)
+      sl_alg:     [1 .. 255]         (unsigned 8-bit value)
+      sl_space:   [1 .. 255]         (unsigned 8-bit value)
+      sl_dim:     [1 .. 255]         (unsigned 8-bit value)
+      sl_id:      [0 .. 16777215]    (unsigned 24-bit value)
+
+      coord = value [ ":" coord ]
+      value:      [0 .. 4294967295]  (unsigned 32-bit value)
+
+
+
+de Launois               Expires January 8, 2006                [Page 7]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+   Numbers can be written in the decimal notation, or in the hexadecimal
+   notation, as illustrated by the examples in the next section.
+
+4.  Examples of Master Files
+
+      ;; A SVivaldi 2D+H synthetic coordinate for domain example.net
+      example.net        SLOC   1 5 6 3     5:3:1:100
+
+      ;; Host A has a standard and a vendor-specific coordinates
+      A.example.net      SLOC   1 3 2 3     0x11111111:0xABCDEF:9
+      A.example.net      SLOC   2 0x00005E  10:20:30:40
+
+      ;; Geographical coordinates can also be expressed with SLOC RR
+      A.south.pole.net   SLOC   ( 1 3 3
+                                  0:0:10:0x00121212 )
+
+   The first example illustrates SVivaldi coordinates assigned to the
+   domain "example.net".  These coordinates use the standard SLOC
+   identification (SLOC_CLASS = 1), the SVivaldi algorithm (SLOC_ALG =
+   5), a Height Vector coordinate space (SLOC_SPACE = 6) with 2D+H = 3
+   dimensions (SLOC_DIM = 3).  The coordinates for SVivaldi are (x = 5,
+   y = 3, h = 1).  There is one extra value (e = 100), which stands for
+   an error estimation of the coordinates [4].
+
+   The second example illustrates the use of coordinates for an
+   individual host A inside the "example.net" network.  This host has
+   two kinds of coordinates.  The first one is a standard (SLOC_CLASS =
+   1) Lighthouse (SLOC_ALG = 3) Euclidean (SLOC_SPACE = 2) 3D (SLOC_DIM
+   = 3) coordinate.  The second one is a vendor-specific (SLOC_CLASS =
+   2) coordinate with vendor ID = 0x5E.
+
+   The third and last example illustrates the coding of geographical
+   coordinates using the SLOC resource record format.  The coordinate
+   values stand for the south pole.  They respect RFC 1876 [3].
+
+5.  Application use of the SLOC RR
+
+5.1  Suggested Uses
+
+   A suggested use is that an algorithm regularly computes the network
+   coordinates of a (sub)domain, and securely updates the SLOC resource
+   records in the DNS.  Using synthetic network coordinates, it is
+   possible to evaluate the round-trip time that exists between two
+   distant domains by computing the distance in the coordinate space
+   between the coordinates of those domains.
+
+
+
+
+
+
+de Launois               Expires January 8, 2006                [Page 8]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+5.2  Search Algorithms
+
+   This section specifies how to use the DNS to translate domain names
+   and/or IP addresses into location information.  This section is
+   similar to the section 5.2 of [3] describing the search algorithm for
+   the SLOC RR.  The text is retranscribed here so that this memo is
+   self-contained.
+
+   As said earlier, the location information may refer to a host, or to
+   a network.  When specifying the location of a network or subnet,
+   network administrators are not required to specify the SLOC RR data
+   for each individual host.  For example, a computer lab with 24
+   workstations, all of which are on the same subnet and in basically
+   the same location, would only need a single SLOC RR for the subnet.
+   However, if the file server's location has been more precisely
+   measured, a separate SLOC RR for it can be placed in the DNS.
+
+   The default behaviour of an application is to query the DNS for the
+   location of an individual host.  Sometimes, a host has no associated
+   SLOC RR data, while its network has one.  In this case, the
+   application may have a {\it fallback} behaviour, and use the SLOC RR
+   data of the network to get a less precise or larger area.  The
+   application MAY support the use of the algorithm in Section
+   Section 5.2.3, as noted in Section Section 5.2.1 and Section
+   Section 5.2.2.  If fallback is desired, this behaviour is the
+   RECOMMENDED default, but in some cases it may need to be modified
+   based on the specific requirements of the application involved.  This
+   search algorithm is designed to allow network administrators to
+   specify the location of a network or subnet without requiring SLOC RR
+   data for each individual hosst.
+
+5.2.1  Searching by Name
+
+   If the application is beginning with a name, rather than an IP
+   address, it MUST check for a SLOC RR associated with that name.
+   (CNAME records should be followed as for any other RR type.)
+
+   If there is no SLOC RR for that name, all A records (if any)
+   associated with the name MAY be checked for network (or subnet) SLOC
+   RRs using the "Searching by Network or Subnet" algorithm
+   (Section 5.2.3).  If multiple A records exist and have associated
+   network or subnet SLOC RRs, the application may choose to use any,
+   some, or all of the SLOC RRs found, possibly in combination.  It is
+   suggested that multi-homed hosts have SLOC RRs for their name in the
+   DNS to avoid any ambiguity in these cases.
+
+   Note that domain names that do not have associated A records must
+   have a SLOC RR associated with their name in order for location
+
+
+
+de Launois               Expires January 8, 2006                [Page 9]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+   information to be accessible.
+
+5.2.2  Searching by Address
+
+   If the application is beginning with an IP address, it MUST first map
+   the address to a name using the IN-ADDR.ARPA namespace (see [1],
+   section 5.2.1), then check for a SLOC RR associated with that name.
+
+   If there is no SLOC RR for the name, the address MAY be checked for
+   network (or subnet) SLOC RRs using the "Searching by Network or
+   Subnet" algorithm (Section 5.2.3).
+
+5.2.3  Searching by Network or Subnet
+
+   Even if the name of a host does not have any associated SLOC RRs, the
+   network(s) or subnet(s) it is on may.  If the application wishes to
+   search for such less specific data, the following algorithm SHOULD be
+   followed to find a network or subnet SLOC RR associated with the IP
+   address.  This algorithm is adapted slightly from that specified in
+   [5], sections 4.3 and 4.4.
+
+   Since subnet SLOC RRs are (if present) more specific than network
+   SLOC RRs, it is best to use them if available.  In order to do so, we
+   build a stack of network and subnet names found while performing the
+   [5] search, then work our way down the stack until a SLOC RR is
+   found.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+de Launois               Expires January 8, 2006               [Page 10]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+   1. create a host-zero address using the network portion of the IP
+      address (one, two, or three bytes for class A, B, or C networks,
+      respectively).  For example, for the host 128.9.2.17, on the class
+      B network 128.9, this would result in the address "128.9.0.0".
+
+   2. Reverse the octets, suffix IN-ADDR.ARPA, and query for PTR and A
+      records.  Retrieve:
+
+               0.0.9.128.IN-ADDR.ARPA.  PTR    isi-net.isi.edu.
+                                        A      255.255.255.0
+
+      Push the name "isi-net.isi.edu" onto the stack of names to be
+      searched for SLOC RRs later.
+
+   3. Since an A RR was found, repeat using mask from RR
+      (255.255.255.0), constructing a query for 0.2.9.128.IN-ADDR.ARPA.
+      Retrieve:
+
+               0.2.9.128.IN-ADDR.ARPA.  PTR    div2-subnet.isi.edu.
+                                        A      255.255.255.240
+
+      Push the name "div2-subnet.isi.edu" onto the stack of names to be
+      searched for SLOC RRs later.
+
+   4. Since another A RR was found, repeat using mask 255.255.255.240
+      (x'FFFFFFF0'), constructing a query for 16.2.9.128.IN-ADDR.ARPA.
+      Retrieve:
+
+               16.2.9.128.IN-ADDR.ARPA. PTR    inc-subsubnet.isi.edu.
+
+      Push the name "inc-subsubnet.isi.edu" onto the stack of names to
+      be searched for SLOC RRs later.
+
+   5. Since no A RR is present at 16.2.9.128.IN-ADDR.ARPA., there are no
+      more subnet levels to search.  We now pop the top name from the
+      stack and check for an associated SLOC RR.  Repeat until a SLOC RR
+      is found.
+
+      In this case, assume that inc-subsubnet.isi.edu does not have an
+      associated SLOC RR, but that div2-subnet.isi.edu does.  We will
+      then use div2-subnet.isi.edu's SLOC RR as an approximation of this
+      host's location.  (Note that even if isi-net.isi.edu has a SLOC
+      RR, it will not be used if a subnet also has a SLOC RR.)
+
+
+5.3  Applicability to non-IN Classes and non-IP Addresses
+
+   Like for the LOC record, the SLOC record is defined for all RR
+
+
+
+de Launois               Expires January 8, 2006               [Page 11]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+   classes, and may be used with non-IN classes such as HS and CH.  The
+   semantics of such use are not defined by this memo.
+
+6.  Implementation of the SLOC RR for the Bind Name Server
+
+   This section proposes an implementation of the SLOC resource record
+   for the popular Internet Systems Consortium's BIND (Berkeley Internet
+   Name Domain) DNS server [6].  The RR type number chosen for
+   illustrative purposes is 51.  The new SLOC RR is implemented in the C
+   language, in two files~: sloc51.h and sloc51.c, located in the /lib/
+   dns/rdata/generic/ subdirectory of the BIND source tree.
+
+6.1  The sloc.h file
+
+   #ifndef GENERIC_SLOC_51_H
+   #define GENERIC_SLOC_51_H 1
+
+   /* Experimental SLOC RR DATA */
+
+   #define RRTYPE_SLOC_MAXLOC 64
+
+   typedef struct dns_rdata_sloc {
+           dns_rdatacommon_t       common;
+           isc_mem_t               *mctx;
+           isc_uint8_t             class;
+           isc_uint8_t             alg;
+           isc_uint8_t             space;
+           isc_uint8_t             dim;
+           isc_uint16_t            len;
+           isc_uint32_t            location[RRTYPE_SLOC_MAXLOC];
+   } dns_rdata_sloc_t;
+
+   #endif /* GENERIC_SLOC_51_H */
+
+
+6.2  The sloc.c file
+
+   /* Experimental SLOC RR DATA */
+
+   #ifndef RDATA_GENERIC_SLOC_51_C
+   #define RDATA_GENERIC_SLOC_51_C
+
+   #define RRTYPE_SLOC_ATTRIBUTES (0)
+
+   static inline isc_result_t
+   fromtext_sloc(ARGS_FROMTEXT) {
+           isc_token_t token;
+
+
+
+
+de Launois               Expires January 8, 2006               [Page 12]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+           char *e;
+           char *str;
+           int i;
+           unsigned char sloc_class;
+           unsigned long sloc_dim = 0;
+           unsigned int location;
+           unsigned int sloc_counter = 1;
+
+           REQUIRE(type == 51);
+
+           UNUSED(type);
+           UNUSED(rdclass);
+           UNUSED(origin);
+           UNUSED(options);
+           UNUSED(callbacks);
+
+           /*
+            * SLOC Class
+            */
+           RETERR(isc_lex_getmastertoken(lexer, &token,
+                                         isc_tokentype_string,
+                                         ISC_FALSE));
+           str = DNS_AS_STR(token);
+           sloc_class = (unsigned char)strtol(str, &e, 0);
+           if (*e != 0)
+                   RETTOK(ISC_R_UNEXPECTEDTOKEN);
+           if (sloc_class == 0 || sloc_class > 3)
+                   RETTOK(ISC_R_RANGE);
+           RETERR(uint8_tobuffer(sloc_class, target));
+
+           /*
+            * SLOC ID.
+            */
+           if (sloc_class == 1) {
+                   /* Standard coordinates          */
+                   /* Read SLOC Alg, SLOC Space and */
+                   /* SLOC Dim (8 bits each)        */
+                   for (i=0; i<3; i++) {
+                           RETERR(isc_lex_getmastertoken(lexer, &token,
+                                  isc_tokentype_string, ISC_FALSE));
+                           str = DNS_AS_STR(token);
+                           sloc_dim = strtoul(str, &e, 0);
+                           if (*e != 0)
+                                   RETTOK(ISC_R_UNEXPECTEDTOKEN);
+                           if (sloc_dim == 0 || sloc_dim > 0xFFU)
+                                   RETTOK(ISC_R_RANGE);
+                           RETERR(uint8_tobuffer(sloc_dim, target));
+                   }
+
+
+
+de Launois               Expires January 8, 2006               [Page 13]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+           } else {
+                   /* Vendor-Specific or Private coordinates */
+                   /* Read SLOC Id (24 bits) */
+
+                   unsigned char sloc_vid_high;
+                   unsigned short sloc_vid_low;
+                   unsigned long sloc_tmp;
+
+                   RETERR(isc_lex_getmastertoken(lexer, &token,
+                                                 isc_tokentype_string,
+                                                 ISC_FALSE));
+                   str = DNS_AS_STR(token);
+                   sloc_tmp = strtoul(str, &e, 0);
+                   if (*e != 0)
+                           RETTOK(ISC_R_UNEXPECTEDTOKEN);
+                   if (sloc_tmp == 0 || sloc_tmp > 0xFFFFFFU)
+                           RETTOK(ISC_R_RANGE);
+
+                   sloc_vid_high = (unsigned char)(sloc_tmp >> 16);
+                   RETERR(uint8_tobuffer(sloc_vid_high, target));
+                   sloc_vid_low = (sloc_tmp & 0xFFFF);
+                   RETERR(uint16_tobuffer(sloc_vid_low, target));
+           }
+
+           /*
+            * LOCATION.
+            */
+           RETERR(isc_lex_getmastertoken(lexer, &token,
+                                         isc_tokentype_string,
+                                         ISC_FALSE));
+
+           str = DNS_AS_STR(token);
+           location = strtoul(str, &e, 0);
+           if (*e != 0 && *e != ':')
+                   RETTOK(ISC_R_UNEXPECTEDTOKEN);
+           RETERR(uint32_tobuffer(location, target));
+
+           for (i=0; i<(RRTYPE_SLOC_MAXLOC-1) && *e == ':'; i++) {
+                   str = e + 1;
+                   location = strtoul(str, &e, 0);
+                   RETERR(uint32_tobuffer(location, target));
+                   sloc_counter++;
+           }
+
+           if (*e != 0)
+                   RETTOK(ISC_R_UNEXPECTEDTOKEN);
+
+           if (sloc_class == 1 && sloc_counter < sloc_dim)
+
+
+
+de Launois               Expires January 8, 2006               [Page 14]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+                   RETTOK(ISC_R_UNEXPECTEDEND);
+
+           return (ISC_R_SUCCESS);
+   }
+
+   static inline isc_result_t
+   totext_sloc(ARGS_TOTEXT) {
+           isc_region_t sr;
+           unsigned char sl_class;
+           unsigned long n;
+           int i;
+
+           char buf[sizeof(":4294967295")];
+
+           UNUSED(tctx);
+
+           REQUIRE(rdata->type == 51);
+           REQUIRE(rdata->length != 0);
+
+           dns_rdata_toregion(rdata, &sr);
+
+           /* SLOC Class */
+           sl_class = sr.base[0];
+           sprintf(buf, "%i ", sl_class);
+           RETERR(str_totext(buf, target));
+
+           if (sl_class == 1) {
+                   /* Convert SLOC Alg, SLOC Space and  */
+                   /* SLOC Dim (8 bits each)            */
+                   for (i = 1; i <= 3; i++) {
+                           unsigned char sl_tmp = sr.base[i];
+                           sprintf(buf, "%i ", sl_tmp);
+                           RETERR(str_totext(buf, target));
+                   }
+
+           } else {
+                   /* Convert SLOC Id (24 bits) */
+                   n = uint32_fromregion(&sr) & 0xFFFFFF;
+                   sprintf(buf, "%lu ", n);
+                   RETERR(str_totext(buf, target));
+           }
+
+           isc_region_consume(&sr, 4);
+
+           /* Convert LOCATION values */
+           n = uint32_fromregion(&sr);
+           isc_region_consume(&sr, 4);
+           sprintf(buf, "%lu", n);
+
+
+
+de Launois               Expires January 8, 2006               [Page 15]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+           RETERR(str_totext(buf, target));
+
+           while (sr.length >= 4) {
+                   n = uint32_fromregion(&sr);
+                   isc_region_consume(&sr, 4);
+                   sprintf(buf, ":%lu", n);
+                   RETERR(str_totext(buf, target));
+           }
+
+           return (ISC_R_SUCCESS);
+   }
+
+   static inline isc_result_t
+   fromwire_sloc(ARGS_FROMWIRE) {
+           isc_region_t sr;
+           unsigned char sl_class;
+           unsigned char sl_alg;
+           unsigned char sl_space;
+           unsigned char sl_dim;
+           unsigned int sl_counter = 1;
+
+           REQUIRE(type == 51);
+
+           UNUSED(type);
+           UNUSED(rdclass);
+           UNUSED(dctx);
+           UNUSED(options);
+
+           isc_buffer_activeregion(source, &sr);
+           if (sr.length < 4)
+                   return (ISC_R_UNEXPECTEDEND);
+
+           sl_class = sr.base[0];
+           sl_alg = sr.base[1];
+           sl_space = sr.base[2];
+           sl_dim = sr.base[3];
+
+           if (sl_class == 0 || sl_class > 3)
+                   return (ISC_R_NOTIMPLEMENTED);
+
+           if (sl_class == 1) {
+                   /* Check for Standard SLOC Class*/
+                   if (sl_alg == 0 || sl_space == 0 || sl_dim == 0)
+                           return (ISC_R_NOTIMPLEMENTED);
+                   if (sl_dim > 63 && sl_dim < 255)
+                           return (ISC_R_NOTIMPLEMENTED);
+           }
+
+
+
+
+de Launois               Expires January 8, 2006               [Page 16]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+           RETERR(mem_tobuffer(target, sr.base, 4));
+           isc_region_consume(&sr, 4);
+           isc_buffer_forward(source, 4);
+
+           if (sr.length < 4) {
+                   return (ISC_R_UNEXPECTEDEND);
+           }
+
+           RETERR(mem_tobuffer(target, sr.base, 4));
+           isc_region_consume(&sr, 4);
+           isc_buffer_forward(source, 4);
+
+           while (sr.length >= 4) {
+                   RETERR(mem_tobuffer(target, sr.base, 4));
+                   isc_region_consume(&sr, 4);
+                   isc_buffer_forward(source, 4);
+                   sl_counter++;
+           }
+
+           if (sl_class==1 && sl_dim!=255) {
+                   /* Check number of coordinates */
+                   if (sl_counter < sl_dim)
+                           return (ISC_R_UNEXPECTEDEND);
+           }
+
+           return (ISC_R_SUCCESS);
+   }
+
+   static inline isc_result_t
+   towire_sloc(ARGS_TOWIRE) {
+           UNUSED(cctx);
+
+           REQUIRE(rdata->type == 51);
+           REQUIRE(rdata->length != 0);
+
+           return (mem_tobuffer(target, rdata->data, rdata->length));
+   }
+
+   static inline int
+   compare_sloc(ARGS_COMPARE) {
+           isc_region_t r1;
+           isc_region_t r2;
+
+           REQUIRE(rdata1->type == rdata2->type);
+           REQUIRE(rdata1->rdclass == rdata2->rdclass);
+           REQUIRE(rdata1->type == 51);
+           REQUIRE(rdata1->length != 0);
+           REQUIRE(rdata2->length != 0);
+
+
+
+de Launois               Expires January 8, 2006               [Page 17]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+           dns_rdata_toregion(rdata1, &r1);
+           dns_rdata_toregion(rdata2, &r2);
+           return (isc_region_compare(&r1, &r2));
+   }
+
+   static inline isc_result_t
+   fromstruct_sloc(ARGS_FROMSTRUCT) {
+           dns_rdata_sloc_t *sloc = source;
+           int i;
+
+           REQUIRE(type == 51);
+           REQUIRE(source != NULL);
+           REQUIRE(sloc->common.rdtype == type);
+           REQUIRE(sloc->common.rdclass == rdclass);
+
+           UNUSED(type);
+           UNUSED(rdclass);
+
+           if (sloc->class == 0 || sloc->class > 3)
+                   return (ISC_R_NOTIMPLEMENTED);
+           RETERR(uint8_tobuffer(sloc->class, target));
+
+           if (sloc->class == 1) {
+                   /* Standard coordinates */
+                   if (sloc->alg == 0
+                       || sloc->space == 0
+                       || sloc->dim == 0)
+                           return (ISC_R_NOTIMPLEMENTED);
+                   if (sloc->dim > 63 && sloc->space < 255)
+                           return (ISC_R_NOTIMPLEMENTED);
+                   if (sloc->len < sloc->dim)
+                           return (ISC_R_UNEXPECTEDEND);
+                   RETERR(uint8_tobuffer(sloc->dim, target));
+
+           } else {
+                   /* Vendor-Specific or Private coordinates */
+                   RETERR(uint8_tobuffer(sloc->alg, target));
+                   RETERR(uint8_tobuffer(sloc->space, target));
+                   RETERR(uint8_tobuffer(sloc->dim, target));
+           }
+
+           if (sloc->len < 1 || sloc->len > RRTYPE_SLOC_MAXLOC)
+                   return (ISC_R_RANGE);
+
+           for (i = 0; i < sloc->len; i++) {
+                   RETERR(uint32_tobuffer(sloc->location[i], target));
+           }
+
+
+
+
+de Launois               Expires January 8, 2006               [Page 18]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+           return (ISC_R_SUCCESS);
+   }
+
+   static inline isc_result_t
+   tostruct_sloc(ARGS_TOSTRUCT) {
+           dns_rdata_sloc_t *sloc = target;
+           isc_region_t r;
+
+           REQUIRE(rdata->type == 51);
+           REQUIRE(target != NULL);
+           REQUIRE(rdata->length != 0);
+
+           UNUSED(mctx);
+
+           dns_rdata_toregion(rdata, &r);
+
+           sloc->common.rdclass = rdata->rdclass;
+           sloc->common.rdtype = rdata->type;
+           ISC_LINK_INIT(&sloc->common, link);
+
+           sloc->class = uint8_fromregion(&r);
+           isc_region_consume(&r, 1);
+           sloc->alg = uint8_fromregion(&r);
+           isc_region_consume(&r, 1);
+           sloc->space = uint8_fromregion(&r);
+           isc_region_consume(&r, 1);
+           sloc->dim = uint8_fromregion(&r);
+           isc_region_consume(&r, 1);
+           sloc->len = 1;
+           sloc->location[0] = uint32_fromregion(&r);
+           isc_region_consume(&r, 4);
+
+           while (r.length >= 4 && sloc->len < RRTYPE_SLOC_MAXLOC) {
+                   sloc->location[sloc->len] = uint32_fromregion(&r);
+                   sloc->len++;
+           }
+
+           return (ISC_R_SUCCESS);
+   }
+
+   static inline void
+   freestruct_sloc(ARGS_FREESTRUCT) {
+           dns_rdata_sloc_t *sloc = source;
+
+           REQUIRE(source != NULL);
+           REQUIRE(sloc->common.rdtype == 51);
+
+           UNUSED(source);
+
+
+
+de Launois               Expires January 8, 2006               [Page 19]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+           UNUSED(sloc);
+   }
+
+   static inline isc_result_t
+   additionaldata_sloc(ARGS_ADDLDATA) {
+           REQUIRE(rdata->type == 51);
+
+           UNUSED(rdata);
+           UNUSED(add);
+           UNUSED(arg);
+
+           return (ISC_R_SUCCESS);
+   }
+
+   static inline isc_result_t
+   digest_sloc(ARGS_DIGEST) {
+           isc_region_t r;
+
+           REQUIRE(rdata->type == 51);
+
+           dns_rdata_toregion(rdata, &r);
+
+           return ((digest)(arg, &r));
+   }
+
+   static inline isc_boolean_t
+   checkowner_sloc(ARGS_CHECKOWNER) {
+
+           REQUIRE(type == 51);
+
+           UNUSED(name);
+           UNUSED(type);
+           UNUSED(rdclass);
+           UNUSED(wildcard);
+
+           return (ISC_TRUE);
+   }
+
+   static inline isc_boolean_t
+   checknames_sloc(ARGS_CHECKNAMES) {
+
+           REQUIRE(rdata->type == 51);
+
+           UNUSED(rdata);
+           UNUSED(owner);
+           UNUSED(bad);
+
+           return (ISC_TRUE);
+
+
+
+de Launois               Expires January 8, 2006               [Page 20]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+   }
+
+   #endif  /* RDATA_GENERIC_SLOC_51_C */
+
+
+7.  IANA Considerations
+
+   IANA is requested to allocate an RR type number for the SLOC record
+   type.
+
+8.  Security Considerations
+
+   This memo describes a new resource record for the Domain Name System.
+   As such, it does not introduce any new vulnerability.  However, care
+   should be taken so that the algorithms used to compute the
+   coordinates are tolerant to abuses.
+
+9.  References
+
+   [1]   Mockapetris, P., "Domain Names - Concepts and Facilities",
+         RFC 1034, November 1987.
+
+   [2]   Mockapetris, P., "Domain Names - Implementation and
+         Specification", RFC 1035, November 1987.
+
+   [3]   Davis, C., Vixie, P., Goodwin, T., and I. Dickinson, "A Means
+         for Expressing Location Information in the Domain Name System",
+         RFC 1876, January 1996.
+
+   [4]   de Launois, C., Uhlig, S., and O. Bonaventure, "Scalable Route
+         Selection for IPv6 Multihomed Sites", Proc. Networking'05,
+         May 2005.
+
+   [5]   Mockapetris, P., "DNS Encoding of Network Names and Other
+         Types", RFC 1101, April 1989.
+
+   [6]   Internet Systems Consortium, Inc., "ISC BIND",
+         URL http://www.isc.org/sw/bind/, May 2005.
+
+   [7]   Ng, T. and H. Zhang, "Predicting Internet Network Distance with
+         Coordinates-Based Approaches", Proc. IEEE INFOCOM'02,
+         June 2002.
+
+   [8]   Pias, M., Crowcroft, J., Wilbur, S., Bhatti, S., and T. Harris,
+         "Lighthouses for scalable distributed location",
+         Proc. IPTPS'03, Feburary 2003.
+
+   [9]   Dabek, F., Kaashoek, F., and R. Morris, "Vivaldi: A
+
+
+
+de Launois               Expires January 8, 2006               [Page 21]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+         Decentralized Network Coordinate System", Proc. ACM SIGCOMM'04,
+         August 2004.
+
+   [10]  Shavitt, Y. and T. Tankel, "Big-Bang Simulation for embedding
+         network distances in Euclidean space", Proc. IEEE INFOCOM'03,
+         April 2003.
+
+   [11]  Ng, T. and H. Zhang, "A network positioning system for the
+         Internet", Proc. USENIX Conference, June 2004.
+
+   [12]  Costa, M., Castro, M., Rowstron, A., and P. Key, "PIC:
+         Practical Internet Coordinates for Distance Estimation",
+         Proc. International Conference on Distributed Systems,
+         March 2004.
+
+
+Author's Address
+
+   Cedric de Launois
+   UCL/INGI
+   Place Ste-Barbe 2
+   B-1348 Louvain-la-Neuve
+   Belgium
+
+   Email: delaunois@info.ucl.ac.be
+   URI:   http://www.info.ucl.ac.be/people/delaunoi/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+de Launois               Expires January 8, 2006               [Page 22]
+
+Internet-Draft       Synthetic Locations in the DNS            July 2005
+
+
+Intellectual Property Statement
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+Disclaimer of Validity
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Copyright Statement
+
+   Copyright (C) The Internet Society (2005).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78, and
+   except as set forth therein, the authors retain all their rights.
+
+
+Acknowledgment
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+de Launois               Expires January 8, 2006               [Page 23]
+

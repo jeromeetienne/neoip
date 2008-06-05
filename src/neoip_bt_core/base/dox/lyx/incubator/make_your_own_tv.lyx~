@@ -1,0 +1,330 @@
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
+\textclass article
+\begin_preamble
+\date{ }
+\end_preamble
+\language english
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize default
+\spacing single 
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\use_natbib 0
+\use_numerical_citations 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 2
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+NeoTV: Make Your Own TV
+\layout Author
+
+Jerome Etienne
+\layout Abstract
+
+This text presents a web site allowing anybody on the internet to make its
+ own TV channel.
+\layout Section
+
+Description of the core
+\layout Itemize
+
+a web site with a video player embeded (e.g.
+ vlc)
+\layout Itemize
+
+this video player is running on a playlist
+\layout Itemize
+
+based on a rss stream, the playlist is dynamically updated
+\layout Itemize
+
+this playlist contains http link toward HTTP OffLoad
+\layout Itemize
+
+so the video player is displaying a continuous video stream as a TV channel
+\layout Section
+
+dynamic playlist vs native stream support
+\layout Itemize
+
+as the streaming feature is handled by the video player itself via its dynamic
+ playlist
+\layout Itemize
+
+PRO: supporting native stream is a complex and yet unsolved problem, even
+ less coded.
+\layout Itemize
+
+PRO: the dynamic playlist is a much more flexible scheme as each video is
+ distinct
+\begin_deeper 
+\layout Itemize
+
+each video in the playlist may be stored at different place, have different
+ compression scheme, different resolutions etc...
+\end_deeper 
+\layout Itemize
+
+PRO: there are no central server which stream the original content
+\layout Itemize
+
+PRO: it is seekable
+\layout Itemize
+
+CON: a seeding issue as it is not possible to plug into existing video streaming
+ using other scheme
+\begin_deeper 
+\layout Itemize
+
+TODO: is it really not possible ?
+\layout Itemize
+
+to seed a existing stream, read it and save it in small file, then use the
+ file in sequence
+\layout Itemize
+
+TODO: how good is the seeding in case of http ? how many existing stream
+ actually use http ? not a lot.
+ in fact very few, because specific protocol for unicast streaming are performin
+g much better than http
+\end_deeper 
+\layout Itemize
+
+CON: it is unable to handle live content
+\begin_deeper 
+\layout Itemize
+
+TODO: it is really not possible ?
+\layout Itemize
+
+ok not really live but ok for short delayed, using the same tech as using
+ the existing stream
+\end_deeper 
+\layout Section
+
+About seekability
+\layout Itemize
+
+The dynamic playlist scheme is seekable
+\layout Itemize
+
+PRO: better user experience
+\layout Itemize
+
+CON: if uses seeks, the inter user sharing is dramatically reduced
+\layout Section
+
+Big Picture delirium
+\layout Itemize
+
+such web site will know which content is looked by which user
+\begin_deeper 
+\layout Itemize
+
+So the same advertisement capability than google video
+\layout Itemize
+
+and you can suggest the channel you may be able to use
+\end_deeper 
+\layout Itemize
+
+As the video is stored in a file and is compressed with a compression not
+ specific to streaming, the quality of the displayed is better than constant
+ bandwidth compression
+\begin_deeper 
+\layout Itemize
+
+So the image quality of the display video is much better than google video
+ with its flash viewing.
+\end_deeper 
+\layout Itemize
+
+As the content location and the playlist edition are completly separated,
+ anybody on the internet can create its own channel, without any requirement
+ on its individual bandwidth.
+\layout Itemize
+
+As the content of each video may be stored at different place, people willing
+ to participate in the distribution of a video can.
+\layout Itemize
+
+as the viewer is thru a browser it is possible to provide external web url
+ related to the content in a timely fashion
+\begin_deeper 
+\layout Itemize
+
+a chat about the programm
+\layout Itemize
+
+website related to the content displayed
+\end_deeper 
+\layout Itemize
+
+And you can do the pay-per-view !!!!!
+\begin_deeper 
+\layout Itemize
+
+e.g.
+ big sport event
+\layout Itemize
+
+e.g.
+ let me look at this dvd during the next 3days ?
+\end_deeper 
+\layout Itemize
+
+So there is a really 2 aspects:
+\begin_deeper 
+\layout Itemize
+
+participation: 
+\begin_inset Quotes eld
+\end_inset 
+
+do you own TV
+\begin_inset Quotes erd
+\end_inset 
+
+ in which anybody can edit the programm of its own tv channel
+\layout Itemize
+
+consumption: spread existing content thru this
+\end_deeper 
+\layout Itemize
+
+As the source of the data is flexible and dynamic, people may contribute
+ to the distribution for money or benevolent.
+\layout Itemize
+
+it unify the streamed content and the static content, as in fact it streams
+ from static content.
+\layout Section
+
+Taking advange of the bandwidth scheduler
+\layout Itemize
+
+if it is possible to set a precendence to a connection download/upload,
+ a lot of thing are possible.
+\layout Subsection
+
+low upload precedence for low want piece
+\layout Itemize
+
+set a low precedence to connection uploading piece which are low want frequency
+\layout Itemize
+
+this allow to upload piece in high want faster
+\layout Itemize
+
+this allows a better spreading of the data within the swarm
+\layout Itemize
+
+it may be more efficient if the protocol provides the piece which are wanted.
+ maybe even how badly wanted ?
+\begin_deeper 
+\layout Itemize
+
+maybe to provide an extension of the protocol for this
+\layout Itemize
+
+if the other peer doesnt support the extension, get the want ratio by how
+ rare is a given piece
+\end_deeper 
+\layout Itemize
+
+it provides a effect similar to super-seeding, but more flexible and efficient
+\begin_deeper 
+\layout Itemize
+
+more flexible because it works even in leech mode
+\layout Itemize
+
+more efficient because it doesnt slow down the normal download.
+ with my system any peer may request any piece at any time, just if the
+ piece is in low want the reply will be slower.
+\layout Itemize
+
+more efficient because the granularity is fined tune while super seeding
+ is one or nothing.
+ super seeding only works when the other peers has fully downloaded the
+ piece.
+ 
+\end_deeper 
+\layout Subsection
+
+Use idle bandwidth
+\layout Itemize
+
+monitor the host network usage and reduce the maximum rates according to
+ some user defined policy.
+\layout Itemize
+
+thus it is possible to upload/download data only when the computer is not
+ used.
+ As the program is less diruptive, it reduce the negative incitation to
+ stop it.
+\layout Itemize
+
+additionnaly to handle bandwidth account could put a positive incitation
+ to let it run
+\layout Section
+
+Note about the helper caching
+\layout Itemize
+
+this is a mode in which the program run only as caching in order to help
+ a given swarm
+\layout Itemize
+
+the algo is (i) download the piece in hi want (ii) distribute it 
+\layout Itemize
+
+the point is to consume less bandwidth from the swarm that it is provided
+\layout Itemize
+
+thus always providing a positive bandwidth balance
+\layout Itemize
+
+that feature mixed with the bandwidth account could take great advantage
+ of the idle bandwidth
+\layout Section
+
+Unapplicable to audio
+\layout Itemize
+
+this concept seems not to apply on audio, why ?
+\layout Itemize
+
+because listening to audio on a computer is a background task
+\layout Itemize
+
+a user is listening to audio while doing something else
+\layout Itemize
+
+as a concequence the audio player is never done thru a web site
+\layout Itemize
+
+the user is much more attached to its audio player than to its video player.
+\layout Itemize
+
+so it would implies to modify all the audio player in order to handle the
+ dynamic playlist
+\layout Itemize
+
+another possibility would be to recreate a stream out of the dynamic playlist,
+ exactly like icecast is doing.
+\the_end

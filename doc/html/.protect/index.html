@@ -1,0 +1,96 @@
+<HTML>
+ <head> <title>Yavipin's homepage</title> </head>
+ <body>
+<center><h2>Yavipin's homepage</h2></center>
+
+Yavipind is a secure tunnel aka 2 peers securely forwarding packets
+toward each other.
+It forwards any kind of packet (IPv4, IPv6 or other) sent over the virtual
+point-to-point device (e.g. tun0).
+
+<p> 
+It runs in linux userspace (currently only 2.4.x kernel).
+
+<p> you can <A href="http://sourceforge.net/project/showfiles.php?group_id=40065">download</A>
+it or look at the <A href="ChangeLog">ChangeLog</A>.
+
+<hr> <h3>Yavipin features:</h3>
+When designing the protocol and writting the software, the author
+used the following criteria:
+the security MUST as strong as reasonably possible, yavipin SHOULD be
+network efficient, easy to use and install.
+<h4>Network efficiency:</h4>
+ <ul>
+ <li> <b>small packet overhead:</b> 26bytes (e.g. ESP with DES+MD5 is 32byte)
+ <li> <b>Packet compression:</b>
+	Forwarded packets may be compressed using deflate (gzip).
+	(WORK: add stat about efficiency)
+ <li> <b>NAT compatible:</b>
+	yavipin's tunnel may be establish over NAT as
+	all packets of a tunnel are sent over a single UDP/IPv4 connection.
+        Moreover the peer unreachability detection periodically send packets
+        which prevent the NAT engine from timing out the connection state.
+ <li> <b>Peer unreachabilty detection:</b>
+        If the other peer becomes unreachable, it will be detected.
+        It is done ala IPv6 neighbours discovery (rfc2461.7).
+ <li> <b>Gracefull shutdown:</b>
+        If a peer purposely stops, it will notify the other which is 
+        immediatly aware of it.
+ </ul>
+
+<h4>Usage's simplicity:</h4>
+ <ul>
+ <li> <b>Fully in userspace:</b> No need to recompile the kernel
+ <li> <b>reuse existing tools:</b>
+        As yavipin use a virtual device, it is possible to apply to the
+        tunnel any tool designed for network device. 
+        For example, it is possible to set up a firewall using 
+	ipchains/netfilter or to do traffic shapping using the 
+	kernel's traffic control (see tc).
+ </ul>
+
+<h4>Security's strength:</h4>
+ <ul>
+ <li> <b>packet security:</b>
+	each packet exchanged during the connection is encrypted using 
+	blowfish CFB and authenticated with HMAC-MD5 96bits.
+ <li> <b>protection against packet replay:</b>
+	It uses strict anti-replay and no packet can be accepted twice.
+	A eavedropper can't take a packet, keep it for a while and make
+	it accept a second time by the destination.
+ <li> <b>Efficient session key renewal:</b>
+	It uses hash chains for efficiency. It allows smooth key transition
+        not to cause any packet loss during the renewal.
+        It provides forward secrecy inside the connection.
+ <li> <b>Protect DoS ala TCP syn :</b>
+	It uses cookie exchange (rfc2522.3) during the connection
+	establishement. 
+ <li> <b>Forward secrecy :</b>
+        Even if the attacker cracks the box, he won't be able to decrypt
+        network traffic older than a given delay (default 10min).
+        The diffie-hellman private key and the session key are periodically
+        renewed and securely erased from memory.
+ </ul>
+
+<hr> <h3>Yavipin portability:</h3>
+Currently, yavipind has been tested only on linux-2.4 and will be ported
+soon to linux-2.2.
+To port it on another UNIX should be not too hard. The new OS must 
+support openssl, glib and virtual tunnels. openssl and glib are
+very portable and Universal TUN/TAP device
+driver is supported by linux, solaris and freebsd. Any volunteer ?
+
+<hr> <h3>Misc:</h3>
+This page is rather short. it will hopefully become more complete later.
+
+
+<hr> <h3>Credits:</h3>
+
+yavipin protocol and software have been written by <A href="http://www.off.net/~jme">jerome etienne</A> (jme 
+at off.net)
+<p>
+yavipin project is hosted by 
+<A href="http://sourceforge.net"> <IMG src="http://sourceforge.net/sflogo.php?group_id=40065" width="88" height="31" border="0" alt="SourceForge Logo"></A>
+</body>
+</HTML>
+

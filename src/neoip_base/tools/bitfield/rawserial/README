@@ -1,0 +1,3 @@
+halfbacked attempt
+- issue with constness for length and serial
+- non const is ok for unserial

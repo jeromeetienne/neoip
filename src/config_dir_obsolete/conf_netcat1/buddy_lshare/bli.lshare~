@@ -1,0 +1,13 @@
+# this is a property file to define a local share in neoip_buddy
+
+# the root path to share
+file_rootpath=/media/usbdisk/music
+
+# the local_id of this local share
+local_id=music
+
+# the keywords under which it must be indexed
+keywords=ogg;mp3
+
+# the user/passwd of who is allowed to access it
+users=

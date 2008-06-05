@@ -1,0 +1,3 @@
+this is a pure nsis experiment
+- this is obsoleted by yavipin/pkg scripts
+  - they handle zero_install and nsis_install in a uniform way

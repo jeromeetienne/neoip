@@ -1,0 +1,91 @@
+.TH NEOIP_FILEFORMAT_TRACKGEN_INFO 8 "Dec 2006" "trackgen_info file format(1)" "trackgen_info file format's Manual"
+.SH NAME
+neoip trackgen_info format extension
+.SH DESCRIPTION
+trackgen_info is the array of command which allow to generate a list of track.
+trackgen_info is a fileformat stored in json. this is a array of object, each object
+being an instruction used to generate the list of track.
+
+
+.SH Instruction object
+This is the description of single instruction object
+.TP
+.I "cmd string"
+the string is one of the allowed instruction
+.TP
+.I "arg anything"
+arg is the argument for the command, its format depend uniquely on the command.
+
+.SH Instruction concat
+The "concat" cmd instruction is to concatenate a list of track to the current 
+list. The arguments are:
+.TP
+.I "space string"
+The string describes the space from where the list is coming from.
+.TP
+.I "desc anything"
+the "desc" arguement describes the criteria to generate the track list. 
+It depends only on the specified "space" arguement.
+
+.SH Instruction select_random_contiguous
+The "select_random_contiguous" cmd instruction is keep only a bunch of contiguous 
+track at random. The arguments are:
+.TP
+.I "nb_contiguous number"
+The number describes number of contiguous track to keep
+
+.SH Instruction filter_field
+The "field_field" cmd instruction is made to remove all the track which doesnt match a given 
+criteria.
+The arguments are
+.TP
+.I "field string"
+The string describe the field which gonna be filtered
+.TP
+.I "pattern string"
+The string is a pattern. If the field of a given track doesnt match this pattern
+it is removed from the list
+
+.SH Instruction sort_by
+The "sort_by" cmd instruction is made to sort all the track according to their 
+value for a given field. TODO adding ascending/descending would not be luxury :) 
+.TP
+.I "field string"
+The string describe the field which gonna be sorted
+
+
+.SH Various field of track
+.TP
+.I "track_title"
+This is a human readable title for the track
+.TP
+.I "flv_uri"
+This is the uri where to find the track file
+
+
+.SH EXAMPLES
+
+{	"playlist_title": "Conference",
+	"playlist_id"	: "conference",
+	"trackgen_info"	: [
+		{	"cmd"	: "concat",
+			"arg"	: {	"space"	: "bliptv",
+					"desc"	: {
+						"base_uri"	: "http://tedtalks.blip.tv/rss"
+						}
+				}
+		},
+		{	"cmd"	: "select_random_contiguous",
+			"arg"	: { "nb_contiguous"	: 3	}
+		}
+		]
+}
+
+.SH AUTHOR
+.B neoip-playlist-
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.

@@ -1,0 +1,21 @@
+TODO task for the nlay brick:
+-----------------------------
+- the remaining brick to code are:
+  - a cnxstat which count the raw data and the cooked data
+    - a basic cnxstat_t counter is already implemented
+  - a network coordinate system
+    - with a space hooked in the profile_t context
+--------------------------------------------------------------------
+DONE:
+  - to complete closure
+    - i think the remaining is in the socket layer and not in the nlay one
+  - a rate limiter for the connection
+    - using the slidwin_t (need review)
+    - call it rate_limit_t
+    - using a rate estimator (call it rate_estim_t)
+
+    
+    
+    
+    
+    

@@ -1,0 +1,9 @@
+#!/bin/sh
+# this script creates a .tgz of yavipin source including the
+# version in the name e.g yavipin-0.9.2.tgz
+cd ..
+make distclean
+(cd src; rmprotect; rmcore)
+VERSION=`grep YAV_SW_VERSION src/packet.h  | cut -d'"' -f 2`
+cd ..
+tar cvzf yavipin-$VERSION.tgz yavipin

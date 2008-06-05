@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launchConfiguration type="org.eclipse.ui.externaltools.ProgramBuilderLaunchConfigurationType">
+<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_BUILDER_ENABLED" value="false"/>
+<mapAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS">
+<mapEntry key="org.eclipse.cdt.make.core.ScannerConfigDiscoveryEnabled" value="false"/>
+<mapEntry key="org.eclipse.cdt.make.core.esiProviderCommandEnabled" value="true"/>
+<mapEntry key="org.eclipse.cdt.make.core.makeBuilderParserId" value="org.eclipse.cdt.make.core.GCCScannerInfoConsoleParser"/>
+<mapEntry key="org.eclipse.cdt.make.core.siProblemGenerationEnabled" value="true"/>
+<mapEntry key="org.eclipse.cdt.make.core.useDefaultESIProviderCmd" value="true"/>
+<mapEntry key="org.eclipse.cdt.make.core.makeBuilderParserEnabled" value="true"/>
+<mapEntry key="org.eclipse.cdt.make.core.esiProviderParserId" value="org.eclipse.cdt.make.core.GCCSpecsConsoleParser"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_DISABLED_BUILDER" value="org.eclipse.cdt.make.core.ScannerConfigBuilder"/>
+<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
+</launchConfiguration>

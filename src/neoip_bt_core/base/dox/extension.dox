@@ -1,0 +1,122 @@
+Note about possible extension on bt
+-----------------------------------
+- interesting to publish them for reputation as somebody who knows his way around
+  bittorrent protocol
+- pure file sharing
+  - file exchange and directory
+  - to get .torrent from other peers or hashtree
+- hashtree
+  - to remove the piece granularity
+  - downloaded piece by piece or as a whole from the 
+- create a info_aux dictionary with the same structure as info but without
+  affecting the infohash
+  - outside of the info directory not to modify the infohash
+  - call it info_aux aka all the data which should be info but are not
+- in the info_aux dictionary
+  - get the hash of each subfile
+  - get the uri of each subfile
+- what about sharing the tracker you got on top of the full connection
+  - would help in case of the tracker goes down to change the tracker smoothly
+- a peer exchange with birth date per peer record.
+  - each time a peer record is seen from a tracker, set its birth date to the
+    present time.
+  - each time a peer record is checked as alive, aka got a connection with it
+    the birthdate is the present date.
+- compatibility of the current .torrent MUST be kept at all cost in order to get
+  a smooth transition/interaction with the current installed base.
+- a .torrent hash, a hash digest of the .torrent
+  - usual compute it over the data with 0 as hash digest, then replace
+- put an extension containing the metalink file within single file torrent
+  - all the advantage of metalink
+  - plus still compatible with torrent client
+- what about sending the piece i want to the other peer ?
+  - can it be used to improve the scheduling
+  - instead of only sending the piece i have
+  - 'rarest first' is valid only on the piece which are wanted
+  - 'rarest first' could be renamed 'most wanted first' ?
+--------------------------------------
+Note about no piecehash
+- when the piecehash is not check
+- an integer variable 'do_piecehash'
+  - equal to 1 if it must be done
+  - equal to 0 if it may not be done
+  - if not present, the default value is 1
+- the root.info.piecehash array may
+  - be empty if 'do_piecehash' is equal to 0
+  - be full of hash with the value 0
+    - ensure .torrent compatibility with non supporting program
+    - which will accept the .torrent but will fails while trying to download it
+    - TODO if so, is this good to allow this ? would be better to prevent the 
+      loading of the .torrent in the first place
+  - be full of hash with the value computed from the totfile
+    - if 'do_piecehash' is equal to 1
+--------------------------------------
+Improvement in the scheduling
+- as a seed, when a leech download a frequent piece, limit its speed compare
+  to when it download a rare piece
+  - with a rate limiter on xmit
+- apply the coop/reject of game theory in the peer selection
+  - not sure about the details, but seems better that the current random
+  - a peer which has cooperated with us in the past would have more chance to be 
+    selected that another.
+  - here the past scope may be the lifetime of this bt_swarm_t
+    - much faster init time when resuming a torrent
+  - here the past scope may be the lifetime of the bt client installation
+    - here relation with a banking system
+    - the banking system may be local, centralized, distributed
+      - local = i am my own bank, remote peer got account in my bank, got account in their bank
+      - centralized = there is a central authority which is the bank, and all people got account in it
+        - issue it require all people to trust this bank
+      - distributed = there are several centralized bank which can exchange information
+    - each remote peer got a local account, amount of data recv/xmit and the balance
+    - if each peer handle its own bank, it will work without needing any cryptography
+      nor external banking with reputation system
+      - but the efficient will be reduced by the fact that 2 bt client should participate
+        in similar swarms in order to really have an advantage over the case of the 
+        past scope limited to the bt_swarm_t lifetime
+    - if the banking is external, it is very efficient and is a strong incitation to 
+      people continue sharing. because it would increase their money and then they
+      will be able to download faster when they want to
+      - issue with the reputation system within the bank
+      - issue with the multiple bank
+      - when a peer receive data, it periodically send proof of reception to the
+        sender, aka a signed data saying 'i own you 100kbyte'
+        - usige of djb elliptic curve signing for the space efficiency
+      - one peer store all the proof of reception from the remote peers and send
+        them to its bank.
+      - it is up to the bank to convert this proof of reception to a actual coin
+        aka money which is widely recognized and spendable everywhere
+--------------------------------------
+Note about reccursive swarm:
+- in the info_aux, for a given subfile, ability to provides a reference to another
+  swarm containing this file too
+- subfile_idx: index of this subfile within the other torrent
+  - subfile_idx or totfile_range ? totfile_range seems more flexible
+- infohash of the other torrent
+- tracker
+  - how to describe the tracker, list priority etc.. ? 
+--------------------------------------
+Note about File Sharing:
+- look at the extension from libtorrent and utorrent to get the .torrent
+  - generalize it for any file
+- may be usefull to share the .torrent of the current infohash
+  - thus allow remove the requirement to get the .torrent from a external source
+  - only required to get the infohash
+- may be usefull to get the hash tree of part of the current infohash
+--------------------------------------
+Note about directory sharing:
+- TODO
+- helps determines which file are available
+  - like for the hashtree, which piece are available
+--------------------------------------
+Note about the hash tree:
+- have the hash type to be tunable like md5/12 or sha1/16
+- have the granularity to be tunable aka what is the size of the buffer covers
+  by the leaves.
+- may be stored in the .torrent outside the info directory not to modify the infohash.
+- may be generated on the fly for the piece already locally available.
+- may be downloaded piece by piece or for all piece... 
+- this is usefull only to reduce the piecelen issue
+  - so require to have a BLOCK_HAVE command BLOCK_HAVE piece_idx, block_off, block_len
+- so require to have the filesharing extension + BLOCK_HAVE extension
+- negociate the granularity of the block_have on connection establishement

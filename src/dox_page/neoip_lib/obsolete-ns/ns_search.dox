@@ -1,0 +1,19 @@
+/*!\page ns-search NS Search
+
+\ref ns-search is a way to select which \ref ns-record(s) to search. It is intented to be
+used with \ref ns-get in order to query \ref ns-record(s) in a \ref ns-realm.
+
+a \ref ns-record-type and a \ref ns-record-famid may be be provided
+
+- can i live with a simple one based only on \ref ns-record-type and a \ref ns-record-famid
+  - and then add new criteria
+- there is likely a network version of it and a local version of it
+
+- other criteria may be 
+  - outdated record accepted
+  - authenticated record
+  - encrypted record
+- it may stackup a list of filter to narrow the search
+  - e.g. neoip_ns_search_stack( only_if_peer_record_locally_available )
+
+*/

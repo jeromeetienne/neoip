@@ -1,0 +1,58 @@
+/*! \page neoip-scnx-full-crypto NeoIP Established Secure Connection Cryptography
+
+- The connection establishement provides a master key. 
+  It is the same for each peer and is impossible to determine
+  by attackers without breaking the underlying cryptography.
+- The length and entropy of the master key depends on the connection establishement
+  parameters.
+- It is very similar to ipsec ESP/AH protocols (see rfc2406 and rfc2402)
+
+\section neoip-scnx-full-areplay NeoIP Secure Connection Anti-Replay Protection
+- It provides a strict antireplay similar to ipsec one (See rfc2406 section 3.3.3
+  and 3.4.3). So no packet can be accepted twice by one peer.
+  - The packet contains a sequence number which is increased for each sent packets.
+    A given sequence number is garanteed to be used for no more than one packet
+    for a given key.
+  - The receiver keeps tracks of the already received packet thanks to a 
+    antireplay windows. It has a tunable size which determine the amount of 
+    packet reordering supported.
+- When the sequence number is about to overflow, a \ref neoip-scnx-rekey is 
+  performed to obtains a new keys.
+  As the key has changed, the sequence number is allowed to be reused.
+
+\section neoip-scnx-full-auth NeoIP Established Secure Connection Packet Authentication
+- the connection establishment provides an algorithm to authenticate the 
+  packets thanks a MAC, in the established connection. 
+  - e.g. sha1/hmac/12 to compute the MAC with a HMAC (rfc2401) using the 
+    SHA1 hash function and truncate its output to 12-byte. (see rfc2404 for 
+    ipsec equivalent)
+- the MAC is computed over the whole packet after encryption and is appened to
+  the packet
+
+\section neoip-scnx-full-ciph NeoIP Established Secure Connection Packet Encryption
+- the connection establishment provides an algorithm to encrypt the 
+  packets in the established connection. 
+  - e.g. aes/ctr will encrypt the packet using the AES algorithm with the 
+    counter mode of operation
+- Some mode of operations requires the plain text to be padded so it expends 
+  the size of the encrypted packet.
+  - TODO check if you implement a standard padding. if not, please do
+- Common mode of operations require a Initial Value, called IV, to hide the 
+  pattern inter packets.
+- The IV is derived from the sequence number by encrypting it with the same
+  algorithm but in ECB. As the sequence number is garanteed to be unique,
+  the IV is garanteed to be unique and doesn't consume space in the packets.
+
+\par IV handling Difference with ipsec 
+\ref neoip-scnx choosed another to handle IV differently than ipsec.
+In ipsec standard, the IV is random and is explicitly put in the packets.
+-# it is a theorical vulnerability as
+   - the IV isn't garanteed to be unique and may reveal inter-packet data pattern
+     in case of collision.
+   - the IV is vulnerable to birthday attacks
+-# it is a waste of bandwidth
+   - as explicit IV requires a amount of byte depending on the block length of 
+     the chosen cryptographic cipher. As an example it is 16-byte per packet
+     for AES.
+  
+*/

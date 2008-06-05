@@ -1,0 +1,333 @@
+# makefile of yavipin
+# special makefile to debug in static
+PROJECT=yavipin
+
+NEOIP_NS_DIR=neoip_ns
+OBJS_NEOIP_NS =							\
+	$(NEOIP_NS_DIR)/neoip_ns_db.o		\
+	$(NEOIP_NS_DIR)/neoip_ns_record.o	\
+	$(NEOIP_NS_DIR)/neoip_ns_realm.o	\
+	$(NEOIP_NS_DIR)/neoip_ns_clicnx.o	\
+	$(NEOIP_NS_DIR)/neoip_ns_srvcnx.o	\
+	$(NEOIP_NS_DIR)/neoip_ns_layer.o
+
+NEOIP_SOCKET_DIR=neoip_socket
+OBJS_NEOIP_SOCKET =								\
+	$(NEOIP_SOCKET_DIR)/neoip_asocket_client.o	\
+	$(NEOIP_SOCKET_DIR)/neoip_socket_client.o	\
+	$(NEOIP_SOCKET_DIR)/neoip_socket_server.o	\
+	$(NEOIP_SOCKET_DIR)/neoip_socket.o			\
+	$(NEOIP_SOCKET_DIR)/neoip_rdvpt.o			\
+	$(NEOIP_SOCKET_DIR)/neoip_socket_echo.o
+	
+NEOIP_TOOLS_DIR=neoip_tools_cpp
+OBJS_NEOIP_TOOLS =							\
+	$(NEOIP_TOOLS_DIR)/neoip_datum.o		\
+	$(NEOIP_TOOLS_DIR)/neoip_timeout.o		\
+	$(NEOIP_TOOLS_DIR)/neoip_delay.o		\
+	$(NEOIP_TOOLS_DIR)/neoip_date.o			\
+	$(NEOIP_TOOLS_DIR)/neoip_id.o			\
+	$(NEOIP_TOOLS_DIR)/testcpp.o			\
+	$(NEOIP_TOOLS_DIR)/testc.o
+
+NEOIP_HTTP_DIR=neoip_http
+OBJS_NEOIP_HTTP =							\
+	$(NEOIP_HTTP_DIR)/neoip_http_handler.o
+
+NEOIP_UTILS_DIR=neoip_utils
+OBJS_NEOIP_UTILS =						\
+	$(NEOIP_UTILS_DIR)/slidwin.o		\
+	$(NEOIP_UTILS_DIR)/bitfield.o		\
+	$(NEOIP_UTILS_DIR)/intval.o			\
+	$(NEOIP_UTILS_DIR)/bdelta.o			\
+	$(NEOIP_UTILS_DIR)/rollsum.o		\
+	$(NEOIP_UTILS_DIR)/bfilter.o		\
+	$(NEOIP_UTILS_DIR)/hook_list.o
+	
+NEOIP_NS2_DIR=ns
+OBJS_NEOIP_NS2 =						\
+	$(NEOIP_NS2_DIR)/ns2_rec.o 			\
+	$(NEOIP_NS2_DIR)/ns2_rec_pdata.o	\
+	$(NEOIP_NS2_DIR)/ns2_db.o 			\
+	$(NEOIP_NS2_DIR)/ns2_dbv.o 			\
+	$(NEOIP_NS2_DIR)/ns2_db_utest.o		\
+	$(NEOIP_NS2_DIR)/ns2_realm.o		\
+	$(NEOIP_NS2_DIR)/ns2_role.o			\
+	$(NEOIP_NS2_DIR)/ns2_cli.o			\
+	$(NEOIP_NS2_DIR)/ns2_srv.o			\
+	$(NEOIP_NS2_DIR)/ns2_put.o			\
+	$(NEOIP_NS2_DIR)/n_db.o				\
+	$(NEOIP_NS2_DIR)/n_db_utest.o
+	
+NEOIP_FT_DIR=neoip_ft
+OBJS_NEOIP_FT =					\
+	$(NEOIP_FT_DIR)/ft_fsum.o	\
+	$(NEOIP_FT_DIR)/ft_blk_io.o	\
+	$(NEOIP_FT_DIR)/ft_share.o	\
+	$(NEOIP_FT_DIR)/ft_blk.o	\
+	$(NEOIP_FT_DIR)/ft_finfo.o	\
+	$(NEOIP_FT_DIR)/ft_ui.o
+
+OBJS_NEOIP =	util.o \
+	rate_estim.o rate_limit.o ndir.o  \
+	logmsg.o \
+	nipmem.o \
+	rand.o \
+	usercfg.o \
+	prop.o prop_util.o prop_db.o \
+	unbound_inpkt.o \
+	relay_cli.o relay_srv.o relay_status.o \
+	responder.o initiator.o auth.o \
+	asymkey.o dh_xchg.o \
+	nsock_ra.o \
+	mac.o enc.o \
+	pkcs5.o \
+	comp.o comp_zlib.o \
+	stunnel.o stun_out.o stun_in.o stun_reach.o stun_rtt.o \
+	stun_samenat.o skey.o stun_secu.o stun_httpd.o \
+	pkt_scramb.o \
+	nsock_err.o \
+	relipkt.o \
+	rdgram.o rdgram_utest.o \
+	rdgram_bufxmit.o \
+	rstream.o rstream_utest.o \
+	optnego_reg.o optnego_payl.o optnego_encmac.o \
+	nipid.o \
+	netif.o \
+	payl.o 	pkt_gram.o pkt_err.o \
+	cookie.o ip_addr.o \
+	rdvpt.o \
+	otsp_addr.o otsp.o otsp_relay_client.o \
+	otsp_udpv4.o otsp_tcpv4.o otsp_tcpv4_cnx.o \
+	pkt_keepalive.o pkt_rxmit.o \
+	ns_db.o ns_util.o ns_realm.o ns_unittest.o \
+	ns_publish.o ns_query.o ns_negcache.o ns_clicnx.o \
+	ns_server.o ns_result.o ns_rec_gram.o \
+	httpd.o \
+	pubaddr_server.o pubaddr_pool.o pubaddr_disc.o \
+	reg_client.o reg_server.o \
+	natdiag_sym.o natdiag_loop.o netdiag.o netdiag_upd.o inetreach_client.o inetreach_server.o \
+	libmain.o \
+	afile_io.o \
+	ncoord.o ncoord2.o \
+	watchdog.o	emergency_exit.o \
+	$(OBJS_NEOIP_UTILS)		\
+	$(OBJS_NEOIP_TOOLS)		\
+	$(OBJS_NEOIP_HTTP)		\
+	$(OBJS_NEOIP_SOCKET)	\
+	$(OBJS_NEOIP_FT)		\
+	$(OBJS_NEOIP_NS)	
+
+
+
+#	n_grp.o \
+#	memb_ship.o memb_ship_httpd.o memb_ship_get_leader.o memb_ship_be_smemb.o memb_ship_connect_leader.o memb_ship_be_leader.o \
+#	memb_list.o memb_info.o \
+#	memb_query.o memb_query_cnx.o \
+#	rdv_client.o rdv_server.o \
+#	nipns_db.o nipns_client.o nipns_server.o nipns_negcache.o\
+#	crypt_enc.o enc_des_cbc.o enc_bf_sbc.o enc_null.o \
+#	crypt_mac.o mac_hmac_md5_96.o \
+#	udp_loc.o lport.o	
+#	icmpc.o icmpc_path.o icmp_recv.o \
+#	pkt_rxmit.o \
+#	otsp.o otsp_client.o otsp_server.o otsp_route.o\
+#	otsp_udpv4_client.o otsp_tcpv4_client.o \
+#	otsp_udpv4_server.o otsp_tcpv4_server.o otsp_tcpv4_cnx.o \
+# sec_pmtu.o skey.o sec_malloc.o pubaddrdisc.o 
+#	sec_ctx.o \
+
+ROUTER_SRC_DIR=neoip_router
+OBJS_ROUTER = 								\
+	$(ROUTER_SRC_DIR)/main.o 				\
+	$(ROUTER_SRC_DIR)/main_router.o 		\
+	$(ROUTER_SRC_DIR)/rawip.o 				\
+	$(ROUTER_SRC_DIR)/vdev.o				\
+	$(ROUTER_SRC_DIR)/onet.o 				\
+	$(ROUTER_SRC_DIR)/dst_iaddr_negcache.o	\
+	$(ROUTER_SRC_DIR)/dnsgrab.o				\
+	$(ROUTER_SRC_DIR)/nodeid_iaddr.o 		\
+	$(ROUTER_SRC_DIR)/iaddr_log_server.o	\
+	$(ROUTER_SRC_DIR)/iaddr_log_client.o	\
+	lib_neoip.a
+
+GROUP_SRC_DIR=neoip_group
+OBJS_GROUP = 						\
+	$(GROUP_SRC_DIR)/main_group.o 	\
+	$(GROUP_SRC_DIR)/script.o		\
+	$(GROUP_SRC_DIR)/script_grp.o	\
+	lib_neoip.a
+
+MAIN_OPT= 
+PROF_OPT=
+# -pg
+LINK_OPT= -Liniparser-2.14/
+DBG_OPT= -Wall
+INCLUDEOPT=  -Iiniparser-2.14/src -I. `pkg-config --cflags glib-2.0 gmodule-2.0 gthread-2.0` \
+			-I$(NEOIP_UTILS_DIR) -I$(NEOIP_TOOLS_DIR) -I$(NEOIP_HTTP_DIR) \
+			-I$(NEOIP_SOCKET_DIR) -I$(NEOIP_NS_DIR) -I$(NEOIP_FT_DIR)
+
+#			-I$(NEOIP_NS2_DIR) 
+
+LINKLIB = `pkg-config --libs glib-2.0 gmodule-2.0 gthread-2.0` \
+		-lz -lipq -lgnutls -lgcrypt -lgpg-error \
+		-liniparser -lm
+
+DEBUG_BUILD=1
+#ifeq ($(DEBUG_BUILD),1)
+#	LINKLIB += -lefence
+#endif
+
+ifeq ($(DEBUG_BUILD),1)
+	DBG_OPT += -g 
+	DBG_OPT += -Werror 
+#	DBG_OPT += -O3
+#	DBG_OPT += -DNO_TRACE_AT_ALL
+else
+	DBG_OPT += -O3 -DNEOIP_NODEBUG_COMPIL=1 -DNO_DBG_TRACE 
+#-DNO_TRACE_AT_ALL
+endif
+		
+
+COMMON_CFLAGS= $(MAIN_OPT) $(INCLUDEOPT) $(PROF_OPT) $(DBG_OPT)
+
+# set to compile with GCC
+CC=gcc
+CFLAGS=$(COMMON_CFLAGS)
+CXXFLAGS=$(COMMON_CFLAGS)
+
+ALL_EXE = neoip_router-bin 
+#neoip_group-bin
+INSTALL_ROUTER_CONFIG_DIR=/etc/neoip_router
+INSTALL_ROUTER_BIN_DIR=/usr/bin
+INSTALL_ROUTER_PRIVATE_BIN_DIR=/usr/lib/neoip_router
+INSTALL_GROUP_CONFIG_DIR=/etc/neoip_group
+INSTALL_GROUP_BIN_DIR=/usr/bin
+INSTALL_GROUP_PRIVATE_BIN_DIR=/usr/lib/neoip_group
+
+all: iniparser $(ALL_EXE)
+
+iniparser:
+	make -C iniparser-2.14
+
+lib_neoip.a: $(OBJS_NEOIP)
+	$(AR) rcs $@ $^
+
+neoip_group-bin: $(OBJS_GROUP)
+	$(CC) $(LINK_OPT) $(PROF_OPT) -o $@ $(OBJS_GROUP) $(LINKLIB)
+
+neoip_router-bin: $(OBJS_ROUTER)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ $(OBJS_ROUTER) $(LINKLIB)
+
+neoip_router-bin.static: $(OBJS_ROUTER)
+	$(CC) $(LINK_OPT) -static $(PROF_OPT) -o $@ $(OBJS_ROUTER) $(LINKLIB)
+	strip $@
+
+install_router: neoip_router-bin
+	install -d -m 755 $(INSTALL_ROUTER_PRIVATE_BIN_DIR)
+	install -d -m 755 $(INSTALL_ROUTER_CONFIG_DIR)
+	install -d -m 755 $(INSTALL_ROUTER_CONFIG_DIR)/netdiag
+	strip neoip_router-bin
+	install -m 755 neoip_router-bin $(INSTALL_ROUTER_PRIVATE_BIN_DIR)
+	install -m 755 cfg_file/neoip_auto_register.sh $(INSTALL_ROUTER_BIN_DIR)/neoip_router
+	install -m 755 cfg_file/neoip_router_configurator.sh $(INSTALL_ROUTER_PRIVATE_BIN_DIR)
+	ln -fs $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router_configurator.sh $(INSTALL_ROUTER_BIN_DIR)/neoip_router_gui
+	ln -fs $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router_configurator.sh $(INSTALL_ROUTER_BIN_DIR)/neoip_router_tui
+	install -m 755 cfg_file/neoip_router.init /etc/init.d/neoip_router
+	install -m 644 cfg_file/neoip_router.desktop /usr/share/applications
+	install -m 644 cfg_file/neoip_router.png /usr/share/pixmaps
+	install -m 644 cfg_file/neoip_lib.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_lib_default.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_router.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_router_default.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/root_ca_cert.pem $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip.ico $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 neoip_router.8 /usr/man/man8
+
+uninstall_router:
+	rm $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router-bin
+	rm $(INSTALL_ROUTER_BIN_DIR)/neoip_router
+	rm $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router_configurator.sh
+	rm $(INSTALL_ROUTER_BIN_DIR)/neoip_router_gui
+	rm $(INSTALL_ROUTER_BIN_DIR)/neoip_router_tui
+	rm /etc/init.d/neoip_router
+	rm /usr/share/applications/neoip_router.desktop
+	rm /usr/share/pixmaps/neoip_router.png
+	rm /usr/man/man8/neoip_router.8
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip.ico
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_lib.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_lib_default.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_router.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_router_default.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/root_ca_cert.pem
+
+install_group: neoip_group-bin
+	install -d -m 755 $(INSTALL_GROUP_PRIVATE_BIN_DIR)
+	install -d -m 755 $(INSTALL_GROUP_CONFIG_DIR)
+	strip neoip_group-bin
+	install -m 755 neoip_group-bin $(INSTALL_GROUP_PRIVATE_BIN_DIR)
+	install -m 755 cfg_file/neoip_auto_register.sh $(INSTALL_GROUP_BIN_DIR)/neoip_group
+	install -m 644 cfg_file/neoip_lib.ini $(INSTALL_GROUP_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_lib_default.ini $(INSTALL_GROUP_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_group.ini $(INSTALL_GROUP_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_group_default.ini $(INSTALL_GROUP_CONFIG_DIR)
+	install -m 644 cfg_file/root_ca_cert.pem $(INSTALL_GROUP_CONFIG_DIR)
+	install -m 644 neoip_group.8 /usr/man/man8
+
+uninstall_group:
+	rm $(INSTALL_GROUP_PRIVATE_BIN_DIR)/neoip_group-bin
+	rm $(INSTALL_GROUP_BIN_DIR)/neoip_group
+	rm $(INSTALL_GROUP_CONFIG_DIR)/neoip_lib.ini
+	rm $(INSTALL_GROUP_CONFIG_DIR)/neoip_lib_default.ini
+	rm $(INSTALL_GROUP_CONFIG_DIR)/neoip_group.ini
+	rm $(INSTALL_GROUP_CONFIG_DIR)/neoip_group_default.ini
+	rm $(INSTALL_GROUP_CONFIG_DIR)/root_ca_cert.pem
+	rm /usr/man/man8/neoip_group.8
+
+##############################################
+#  beyond this points only mangement target. #
+##############################################
+clean :
+	@echo Begin to clean
+	$(RM) $(ALL_EXE)
+	$(RM) *.[ao] core
+	$(RM) $(NEOIP_UTILS_DIR)/*.[ao]
+	$(RM) $(NEOIP_NS_DIR)/*.[ao]
+	$(RM) $(NEOIP_SOCKET_DIR)/*.[ao]
+	$(RM) $(NEOIP_FT_DIR)/*.[ao]
+	$(RM) $(NEOIP_TOOLS_DIR)/*.[ao]
+	$(RM) $(NEOIP_HTTP_DIR)/*.[ao]
+	$(RM) $(GROUP_SRC_DIR)/*.[ao]
+	$(RM) $(ROUTER_SRC_DIR)/*.[ao]
+	make -C iniparser-2.14 clean
+	@echo Clean is completed
+
+mrproper : clean
+	@echo Begin to mrproper
+	$(RM) -r .depend .protect/
+	@echo Mrproper is completed
+
+strip :
+	@echo Begin to strip $(ALL_EXE)
+	$(STRIP) $(ALL_EXE)
+	@echo $(ALL_EXE) have been striped
+
+backup: mrproper cleanlog
+	@echo Backup to backup
+	(cd .. && tar cf - $(PROJECT) | gzip -9 >$(PROJECT).tgz)
+	sync
+	@echo Backup is completed
+
+# only GCC. 
+depend dep:
+	@echo Start to build depedances in .depend
+	for i in `find -name "*.c" -or -name "*.cpp"`; do $(CPP) -M $(CFLAGS) $$i; done >.tmpdepend
+	mv -f .tmpdepend .depend
+	@echo Dependances completed
+
+#only GCC and good make
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif
+
+

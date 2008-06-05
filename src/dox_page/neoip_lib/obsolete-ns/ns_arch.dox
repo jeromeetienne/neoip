@@ -1,0 +1,51 @@
+/*!\page ns-arch NS Architecture
+
+\section ns-arch-definition Definition
+\ref ns-arch is the way the peers acting as \ref ns-server organizes themselves to maintain
+the \ref ns-realm. Each \ref ns-realm has a given \ref ns-arch, but distincts \ref ns-realm can have distincts
+architecture. 
+
+The \ref ns-arch available are:
+-# \ref ns-arch-flood
+-# \ref ns-arch-dht (Not currently available but help thinking about various type of \ref ns-arch)
+
+\section ns-arch-specification NS Architecture Specification
+This describes what needs to be specified for a given \ref ns-arch
+- init: aka what a \ref neoip-peer has to do when it becomes \ref ns-server
+- term: aka what a \ref neoip-peer has to do when it leaves \ref ns-server
+- ns-get: aka what a \ref ns-server needs to do to perform \ref ns-get
+- ns-put: aka what a \ref ns-server needs to do to perform \ref ns-put
+
+\section ns-arch-flood NS Architecture Flood
+
+\subsection ns-arch-flood-procon Ns Architecture Flooding PRO/CON
+- \b PRO: Low Load when servers have high \ref churn-rate 
+  - \ref ns-arch-dht requires to replicates the records which were stored by the \ref ns-server which
+    just became unreachable.
+- \b PRO: if the usage pattern is to make a lot more \ref ns-put than \ref ns-get, \ref ns-arch-flood
+  is better as \ref ns-put is much cheaper.
+- \b PRO: flexibility to implement custom query
+- \b PRO: ability to unpublish
+- TODO quite hard to do the pro/con as i currently dont know DHT well enougth to do it
+
+\subsection ns-arch-flood-ns-put NS Put in NS Flood Architecture
+- each peer publish its records in a given server
+  - if the local peer acts as client in this \ref ns-realm, it will connect a peer acting as 
+    server for the same \ref ns-realm and store them in the server's \ref ns-db
+  - if the local peer acts as server in this \ref ns-realm, it will simply store its own
+    records in its local \ref ns-db.
+- additionnally this architecture allows to unpublish
+
+\par todo 
+- what happen when a connection client to server is lost
+- how the server interconnect each other
+
+\subsection ns-arch-flood-ns-get NS Get in NS Flood Architecture
+- the query has a specified horizon which determine the span of this query
+- \ref ns-arch-flood allows very flexible query policies which can exploited thanks 
+  to \ref ns-record-custom
+
+\section ns-arch-dht NS Architecture DHT
+Not yet implemented, but help me thinking about flexibility in \ref ns-arch
+
+*/

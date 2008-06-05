@@ -1,0 +1,18 @@
+note about massive seeding:
+---------------------------
+- massive seeding is being able to seed a very large number of files
+- so the rescource comsumption when the peer is able to seed must be 
+  very low
+  - obviously it is not the case when seeding actually happen
+---------------------------
+- intercept the case where bt_session_t receive a infohash with no matching
+  bt_swarm_t
+  - trigger an event and search among the possible files to seed
+- how the remote peer find the peers which are able to seed a bunch of swarm
+  - POSSIBLE SOLUTION: with a a dicotomy of bloom filter
+    - the query contains a bloom filter containing the searched swarms
+      - this bloom filter depends on a range in infohash space
+    - the queried peer look at its local bloom filter for this range and 
+      reply if it has local files which matches
+    - then the querier reiterate until it got the answer of each queried swarm
+  - half backed at best but noted to forget it

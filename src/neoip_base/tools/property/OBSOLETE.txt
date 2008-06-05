@@ -1,0 +1,5 @@
+this is obsolete code.
+- it was a intend to get a multiple type variable database but it is 
+  half backed and badly designed
+  - the dvar_t stuff designed to store the bencoded stuff is way better
+- for basic string variable, strvar_db_t is better

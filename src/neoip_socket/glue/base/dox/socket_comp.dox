@@ -1,0 +1,33 @@
+/*! \page neoip-socket-comp NeoIP Socket Compression
+
+\ref neoip-socket-comp is a layer able to transparently compress data 
+passing thru the \ref neoip-socket.
+
+- see IPComp rfc section 2.2 in http://www.faqs.org/rfcs/rfc3173.html
+  about the adaptative algorithm to avoid try to compress data when 
+  the last X attempts failed
+- use the neoip::compress_t layer
+
+\par Possible Improvement
+- if the outter transport is reliable, the compression algorithm may share
+  its history with previous packets sent over the same connection, but 
+  not accross several connections.
+  - see tls compression rfc2943 section 2.2 http://www.faqs.org/rfcs/rfc3943.html
+
+\par Negociation
+Each peer advertizes all the supported compression type in reception. the other
+peer chooses to compress or not using those algorithms.
+
+\par Protocol
+- the itor and the resp sends both the list of compression algorithm they
+  support.
+  - when the responder receives the list of options of the other peers, it 
+    determines the algorithm chosen for sending.
+- when sending a packet, it tries to compress the packet with the chosen 
+  algorithm for sending.
+  - it prepends a header which describes the compression of the packet.
+  - it may be null or the chosen algorithm for sending
+- when receiving the packet, it is uncompressed by one of the algorithm
+  offered in the list send during the establishement.
+
+*/

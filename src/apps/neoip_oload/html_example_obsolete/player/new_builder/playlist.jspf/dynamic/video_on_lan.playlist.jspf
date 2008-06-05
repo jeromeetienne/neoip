@@ -1,0 +1,55 @@
+{
+  "playlist": {
+    "title": "Videos on lan",
+    "date": "Wed Dec 19 17:40:13 UTC 2007",
+    "track": [
+      {
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 19794.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "mod": "flv",
+            "static_filelen": 30718144
+          }
+        },
+        "title": "frank dixon",
+        "meta": {
+
+        },
+        "duration": 489960,
+        "location": "http:\/\/jmehost2\/~jerome\/flash\/0021_frankdixon.flv"
+      },
+      {
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 47697.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "mod": "flv",
+            "static_filelen": 51175993
+          }
+        },
+        "title": "3rd planete from the sun 6x01",
+        "meta": {
+
+        },
+        "duration": 1241160,
+        "location": "http:\/\/jmehost2\/~jerome\/flash\/3rd_planete_6x01_40k.flv"
+      }
+    ],
+    "meta": {
+      "trackidx_beg": 2,
+      "instance_nonce": "BWzNTaxN7R",
+      "reload_delay": 10000,
+      "may_loop": false
+    },
+    "identifier": "video_on_lan"
+  }
+}

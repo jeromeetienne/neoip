@@ -1,0 +1,47 @@
+'doc' from ludde:
+-----------------
+Every minute a PEX message is sent out. This is used to let the other peer know about which
+peers that I'm currently connected to. The message contains the diffs since the previous
+message. The very first message contains a full set. If the difference is empty, no message
+needs to be sent out.
+
+added contains a concatenation of 6-byte strings (one for each peer to be added to the list
+of peers I'm connected to). The added message contains all peers that were ADDED. It's
+ip(4 byte):port(2 byte) in packed big endian form. dropped contains the same thing, but
+the peers that were DROPPED. These should then be removed from the set.
+
+added.f contains one byte per added peer. (so length(added.f) == length(added) / 6) Currently
+the only defined bit is &1, it's 1 if the peer wants us to connect to it using encrypted
+handshake. The other bits must be 0.
+
+================================================================================
+[13:35] <Andrius> [8:25pm] <hydri> MassaRoddel: the packet is a bencoded dictionary 
+	with 3 entries:
+[13:35] <Andrius> [8:25pm] <hydri> "added": a string with peers added since last message. 
+	6 bytes per peer.
+[13:35] <Andrius> [8:25pm] <hydri> "dropped": a string with the peers we're not connected
+	to since last message. 6 bytes per peer.
+[13:35] <Andrius> [8:25pm] <hydri> "added.f": a string with one byte per added peer 
+	(i.e. added.length() / 6). The bytes are flags for the peers.
+[13:35] <Andrius> [8:25pm] <hydri> All bits should be zero except the least significan bit, 
+	which should be 1 if the peer prefers/supports encrypted connections.
+[13:35] <Andrius> [8:26pm] <hydri> I assume that you implicitly are subscribing to those
+	messages once you advertize support for the extension.
+[13:36] <Andrius> <MassaRoddel> i assume those 6 bytes have the same format as the dht msgs
+[13:36] <Andrius> [8:29pm] <hydri> MassaRoddel: to add the peers, I think the best way is 
+	to pass them to "peer_from_tracker".. then, if the peer already is connected as an 
+	incoming connection, it will be updated to have a listen port so that it can be 
+	contacted back again.
+[13:36] <Andrius> [8:29pm] <hydri> yes, I assume so to
+[13:36] <Andrius> <MassaRoddel> this seems complicated for a pex
+[13:36] <Andrius> [8:32pm] <hydri> you can just keep a std::set<> in each connection that 
+	supports the extension, and then do two set_difference() to build the two lists
+[13:36] <Andrius> <MassaRoddel> yeah, but why would i need to tell the other peer about 
+	peers i am not connected to?
+[13:36] <Andrius> <MassaRoddel> or did i misunderstand 'dropped'?
+[13:36] <Andrius> <MassaRoddel> or is the goal to build a list of all available peers?
+[13:36] <Andrius> <MassaRoddel> if all peers in the swarm are supposed to be collected 
+	then this task should reside somewhere in the torrent
+[13:36] <Andrius> [8:44pm] <hydri> I don't know what the purpose with dropped is..
+[13:36] <Andrius> textfile from moopolice source
+[13:36] <Andrius> source downloaded from the last link i gave you on channel

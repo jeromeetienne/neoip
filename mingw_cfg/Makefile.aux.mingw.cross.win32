@@ -1,0 +1,145 @@
+PREFIX_INST=$(PWD)/inst
+
+CFGFLAGS= --host=i586-mingw32msvc --build=i686-pc-linux-gnu	\
+	--prefix=$(PWD)/inst					\
+
+LIBEVENT_VERSION=1.3a
+LIBBZIP2_VERSION=1.0.4
+ZLIB_VERSION=1.2.3
+LIBIDN_VERSION=1.0
+
+################################################################################
+################################################################################
+#
+################################################################################
+################################################################################
+
+all: libevent bzip2 zlib libidn
+clean:	clean-libevent clean-bzip2 clean-zlib clean-libidn
+	rm -rf src build inst
+
+################################################################################
+################################################################################
+# libevent rules
+################################################################################
+################################################################################
+
+src/libevent-$(LIBEVENT_VERSION)/configure: dist/libevent-$(LIBEVENT_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/libevent-$(LIBEVENT_VERSION).tar.gz
+	cd src && patch -p0 < ../dist/libevent-$(LIBEVENT_VERSION).patch
+	touch src/libevent-$(LIBEVENT_VERSION)/configure
+
+build/libevent-$(LIBEVENT_VERSION)/Makefile: src/libevent-$(LIBEVENT_VERSION)/configure
+	-mkdir build
+	rm -rf build/libevent-$(LIBEVENT_VERSION)
+	cp -r src/libevent-$(LIBEVENT_VERSION) build/libevent-$(LIBEVENT_VERSION) && \
+	cd build/libevent-$(LIBEVENT_VERSION) && \
+	./configure $(CFGFLAGS)
+
+inst/bin/libevent.a: build/libevent-$(LIBEVENT_VERSION)/Makefile
+	make -C build/libevent-$(LIBEVENT_VERSION) install
+
+libevent: inst/bin/libevent.a
+	touch libevent
+
+clean-libevent:
+	-make -C build/libevent-$(LIBEVENT_VERSION) uninstall
+	rm -f libevent
+	rm -rf src/libevent-$(LIBEVENT_VERSION)
+	rm -rf build/libevent-$(LIBEVENT_VERSION)
+
+
+################################################################################
+################################################################################
+# bzip2 rules
+################################################################################
+################################################################################
+
+src/bzip2-$(LIBBZIP2_VERSION)/configure: dist/bzip2-$(LIBBZIP2_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/bzip2-$(LIBBZIP2_VERSION).tar.gz
+	cd src && patch -p0 < ../dist/bzip2-$(LIBBZIP2_VERSION).patch
+	touch src/bzip2-$(LIBBZIP2_VERSION)/Makefile
+
+build/bzip2-$(LIBBZIP2_VERSION)/Makefile: src/bzip2-$(LIBBZIP2_VERSION)/configure
+	-mkdir build
+	rm -rf build/bzip2-$(LIBBZIP2_VERSION)
+	cp -r src/bzip2-$(LIBBZIP2_VERSION) build/bzip2-$(LIBBZIP2_VERSION) && \
+	cd build/bzip2-$(LIBBZIP2_VERSION) && \
+	make libbz2.a
+
+inst/bin/libbz2.a: build/bzip2-$(LIBBZIP2_VERSION)/Makefile
+	make -C build/bzip2-$(LIBBZIP2_VERSION) install
+
+bzip2: inst/bin/libbz2.a
+	touch bzip2
+
+clean-bzip2:
+	-make -C build/bzip2-$(LIBBZIP2_VERSION) uninstall
+	rm -f bzip2
+	rm -rf src/bzip2-$(LIBBZIP2_VERSION)
+	rm -rf build/bzip2-$(LIBBZIP2_VERSION)
+
+################################################################################
+################################################################################
+# zlib rules
+################################################################################
+################################################################################
+
+src/zlib-$(ZLIB_VERSION)/configure: dist/zlib-$(ZLIB_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/zlib-$(ZLIB_VERSION).tar.gz
+	touch src/zlib-$(ZLIB_VERSION)/Makefile
+
+build/zlib-$(ZLIB_VERSION)/Makefile: src/zlib-$(ZLIB_VERSION)/configure
+	-mkdir build
+	rm -rf build/zlib-$(ZLIB_VERSION)
+	cp -r src/zlib-$(ZLIB_VERSION) build/zlib-$(ZLIB_VERSION) && \
+	cd build/zlib-$(ZLIB_VERSION) && \
+	CC=i586-mingw32msvc-gcc RANLIB=i586-mingw32msvc-ranlib \
+	./configure --prefix=$(PREFIX_INST)
+
+inst/bin/libz.a: build/zlib-$(ZLIB_VERSION)/Makefile
+	make -C build/zlib-$(ZLIB_VERSION) install
+
+zlib: inst/bin/libz.a
+	touch zlib
+
+clean-zlib:
+	-make -C build/zlib-$(ZLIB_VERSION) uninstall
+	rm -f zlib
+	rm -rf src/zlib-$(ZLIB_VERSION)
+	rm -rf build/zlib-$(ZLIB_VERSION)
+
+
+################################################################################
+################################################################################
+# libidn rules
+################################################################################
+################################################################################
+
+src/libidn-$(LIBIDN_VERSION)/configure: dist/libidn-$(LIBIDN_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/libidn-$(LIBIDN_VERSION).tar.gz
+	touch src/libidn-$(LIBIDN_VERSION)/configure
+
+build/libidn-$(LIBIDN_VERSION)/Makefile: src/libidn-$(LIBIDN_VERSION)/configure
+	-mkdir build
+	rm -rf build/libidn-$(LIBIDN_VERSION)
+	cp -r src/libidn-$(LIBIDN_VERSION) build/libidn-$(LIBIDN_VERSION) && \
+	cd build/libidn-$(LIBIDN_VERSION) && \
+	CC=i586-mingw32msvc-gcc RANLIB=i586-mingw32msvc-ranlib \
+	./configure --prefix=$(PREFIX_INST)
+
+inst/bin/libidn.a: build/libidn-$(LIBIDN_VERSION)/Makefile
+	make -C build/libidn-$(LIBIDN_VERSION) install
+
+libidn: inst/bin/libidn.a
+	touch libidn
+
+clean-libidn:
+	-make -C build/libidn-$(LIBIDN_VERSION) uninstall
+	rm -f libidn
+	rm -rf src/libidn-$(LIBIDN_VERSION)
+	rm -rf build/libidn-$(LIBIDN_VERSION)

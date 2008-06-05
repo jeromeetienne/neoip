@@ -1,0 +1,72 @@
+{
+  "playlist": {
+    "title": "bliptv_tag_at_random",
+    "date": "Tue Dec 11 23:49:06 UTC 2007",
+    "track": [
+      {
+        "title": "Elephant amphitheatre ",
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 2770.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "mod": "flv",
+            "static_filelen": 11517869
+          }
+        },
+        "meta": {
+
+        },
+        "duration": 180296,
+        "location": "http:\/\/s1.video.blip.tv\/0970000872453\/Wildcaster-ElephantAmphitheatre541.flv"
+      },
+      {
+        "title": "Giraffe in the river",
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 2734.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "mod": "flv",
+            "static_filelen": 11144959
+          }
+        },
+        "meta": {
+
+        },
+        "duration": 180713,
+        "location": "http:\/\/s2.video.blip.tv\/0910000875960\/Wildcaster-GiraffeInTheRiver188.flv"
+      },
+      {
+        "title": "Tree Squirrels",
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 2842.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "mod": "flv",
+            "static_filelen": 11824336
+          }
+        },
+        "meta": {
+
+        },
+        "duration": 183352,
+        "location": "http:\/\/s5.video.blip.tv\/0590000876918\/Wildcaster-TreeSquirrels974.flv"
+      }
+    ],
+    "meta": {
+      "trackidx_beg": 0,
+      "instance_nonce": "eZE3WFMtGV",
+      "reload_delay": 10000,
+      "may_loop": false
+    },
+    "identifier": "bliptv_tag_at_random"
+  }
+}

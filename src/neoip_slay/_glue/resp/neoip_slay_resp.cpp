@@ -1,0 +1,63 @@
+/*! \file
+    \brief Definition of the slay_resp_t
+
+*/
+
+
+/* system include */
+/* local include */
+#include "neoip_slay_resp.hpp"
+#include "neoip_log.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+// define the factory plant for slay_resp_t
+FACTORY_PLANT_DEFINITION (slay_resp_factory	, slay_domain_t, slay_resp_vapi_t);
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                       CTOR/DTOR
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+slay_resp_t::slay_resp_t() throw()
+{
+	// zero some fields
+	m_resp_vapi	= NULL;
+}
+
+/** \brief Desstructor
+ */
+slay_resp_t::~slay_resp_t() throw()
+{
+	if( m_resp_vapi )	resp_vapi()->destroy();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			Setup function
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Start the operation
+ */
+slay_err_t	slay_resp_t::start(const slay_resp_arg_t &arg)	throw()
+{
+	// sanity check
+	DBG_ASSERT( is_null() );
+
+	// create the responder thru the factory
+	m_resp_vapi	= slay_resp_factory->create(arg.domain());
+	DBG_ASSERT( m_resp_vapi );
+	
+	// then setup the resp_vapi
+	return resp_vapi()->start(arg);
+}
+
+
+
+
+NEOIP_NAMESPACE_END
+

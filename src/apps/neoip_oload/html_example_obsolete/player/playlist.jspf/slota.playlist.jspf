@@ -1,0 +1,40 @@
+{"playlist": {
+	"date"	: "Fri, 17 Aug 2007 20:07:25 GMT",
+	"meta"	: {
+		"may_loop"	: 1
+		},
+	"track"	: [
+		{
+		"location"	: "http:\/\/192.168.1.3\/~jerome\/output.flv",
+		"title"		: "me in front of webcam",
+		"duration"	: 88520,
+		"meta"		: {
+			"start_time"		: 10000,
+			"prefetch_delay"	: 30000
+			},
+		"extension"	: {
+			"oload"	: {
+				"mod"		: "flv",
+				"httpo_maxrate"	: "100k"				
+				},
+			"flv_mdata_info": {
+				"type"		: "internal",
+				"intmdata_len"	: 2226
+				}
+			}
+		}
+		,
+		{
+		"location"	: "http://192.168.1.3:8080/stream.mp4",
+		"duration"	: 88520,
+		"meta"		: [
+			{ "content_type"	: "stream"	}
+			],
+		"extension"	: {
+			"casto"	: {
+				"cast_name": "superstream.mp4"
+				},
+			}	
+		}
+	]
+}}

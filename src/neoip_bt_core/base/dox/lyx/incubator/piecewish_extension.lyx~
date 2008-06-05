@@ -1,0 +1,94 @@
+#LyX 1.4.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 245
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+\date {}
+\end_preamble
+\language english
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize default
+\spacing single
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 2
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+PieceWish extension to bittorrent
+\end_layout
+
+\begin_layout Author
+Jerome Etienne
+\end_layout
+
+\begin_layout Abstract
+This text presents an extension to the bittorrent protocol for peers to
+ advertize the pieces they wishes to download.
+\end_layout
+
+\begin_layout Section
+Basic description
+\end_layout
+
+\begin_layout Itemize
+describe the protocol in itself
+\end_layout
+
+\begin_layout Itemize
+integration with the extension protocol of ut
+\end_layout
+
+\begin_layout Itemize
+relation with the HAVE message
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+if a peer advertize the piece as available, it is considered nowish
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+it is possible to express your wish globally with bitfield and singularly
+ by index.
+ (similar to the piece presence)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+dowish_index and dowish_field
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+It is possible to advertize the wish to download (with dowish_*) and the
+ absence of wish with (nowish_*)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+thus if a piece is wished at a given moment and then is no more, it is possible
+ to advertize it
+\end_layout
+
+\end_body
+\end_document

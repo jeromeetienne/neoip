@@ -1,0 +1,170 @@
+NOTE about coding a reliable stream on top of nsock
+---------------------------------------------------
+- local information
+  o xmit window: buffer, cur_len, max_len
+  o recv window: buffer, cur_len, max_len
+  o last_xmited_ts: 
+    o the value of last xmited timestamp
+    o the local time of its reception
+- how do i call this layer
+  o rstream.c good for now
+  o relistream.c too long
+------------------------------------------------------
+QUESTIONS:
+- when to rxmit ?
+  o related to rtt and other peer's delayed_ack timer obviously 
+  o to rxmit just at rtt+rem_delayed_ack seems *currently* stupid to me because it wont be robust to even 
+    a very slight delay
+- how to tune the rxmit timer ?
+- what to rxmit ?
+  o assume i sent 10 packets since the last acknowledgement
+  o now it is time to rxmit, do i rxmit all 10 times in a row ?
+  o a simple solution could be to handle each packet separatly
+    + not that bad solution for a first generation of this protocol
+    + if a given packet needs to be rxmit, do rxmit it now
+    + if other packets needs to be rxmit too, rxmit them too
+    + what about initially partial packet which are rxmit as full packet ?
+- how to handle packet reordering
+  o hope for the delayed ack to catch it
+  o a matter of code to handle it properly
+  o nothing in timer of anything
+
+QUESTIONS with pretty good answers:
+- how to handle the wrap around of seqnb and timestamp ?
+  o the seqnb can be handled as in tcp (see seqnb_arithm.h)
+  o can i use the same for time stamp ?
+  o you can simply recompute it by doing simple test in a /tmp/main.c
+    + would be good, just to be sure to understand it
+  => ok i did the test and YES it works
+     o under the normal assumption that the difference between the two number are less than the half the space
+- What about the initial value of recved_seqnb and recved_ts
+  o the sender adds an header option which asks the receiver to ignore them
+  o it should zero them for sanity
+- when to notify the caller for reception/transmition ?
+  o the caller determine itself when to be called
+  o "call me when the xmit/recv window has at least X bytes available"
+- which value put in the adv_window
+  o handle the silly 0 window syndrome
+  o what about advertize 0 if the free room in the recv window is below min(mtu, recv_window.max_len/2)
+    + if a 0 zero has been advertized, and the free room goes >= the min(), then spontaneously send an adv_win
+  o else advertize the current free room
+- handle the nagle/cork algo ? lets call it delayed_xmit
+  o how usefull it will be for my usage ?
+    + currently my only usage of reliable stream is neoip_ft and it wont be usefull there as its read/write
+      blocks typically much larger than the mtu.
+    + for neoip_cxnfwd or neoip_sock shared lib, the reliable stream has to emulate tcp so nagle and cork
+      may be usefull
+    + easy to code anyway
+  o _set_delayed_xmit( delayed_f=TRUE/FALSE, timer_ms )
+    + if delayed_f and timer_ms = 0, never send partial packet
+    + if delayed_f and timer_ms != 0, send when timer_ms expired since the first write in the emtpy xmit_buffer
+      or when the xmit_buffer contains enougth to send a full packet, which ever comes first
+    + if !delayed_f, timer_ms is ignored and always send immediatly regardless of the amount of data
+------------------------------------------------------
+packet format:
+- advertized window = how many byte the sender can currently accept 
+  o (max_len - used_len) + handling of 0 window
+  o coded in 16-bit with possible multiplier
+  o pure 32-bit allows 4gbyte
+  o a adv_window of 16-bit with a multiplier of 4-bit allows 64-kbyte * (2^15) = 2gbyte
+    + but with a 5-bit multiplier it allows, 64-kbyte * (2^31) = 128gbyte
+      o so 32-times more than a flat 32-bit but with only 21-bits
+    + this multiplier stuff provides less precision but require less space
+      o moreover if you needs this kind of windows, the precision of small numbers (1/65536) the max
+        may be considered negligible.
+- a 16-bit reserved flags
+  o here is the place to put frequent option
+  o put one bit for validity of recved ts/seqnb here 
+    + temporary the time i code the options parsing/building
+  o one bit to indicate the presence header's option
+  o one bit for DONT DELAY ACK ? 
+    + this implies dont delay to acknowledge this packet
+    + what would be the purpose of it ? if you dont find one, dont do it
+    + when i put it there, i had an idea... unfortunatly i dont remember which one :)
+- xmited seqnb of the data contained in the packet 32-bit
+  o the sender's sequence nb of the first byte of this packet
+  o xmited_seqnb is a byte counter since the begining of the stream but it can wrap around
+  o seqnb of the beginiing of the xmit_buf + buf_offset
+- recved seqnb = the sequence number of the last byte of the fully received stream
+  o fully received stream = all the stream without hole in it (e.g. due to packet loss/reordering)
+  o used by the receiver to determine up to which byte the stream has been fully received
+  o receiver remove the data of this xmit_buf up to this seqnb
+- xmited timestamp = current time of the sender while sending it
+  o used by the receiver to computed the recved_timestamp
+- recved_timestamp
+  o recved timestamp = xmited ts of last received packet + delay before acknowledge it (i.e. current date - date of reception)
+  o allow to deduce the rtt = current time - recved_ts
+- may be followed by options (here is the place to put rare option)
+  o validity of recved_seqnb and recved_ts
+  o multiplier of the adv_window
+  o delayed_ack delay
+----------------------------------------------------------
+- protocol information
+  o other peer advertized window
+    + adv_window = amount of data the other peer is able to receive
+    + do not advertized to small window aka 0 window syndrome
+  o rtt of the connection
+  o data acknoledgement
+  o path mtu of the connection
+    + issue currently otsp doesnt have pmtu
+    + so nsock, on top of otsp, doesnt have one either
+    + as fragmentation increase the packet loss, it should be avoided when possible
+    + so no packet bigger than the mtu should be sent for this reliable stream
+    => currently hardcode the mtu 
+       + but code it fast
+-----------------------------------------------------------
+NOTE ABOUT DELAYS
+- rtt = round time trip between the 2 applications
+  o it is independant of the packet loss ratio
+  o what is the initial value of the rtt ? 
+  o #define RSTREAM_INITIAL_RTT	(1*1000)
+  o it is averaged by avg_rtt += (last measured rtt - avg_rtt)/4
+- the minimal rxmit delay is
+  o avg_rtt + delayed_ack_delay
+  o #define RSTREAM_DELAYED_ACK_DELAY	(200)
+- when a packet has to be rxmit
+  o multiply the rxmit_delay by a constant >= 1
+  o say 5/4 at first
+  o called the rxmit_delay_upd_if_rxmit
+  o if a packet needs to be rxmit, either there is some packet loss or the rtt increase
+- when a packet is acknowledged before its rxmit delay
+  o multiply the rxmit_delay by a constance <= 1
+  o with a minimal of rtt + delayed_ack_delay
+  o say 3/5
+  o called the rxmit_delay_upd_if_early_recv
+- under constant conditions, the rxmit_delay must be stable
+- code that with some macro in order to easily experiment
+-----------------------------------------------------------------
+ALGO:
+- the caller writing data in the stream. via rstream_write(rstream, data, data_len)
+  o rstream may write part of the data in the stream
+    + rstream_write return the number of byte actually written in the stream
+  o if delayed_xmit_f and xmit_buf->used_len < mtu
+    + if delayed_xmit_timer is not running, launch it if not zero
+    + return
+  o try to immediatly send data
+- when delayed_xmit_timer expires
+  o try to immediatly send data
+- the caller reading data in the stream
+  o the caller is notified by callback that some data are available in the recv_buf
+  o the caller read the data via rsteam_read(rstream, data, data_len)
+  o this change the local advertized window
+    + when should i send it spontaneously ? delay its advertissement ? like delayed_ack
+    + what about the 0 window stuff ?
+- rstream transmiting packet on the connection
+  o the xmit buffer contains only the not yet acknowledged data
+  o the amount of data in the air should not be greater than the rstream->remote_adv_window
+- rstream receiving packet on the connection
+  o update the copy of the rstream->remote_adv_window
+  o depending on the acknowledged data
+    + what are the consequence on in_air packet
+- to avoid to rely on default value, at the very begining of the stream
+  o both side send an empty packet with their values (adv_window, window_scaling, delayed_ack_delay)
+  o before received the remote peer packet, the local peer relies on default value
+  o allow fast sync but no blocking
+  o Q. what if this packet is dropped by the network ?
+------------------------------------------------------------------
+POINT TO KEEP IN MIND:
+- the part of the received packet may be lost or reordered
+  o so xmited_seqnb = 3 may be received before xmited_seqnb = 1
+  o try to handle this case, to avoid useless rxmit

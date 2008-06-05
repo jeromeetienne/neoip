@@ -1,0 +1,21 @@
+{"playlist": {
+	"date"	: "Fri, 17 Aug 2007 20:07:25 GMT",
+	"meta"	: {
+		"may_loop"	: 1
+		},
+	"track"	: [
+		{
+		"location"	: "http:\/\/192.168.1.3\/~jerome/ntv002.mp4",
+		"title"		: "pbs nerd tv chunk1",
+		"duration"	: 100000,
+		"meta"		: {
+			"start_time"		: 100000,
+			},
+		"extension"	: {
+			"oload"	: {
+				"announce_uri"	: "http://jmehost.podzone.net:55001/announce",
+				}
+			}
+		}
+	]
+}}

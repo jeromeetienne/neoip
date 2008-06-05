@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>Test NeoIP oload playlist with flash</title></head>
+<body>
+
+
+<script type="text/javascript" src="../../base/javascript/swfobject.js"></script>
+<script type="text/javascript">
+	// some variables to save
+	var currentPosition;
+	var currentVolume;
+	var currentItem;
+
+	// these functions are caught by the JavascriptView object of the player.
+	function sendEvent(typ,prm) { thisMovie("mpl").sendEvent(typ,prm); };
+	function getUpdate(typ,pr1,pr2,pid) {
+		if(typ == "time"){
+			currentPosition = pr1;
+		}else if(typ == "volume"){
+			currentVolume = pr1;
+		}else if(typ == "item"){
+			currentItem = pr1;
+			setTimeout("getItemData(currentItem)",100);
+		}
+		
+		// jme- ugly trick to get a new play_tv when the state is no more 'playing'
+		// - this is bad as it reinit the whole flash plugin
+		// - maybe to play with the players playlist. i dunno
+		// - this *kinda* works for now
+		if( typ == "state" && pr1 != "2" ){
+			play_tv();
+		}
+		
+		var id = document.getElementById(typ);
+		id.innerHTML = typ+ ": "+Math.round(pr1);
+		pr2 == undefined ? null: id.innerHTML += ", "+Math.round(pr2);
+		if(pid != "null") {
+			document.getElementById("pid").innerHTML = "(received from the player with id <i>"+pid+"</i>)";
+		}
+	};
+
+	// These functions are caught by the feeder object of the player.
+	function loadFile(obj) { thisMovie("mpl").loadFile(obj); };
+
+	function getItemData(idx) {
+		var obj = thisMovie("mpl").itemData(idx);
+		var nodes = "";
+		for(var i in obj) { 
+			nodes += "<li>"+i+": "+obj[i]+"</li>"; 
+		}
+		document.getElementById("data").innerHTML = nodes;
+	};
+
+	// This is a javascript handler for the player and is always needed.
+	function thisMovie(movieName) {
+	    if(navigator.appName.indexOf("Microsoft") != -1) {
+			return window[movieName];
+		} else {
+			return document[movieName];
+		}
+	};
+
+	function loadPlayer(fil, width, height, start_position) {
+		var so = new SWFObject('flvplayer.swf','mpl',width, height, '7');
+		so.addVariable("file",fil);
+		if( start_position )	so.addVariable("start", start_position);
+		so.addVariable("autostart","true");
+		so.addVariable("enablejs","true");
+		so.addVariable("javascriptid","mpl");
+		so.addVariable("streamscript", "lighttpd");
+		so.write('player');
+	};
+</script>
+<script src="neoip_oload_playlist_parser.js"></script> 
+<script>
+	var	playlist_parser	= new neoip.oload_playlist_parser();
+	var	current		= playlist_parser.current();
+	
+	document.write( "When this page was loaded: the current was " + Math.round(current.position) + "-sec within "
+				 + current.item.description + "<br/>");
+</script>
+<script>
+	function play_tv(){
+		var playlist_json = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: [     {      	"description"	: "first movie output.flv",'
+			+'				"url"		: "http://jmehost1:4500/flv/http/jmehost1/~jerome/output.flv",'
+			+'		        	"duration"	: 84.92'
+			+'		        },{    	"description"	: "second movie - golfers.flv",'
+			+'				"url"		: "http://jmehost1:4500/flv/http/jmehost1/~jerome/golfers.flv",'
+			+'		        	"duration"	: 60.26'
+			+'		        }'
+			+'		]'
+			+'}';
+
+		var	playlist_parser	= new neoip.oload_playlist_parser(playlist_json);
+		var	current		= playlist_parser.current();
+		loadPlayer(current.item.url,'320', '260', current.position);
+	}
+	// jme- ultra lame way to autostart on load
+	// - put a onload event instead
+	//setTimeout("play_tv()",100);
+</script>
+
+
+<h3>issue with flash buffering</h3>
+<ul>
+	<li>Currently the flash player read the movie as fast as it can</li>
+	<li>this breaks the 'lets all be at the same position' assumption of neoip-oload</li>
+	<li>because some people will have more bw and so download faster than other
+		so they will be desynched.</li>
+	<li>Other player like vlc/mplayer etc... download only a given amount before the currently displayed position</li>
+	<li><b>TODO</b>: how to make flash do the same.</li>
+	<li><b>possible solution:</b> have neoip-oload to deliver at a maximum rate.
+	    it would not fix the issue but would reduce it. This is not yet implemented.
+	    This require a rate_limit_t in each httpo_full_t. and a outter_var to set it up</li>
+	<li><b>another solution:</b> even finer grained bw control, by using range. like between 
+	    this offset and this offset, deliver at X, and in this other range, deliver at Y.
+	    This is more able to handle the variation in bitrate. unclear this is neeed</li> 
+	<li><b>another solution:</b> have the browser to communicate with the daemon to 
+		periodically notify it of the current player position. thus the daemon
+		could handle the delivery itself</li>
+		<ul>
+		<li>how to get the browser to communicate ? xmlrpc ? javascript.js kludge?
+		    other ?
+		    </li>
+		<li>some 'security' stuff may prevent me from doing it based on the 
+		    single domain restriction. i dont understand this restriction. get info.
+		    the script javacsript kludge is surely possible as i discover the daemon
+		    this way.
+		    </li>
+		<li>how to get the current byte position in the webpage. required as the 
+		    daemon only understand byte, aka not seconds. this is available in flash.
+		    'simply' have to modify the player to export this imformation.
+		    look at a haxe player to produce your own player. see flpivee as an 
+		    example</li>
+		</ul>
+</ul>
+
+<h3>The player</h3>
+btw the <a href="http://www.jeroenwijering.com/?item=JW_FLV_Player">player</a>
+license is free only for 'individuals', aka not for commercial use. It is 
+ok as it is only for experimentation.
+<ul>
+	<li><a href="javascript:loadPlayer('http://jmehost1:4500/flv/http/jmehost1/~jerome/golfers.flv','320', '260')">golfers.flv</a></li>
+	<li><a href="javascript:loadPlayer('http://jmehost1:4500/flv/http/jmehost1/~jerome/output.flv','320', '260')">output.flv</a></li>
+	<li><a href="javascript:play_tv()">play_tv</a></li>
+</ul>
+
+
+<p id="player"><a href="http://www.macromedia.com/go/getflashplayer">Get the Flash Player</a> to see this player.</p>
+
+
+	<h2>RECEIVE UPDATES</h2>
+	<p id="pid"></p>
+	<ul>
+		<li id="item">&nbsp;</li>
+		<li id="volume">&nbsp;</li>
+		<li id="state">&nbsp;</li>
+		<li id="time">&nbsp;</li>
+
+		<li id="load">&nbsp;</li>
+		<li id="size">&nbsp;</li>
+	</ul>
+	<h2>ITEM DATA</h2>
+	<ul id="data"></ul>
+</body>
+</html>

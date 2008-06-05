@@ -1,0 +1,9 @@
+#!/bin/sh
+# Upload the current release to sourceforge
+cd ..
+VERSION=`grep YAV_SW_VERSION src/packet.h  | cut -d'"' -f 2`
+cd ..
+echo -n Uploading yavipin-$VERSION.tgz to sourceforge...
+lftp -e "put yavipin-$VERSION.tgz;exit" upload.sourceforge.net/incoming
+echo Done
+

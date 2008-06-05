@@ -1,0 +1,151 @@
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
+\textclass article
+\begin_preamble
+\date{ }
+\end_preamble
+\language english
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize default
+\spacing single 
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\use_natbib 0
+\use_numerical_citations 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 2
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+HTTP OffLoad Business Model
+\layout Author
+
+Jerome Etienne
+\layout Abstract
+
+This text presents a possible business model for HTTP OffLoad and web site
+ selling digital content.
+ It introduces an incencitive for the web site and for the customer to use
+ HTTP OffLoad, which would ease the adoption of HTTP OffLoad.
+\layout Section
+
+Description of the actors
+\layout Standard
+
+In this business model, there are 2 actors:
+\layout Description
+
+Seller In this business model, the seller is a web site selling digital
+ content via large file, e.g.
+ video.
+ For example, it could be a movie producer, such as hollywood, selling its
+ dvd under this format.
+ It could be a porn web site, selling its movies via subscription.
+\layout Description
+
+Buyer In this business model, the buyer is a customer on the internet, buying
+ the content of the seller.
+ NOTE: As the seller receives money from the buyer, it is able to identify
+ the buyer.
+ This is an important part in the banking system described later.
+\layout Section
+
+Incencitives
+\layout Standard
+
+HTTP OffLoad allows the buyers to exchange the data between themselves,
+ thus reducing the bandwidth cost of the seller.
+\layout Subsection
+
+Incencitive for the seller
+\layout Standard
+
+If the buyers uses HTTP OffLoad, its bandwidth cost is reduced.
+ Moreover HTTP OffLoad efficiency is proportionnal to its number of users.
+ Thus the bandwidth cost is no more linear to the number of buyers, while
+ it is linear under the traditionnal central http server model.
+\layout Standard
+
+So the incencitive of the seller is to reduce its bandwidth cost.
+ This depends on ratio between the cost of the whole sale process vs the
+ cost of the bandwidth.
+ If producing the content is rather cheap, the cost of the bandwidth is
+ proportionnaly high, thus the incencitive is high.
+\layout Subsection
+
+Incencitive for the Buyer
+\layout Standard
+
+As HTTP OffLoad download from more sources, it may provide a faster download,
+ so a better service.
+ Nevertheless, HTTP OffLoad consumes the buyer upload bandwidth.
+ If the faster download is not considered an high enougth incencitive, which
+ is likely, one should introduce a banking system where the more a buyer
+ upload to other buyer, the more advantages it got from the sellers.
+ It is up to the buyers to determine which kind of advantages may be provided
+ to the 'good customers'.
+ As an example, the advantages could be additionnal contents accessible
+ only to them or to pay less for the content they got.
+\layout Section
+
+Banking system
+\layout Standard
+
+In order to provide advantage to the 'good customers', the seller needs
+ to be able to distinguish them from the 'normal customers', so to be able
+ to monitor how much data has been uploaded and downloaded by a given buyer.
+\layout Subsection
+
+NOTE
+\layout Itemize
+
+As the seller is a web site, so a central server, it can run a centralized
+ bank dedicated to its web site
+\layout Itemize
+
+All the buyers reports how much they uploaded and downloaded and from whom
+\layout Itemize
+
+as all buyer are identifiable by the seller, due to the original physical
+ money transaction, the identity of the peers can be directly derived from
+ this.
+\layout Itemize
+
+The connection between the peers should be authenticated to ensure that
+ the identity are not forged.
+\layout Itemize
+
+On the other hand, right now i dont see what would be the incencitive to
+ forge it.
+ 
+\layout Itemize
+
+As a buyer needs to pay to get its identity, it wont be willingly give it
+ away to others ?
+\layout Section
+
+Security
+\layout Itemize
+
+As there is money involved, people will try not to pay.
+ aka will try to crack the system.
+\layout Itemize
+
+Describe what are the possible attacks
+\layout Itemize
+
+What about the collusion between 2 buyers to simulate a large amount of
+ data shared between them and thus increasing artificially their account.
+\the_end

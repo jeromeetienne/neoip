@@ -1,0 +1,110 @@
+/*! \page bt-track-compat-distri Distributed tracker compatible with bittorrent
+
+This page describe a system able to provide distributed tracker to bittorrent
+in a compatible fashion.
+So this systems provides better data availability and/or better download speed
+and/or reduces the off-line trackers issue and/or reduce the load put on trackers. 
+Moreover this system is fully compatible with current bt protocol.
+
+\par Issue with http tracker
+The bittorrent protocol is using a http server to keep tracks of the peers
+currently participating to a given .torrent (called a swarm).
+The address tracker is provided via an url in the .torrent file.
+The issue with this system is :
+-# Using a http server is centralized, so this computer will suffer of the usual
+   issue of centralized system.
+   -# it is a single point of faillure: aka if this computer goes off-line, the peers
+      can no more participate in the swarm.
+   -# it suffers from high load: aka all the peers requests to a single computer,
+      So if there are many peers, its load is high and the computer has to be 
+      more powerfull to handle it. If it isnt powerfull enougth, some peers
+      will be enable to participate in the swarm
+-# The address tracker MAY be dynamic via dns, but in most case, this feature 
+   isn't used.
+-# The address is in the .torrent so it isn't modifiable
+-# due to this load, trackers are expensive to run so they limit the number of
+   peers or the swarms they serves.
+-# trackers doesn't share their swarm information. so if a given file is 
+   shared using a tracker A and a tracker B, peers participating thru A won't
+   be aware of B's peers. This decreases the download speed and the data
+   availability. Possible scenario:
+   - relation with the rarest-first. here rarest is estimated only with the 
+     A swarm without the information from the B swarm
+   - a piece available on B swarm but not on A
+   - A tracker may contains 1 seed and 50 leechs while B may contain 50seed totally idle
+
+\par System Description
+- the http query to the tracker contains an identification of the queried swarm.
+  So the http tracker doesn't need to be aware of the swarm before.
+  - it is my currently analysis of the bt protocol, but im not fully sure
+- behind each http tracker there is a dht
+  - the http tracker acts as a gateway between the http tracker bt protocol and 
+    the dht.
+- the tracker's hostname contained in the .torrent has the following format:
+  - swarmid.port.domain
+  - the domain is any usual DNS domain e.g. btpool.org or btpool.neo-ip.org
+  - the port is the bound port of http tracker
+    - the port information is required in the url due to the way dns resolves it.
+      aka it use A records which doesnt take the port into account. But the connection
+      to the http tracker is done over tcp so with a specific port. In practice,
+      this port isn't a 'well known' port similar in each .torrent and depends on
+      the configuration of the specific tracker.
+  - the swarmid is the info_hash of the .torrent
+  - possiblity something about https or http authentication for 'private .torrent'
+- all http tracker participate in a dns pool according to their ports and 
+  possibly a given swarm.
+  - if it wishes to serves only given swarm, it has to subscribe to each
+    of the hostname with the specific swarmid
+  - if it wishes to handle all the swarmes for a specific domain, it
+    subscribe any.port.domain
+  - a http tracker may participate in one or more domain
+- the domain dns server handles the pool and return the proper record according 
+  to the currently online trackers.
+  - the domain dns server may performs a filter on the swarmid as well
+  - or dictate policy about port
+    - if the port are the same for each tracker participating in the domain, the
+      availability of the trackers is to its max.
+    - on the other hand, isp may detects this fact and slow down traffic to those
+      port.
+    - it is up to the domain to decide the policy it wishes to apply
+  - the http tracker may choose the amount of load it wishes by asking the 
+    dns server to reply its address only once in a while.
+    
+\par Anaylysis
+- This system allows all trackers of a given domain to share the same swarm
+  information. 
+  - so better that current http tracker
+- several dns domains may share the same dht or not
+  - it is desirable to share the same dht to maximize the availability of 
+    the swarm information 
+- It allows to control:
+  - a given tracker can choose which swarm to serve
+  - a given domain can chooose which swarm to serve or which tracker 
+    to accept (important with 'private .torrent')
+  - So the control offered to tracker's admin is the same as with http trackers
+- It distributes the load among all tracker serving a given torrent.
+  - this can be done with current http trackers via dns, but isn't used in practice
+
+So this systems provides better data availability (thanks to sharing
+swarm informations) and/or better download speed (thanks to sharing swarm information again)
+and/or reduces the off-line trackers issue (thanks to the tracker pool) and/or 
+spread of the load of trackers (thanks to the tracker pool again).
+Moreover this system is fully compatible with current bt protocol.
+
+
+\par Relation with dht of mainline/azureus
+- those dht are incompatible with each other
+  - none is specified, so it is hard to reimplement in a compatible fashion.
+    because it would require to reverse engineer the source.
+- They are not compatible with the bt protocol
+  - so bt client not implementing dht are still stuck with all the issues of 
+    http tracker
+
+*/
+
+
+
+
+
+
+

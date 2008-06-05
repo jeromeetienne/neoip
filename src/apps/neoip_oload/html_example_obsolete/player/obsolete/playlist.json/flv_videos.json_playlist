@@ -1,0 +1,31 @@
+{
+	base_date	: "Fri, 17 Aug 2007 20:07:25 GMT",
+	may_loop	: true,
+	item_arr	: [
+			{	address		: "http://192.168.1.3/~jerome/output.flv",
+				duration	: 88.52,
+				prefetch_delay	: 30,
+				meta : {
+			       		oload:	{
+						mod: "flv"
+			       		},
+			       		admin:	{
+			       			name:	"me in front of webcam"
+			       		}
+			       	}
+			},
+			{	address		: "http://192.168.1.3/~jerome/flash/golfers.flv",
+				duration	: 60.24,
+				prefetch_delay	: 30,
+				meta : {
+					oload:	{
+						mod: "flv"
+					},
+			       		admin:	{
+			       			name:	"playstation advertisement"
+			       		}
+				}
+			}
+
+		]
+}

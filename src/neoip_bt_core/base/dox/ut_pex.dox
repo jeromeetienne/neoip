@@ -1,0 +1,15 @@
+Every minute a PEX message is sent out. This is used to let the other peer know about which
+peers that I'm currently connected to. The message contains the diffs since the previous
+message. The very first message contains a full set. If the difference is empty, no message
+needs to be sent out.
+
+"added" contains a concatenation of 6-byte strings (one for each peer to be added to the list
+of peers I'm connected to). The added message contains all peers that were ADDED. It's
+ip(4 byte):port(2 byte) in packed big endian form. 
+
+"dropped" contains the same thing, but the peers that were DROPPED. These should
+then be removed from the set.
+
+"added.f" contains one byte per added peer. (so length(added.f) == length(added) / 6) Currently
+the only defined bit is &1, it's 1 if the peer wants us to connect to it using encrypted
+handshake. The other bits must be 0.

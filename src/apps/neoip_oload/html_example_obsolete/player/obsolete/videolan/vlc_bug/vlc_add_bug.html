@@ -1,0 +1,47 @@
+<html>
+<head><title>playlist.add not adding</title></head>
+<body>
+
+<p>This web page shows a bug in the mozilla plugin of svn Rev: 21313, a bug
+which is not in the 0.8.6 of ubuntu feisty.
+<ul>
+<li>On 0.8.6, playlist.items.count is 0 after a clear. while it is still 1 on svn version.</li>
+<li>additionnaly notice how the numbers moves when you reload the page only on the svn version.
+    or play with the mozilla menu.</li>
+</ul>
+The demonstration demonstrate clear() but it seems to have a kind of latency between the
+call to the plugin and its execution. like clear() do not clear when called, but a short
+time after.
+</p>
+
+<ul id="vlc_disp_data"></ul>
+<object type="application/x-vlc-plugin" pluginspage="http://www.videolan.org/"
+	version="VideoLAN.VLCPlugin.2"
+	id="vlc" width="400" height="300"/>
+
+<script>
+	function test(){
+		var 	vlc	= document.getElementById("vlc");
+		var	url	= "http://example.com/sbl";
+		var 	tmp	= "";
+		
+		tmp	+= "<li>BEFORE clear(), count=" + vlc.playlist.items.count + "</li>";
+		vlc.playlist.clear();
+		tmp	+= "<li>AFTER clear(), count=<font color=red>" + vlc.playlist.items.count + "</font></li>";
+		vlc.playlist.add(url);
+		vlc.playlist.add(url);
+		vlc.playlist.add(url);
+		vlc.playlist.add(url);
+		tmp	+= "<li>AFTER add(), count=" + vlc.playlist.items.count + "</li>";
+		//vlc.playlist.play();
+		tmp	+= "<li>AFTER play(), count=" + vlc.playlist.items.count + "</li>";
+		
+		document.getElementById("vlc_disp_data").innerHTML = tmp;
+		
+		setTimeout("test()", 250);
+	}
+	setTimeout("test()", 250);
+</script>
+
+</body>
+</html>

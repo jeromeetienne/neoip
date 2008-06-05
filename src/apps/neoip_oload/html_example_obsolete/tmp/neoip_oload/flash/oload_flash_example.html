@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>NeoIP oload sample page for flash player</title></head>
+<body>
+
+<script type="text/javascript" src="../../base/javascript/swfobject.js"></script>
+<script type="text/javascript">
+	// This is a javascript handler for the player and is always needed.
+	function thisMovie(movieName) {
+	    if(navigator.appName.indexOf("Microsoft") != -1) {
+			return window[movieName];
+		} else {
+			return document[movieName];
+		}
+	};
+	function sendEvent(typ,prm) { thisMovie("mpl").sendEvent(typ,prm); };
+	
+	function loadPlayer(fil, width, height) {
+		var so = new SWFObject('flvplayer.swf','mpl',width, height, '7');
+		so.addParam("allowfullscreen","true");
+		so.addVariable("file",fil);
+		so.addVariable("enablejs","true");
+		so.addVariable("javascriptid","mpl");
+		so.addVariable("usefullscreen","false");
+		so.addVariable("fsbuttonlink","fullscreen.html%3Ffile%3D"+fil);
+		so.addVariable("streamscript", "lighttpd");
+		so.addVariable("autostart","true");
+		so.write('player');
+	};
+</script>
+	
+<h1>Flash Movie Player supporting seeking</h1>
+It demonstrate a flash movie player able to seek thru the video. 
+<h3>About seeking in flv</h3>
+It is able to seek thru the movie at any position
+(without need of downloading all the begining of the movie). it is achieved using 
+the ?start=byteoffset trick. lighttpd/apache2 provide it, so it becomes a standard.
+<ul>
+<li><a href="http://www.flashcomguru.com/index.cfm/2005/11/2/Streaming-flv-video-via-PHP-take-two">Original description of the technic</a></li>
+<li><a href="http://blog.lighttpd.net/articles/2006/03/09/flv-streaming-with-lighttpd">lighttpd implementation</a></li>
+<li><a href="http://journal.paul.querna.org/articles/2006/07/11/mod_flvx">apache2 implementation</a></li>
+<li><a href="http://blog.kovyrin.net/2006/10/14/flash-video-flv-streaming-nginx/">nginx implementation</a></li>
+</ul>
+
+<h3>Example of usefull command to handle video</h3>
+<ul>
+	<li>mencoder to save video file from webcam (video only without sound. i dunno how to save sound for now)
+		<pre>mencoder tv:// -tv driver=v4l:device=/dev/video0:width=320:height=240:fps=25:noaudio -o output.flv -of lavf -ovc lavc -lavcopts vcodec=flv:vbitrate=200:mbd=2:mv0:trell:v4mv:cbp:last_pred=3:keyint=25 -lavfopts i_certify_that_my_video_stream_does_not_use_b_frames -vf-add pp=hb:a/vb:a,hqdn3d,mirror
+		</pre>
+	</li>
+	<li>mencoder to save .avi file encoded with snow at 40kbyte/s
+		<pre>mencoder -of lavf -ovc lavc -lavcopts vcodec=snow:vstrict=-2:pred=0:cmp=1:subcmp=1:mbcmp=1:qpel:vbitrate=256 -lavfopts i_certify_that_my_video_stream_does_not_use_b_frames -vf scale=320:208 -oac mp3lame -lameopts cbr:br=64:mode=1 -o /tmp/output.avi /tmp/source.avi
+		</pre>
+	</li>
+	<li>vlc 9.0 to stream flv from file
+		<pre>./vlc --sout "#transcode{vcodec=FLV1,acodec=mp3,sameplerate=44100:vb=50:ab=20}:std{access=http{mime=video/x-flv},mux=ffmpeg{mux=flv},dst=0.0.0.0:8080/stream.flv}" ~/ntv002.mp4 --loop -vvv --color -I dummy 
+		</pre>
+	</li>
+	<li>vlc 9.0 to stream flv from webcam+microphone
+		<pre>./vlc --sout "#transcode{vcodec=FLV1,acodec=mp3,sameplerate=44100}:std{access=http{mime=video/x-flv},mux=ffmpeg{mux=flv},dst=0.0.0.0:8080/stream.flv}"  --loop -vvv --color v4l:// :v4l-vdev="/dev/video0" :v4l-adev="/dev/dsp" :v4l-width=320 :v4l-height=240 :v4l-fps=24.0
+		</pre>
+	</li>
+	<li>vlc9.0 to stream normandie tv
+		<pre>./vlc --sout "#transcode{vcodec=FLV1,acodec=mp3,samplerate=22050,vb=200,ab=64,width=320,height=240,fps=25}:std{access=http{mime=video/x-flv},mux=ffmpeg{mux=flv},dst=0.0.0.0:8080/stream.flv}"  --loop -vvv -I dummy --sout-ffmpeg-keyint 250 --sout-ffmpeg-strict-rc mms://a1251.l252123153.c2521.e.lm.akamaistream.net/D/1251/2521/666/reflector:23153
+		</pre>
+	</li>
+	<li>To compile vlc 9.0 on ubuntu feisty
+		<a href="http://www.jbkempf.com/blog/post/2007/05/06/Build-VLC-media-player-under-Ubuntu-Feisty-704">here</a>
+	</li>
+	<li>TODO to get vlc 9.0 to stream from the webcam</li>
+	<li>TODO get with vlc the same image quality as with mencoder</li>
+</ul>
+
+<a href="mms://85.236.101.101/netgamingtv">netgamingtv</a>
+<a href="http://movix.sdv.fr:8080/teleg1.asf">grenoble TV</a>
+<a href="mms://a1251.l252123153.c2521.e.lm.akamaistream.net/D/1251/2521/666/reflector:23153">Normandie TV</a>
+<a href="mms://a1729.l2168647534.c21686.g.lm.akamaistream.net/D/1729/21686/v0001/reflector:55505">Paris Cap</a>
+<a href="http://207.253.121.82/TVA?MSWMExt=.asf">Shopping TVA</a>
+<a href="mms://85.214.87.175/western-tv/">western tv</a>
+
+<h3>list of available video stream</h3>
+<ul>
+<li><a href="http://www.freeetv.com">freeetv</a>
+	</li>
+<li><a href="http://mediahopper.com">mediahopper</a>
+	</li>
+</ul>
+
+<h3>The player</h3>
+btw the <a href="http://www.jeroenwijering.com/?item=JW_FLV_Player">player</a>
+license is free only for 'individuals', aka not for commercial use. It is 
+ok as it is only for experimentation.
+<ul>
+	<li><a href="javascript:loadPlayer('http://localhost:4550/flv/*xmit_maxrate*100k/http%3a/jmehost2/~jerome/flash/elephantsdream_420_v4.flv','420', '256')">Elephant Dream</a></li>
+	<li><a href="javascript:loadPlayer('http://localhost:4550/flv/http%3a/jmehost2/~jerome/flash/golfers.flv','320', '200')">Golfers</a></li>
+	<li><a href="javascript:loadPlayer('http://localhost:4550/flv/*xmit_maxrate*100k/http%3a/jmehost2/~jerome/flash/0021_frankdixon.flv','320', '260')">bigpictuce frankdixon</a></li>
+	<li><a href="javascript:loadPlayer('http://jmehost2:8080/stream.flv','320', '260')">vlc streaming on jmehost2</a></li>
+	<li><a href="javascript:loadPlayer('http://jmehost1:4001/http%3a/jmehost2:8080/stream.flv','320', '260')">vlc streaming on jmehost2 VIA casto</a></li>
+	<li><a href="javascript:loadPlayer('http://jmehost1/~jerome/output.flv','320', '260')">test from webcam DIRECT</a></li>
+	<li><a href="javascript:loadPlayer('http://localhost:4550/flv/http%3a/jmehost1/~jerome/output.flv','320', '260')">test from webcam via OLOAD</a></li>
+	<li><a href="javascript:loadPlayer('http://localhost:8080/stream.flv','320', '260')">test from webcam live DIRECT</a></li>
+	<li><a href="javascript:sendEvent('scrub',10)">Scrub 5 seconds forward</a>.</li>
+</ul>
+
+<p id="player"><a href="http://www.macromedia.com/go/getflashplayer">Get the Flash Player</a> to see this player.</p>
+
+<h3>Example of mp3 radio stream</h3>
+<ul>
+	<li><a href="http://jmehost1:4001/http%3a/www.jamzine.net:8000/live.mp3">jamzine mp3 stream</a></li>
+	<li>jamzine mp3 stream DIRECT
+		<p id="mp3player_direct"><a href="http://www.macromedia.com/go/getflashplayer">Get the Flash Player</a> to see this player.</p>
+		<script type="text/javascript">
+			var s3 = new SWFObject("mp3player.swf", "line", "240", "20", "7");
+			s3.addVariable("file","http://www.jamzine.net:8000/live.mp3");
+			s3.addVariable("repeat","true");
+			s3.addVariable("showdigits","false");
+			s3.write("mp3player_direct");
+		</script>
+		</li>
+	<li>jamzine mp3 stream thru casti/casto
+		<p id="mp3player_casto"><a href="http://www.macromedia.com/go/getflashplayer">Get the Flash Player</a> to see this player.</p>
+		<script type="text/javascript">
+			var s3 = new SWFObject("mp3player.swf", "line", "240", "20", "7");
+			s3.addVariable("file","http://jmehost1:4001/http%3a/www.jamzine.net:8000/live.mp3");
+			s3.addVariable("repeat","true");
+			s3.addVariable("showdigits","false");
+			s3.write("mp3player_casto");
+		</script>
+		</li>
+</ul>
+
+
+</body>
+</html>

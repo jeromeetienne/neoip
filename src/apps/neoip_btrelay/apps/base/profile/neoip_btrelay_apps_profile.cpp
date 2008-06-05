@@ -1,0 +1,56 @@
+/*! \file
+    \brief Definition of the \ref btrelay_apps_profile_t
+
+*/
+
+
+/* system include */
+/* local include */
+#include "neoip_btrelay_apps_profile.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+// definition of \ref btrelay_apps_profile_t constant
+#if 0
+	const delay_t	btrelay_apps_profile_t::DELSEED_PERIOD	= delay_t::from_sec(10);
+#else
+	const delay_t	btrelay_apps_profile_t::DELSEED_PERIOD	= delay_t::from_sec(10);
+#endif
+// end of constants definition
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                              ctor/dtor
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+btrelay_apps_profile_t::btrelay_apps_profile_t()	throw()
+{
+	delseed_period	(DELSEED_PERIOD);
+}
+
+/** \brief Destructor
+ */
+btrelay_apps_profile_t::~btrelay_apps_profile_t()	throw()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+//                     check function
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+
+/** \brief Check the validity of the profile
+ */
+bt_err_t	btrelay_apps_profile_t::check()	const throw()
+{
+	// return no error
+	return bt_err_t::OK;
+}
+
+NEOIP_NAMESPACE_END
+

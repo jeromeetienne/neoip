@@ -1,0 +1,45 @@
+/*! \page neoip-socket-tcp NeoIP Socket TCP
+
+\ref neoip-socket-udp is part of the \ref neoip-socket.
+It performs connections on top of TCP/IP.
+
+\par NOTES
+- This layer has a special requirement
+  - if the \ref neoip-socket-domain is \ref neoip-socket-tcp and the 
+    \ref neoip-socket-type is the TCP native one aka \ref neoip-socket-type-stream,
+    the data going thru the socket MUST NOT be modified
+    - in other words, such socket must be able to connect another tcp socket
+      which isnt implemented with \ref neoip.
+    - This is made to allow to use \ref neoip-socket-api even when talking 
+      to non \ref neoip programms.    
+    - The same applies to \ref neoip-socket-udp.
+    \todo find a name for this feature
+
+\section neoip-socket-tcp-addr NeoIP Socket TCP Address Space
+- \ref neoip-socket-udp-addr is the same as it is both a usual IP stack
+  address space.
+  
+\subsection neoip-socket-tcp-dns-addr Handling DNS record
+  - the dns A   record  can provide the ip address
+  - the dns SRV record	can provide ip address and port
+  - the dns TXT record  can provide .. TXT i dunno what to put in it
+
+\par dynamic update
+- the dns record can be updated
+- for example if a user has changed its ip and update its dns entry. the 
+  address doesn't need to be changed.
+  - this can be usefull for long lived addresses like in the bootstrapping
+    process.
+
+\subsection neoip-socket-tcp-local-addr NeoIP Socket TCP Local Address
+- tcp://127.0.0.1:80	the ip address and the tcp port is determined
+- tcp://:80		the ip address is ANY and the tcp port is determined
+- tcp://127.0.0.1:0	the ip address is determined and the tcp port is dynamic
+- tcp://:0		the ip address is ANY and the tcp port is dynamic
+
+\subsection neoip-socket-tcp-remote-addr NeoIP Socket TCP remote Address
+- the same as \ref neoip-socket-tcp-local-addr with the following exception:
+  -# the ip address MUST be determined, so MUST NOT be ANY
+  -# the tcp port MUST NOT dynamic, so MUST NOT be dynamic
+
+*/

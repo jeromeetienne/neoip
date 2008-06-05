@@ -1,0 +1,121 @@
+/*! \page neoip-kad-nat-friendly NeoIP Kademlia NAT friendlyness
+
+
+This page describes how the kademlia DHT layer handles its network position.
+This is badly called 'nat friendlyness'
+
+\section nat-goals Nat friendlyness goals
+-# to allow the "dentist-office" case
+  - i.e. a bunch of computer connected together on a lan should be able to find
+    each others without human intervention.
+-# to allow the cohabitation of peers directly reachable from the public internet
+   with other which are not
+-# to allow not to be connected to the internet.
+
+
+\section nat-reach reachability from the public internet
+The inetreach status is provided by the caller. the kad dht layer doesnt contains
+any diagnostic for it. if the listen_addr_pview is non null, it must be fully qualified
+and provide the public view of the kad_peer_t listen_addr.
+
+\subsection nat-issue Issue with the transition of inetreach status
+In some cases, the inetreach status may change over time. For example ntudp uses
+have a dynamic autodiagnostic layer which notify change in the network position. 
+So a peer may change its position and ntudp is supposed to handle it gracefully.
+This feature is nice on a mobile computer.
+
+As of now, it is impossible to change the inetreach status of a kad_listener_t
+with the API and *ESPECIALLY* i dunno how the kad_peer_t will reacts. there are
+2 cases:
+- from inetreach ko to ok: in this case it is not a real issue as the kad_peer_t
+  will simply have more functionnality.
+- from inetreach ok to ko: this case is more of an issue, as the kad_peer_t wont
+  be reachable anymore when other assumes it would...
+  
+It may very well be ok as the kad dht is tuned to work ok even in very dynamic 
+environement, but im not sure... a raw but safe strategy would to simply get a new
+kad_peer_t and republish the kad_rec_t on it. This is not clean as a general politic
+but would work ok in ntudp (which has only 2 published records)
+
+Frequency of the event:
+- ntudp is inetreach in 2 cases
+  - in case of a port forwarding: so not dynamic stuff
+  - in case of a host with no firewall on the listen_oaddr_lview port and its
+    ip address being a public one.
+- so those events are possible but not very frequent.
+  - TODO to be solved but not an emergency
+
+
+\section nat-note Technical notes
+The fields which intervenes in the nat friendlyness are:
+-# the source address: In kademlia dht, the source address kad_addr_t is included
+in each packet, thus the receiver may update its own kbucket.
+-# the list of kad_addr_t returned by some RPC such as findnode and findsomeval
+-# the nslan peer record used to bootstrap thru LANs.
+
+
+\subsection nat-nslan nslan peer record
+This record payload contains a kad_addr_t of its publisher, but specially crafted
+
+nslan peer record building: (this is done in kad_peer_t)
+- kad_addr.ipaddr = ANY (in all cases)
+- kad_addr.port   = listen_addr_lview.port
+- kad_addr.peerid = publisher peerid
+
+nslan peer record parsing: (in kad_bstrap_src_t)
+- the nslan_rec_src_t reports the nslan_rec_t and the source ipport_addr which
+  sent it (aka its publisher)
+- extrace the kad_addr_t from the record's payload
+- replace the kad_addr.ipaddr by the ip address from the source ipport_addr
+- THEN the kad_addr_t is one which can be used by the peer record receiver to 
+  reach the peer record publisher
+
+\subsection nat-kadaddr List of return kad_addr_t
+- When receiving a request for a RPC which returned a list of kad_addr_t, the source
+  outter address of the request is stored
+- if the source_oaddr is public, only the kad_addr_t with public outter address are
+  returned. (see the kad_addr_t::filter_t stuff)
+- if the source_oaddr is nonpublic, any kad_addr_t is returned
+
+\subsection nat-sourceaddr source_addr
+In kademlia dht, the source address kad_addr_t is included
+in each packet, thus the receiver may update its own kbucket.
+
+source address building: (in kad_peer_t)
+- if the packet to sent to a public outter address
+  - if the local peer is not inetreach, the source address is a null kad_addr_t
+  - if the local peer is inetreach, the source address is the listen_addr_pview
+- if the packet is sent to a nonpublic outter address, the source address is 
+  the kad_addr_t composed of the listen_addr_lview + local_peerid
+
+source address parsing: (in kad_kbucket_t::notify_source_addr)
+- if the source address is null, dont update the kbucket
+- if the source address has a null ip address, replace it by the source ip address
+  of the packet which contained the kad_addr_t
+- with the resulting kad_addr_t, update the kbucket
+
+
+\section nat-summary Summary
+All the kad_addr_t in the kbucket MUST be reachable by the local peer.
+- They may be on the same lan (in this case, being inetreach or not is irrelevant)
+- They may be on the long-haul but only if they are inetreachable.
+
+So the records of a given kad_peer_t will be stored either by other on the same LAN
+or by inetreach kad_peer_t on the long-haul.
+
+- there is a assumption that host on the same lan doesn't firewall each other.
+
+- the "dentist-office" case and the "not connected to the internet" case are both
+  handled thanks to nslan and the null ip address in the source address.
+- the "the cohabitation of peers directly reachable from the public internet
+  with other which are not" is handled by the source address and the fact not 
+  to return nonpublic peer if the requester source ip address is public 
+
+*/
+
+
+
+
+
+
+

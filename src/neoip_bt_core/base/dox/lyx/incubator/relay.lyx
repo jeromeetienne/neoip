@@ -1,0 +1,404 @@
+#LyX 1.4.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 245
+\begin_document
+\begin_header
+\textclass article
+\language english
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize default
+\spacing single
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 2
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+bittorrent relay
+\end_layout
+
+\begin_layout Author
+Jerome Etienne
+\end_layout
+
+\begin_layout Abstract
+This text presents how to code a relay in a bittorrent swarm.
+ Its purpose is to help other peers to download faster by increasing the
+ global bandwidth of the swarm.
+\end_layout
+
+\begin_layout Section
+Basic Assumption
+\end_layout
+
+\begin_layout Itemize
+A relay aims to receive less bytes than it sends.
+ So it assumes the role of a giver while normal bittorrent client are taker
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+except the ones seeding which are giver too
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+It is assumed that a relay starts with no piece available
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Potentially piece may be cached from one boot to another, but this is out
+ of the scope of this document.
+ Moreover it doesn't affect the core principle described here
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+it is considered to have limited diskspace, so the number of locally available
+ pieces is limited
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+MaxLocalPiece is this constant
+\end_layout
+
+\begin_layout Itemize
+TODO what is the relation between the different piecelen which may appears
+ on different swarms?
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+A relay will likely operate on multiple swarm at the same time
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+TODO potentially a scheduling to determine on which swarm it will enter.
+\end_layout
+
+\begin_layout Itemize
+likely base the number of seed vs the number of leech
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+a relay can take advantage of the PieceWish extension.
+ This extension provides more precise information on which piece are wished
+ to download.
+ So it provides more precise information on how to help them downloading
+ those pieces.
+\end_layout
+
+\begin_layout Section
+Basic Principle
+\end_layout
+
+\begin_layout Itemize
+The wish factor of a given piece is the number peers which wish to download
+ it divided by the number of peers which have it already available.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+WishFact(pieceidx) = NbWisher(pieceidx) / NbAvailer(pieceidx)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+A piece which has a WishFact below WishFactThres is not considered for download
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Having WishFactThres <= 1 means that the repeater download of this piece
+ will likely consume more from the swarm that it will offer.
+ So in direct opposition of the principle 
+\begin_inset Quotes eld
+\end_inset
+
+A repeater aims to recieve less bytes than it sends
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+This value should be tunable as it depends on the needs of the relay admin.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+This is estimated globally i.e.
+ for all the pieces, from all the swarms
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Obviously excluding the piece already locally available and the ones with
+ a WishFact < WishFactThres
+\end_layout
+
+\end_deeper
+\begin_layout Section
+TODO
+\end_layout
+
+\begin_layout Itemize
+It make uses of the pieceprec to determine the order of download
+\end_layout
+
+\begin_layout Itemize
+It is periodically reestimated to stay up-to-date
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+With which frequence
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Write the algo in pseudo code
+\end_layout
+
+\begin_layout Itemize
+How to schedule all that ? 
+\end_layout
+
+\begin_layout Itemize
+Especially When a piece already locally available must be discarded in order
+ to make room for a new remote piece to download ?
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Just getting the new remote piece cost to the swarm.
+ while the local piece may offer for free.
+\end_layout
+
+\begin_layout Itemize
+I think it is not a matter of policy, i think it could be solved easily
+ by math
+\end_layout
+
+\begin_layout Itemize
+discarding the piece simply means that the piece with have one less Availer
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+This implies to declare piece as isavail and then as unavail BUT plain bittorren
+t doesn't allow to declare piece as nomore available.
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+If a peer receives a request for a unavail piece, it closes immediatly the
+ connection 
+\end_layout
+
+\begin_layout Itemize
+FastExtension allows to cancel a request, this may be used too if it is
+ supported by both peers
+\end_layout
+
+\begin_layout Itemize
+TODO write a special document about this extension, call it NoHave Extension
+\end_layout
+
+\begin_layout Itemize
+If the remote peer supports PieceNoHave Extension, do nothing.
+ 
+\end_layout
+
+\begin_layout Itemize
+This case may happen as a race condition aka the remote peer sent the request
+ before receiving the NoHave message
+\end_layout
+
+\begin_layout Itemize
+allow it by index or by bitfield (the bitfield supports is only for completness
+ as i dont see any practical use of it)
+\end_layout
+
+\begin_layout Section
+Basic Math
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+WishFactor(pieceidx) = rem_piecewish(pieceidx) / rem_pieceavail(pieceidx)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+WishFactor is the intensity with which remote peers wish to download this
+ piece
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+anyavaillen(pieceidx) = amount of byte locally available for this piece
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+if the pieceidx is already fully available, anyavaillen(pieceidx) = piecelen(pie
+ceidx)
+\end_layout
+
+\begin_layout Itemize
+if it is currently downloading, it is the amount already downloaded
+\end_layout
+
+\begin_layout Itemize
+else it is 0
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+TakeCost(pieceidx) = piecelen(pieceidx) - anyavaillen(pieceidx)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+TakeCost is the amount of byte which need to be taken from the swarm to
+ have this piece locally available.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+GiveExpect(pieceidx) = piecelen(pieceidx) * rem_piecewish(pieceidx) / (rem_piece
+avail(pieceidx) + 1)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+ASSUMING pieceidx is locally available, GiveExpect is the expectation of
+ byte given to the swarm.
+ aka how many byte the local peer may expect to give if this pieceidx.
+\end_layout
+
+\begin_layout Itemize
+the +1 in 
+\begin_inset Quotes eld
+\end_inset
+
+rem_pieceavail(pieceidx) + 1
+\begin_inset Quotes erd
+\end_inset
+
+ is to take into account that this piece will be available in all those
+ remote peers *AND* in the local peer too.
+ so +1 for the local peer.
+\end_layout
+
+\begin_layout Itemize
+this formula is directly derived from PieceLen * WishFactor with a correction
+ to take into account that the local peer will be able to give this piece
+ too.
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+GainExpect(pieceidx) = GiveExpect(pieceidx) - TakeCost(pieceidx)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+the gain expectation for this pieceidx in byte
+\end_layout
+
+\begin_layout Section
+Pseudo Algorithm
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+which piece to download or keep are sent the bt_swarm_t via the bt_pieceprec_arr
+_t
+\end_layout
+
+\begin_layout Itemize
+TODO this will use bt_pselect_fixed_t and bt_io_pfile_t which is an unusual
+ combinasion
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+bt_pselect_fixed_t because it operates from the whole totfile
+\end_layout
+
+\begin_layout Itemize
+bt_io_pfile_t because it need to delete piece from the totfile
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Periodically, reevaluate the piece precedence to determine which one is
+ to be kept or downloaded.
+\end_layout
+
+\begin_layout Enumerate
+for each piece of each swarm, (WOW this is may be a lot), compute the [bt_swarm_
+t *, pieceidx, GainExpect(pieceidx)]
+\end_layout
+
+\begin_layout Enumerate
+sort this with the highest GainExpect first
+\end_layout
+
+\begin_layout Enumerate
+Convert the first elements to a bt_pieceprec_arr_t for each swarm
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+up to a given limit depending on the disk available
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+then for all the unselected piece, declare them unavail if they are available
+\end_layout
+
+\begin_layout Section
+ISSUES
+\end_layout
+
+\begin_layout Itemize
+Some issue with the timing...
+ and the disk available
+\end_layout
+
+\begin_layout Itemize
+It doesnt take into account the estimated time to download a pieceidx
+\end_layout
+
+\begin_layout Itemize
+it removes pieceidx to let room to new pieceidx BEFORE the room is actually
+ needed because the new pieceidx is just started downloading
+\end_layout
+
+\end_body
+\end_document

@@ -1,0 +1,3 @@
+#!/bin/sh
+# tools to launch the neoip-router tui
+/etc/neoip/neoip-ui-launcher.sh -ui tui `pidof neoip-router`

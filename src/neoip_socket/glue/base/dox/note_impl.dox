@@ -1,0 +1,18 @@
+/*! \page neoip-socket-impl-note Note about NeoIP Socket
+
+List of simple things to code while designing the \ref neoip-socket
+
+-# implement a neoip::pkt_t
+  - store the packet data
+    - similar to neoip_datum, maybe even something inherited
+    - may store the timestamp of the packet arrival
+    - allow to prepend and append data to it
+-# do the packet scrambler
+-# fragmentation/reassembly layer
+  - see rfc815 for that http://www.faqs.org/rfcs/rfc815.html
+  - see \ref neoip-socket-reasm
+-# The ACL
+  - look at iptables stuff
+  - the neoip_crypto_identity to store the identity
+
+*/

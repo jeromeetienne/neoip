@@ -1,0 +1,30 @@
+/*!\page ns-role NS role
+
+- The API to publish or query the \ref ns-realm is fully independant of the \ref ns-role
+- TODO explain the ratio server/client and how it influence the performance
+
+\section ns-role-switch Ns Role Switch
+The \ref ns-arch(s) are implemented such as any \ref neoip-peer of a given \ref ns-realm 
+can switch between \ref ns-client or \ref ns-server at any time.
+This feature allows a great deal of flexibility while using \ref ns-realm.
+
+\section ns-server Ns Server
+- a \ref ns-server publishes a \ref ns-record-group for the \ref ns-realm in the parent \ref ns-realm
+- A \ref ns-server is able to receives \ref ns-get and \ref ns-put from \ref ns-client.
+
+\subsection ns-arch-flood-server Ns Server in a FLOOD architecture
+- the \ref ns-server try to establish connections with other \ref ns-server(s)
+  - TODO how much
+  - TODO it retries how frequently
+- The \ref ns-record published by the local \ref neoip-peer or by connected \ref ns-client are 
+  stored in the local database.
+- The \ref ns-get is flooded among the connected \ref ns-server and contains a \ref horizon
+
+\section ns-client Ns Client
+- a \ref ns-client queries the parent \ref ns-realm to try to find \ref ns-server for the 
+  current \ref ns-realm.
+- The \ref ns-client 
+
+
+
+*/

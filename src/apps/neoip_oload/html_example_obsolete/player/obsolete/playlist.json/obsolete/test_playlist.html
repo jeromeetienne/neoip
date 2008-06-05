@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>NeoIP oload playlist parser tester</title></head>
+
+<script src="neoip_oload_playlist_parser.js"></script> 
+<script>
+	var playlist_json = '{'
+		+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+		+'"item"	: [     {      	"description"	: "first movie output.flv",'
+		+'				"url"		: "http://jmehost1:4500/flv/http/jmehost1/~jerome/output.flv",'
+		+'		        	"duration"	: 84.92'
+		+'		        },{    	"description"	: "second movie - golfers.flv",'
+		+'				"url"		: "http://jmehost1:4500/flv/http/jmehost1/~jerome/golfers.flv",'
+		+'		        	"duration"	: 60.26'
+		+'		        }'
+		+'		]'
+		+'}';
+		
+	var	playlist_parser	= new neoip.oload_playlist_parser(playlist_json);
+	var	current		= playlist_parser.current();
+	// display the current status of the playlist
+	document.write( "current is " + Math.round(current.position) + "-sec within "
+				 + current.item.description + "<br/>");
+</script>
+
+</body>
+</html>

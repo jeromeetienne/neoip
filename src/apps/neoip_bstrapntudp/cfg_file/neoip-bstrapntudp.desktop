@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=NeoIP ntudp bootstrapper
+Comment=Allow neoip ntudp peer to bootstrap
+Exec=neoip-bstrapntudp-gui
+Icon=neoip-bstrapntudp.png
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=Network;Application;

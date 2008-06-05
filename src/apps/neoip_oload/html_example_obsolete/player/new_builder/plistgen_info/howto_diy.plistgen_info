@@ -1,0 +1,24 @@
+{	"playlist_title": "Howto DIY",
+	"playlist_id"	: "howto_diy",
+	"trackgen_info"	: [
+		{	"cmd"	: "concat",
+			"arg"	: {	"space"	: "bliptv",
+					"desc"	: {
+						"base_uri"	: "http://make.blip.tv/rss"
+						}
+				}
+		},
+		{	"cmd"	: "concat",
+			"arg"	: {	"space"	: "youtube",
+					"desc"	: {	"cmd"	: "videos_by_category_id_and_tag",
+							"arg"	: {
+								"category_id"	: "howto_diy"
+								}
+						}
+				}
+		},
+		{	"cmd"	: "select_random_contiguous",
+			"arg"	: { "nb_contiguous"	: 3	}
+		}
+		]
+}

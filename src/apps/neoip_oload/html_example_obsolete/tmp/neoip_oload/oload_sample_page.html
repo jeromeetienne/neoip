@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>NeoIP oload sample page</title></head>
+
+<body>
+
+<script src="../base/javascript/neoip_daemon_disc.js"></script> 
+<script>neoip.discover_daemon("oload", 4550, 4559)</script>
+
+<h1>Test nested_uri_builder</h1>
+<script src="../base/javascript/neoip_base64_safe.js"></script> 
+<script src="../base/javascript/neoip_nested_uri_builder.js"></script> 
+
+<script>
+	var	nested_uri	= new neoip.nested_uri_builder();
+	nested_uri.outter_uri	("http://localhost:4550");
+//	nested_uri.piecelen	("32k");
+//	nested_uri.xmit_maxrate	("200k");
+//	nested_uri.read_ahead	("400k");
+	nested_uri.announce_uri	("http://jmehost2:6969/announce");
+	nested_uri.inner_uri	("http://jmehost2/~jerome/go%20open.mp4");
+	document.write(nested_uri.to_string() + "<br/>");
+</script>
+
+<script>
+	var	nested_uri	= new neoip.nested_uri_builder();
+	nested_uri.outter_uri	("http://localhost:4550");
+//	nested_uri.mod		("raw");
+//	nested_uri.link_type	("torrent");
+//	nested_uri.dupuri	("http://bla");
+//	nested_uri.dupuri	("http://bli");
+	nested_uri.subfile_path	("my/file/inside");
+	nested_uri.inner_uri	("http://jmehost2/~jerome/golfers.flv?blabl&slota=3");
+	document.write(nested_uri.to_string() + "<br/>");
+</script>
+
+<script>
+	var	nested_uri	= new neoip.nested_uri_builder();
+	nested_uri.outter_uri	("http://localhost:4550");
+//	nested_uri.mod		("raw");
+//	nested_uri.dupuri	("http://bla");
+//	nested_uri.dupuri	("http://bli");
+	nested_uri.dupuri	("http://ftp.oleane.net/ubuntu-cd/7.04/ubuntu-7.04-desktop-i386.iso");
+	nested_uri.subfile_path	("ubuntu-7.04-desktop-i386.iso");
+	nested_uri.link_type	("torrent");
+	nested_uri.inner_uri	("http://torrent.ubuntu.com:6969/file?info_hash=%1B%060%E6%BC%BF%1Bi%10%F5%20C%93%C9%85%C7%0Cq%AA%F5");
+	document.write(nested_uri.to_string() + "<br/>");
+</script>
+
+<h1>Introduction</h1>
+This page demonstrate how to use javascript in order to automatically detect
+the neoip-oload running on the http browser computer.
+
+It is testing the localhost:4550 to localhost:4509 for the presence of a neoip-oload
+
+<h1>Possible Improvement</h1>
+<ul>
+	<li>To have a web page with this script on. say: neoip-oload.org.
+	   the external web page designer willing to potentially use noeip-oload 
+	   when possible, will prepend http://neoip-oload.org/ to the original
+	   address, say http://slota.org/myfile, and produce the address
+	   http://neoip-oload.org/slota.org/myfile. This page will execute
+	   the neoip-oload detection and if neoip-oload is detected, redirect 
+	   to a address which use it, else redirect to the original address.
+	   It will be much easier on the external web writer and so may ease
+	   the adoption, on the other hand the external page may receive a lot
+	   of hit. possibly possibility to make money by advertizement there.
+	   as you got the source address in the referer and the destination address.
+	   </li>
+</ul>
+
+
+<a href="../flash/oload_flash_example.html">See example of flash</a>
+
+<h1>Current status</h1>
+<script>
+	if( neoip.oload_present ){
+		document.write("neoip-oload has been found at " + neoip.oload_outter_uri);
+	}else{
+		document.write("No neoip-oload has been found to run on your computer.");
+	}
+</script>
+
+
+<h1>Link examples</h1>
+Thos link are raw aka not processed by neoip-oload
+<ul>
+	<li><a href="http://jmehost2/~jerome/go%20open.mp4">go open</a></li>
+	<li><a href="http://jmehost2/~jerome/IBM_Linux_Commercial.avi">IBM_Linux_Commercial.avi</a></li>
+</ul>
+
+
+<h1>Link examples on Ubuntu 7.04 iso</h1>
+Original urls
+<ul>
+	<li><a href="http:torrent.ubuntu.com:6969/file/ubuntu-7.04-desktop-i386.iso?info_hash=%1B%060%E6%BC%BF%1Bi%10%F5%20C%93%C9%85%C7%0Cq%AA%F5">
+		the ubuntu-7.04-desktop-i386.iso plain torrent file</a>
+		Note that the url has no .torrent extension, this is important
+		for neoip-oload link_type outter url variable.
+		</li>
+	<li>List of http link which provides the same iso via http (at various speed)
+		<ul>
+			<li><a href="http://ftp.oleane.net/ubuntu-cd/7.04/ubuntu-7.04-desktop-i386.iso">
+				ftp.oleane.net</a></li>
+			<li><a href="http://releases.ubuntu.com/feisty/ubuntu-7.04-desktop-i386.iso">
+				release.ubuntu.com</a></li>
+		</ul></li>
+</ul>
+
+neoip-oload url
+<ul>
+	<li><a href="http://localhost:4550/*link_type*torrent/*subfile*1/http://torrent.ubuntu.com:6969/file/ubuntu-7.04-desktop-i386.iso?info_hash=%1B%060%E6%BC%BF%1Bi%10%F5%20C%93%C9%85%C7%0Cq%AA%F5">
+		ubuntu-7.04-desktop-i386.iso</a>
+		This is downloading a .iso from a .torrent but exported by http.
+		Additionnaly it set the link_type because the inner_uri basename
+		doesnt allows to guess it.
+		Additionnaly it uses the subfile to make the uri basename more typical
+		NOTE: the fact that the inner_uri variable MUST be AFTER the added subfile.
+		</li>
+	<li><a href="http://localhost:4550/*dupuri*http%253a%252f%252fftp.oleane.net%252fubuntu-cd%252f7.04%252fubuntu-7.04-desktop-i386.iso/http://releases.ubuntu.com/feisty/ubuntu-7.04-desktop-i386.iso">
+		ubuntu-7.04-desktop-i386.iso</a>
+		This is downloading a .iso from the 2 http url (ftp.oloane.net and release.ubuntu.com) 
+		at the same time, using the outter_uri variable "dupuri".
+		</li>
+	<li><a href="http://localhost:4550/*dupuri*http%253a%252f%252fftp.oleane.net%252fubuntu-cd%252f7.04%252fubuntu-7.04-desktop-i386.iso/*link_type*torrent/*subfile*1/http://torrent.ubuntu.com:6969/file/ubuntu-7.04-desktop-i386.iso?info_hash=%1B%060%E6%BC%BF%1Bi%10%F5%20C%93%C9%85%C7%0Cq%AA%F5">
+		ubuntu-7.04-desktop-i386.iso</a>
+		This is download from the .torrent AND from the ftp.oloane.net at the same time.
+		</li>
+</ul>
+
+<h1>Link examples on Elephant dream video</h1>
+Original urls found on their <a href="http://orange.blender.org/download">Download page</a>.
+<ul>
+	<li><a href="http://tribler.org/content/Elephants_Dream_480-h264-st-aac.mov.torrent">Elephants Dream</a>
+		This is the url to the plain .torrent for elephant deam
+		</li>
+	<li>List of http link which provides the same video via http (at various speed)
+		<ul>
+			<li><a href="http://ftp.drazzib.com/mirrors/elephants-dream/elephantsdream-480-h264-st-aac.mov">
+				ftp.drazzib.com</a></li>
+			<li><a href="http://ftp.gui.uva.es/pub/multimedia/movies/elephantsdream/elephantsdream-480-h264-st-aac.mov">
+				ftp.gui.uva.es</a></li>
+			<li><a href="http://osaddict.com/files/elephantsdream-480-h264-st-aac.mov">
+				osaddict.com</a></li>
+		</ul></li>
+</ul>
+neoip-oload url
+<ul>
+	<li><a href="http://localhost:4550/*subfile*1/http://tribler.org/content/Elephants_Dream_480-h264-st-aac.mov.torrent/Elephants_Dream_480-h264-st-aac.mov">Elephants_Dream.mov</a>
+		This is a video read from a plain .torrent swarm and transparently exported as http
+		So any video player can read it without being aware of the .torrent.
+		</li>
+	<li><a href="http://localhost:4550/*dupuri*http%253a%252f%252fosaddict.com%252ffiles%252felephantsdream-480-h264-st-aac.mov/http://ftp.drazzib.com/mirrors/elephants-dream/elephantsdream-480-h264-st-aac.mov">
+		elephant dream</a>
+		This is downloading a .mov from the 2 http url (ftp.drazzib.com and osaddict) 
+		at the same time, using the outter_uri variable "dupuri".
+		</li>
+	<li><a href="http://localhost:4550/*dupuri*http%253a%252f%252fftp.gui.uva.es%252fpub%252fmultimedia%252fmovies%252felephantsdream%252felephantsdream-480-h264-st-aac.mov/*dupuri*http%253a%252f%252fosaddict.com%252ffiles%252felephantsdream-480-h264-st-aac.mov/http://ftp.drazzib.com/mirrors/elephants-dream/elephantsdream-480-h264-st-aac.mov">
+		elephant dream</a>
+		This is downloading a .mov from the 3 http url (ftp.drazzib.com and osaddict and ftp.gui.uva.es) 
+		at the same time, using the outter_uri variable "dupuri".
+		</li>
+	<li><a href="http://localhost:4550/*dupuri*http%253a%252f%252fftp.gui.uva.es%252fpub%252fmultimedia%252fmovies%252felephantsdream%252felephantsdream-480-h264-st-aac.mov/*dupuri*http%253a%252f%252fosaddict.com%252ffiles%252felephantsdream-480-h264-st-aac.mov/*subfile*1/http://tribler.org/content/Elephants_Dream_480-h264-st-aac.mov.torrent/Elephants_Dream_480-h264-st-aac.mov">Elephants_Dream.mov</a>
+		This is downloading the .mov from the torrant AND from 2 http url (osaddict and ftp.gui.uva.es)
+		</li>
+</ul>
+</body>
+</html>

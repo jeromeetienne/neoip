@@ -1,0 +1,23 @@
+/*!\page ns-accesscontrol NS Access Control
+
+- This feature isnt required for \ref neoip-router
+
+- The access to \ref ns-realm are controlled in precise fashion
+- it uses \ref ns-acl derived from \ref n-acl
+- a \ref neoip-peer connecting a \ref ns-realm specifies
+  - its own \ref ns-acl to be sent to other \ref neoip-peer(s) in this \ref ns-realm
+    - TODO what about the identity to be sent
+  - a server \ref ns_acl which limits the access of other \ref neoip-peers when the 
+    local \ref neoip-peer acts as \ref ns-server.
+  - TODO what about the list of authority that i allow for the identiy in this \ref ns-realm
+
+\section ns-acl NS Access Control List
+- the operation defined for the \ref n-acl are
+  - PUT/GET followed by a \ref ns-search
+  - CAN_BE_SERVER
+  - in case of \ref ns-arch-flood it may contains a maximal \ref horizon
+
+\section TODO
+- how to preserve the hierarchy between the \ref ns-acl of multiple \ref ns-realm
+
+*/

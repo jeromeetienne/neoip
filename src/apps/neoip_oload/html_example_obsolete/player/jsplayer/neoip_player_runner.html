@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>NeoIP Web player runner</title></head>
+<script src="../../base/firebug/firebug.js"></script> 
+<script src="../../base/javascript/neoip_core.js"></script>
+<script src="../../base/javascript/neoip_base64_safe.js"></script>
+<script src="../../base/javascript/neoip_nested_uri_builder_t.js"></script> 
+<script src="../../base/javascript/swfobject.js"></script>
+<script src="../../base/javascript/neoip_xdomrpc_t.js"></script>
+<script src="../../base/javascript/neoip_apps_detect_t.js"></script> 
+<script src="../../base/javascript/neoip_apps_detect_wikidbg_t.js"></script> 
+<script src="../../base/javascript/neoip_wikidbg_t.js"></script>
+<script src="neoip_playlist_t.js"></script>
+<script src="neoip_playlist_track_t.js"></script>
+<script src="neoip_playlist_loader_t.js"></script>
+<script src="neoip_subplayer_cb_t.js"></script>
+<script src="neoip_subplayer_vlc_t.js"></script>
+<script src="neoip_subplayer_asplayer_t.js"></script>
+<script src="neoip_player_t.js"></script>
+<script src="neoip_player_wikidbg_t.js"></script>
+<script src="neoip_prefetcher_t.js"></script>
+<script src="neoip_ezplayer_t.js"></script>
+<script src="neoip_ezplayer_embedui_t.js"></script>
+<style type="text/css">	
+	/* body style for the video fullpage mode - hardcoded for now */
+	body {	height	: 100%;
+		width	: 100%;
+		margin	: 0px;
+		overflow: hidden;
+		background-color: transparent;
+	}
+</style>
+
+<body>
+<div id="neoip_player_container_id">Place to put player container</div>
+
+
+<!-- <center><h3>NeoIP web player demo</h3></center> -->
+
+<table>
+<tr><td><!-- PLAYER CONTAINER	-->
+	<!-- <div id="neoip_player_container_id">Place to put player container</div> -->
+</td><td><table><tr><td ><!-- ADMIN INFO	-->
+	<div id="player_info_container_id"></div>
+</td></tr><tr><td><!-- APPS DETECT	-->
+	<div id="apps_detect_container_id"></div>
+</td></tr></table>
+</table>
+
+<input type=button value="Start"	onClick='ezplayer.playing_start()'>
+<input type=button value="Stop" 	onClick='ezplayer.playing_stop()'>
+<br>
+<input type=button value="sample_static"
+		onClick='ezplayer.change_playlist("../playlist.jspf/sample_static.playlist.jspf")'>
+<input type=button value="sample_stream"
+		onClick='ezplayer.change_playlist("../playlist.jspf/sample_stream.playlist.jspf")'>
+<input type=button value="sample_stream_static"
+		onClick='ezplayer.change_playlist("../playlist.jspf/sample_stream_static.playlist.jspf")'>
+<input type=button value="youtube_featured_at_random"
+	 	onClick='ezplayer.change_playlist("../playlist.jspf/youtube_featured_at_random.playlist.jspf")'>
+<input type=button value="youtube_tag_at_random"
+	 	onClick='ezplayer.change_playlist("../playlist.jspf/youtube_tag_at_random.playlist.jspf")'>
+<input type=button value="youporn_at_random"
+	 	onClick='ezplayer.change_playlist("../playlist.jspf/youporn_at_random.playlist.jspf")'>
+<input type=button value="bliptv_at_random"
+	 	onClick='ezplayer.change_playlist("../playlist.jspf/bliptv_at_random.playlist.jspf")'>
+<input type=button value="ntv002"
+	 	onClick='ezplayer.change_playlist("../playlist.jspf/ntv002.playlist.jspf")'>
+<br>
+<input type=button value="Start prefetch 0" onClick='ezplayer.m_player._prefetch_try_start({trackidx:0, track_reltime:0})'>
+<input type=button value="Stop prefetch 0" onClick='ezplayer.m_player._prefetch_try_stop(0)'>
+<br>
+<input type=button value="Start prefetch 1" onClick='ezplayer.m_player._prefetch_try_start({trackidx:1, track_reltime:0})'>
+<input type=button value="Stop prefetch 1" onClick='ezplayer.m_player._prefetch_try_stop(1)'>
+<br>
+<input type=button value="Start prefetch 2" onClick='ezplayer.m_player._prefetch_try_start({trackidx:2, track_reltime:0})'>
+<input type=button value="Stop prefetch 2" onClick='ezplayer.m_player._prefetch_try_stop(2)'>
+<br>
+<input type=button value="init_all_prefetch" onClick='ezplayer.m_player._prefetch_reinit_full()'>
+<input type=button value="prefetch_initial" onClick='ezplayer.m_player._prefetch_initial()'>
+<br>
+
+<script>
+	ezplayer	= new neoip.ezplayer_t();
+	ezplayer.play_post_playlist(true);
+	ezplayer.fullpage_state("maximized");
+	// TODO make this playlist_arr read asynchronous
+	// - this playlist_arr is read in sync, which increase the latency of the start
+//	ezplayer.load_playlist_arr("../playlist.jspf/ezplayer_playlist_arr.json");
+	ezplayer.load_playlist_arr("../new_builder/playlist.jspf/ezplayer_playlist_arr.json");
+
+	ezplayer.start();
+</script>
+
+</body>
+</html>

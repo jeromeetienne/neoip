@@ -1,0 +1,47 @@
+0.9.6 -- Feb 06 2002
+- portability: support 2.2.x kernels
+  o fall back to ethertap if compiled on 2.2.x kernel
+- fixed a memory leak (Richard Jones <richard@earthmen.com>)
+
+0.9.5 -- Nov 27 2001
+- updated online help
+- added --comp=algo to choose the compression algorightm function used
+  to compress the packet
+- DoS resistance: Changed the default udp port allocation. if the port 
+  is unspecified, yavipin allocate a random unused one (using 
+  /dev/urandom), it increase the DoS resistance. the additionnal
+  security will likely be canceled if the initiator is behind a NAT box.
+  o added ":dynamic" while specifiing udp port. It forces yavipin to use
+    the kernel udp port allocation (aka make it easy to predic). 
+    it SHOULD not be used. it is an debug option
+- configuration: simplified the address binding. the only requirement
+  is to specify the destination address for a initiator. all the other
+  cases may be done automatically if the admin doesnt explicitly specify
+  them.
+
+0.9.4 -- Nov 22 2001
+- added GPL in the source
+- added long options for the command line (short option no more supported)
+- added --enc=algo and --mac=algo to choose the block cipher and the mac
+  function used once the tunnel is established.
+
+0.9.3 -- Nov 18 2001
+- fixed a bug in setting the virtual device MTU
+- minor improvements in error reporting
+
+0.9.2 -- Nov 16 2001
+- for forward secrecy, periodically renew the diffie hellman secret
+  o even if the attacker cracks the box, he won't be able to read
+    traffic older than YAV_AUTH_NEW_DH_PRIV (as skey renewal is shorter)
+  o the period is YAV_AUTH_NEW_DH_PRIV (default 10min)
+- update the web docs
+- use the libc daemon() instead of my own
+- source beautifullication (rename cert by auth)
+
+0.9.1 -- Nov 14 2001
+- used autoconf to create a ./configure. it improve the compilation and
+  installation
+
+0.9.0 -- Nov 13 2001
+- initial release
+

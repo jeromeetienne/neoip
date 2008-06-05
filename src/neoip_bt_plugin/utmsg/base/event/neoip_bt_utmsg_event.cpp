@@ -1,0 +1,107 @@
+/*! \file
+    \brief Implementation of the bt_utmsg_event_t
+*/
+
+/* system include */
+#include <iostream>
+
+/* local include */
+#include "neoip_bt_utmsg_event.hpp"
+#include "neoip_log.hpp"
+
+NEOIP_NAMESPACE_BEGIN
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                       CTOR/DTOR
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief constructor
+ */
+bt_utmsg_event_t::bt_utmsg_event_t() throw()
+{
+	type_val = NONE;
+}
+
+/** \brief desstructor
+ */
+bt_utmsg_event_t::~bt_utmsg_event_t() throw()
+{
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                       display function
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief Convert the object to a std::string
+ */
+std::string	bt_utmsg_event_t::to_string()	const throw()
+{
+	std::ostringstream	oss;
+	// build the string
+	switch( get_value() ){
+	case bt_utmsg_event_t::NONE:		oss << "NONE";					break;
+	case bt_utmsg_event_t::DOREGISTER:	oss << "DOREGISTER";				break;
+	case bt_utmsg_event_t::UNREGISTER:	oss << "UNREGISTER";				break;
+	default: 	DBG_ASSERT(0);
+	}
+	// return the just built string
+	return oss.str();
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                    DOREGISTER
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief return true is the type is DOREGISTER, false otherwise
+ */
+bool	bt_utmsg_event_t::is_doregister() const throw()
+{
+	return type_val == DOREGISTER;
+}
+
+/** \brief build a bt_utmsg_event_t to DOREGISTER
+ */
+bt_utmsg_event_t bt_utmsg_event_t::build_doregister()	throw()
+{
+	bt_utmsg_event_t	utmsg_event;
+	// set the type_val
+	utmsg_event.type_val		= DOREGISTER;
+	// return the built object
+	return utmsg_event;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                    UNREGISTER
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief return true is the type is UNREGISTER, false otherwise
+ */
+bool	bt_utmsg_event_t::is_unregister() const throw()
+{
+	return type_val == UNREGISTER;
+}
+
+/** \brief build a bt_utmsg_event_t to UNREGISTER
+ */
+bt_utmsg_event_t bt_utmsg_event_t::build_unregister()	throw()
+{
+	bt_utmsg_event_t	utmsg_event;
+	// set the type_val
+	utmsg_event.type_val	= UNREGISTER;
+	// return the built object
+	return utmsg_event;
+}
+
+
+NEOIP_NAMESPACE_END
+

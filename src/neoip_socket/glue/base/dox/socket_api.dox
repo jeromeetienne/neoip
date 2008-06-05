@@ -1,0 +1,63 @@
+/*! \page neoip-socket-api NeoIP Socket API
+
+- There is 3 main part in the \ref neoip-socket-api
+  - The initiator which initiates the connection establishement.
+    see \ref neoip-socket-api-itor
+  - The reponder which responder the connection establishement.
+    see \ref neoip-socket-api-resp
+  - The full which handles the established connection
+    see \ref neoip-socket-api-full
+
+\par MISC
+- what about the parameters
+- the event meaning and when are they sent
+   
+*/
+
+/*! \page neoip-socket-api-itor NeoIP Socket API Initiator
+
+\par API
+- set_local_addr()
+- set_timeout( neoip_delay_t )
+
+*/
+
+/*! \page neoip-socket-api-resp NeoIP Socket API Responder
+
+\par API
+- what about the strengh of the reponder
+
+*/
+
+/*! \page neoip-socket-api-full NeoIP Socket API Full
+
+- what about the data priority
+
+\par API
+- set_callback()
+  - set the events callbacks to which all the events gonna be notified
+  - default: NULL
+- set_idle_timeout( neoip_delay_t )
+  - if the other peer hasn't sent data packets (signalisation packets are ignored)
+    for this delay, the connection is closed with TIMEDOUT
+- set_liveness_timeout( neoip_delay_t first_probe_delay, neoip_delay_t timeout_delay )
+  - if no packets (data or signalisation) has been received from the other peer
+    for first_probe_delay, start to send probes to the other peer. If no probes
+    has been replied when timeout_delay expires, the connection is closed
+    with UNREACHABLE
+
+\par API for reliable transmition
+- set_recv_max_len()
+  - set the amount of data which can be notifie to the event callback
+  - TODO what about the datagram stuff
+  - if the amount of data is 0, no received data are notified
+- to be able to send data with a congestion control, there is a 
+  xon/xoff type of mechanism
+  - maysend_on and maysend_off event
+  - there is a sendbuf handling
+
+*/
+
+
+
+

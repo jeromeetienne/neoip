@@ -1,0 +1,20 @@
+[
+	{	"playlist_title": "sample static",
+	  	"playlist_uri"	: "../playlist.jspf/sample_static.playlist.jspf"
+  	},
+	{	"playlist_title": "sample stream",
+	  	"playlist_uri"	: "../playlist.jspf/sample_stream.playlist.jspf"
+	},
+	{	"playlist_title": "Elephant dream",
+	  	"playlist_uri"	: "../playlist.jspf/elephant_dream.playlist.jspf"
+  	},
+	{	"playlist_title": "BlipTV",
+	  	"playlist_uri"	: "../playlist.jspf/bliptv_tag_at_random.playlist.jspf"
+	},
+	{	"playlist_title": "YouTube",
+	  	"playlist_uri"	: "../playlist.jspf/youtube_tag_at_random.playlist.jspf"
+  	},
+	{	"playlist_title": "YouPorn",
+	  	"playlist_uri"	: "../playlist.jspf/youporn_at_random.playlist.jspf"
+	}
+]

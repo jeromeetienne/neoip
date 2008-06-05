@@ -1,0 +1,8 @@
+# this is the neoip_lib configuration file
+lib_httpd_listen=127.0.0.1:9080
+lib_httpd_public_listen=:9080
+#lib_httpd_listen=:9080
+#lib_httpd_listen=192.168.1.2:50002
+#lib_httpd_public_listen=:50002
+# name is a dummy variable to identify multiple instance
+name=netcat1.4afree.net

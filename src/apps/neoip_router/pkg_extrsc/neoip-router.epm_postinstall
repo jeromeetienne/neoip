@@ -1,0 +1,30 @@
+# this file is a .epm_postinstall hook.
+# - i.e. it is a /bin/sh script which gonna be executed first thing after the 
+#   installation of this epm package. 
+# - it gonna run under root, as it is done inside the packager
+# - NOTE: epm will do a pass on this script to replace its own variable
+#   so any shell variable MUST have a double $
+
+# if there are no current_identity.priv, create a nonesigned one
+if [ ! -e /etc/neoip_router/router/current_identity.priv ]; then
+	# log the event
+	echo "No current identity found. create a nonesigned one..."
+
+	# on linux /dev/random is *very* slow, and this ugly kludge avoid to wait 
+	# up to 20min to generate a key.
+	# - dirty! dont keep this
+	# - i cant force it internally because my crypto lib doesnt allow to tune it. gaps bis
+	#ln -sf /dev/urandom /dev/random
+	
+	# build the nonesigned name
+	# - NOTE: it artificially starts with 'A0' because it is a hostname and 
+	#   dns requires to start with a letter.
+	local NONESIGNED_NAME=A0`dd if=/dev/urandom bs=1 count=19 2>/dev/null | od -t x1 -w19  | head -1| cut -d ' ' -f 2-| tr -d ' '`.unauthenticated
+	# make neoip-router register it
+	/usr/lib/neoip_router/neoip-router-bin -r $$NONESIGNED_NAME
+	
+	# restore the /dev/random now - only valid if removed before
+	#rm /dev/random
+	#mknod /dev/random c 1 8
+	#chmod 666 /dev/random
+fi

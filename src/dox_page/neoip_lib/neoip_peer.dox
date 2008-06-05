@@ -1,0 +1,12 @@
+/*! \page neoip-peer NeoIP Peer
+
+A \ref neoip-peer is an application (and not a host) running on a computer.
+
+- It is identified by a \ref peerid
+- The stability of its \ref rdvpt may be estimated from the age of a rdvpt
+
+
+*/
+
+
+

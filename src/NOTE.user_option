@@ -1,0 +1,25 @@
+********************************************************************************
+commande line only:
+------------------
+--help/-h
+--register/-r <nodename to register>
+--config_dir/-c
+--version/-v
+
+********************************************************************************
+commandline + configuration file
+--------------------------------
+nodename=
+act_as_rendezvous
+listen_addr
+rendezvous_addr=
+icmpc=[never,ondemand,always]
+deamon=FALSE
+tunnel=FALSE
+dnsgrab=TRUE
+
+pkt_drop_rate
+pkt_delay
+pkt_delay_var
+pkt_corrupt_length
+pkt_corrupt_data

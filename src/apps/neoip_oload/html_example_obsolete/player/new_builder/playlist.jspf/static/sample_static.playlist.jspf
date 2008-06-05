@@ -1,0 +1,32 @@
+{"playlist": {
+	"title"		: "Sample Static",
+	"date"		: "Fri, 17 Aug 2007 20:07:25 GMT",
+	"identifier"	: "sample_static",
+	"meta"	: {
+		"may_loop"	: 1
+		},
+	"track"	: [
+		{
+		"location"	: "http:\/\/192.168.1.3\/~jerome/output.flv",
+		"title"		: "me in front of webcam",
+		"duration"	: 88520,
+		"extension"	: {
+			"oload"	: {
+				"announce_uri"	: "http://jmehost.podzone.net:55001/announce",
+				"mod"		: "flv",
+				"static_filelen": 1927983
+				},
+//			"flv_mdata_info": {
+//				"type"			: "internal",
+//				"kframe_index_present"	: 1,
+//				"intmdata_len"		: 2226
+//				}
+			"flv_mdata_info": {
+				"type"			: "external",
+				"kframe_index_present"	: 1,
+				"extmdata_uri"		: "http://jmehost1/~jerome/output.flv.flv_mdata.xml"
+				}
+			}
+		}
+	]
+}}

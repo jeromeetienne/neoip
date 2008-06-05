@@ -1,0 +1,78 @@
+/*! \page ns-impl Ns Implementation
+
+\section Modules list
+- \ref impl-ns-step
+- \ref impl-ns-realm
+- \ref impl-ns-db
+- \ref impl-ns-record: 
+
+*/
+
+/*! \page impl-ns-record Ns Record Implementation
+
+This modules simply handle the object in itself without doing any link or expirations.
+this module is called ns2_record.c
+This module
+- serialization
+- contruction in memory
+- grammar checking
+  - core and pdata
+- register the type of records
+  - do it for all records
+  - handle the custom records
+
+*/
+
+/*! \page impl-ns-step Ns Implementation Steps
+
+reimplement the whole stuff using the gnutls coding style
+- pointer on anonymous struct
+- no _t at the end of type
+- just as an experiement of this style of coding
+- neoip_ as prefix for any public function or type
+
+-# Basic stub for the \ref ns-realm
+   - neoip_ns_realm_open()
+   - neoip_ns_realm_close()
+-# Basic for the \ref ns-db
+   - ability to store \ref ns-record
+   - \ref ns-record to be expirable
+   - ability to walk the \ref ns-db
+   - no need for view
+   - the n_db can be the base of this. rename it n_list
+-# Basic for \ref ns-get
+   - handle only the local records
+   - use a callback to return records with a boolean to say if you should keep the 
+     get running or not
+-# Handle the connections between \ref ns-server and \ref ns-client
+   - feed the \ref ns-db with fake records
+     - some \ref neoip-peer being \ref ns-server and other being \ref ns-client
+   - a \ref ns-server to launch it self and wait for connection
+   - a \ref ns-client to query the local \ref ns-db and connect
+     a server.
+     - itor_grp doing neoip_ns_get( neoip_ns_search )
+       - filter gonna be added later in neoip_ns_search. 
+       - this owuld solve the 'connect any peers of this group if not already connected'
+   - \ref ns-server to connect each other
+   - no \ref ns-role-switch
+
+===========================
+AFTER THAT:
+- handle \ref ns-put for client and server, with \ref ns-role-switch in mind
+- handle the \ref ns-role-switch
+  - implement the \ref ns-role-switch mechanism
+    - \ref ns-server asking \ref ns-client to become \ref ns-server
+    - \ref ns-server becoming \ref ns-client based on some policy
+  - Implement a way to switch thru httpd to debug
+  - implement the \ref ns-role-switch policy
+    - variuos of them to test the software
+  - implement the protocol to support it
+    - add a \ref ns-role-switch thru http to help debug
+- handle the \ref ns-get with a networked version
+  - \ref ns-client to forward the request to the \ref ns-server
+  - \ref ns-server to flood the \ref ns-get to all server
+- handle the NS version of the \ref n-cred
+  - code the \ref n-cred layer
+  - use them in the \ref neoip-ns
+
+*/

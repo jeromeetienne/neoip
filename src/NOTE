@@ -1,0 +1,50 @@
+*******************************************
+* Connection establishment
+*******************************************
+
+    Initiator                                       Responder
+CnxId_i           -------- Cnx Request -------> 
+
+                  <------- Cnx Reply ---------- CnxId_i, CnxId_r, 
+                                                auth_r, g^x_r
+
+CnxId_i, CnxId_r  -------- Itor auth --------->
+auth_i, g^y_i, pop_i
+
+                  <------- Resp Auth ---------- CnxId_i, CnxId_r, 
+                                                pop_r
+
+- CnxId are cookies (rfc2522.3)
+- initiator may be seen as a client, responder may be seen as a server
+- g^x_[ir] are the diffie-hellman public key for the initiator and responder
+  o it can be reused for several connections
+  o limited for forward secrecy
+  o authenticated by auth_[ir]
+- auth_[ir] is a way to identify the sender and an authentication
+  of the g^x_[ir]
+  o auth with preshared key is a 32bit key_id followed by a MAC covering
+    auth_[ir] + g^x_[ir]
+- pop_[ir] is a MAC computed over the whole packet with a zeroed MAC
+  o pop stands for Proof of possetion i.e. to proove the sender knows
+    the secret key
+  o the key is derivated from CnxID_[ir] and g^xy
+- WORK: it is possible to prevent the replay of auth_ by asking
+  to sign a challenge. it is usefull in case the other peer's OS
+  is corrupted but that the user has physical security of the 
+  private key (i.e. smartcard). moreover it would need to 
+  periodically check auth_ (e.g. timeout the tunnel or periodic
+  check with new packet). here the period is a bad tradeoff:
+  the shorter is the period, the faster the OS corruption is 
+  detected but the more rescource are consumed. This doesn't
+  solve the issue it just reduce it.
+  I think it is bloat becasue very few people has physical 
+  security of the secret key and the security advantage isnt
+  clear, so i dont want to polute yavipin with it.
+  moreover people with such particular needs can still implement
+  it with an external deamon doing periodic check of the auth_
+  and that will be launch by the scrip up/down.
+************************************************************
+- packet compression may have funky effects on pmtu dicovery as the
+  mtu keeps changing
+  o no because the mtu is set in the virtual device, so it is checked
+    by the kernel before yavipin gets the packet

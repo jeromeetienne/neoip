@@ -1,0 +1,57 @@
+{
+  "playlist": {
+    "title": "youtube_tag_at_random",
+    "date": "Wed Dec 12 22:23:40 UTC 2007",
+    "track": [
+      {
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 918.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "neoip_metavar_http_mod_flv_varname": "start",
+            "mod": "flv",
+            "neoip_metavar_http_mod_type": "flv",
+            "static_filelen": 7278733
+          }
+        },
+        "title": "One for the Long Time Fans",
+        "meta": {
+          "location_rangereq_byuri_varname": "start"
+        },
+        "duration": 178745,
+        "location": "http:\/\/mia-v56.mia.youtube.com\/get_video?video_id=gDly0Gw2Kuc"
+      },
+      {
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 1116.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "neoip_metavar_http_mod_flv_varname": "start",
+            "mod": "flv",
+            "neoip_metavar_http_mod_type": "flv",
+            "static_filelen": 8470919
+          }
+        },
+        "title": "Re: Introduction: Who, What, Why?:",
+        "meta": {
+          "location_rangereq_byuri_varname": "start"
+        },
+        "duration": 208308,
+        "location": "http:\/\/mia-v39.mia.youtube.com\/get_video?video_id=zRe1UJLih4k"
+      }
+    ],
+    "meta": {
+      "trackidx_beg": 13,
+      "instance_nonce": "ZLsErzWUqf",
+      "reload_delay": 10000,
+      "may_loop": false
+    },
+    "identifier": "youtube_tag_at_random"
+  }
+}

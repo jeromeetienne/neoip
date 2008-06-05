@@ -1,0 +1,89 @@
+/*!\page ns-record NS Record
+
+a \ref ns-record is a record stored in the \ref ns-realm. They can have
+predefined format \ref ns-record such as \ref ns-record-peer or \ref ns-record-group
+or have custom format defined by the application using \ref neoip-lib (see \ref ns-record-custom).
+
+A \ref ns-record private data can be encrypted or authenticated.
+
+\htmlonly<hr>\endhtmlonly
+
+\section ns-record-common-field Ns Record Common Fields
+All \ref ns-record, predefined or custime, share the following fields:
+
+\subsection ns-record-age Ns Record Age
+The \ref ns-record-age of the record is the time since when it has been first published.
+  - it is expressed in seconds
+  - It is mainly used to estimate the \ref churn-rate of the record
+
+\subsection ns-record-ttl Ns Record TTL
+The time to live of a record is the remaining time that this record may
+be consired up-to-date.
+  - it is expressed in seconds
+  - This value is used to determine how long a given \ref ns-record can be cached
+  - a ttl of 0 marks this \ref ns-record as a \ref ns-outdated-record.
+
+\subsection ns-record-type Ns Record Type
+- it defines the type of the record e.g. \ref ns-record-peer or \ref ns-record-group
+- If the \ref ns-record-pdata have a specified format, it depends on the \ref ns-record-type
+- It is possible to define \ref ns-record-custom based on the \ref ns-record-type
+ 
+\subsection ns-record-famid Ns Record FamilyId
+- it is a \ref nipid specific to a family of records
+
+\subsection ns-record-recid Ns Record Id
+- <b>RecId</b>: a \ref nipid which is statically unique for this record
+
+\subsection ns-record-peerid Ns Record PeerId
+\ref ns-record-peerid is the \ref peerid of the publisher of this \ref ns-record.
+
+\subsection ns-record-pdata Ns Record Private Data
+- <b>Private data</b>: Define the private data associated with this record
+  - the format of the private data depends on the \ref ns-record-type.
+
+With the exception of the \ref ns-record-age and the \ref ns-record-peerid fields, this structure is very 
+close to the one provided by the DNS service on the internet.
+
+non custom query are done based on the \ref ns-record-recid, \ref ns-record-type and \ref ns-record-famid.
+With \ref ns-arch-flood, custom query mechanism can be used.
+
+
+\section ns-outdated-record Ns outdated Record
+Sometime it is better to have outdated informations rather than no information at all.
+So \ref ns-outdated-record are cached when they become outdated and the caller may query
+them by asking explicitly for them.
+
+A direct use of \ref ns-outdated-record is the \ref ns-bootstrapping for \ref ns-realm.
+
+\par Notes
+- TODO how to handle them
+- how to query them ? explicat flag in ns_db_t and ns_get()
+- how to save/load them ?
+- is it \ref ns-realm-mother only ?
+
+
+\htmlonly<hr>\endhtmlonly
+
+\section ns-record-specification Ns Record Specification
+For each \ref ns-record, several fields MUST be specified 
+- the \ref ns-record-type 
+- how to build the \ref ns-record-famid
+  - it isnt code, it is documentation
+- optionnally the following fields may be specified
+  - a function to check the format of the \ref ns-record-pdata
+  - a function to convert the \ref ns-record-pdata into a string 
+  - a function to perform a \ref ns-search to help doing custom \ref ns-get
+
+\section ns-record-peer Ns Peer Record
+This records provides short lived information about a peer.
+- The private data contains the following fields:
+  - The list of possible \ref rdvpt to connect this \ref neoip-peer
+    - to handle a age per \ref rdvpt would allow to determine how stable it is 
+  - the \ref network-coord of this \ref neoip-peer
+
+\section ns-record-group Ns Group Record
+This record provides informations about a \ref neoip-peer membership for a given group.
+- The group is defined thanks the \ref ns-record-family
+
+
+*/

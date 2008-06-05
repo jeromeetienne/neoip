@@ -1,0 +1,78 @@
+/*! \page dht-rsc-location Hierarchical Rescource Location in DHT
+
+This page describe a mechanism to perform hierarchical resource location
+in a DHT.
+
+A DHT allows to perform to store records and to perform exact search
+to retrieve them. Based on this fact, it is possible to build a mechanism
+to locate a given rescource. here is a example based on email address which
+is trivially adaptable to any hierarchical address space.
+
+Say alice wishes to send an email to bob@lab.school.org but bob's computer is currently
+off-line. In this case, an email system, e.g. smtp, will typically send
+the email message to a computer dedicated to temporarly store messages
+for bob. In smtp, those computers are called MX (mail exchange). When bob's computer
+is on-line, bob's messages are sent to his computer.
+
+To locate the MX computer on a DHT system, alice does
+-# query an record for "mx bob@lab.school.org" (the computer which accepts only bob's emails)
+-# query an record for "mx *@lab.school.org" (the computer which accepts emails for the whole lab)
+-# query an record for "mx *@*.school.org" (the computer which accept emails for the whole school)
+-# query an record for "mx *@*.org" (the computer which accept emails for the whole domain)
+-# send the email to the most specific record which accept the emails
+
+TODO
+- some scheduling for the query not to overload the dht itself.
+- some testing for stale records, aka the record may be answeredbut the computer
+  may be off-line.
+- least specific records may have many query
+  - e.g. "mx *@*.org" storer in DHT will receive a lot query as most (depending
+    on scheduling) sent emails will query it
+  - relation with 'how to spread storer load for records which have
+    many dups or many query"
+
+*/
+
+/*! \page dht-load-spread DHT Storers offload in case of frequent query or many duplicates
+
+Some records may be queried very frequently or have many duplicates.
+In this case, the dht nodes which happens to have a nodeid close to its
+key will experience high network load due to queries or high memory load
+due to duplicates.
+
+The kademlia includes a caching system which clearly helps the many query issue.
+TODO unsure of the relation, but the caching still locate the load on given
+nodes. the mechanism described here is complementary and goes one step further 
+
+
+\par Load Spreading
+A possible way to spread the load is to derive the original record key with a 
+counter/salt e.g.
+- The publisher of a "mx *@*.org"
+  -# picks a salt, aka random number in a range between 0 and the spread factor
+  -# derives a record key with it
+  -# publish this record using the derived key
+- The querier of a "mx *@*.org" 
+  -# picks the salt, aka a random number in the range
+  -# query the key derived with it
+  -# if it fails, increase the seed and query again
+  -# stop when all the salt has been queried
+
+\par TODO issue how to tune the spread factor
+- the higher the spread factor is, the more spreaded is the load
+- how a node knows the current spread factor ?
+  - staticaly hard coded in the source or in a file ?
+  - manually tuned and stored in a dht record itself or in a network location (e.g. https)
+    - to avoid the many query issue on this record, it is queried with a long
+      period, e.g. every weeks/months
+    - possibly some security issue.
+- possibly automatically
+
+*/
+
+
+
+
+
+
+

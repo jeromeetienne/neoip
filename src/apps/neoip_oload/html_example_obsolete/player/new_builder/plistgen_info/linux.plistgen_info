@@ -1,0 +1,42 @@
+{	"playlist_title": "Linux",
+	"playlist_id"	: "linux",
+	"trackgen_info"	: [
+		{	"cmd"	: "pick_one_randomly",
+			"arg"	: [
+				{	"precedence"	: 50,
+					"trackgen_info"	: [{	"cmd"	: "concat",
+								"arg"	: {	"space"	: "youtube",
+										"desc"	: {	"cmd"	: "videos_by_tag",
+												"arg"	: {	"tag"	: "linux"
+													}
+											}
+									}
+							}]
+				},
+				{	"precedence"	: 50,
+					"trackgen_info"	: [{	"cmd"	: "concat",
+								"arg"	: {	"space"	: "youtube",
+										"desc"	: {	"cmd"	: "videos_by_tag",
+												"arg"	: {	"tag"	: "beryl compiz fusion"
+													}
+											}
+									}
+							}]
+				},
+				{	"precedence"	: 50,
+					"trackgen_info"	: [{	"cmd"	: "concat",
+								"arg"	: {	"space"	: "youtube",
+										"desc"	: {	"cmd"	: "videos_by_tag",
+												"arg"	: {	"tag"	: "kde4"
+													}
+											}
+									}
+							}]
+				}]
+				
+		},
+		{	"cmd"	: "select_random_contiguous",
+			"arg"	: { "nb_contiguous"	: 3	}
+		}
+		]
+}

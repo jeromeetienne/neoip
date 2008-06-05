@@ -1,0 +1,62 @@
+/*! \file
+    \brief Definition of the slay_full_t
+
+*/
+
+
+/* system include */
+/* local include */
+#include "neoip_slay_full.hpp"
+#include "neoip_log.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+// define the factory plant for slay_full_t
+FACTORY_PLANT_DEFINITION (slay_full_factory	, slay_domain_t, slay_full_vapi_t);
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                       CTOR/DTOR
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+slay_full_t::slay_full_t() throw()
+{
+	// zero some fields
+	m_full_vapi	= NULL;
+}
+
+/** \brief Desstructor
+ */
+slay_full_t::~slay_full_t() throw()
+{
+	// delete m_full_vapi if needed
+	if( m_full_vapi )	full_vapi()->destroy();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			Setup function
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Start the operation
+ */
+slay_err_t	slay_full_t::start(slay_full_vapi_t *p_full_vapi)		throw()
+{
+	// sanity check - this object MUST be null at this point
+	DBG_ASSERT( is_null() );
+	// copy the parameter
+	this->m_full_vapi	= p_full_vapi;
+	
+	// return no error
+	return slay_err_t::OK;
+}
+
+
+
+
+NEOIP_NAMESPACE_END
+

@@ -1,0 +1,31 @@
+dnl Autoconf configure script for cygrunsrv.
+
+AC_PREREQ(2.12)dnl
+AC_INIT(cygrunsrv.cc)
+
+AC_CANONICAL_SYSTEM
+
+AC_PROG_INSTALL
+
+case "${target}" in
+  *-cygwin)
+  	;;
+  *)
+  	echo "The only supported target is cygwin."
+	exit 1
+	;;
+esac
+
+AC_CHECK_TOOL(CXX, c++, c++)
+if test -z "$CXX"; then
+  AC_CHECK_TOOL(CXX, g++, g++)
+  test -z "$CXX" && AC_MSG_ERROR([no acceptable c++ found in \$PATH])
+fi
+
+test -z "$CFLAGS" && CFLAGS="-g -O2"
+test -z "$CXXFLAGS" && CXXFLAGS="$CFLAGS"
+
+AC_SUBST(CFLAGS)
+AC_SUBST(CXXFLAGS)
+
+AC_OUTPUT(Makefile)

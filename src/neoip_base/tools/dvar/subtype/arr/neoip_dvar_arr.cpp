@@ -1,0 +1,80 @@
+/*! \file
+    \brief Declaration of the dvar_arr_t
+*/
+
+/* system include */
+#include <iostream>
+/* local include */
+#include "neoip_dvar_arr.hpp"
+#include "neoip_log.hpp"
+#include "neoip_nipmem_alloc.hpp"
+
+NEOIP_NAMESPACE_BEGIN
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                       ctor/dtor
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief clone this object
+ */
+dvar_vapi_t *	dvar_arr_t::clone()	const throw()
+{
+	return nipmem_new dvar_arr_t(*this);	
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                      compare() function
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Compare the object ala memcmp
+ */
+int 	dvar_arr_t::compare(const dvar_vapi_t &other_vapi)	const throw()
+{
+	// sanity check - check that other_vapi is of the same dvar_type_t
+	DBG_ASSERT( other_vapi.type() == type() );
+	// convert the other_vapi
+	const dvar_arr_t &	other	= dynamic_cast <const dvar_arr_t &>(other_vapi);
+	// compare the value
+	if( array < other.array )	return -1;
+	if( array > other.array )	return +1;
+	// here both are considered equal
+	return 0;
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                         display function
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Convert the object to a std::string
+ */
+std::string	dvar_arr_t::to_string()	const throw()
+{
+	std::ostringstream	oss;
+	// put the begining of the array
+	oss << "[";
+	// put each element of the array
+	for(size_t i = 0; i < array.size(); i++ )
+		oss << "[" << array[i] << "]";
+	// put the end of the array
+	oss << "]";
+	// return the just built string
+	return oss.str();	
+}
+
+NEOIP_NAMESPACE_END
+
+
+
+
+
+
+

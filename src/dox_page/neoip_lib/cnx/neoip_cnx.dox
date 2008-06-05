@@ -1,0 +1,74 @@
+/*! \page neoip-cnx NeoIP Connections
+
+This is a core part of the \ref neoip-lib.
+
+\ref neoip-cnx is a connection layer which run as an overlay network on top on the
+current internet.
+
+It allows to establish multiple kinds of connections:
+- unreliable, unordered datagram connection ala UDP
+- reliable, ordered byte stream connection ala TCP
+- reliable, unordered datagram connection
+  - with or without transmittion buffer
+- reliable, ordered datagram connection
+
+Additionnaly each connection can be either unicast or multicast.
+
+\section neoip-cnx-overlay Overlay Network
+As an overlay network, it defines its own addressing scheme for peers and connections. It is based 
+on \ref peerid and \ref portid (acting like IP address and port on the internet).
+
+In order to be easily routable in various environnment, \ref neoip-cnx run on top of an abtraction
+layer called \ref otsp. 
+
+\section neoip-cnx-module Included modules
+- Its API should be as close as possible to a BSD socket API.
+- \ref pubaddr which allows to discover the public view of an \ref otsp-addr
+- \ref cnxrelay which allows to relay all or part of the data exchange thru a tiers in order to 
+  provide connectivity thru NAT
+  - ESTACNX and FULLCNX
+- \ref rdvpt which list all the otsp address thru which a given peer can be contacted
+- \ref peerid acts as an IP address
+- \ref portid acts as a tcp/udp port
+- NeoIP acts as an overlay network on top of the internet
+- \ref otsp concept
+  - otsp_addr
+- \ref otsp_cnx properties
+  - is secured
+  - is stream
+  - MTU
+
+\section neoip-cnx-api Definition of the API
+- what about the security options
+  - identity sent to the other peer ?
+  - which identity do i accept ? see \ref n-acl
+  - which property ? encription, mac, compression, unrechability detection, idle timeout)
+  - 2 kind of options, the one needed at the connection establishement time, the other for the established connection
+- some low level stuff should be provided
+  - for example the curren rdv point to determine if the local peer can receive connection
+  - the current network location, e.g. do i need a RELAY_FULLCNX
+- typedef struct neoip_socket_stt *neoip_socket_fd
+- neoip_socket_addr = peerid, portid, rdvpts
+- neoip_socket_fd = neoip_socket_client( neoip_socket_addr, read_cb, err_cb, userptr )
+- neoip_socket_server( neoip_portid, accept_cb, userptr ) 
+- neoip_socket_close( neoip_socket_fd )
+- neoip_socket_fd
+- n_socket_addr = peerid, portid, rdvpts
+- n_socket_type = DGRAM, RDGRAM, STREAM
+  - what about the callback and buffer for the RDGRAM case
+  - i have a layer to do the buffering of xmit dgram, how do i interface this here ?
+  - the original RDGRAM put the memory of the xmit in the caller burden, how do i interface this
+    in the n_socket API
+- fd = n_socket_client_full( n_socket_type, nipid_t *local_portid, nipid_t *remote_peerid, nipid_t *remote_portid
+							, rdvpts_t *rdvpts, read_cb, err_cb, userptr )
+- n_socket_fd = n_socket_client( socket_addr_t dest_addr, read_cb, err_cb, userptr )
+- n_socket_write( n_socket_fd, void *data, int len )
+- void n_socket_close( n_socket_fd )
+- n_socket_fd = otsp_server( otsp_addr_t *listen_addr, accept_cb, userptr )
+  - accept_cb( userptr, otsp_fd of the connected socket )
+- n_socket_type = n_socket_get_type( n_socket_fd )
+- n_socket_get_mtu( n_socket_fd )
+- otsp_is_reliable( n_socket_fd )
+
+
+*/

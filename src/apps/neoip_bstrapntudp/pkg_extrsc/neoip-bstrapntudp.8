@@ -1,0 +1,109 @@
+.\" -*- nroff -*-
+.TH NEOIP-ROUTER 8 "Dec 2006" "neoip-bstrapntudp(1)" "neoip-bstrapntudp's Manual"
+.SH NAME
+neoip-bstrapntudp - Deamon for ntudp bootstrapping
+.SH SYNOPSIS
+.B neoip-bstrapntudp
+[--config_dir dirname] [--help] [--version] [--nb_ntudp_peer nbpeer]
+.SH DESCRIPTION
+neoip-bstrapntudp is a deamon which does nothing except generating some
+ntudp_peer_t. This is usefull for ntudp bootstrapping. 
+
+Every ntudp_peer_t MUST be able to reach at least 2 other ntudp_peer_t in
+order to determine it network position (via ntudp_npos_watch_t).
+
+As it is not a 'normal' neoip application but more one dedicated to the
+administration, it is setup to use a specific configuration directory.
+It put all the configuration files in /var/lib/neoip-bstrapntudp and dont
+use any other directories. Thus it doesnt use the usual /etc/neoip one.
+The fact to be separated from 'normal' neoip application allows a simpler
+administrations due to less conflicts.
+
+.SH Special case seen in the fields
+The available hosts on which to run neoip-bstrapntudp are : (i) jmehost1, a host
+behind a NAT realm with no nat-loopback support but with upnp available 
+and (ii) btcorp, a host behind a nested NAT realm with port forwarding enable 
+but no upnp on the most outter NAT box and no nat-loopback support.
+
+.TP 
+1.
+neoip-bstrapntudp on jmehost1 uses upnp to determine its network position
+without relying on any other ntudp_peer_t.
+.TP
+2.
+neoip-bstrapntudp on btcorp uses the neoip-bstrapntudp on jmehost1 to determine
+btcorp network position
+.TP
+3.
+It is required to get those 2 hosts as the hosts behind the same NAT realm as
+jmehost1 could not reach it due to the lack of nat-loopback support.
+
+.SH MOTIVATION
+It is impossible to use the normal way to determine the network position, usually 
+done via ntudp_npos_watch_t.
+This special case is required to solve a chicken-egg issue:
+.TP
+-
+To be able to determine the network position the usual way via ntudp_npos_watch_t
+requires some public server ntudp_pserver_t to help the testing.
+.TP
+-
+BUT to become public server ntudp_pserver_t, a ntudp_peer_t MUST be declared
+inetreach ok. So having a ntudp_npos_watch_t declaring the ntudp_peer_t as 
+such.
+  - so to become a ntudp_pserver_t, other ntudp_pserver_t are required. This 
+    is the chiken-egg problem.
+.TP
+-
+- This chicken-egg problem is solved by using a special way to determine the 
+  network position for the 'first' ntudp_pserver_t
+  - in short, this is deduced from the listening ipport_aview_t based on 
+    assumption.
+  - those assumptions are ok ONLY because it is supposed to be checked by 
+    the user running ntdup-bstrapntudp which is supposed to be an experienced
+    user.
+
+.SH OPTIONS
+.TP
+.I "-n, --nb_ntudp_peer nb"
+It indicates the number of ntudp_peer_t to create. This options is mandatory.
+.TP
+.I "-d, --nodaemon"
+If this option is set, the application will not daemonize itself and will
+remain in the foreground. This is usefull for debugging.
+.TP
+.I "-c, --config_dir dirname"
+set the configuration directory.
+If not specified, it uses /etc/neoip.
+.TP
+.I "-h, --help"
+display a short inlined help
+.TP
+.I "-v, --version"
+display the version string
+
+.SH HOWTO
+launch the bstrapntudp deamon with 2 ntudp_peer_t
+   # neoip-bstrapntudp -n 2
+
+launch the bstrapntudp with 2 ntudp_peer_t, keep it in the front and use config_dir_debug
+as configuration directory
+   # neoip-bstrapntudp -n 2 -d -c condig_dir_debug
+
+.SH FILES
+This sections describes the various files and directory used by the neoip-bstrapntudp :
+.TP
+.I /etc/neoip
+default configuration directory
+
+.SH LICENSE
+The license is proprietary and this programm should be used for testing purpose only
+
+.SH AUTHOR
+.B neoip-bstrapntudp
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP's homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.

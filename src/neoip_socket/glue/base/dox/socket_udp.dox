@@ -1,0 +1,10 @@
+/*! \page neoip-socket-udp NeoIP Socket UDP
+
+\ref neoip-socket-udp is part of the \ref neoip-socket.
+It performs connections on top of UDP/IP.
+
+\section neoip-socket-udp-addr NeoIP Socket UDP Address Space
+- It is the same as \ref neoip-socket-tcp-addr as it is both a usual IP stack
+  address space.
+
+*/

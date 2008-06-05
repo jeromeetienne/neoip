@@ -1,0 +1,35 @@
+#!/bin/sh
+# jme- helper executable to perform dns query honoring /etc/nsswitch.conf via fork()
+#
+# POSSIBLE IMPROVEMENT:
+# - it may be made faster by a small C program, but would require a arch specific package
+# - well a small exe to do that is not a real problem
+# - so likely better to do it, but currently it is not a priority
+
+# extract the HOSTNAME_TO_QUERY
+HOSTNAME_TO_QUERY=$1
+
+###############################################
+# bash version relying on 'getent' (but getent which is bugged with ipv6 host:)
+###############################################
+# TODO BUG BUG BUG
+# - if the hostname requested support IPv6 this will resolve in ipv6 and make
+#   it appears as a faillure
+#   - force the resolution to IPv4
+#   - e.g. no.releases.ubuntu.com resolve in IPv6
+# ok now the code itself
+# it output the list of ip address resulting of the resolution with a '/' at the end of each address
+# if the resolution fails, it output nothing
+# NOTE: the protocol of the output string is rather crappy for now. may be cleaned up latter
+#
+# disabled
+##### getent hosts $HOSTNAME_TO_QUERY | cut -d" " -f1 | tr '\n' '/'  2>/dev/null
+#
+
+
+###############################################
+# ruby version which works with ipv6 hosts
+###############################################
+# NOTE: it spawn a ruby interpreter each time... so it is cpu consuming
+ruby -e "require 'socket'; begin; addr=Socket::getaddrinfo(ARGV[0],'')[0][3]; rescue; exit 1; end; puts addr; exit 0" $HOSTNAME_TO_QUERY
+

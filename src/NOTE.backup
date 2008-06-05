@@ -1,0 +1,74 @@
+NOTE about the way to do a kinda rsync:
+---------------------------------------
+- there is a file which change with time
+- The old and the current version of the file
+- the goal is to provide the delta to go from the old version to the current one
+  - old + delta = current
+=============================================================
+- The input to produce the delta is 
+  - meta data of the old version
+  - the current version data
+- the meta data of the old version is the rolling checksum + hash of each block
+  - the block are of fixed length
+  - the best length depends on the data and their pattern change
+- the rolling checksum is 'only' a speed optimisation
+=========================================================
+- the delta contains
+  - the reference to old data: i.e. the blocks of the old version which are still in the new version
+  - the new data: the data which are in the current version but not in the old version
+- the file format of the delta isnt expressed in blocks but in offset+length ala IFF
+---------------------------------
+- official name: bdelta
+- 2 distinct steps
+  - generate the bdelta blocks
+  - generate the bdelta diff from the blocks of the old version and the data of the current version
+- API ala md5
+  - open/update/close
+  - bdelta_blks_open/bdelta_diff_open
+  - callback to read/write the result
+  
+==========================================================================
+SOFTWARE ALGO:
+--------------
+
+write_diff( forced )
+- if !forced and diff_len < diff_max_len, exit
+- the diff is the first diff_len byte of the buffer
+- write the diff in the delta
+- consume the written diff from the buffer
+- zero the diff_len
+- NOTE: the roll_csum is no more valid after that
+
+write_equal( blk_idx )
+- assert diff_len == 0
+- assert buffer_len >= block_size
+- write the equal in the delta
+- consume the block from the buffer
+
+proc_blk()
+- assert the buffer contains at least diff_len + block_size byte
+- assert the roll_csum is valid for this block 
+- the block is the buffer from buffer[diff_len, diff_len + block_size-1]
+- if this block is equal to a previous one
+  - if diff_len != 0, write_diff( forced )
+  - write_equal( blk_idx )
+- if this block isnt equal to a previous one
+  - remove the buffer[diff_len] byte from the roll_csum
+  - increase diff_len
+  - write_diff( unforced )
+   
+add_bytes()
+- assert that if the buffer is > block_size, then diff_len > 0
+- while( buffer_len - diff_len >= block_size )
+  - if diff_len > 0		
+  		add buffer[diff_len + block_size] byte to the roll_csum
+    else
+  		compute the roll_csum over the whole block buffer[diff_len, diff_len + block_size-1]
+  - proc_blk()
+
+final()
+- write_diff( forced )
+
+
+
+

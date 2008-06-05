@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=NeoIP OffLoad
+Comment=offload http
+Exec=neoip-oload-gui
+Icon=neoip-oload.png
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=Network;Application;

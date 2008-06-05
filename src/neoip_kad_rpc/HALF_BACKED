@@ -1,0 +1,4 @@
+i started this but it is not complete
+- a ruby implementation of the xmlrpc library is missing
+- the xmlrpc API is uncool
+  - especially the kad_listener part

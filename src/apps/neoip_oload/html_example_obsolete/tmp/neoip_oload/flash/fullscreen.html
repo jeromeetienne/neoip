@@ -1,0 +1,26 @@
+<html>
+<head>
+
+
+<script type="text/javascript" src="../../base/javascript/swfobject.js"></script>
+
+
+</head>
+<body style="margin:0;">
+
+
+<div id="player"><a href="http://www.macromedia.com/go/getflashplayer">Get the Flash Player</a> to see this player.</div>
+<script type="text/javascript">
+	var so = new SWFObject('flvplayer.swf','player','100%','100%','7','#000000');
+	so.addVariable("file",getQueryParamValue("file"));
+	so.addVariable("streamscript", "lighttpd");	
+	so.addVariable("usefullscreen","false");
+	so.addVariable("fsbuttonlink","oload_flash_example.html");
+	so.addVariable("displayheight","9999");
+	so.addVariable("autostart","true");
+	so.write('player');
+</script>
+
+
+</body>
+</html>

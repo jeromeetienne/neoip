@@ -1,0 +1,11 @@
+{
+	base_date	: "Fri, 17 Aug 2007 20:07:25 GMT",
+	item_arr	: [
+			{	address	: "http://blip.tv/file/get/Commandn-commandN106965.mov",
+			       	duration: 826.56,
+			},
+			{	address	: "http://blip.tv/file/get/Commandn-commandN105973.mov",
+			       	duration: 767.03,
+			},
+		]
+}

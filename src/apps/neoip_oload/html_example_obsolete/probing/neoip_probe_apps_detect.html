@@ -1,0 +1,56 @@
+<html debug=true>
+<head><title>neoip apps_detect_t probe</title></head>
+<body onload="start_probing()">
+<script src="../base/firebug/firebug.js"></script> 
+<script src="../base/javascript/neoip_xdomrpc_t.js"></script> 
+<script src="../base/javascript/neoip_apps_detect_t.js"></script> 
+
+This page just probes all local neoip-apps for apps_detect_t website. and if 
+an neoip-apps is found, it display them below. As those outter_uri are only made
+to be used programatically, this page is more for info and maybe to debug
+the javascript apps_detect_t class, than anything else.
+
+<h1>List of running neoip apps with apps_detect_t</h1>
+<ul id="neoip_apps_list"></ul>
+
+<script>
+	function start_probing()
+	{
+		// start probing neoip-apps
+		var	oload_detect	= new neoip.apps_detect_t("oload", 4550, 4559
+						, neoip.apps_detect_cb_t(apps_detect_cb));
+		var	casto_detect	= new neoip.apps_detect_t("casto", 4560, 4569
+						, neoip.apps_detect_cb_t(apps_detect_cb));
+		var	casti_detect	= new neoip.apps_detect_t("casti", 4570, 4579
+						, neoip.apps_detect_cb_t(apps_detect_cb));						
+	}
+	function apps_detect_cb(apps_detect, userptr, result_str)
+	{
+		var	suffix_name	= apps_detect.suffix_name();
+		// log the result
+		console.info("enter suffix_name=" + apps_detect.suffix_name() + " result_str=" + result_str);
+
+		// delete the apps_detect
+		apps_detect.destructor();
+
+		// build the string to display
+		var	str;
+		if( neoip.apps_present(suffix_name) ){
+			str	 = "neoip-" + suffix_name + " HAS been found -";
+			str	+= " version " + neoip.apps_version(suffix_name);
+			str	+= " with outter_uri of " + neoip.outter_uri(suffix_name);
+		}else{
+			str	= "neoip-" + suffix_name + " HAS NOT been found";
+		}
+		
+		// append this string in the neoip_apps_list element
+		var line_elem	= document.createElement('li');
+		line_elem.appendChild(document.createTextNode(str));
+		var list_elem	= document.getElementById('neoip_apps_list');
+		list_elem.appendChild(line_elem);
+	}
+</script>
+
+
+</body>
+</html>

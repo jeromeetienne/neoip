@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=NeoIP Router
+Comment=Remove NAT and VPN problems
+Exec=neoip-router-gui
+Icon=neoip-router.png
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=Network;Application;

@@ -1,0 +1,220 @@
+/*===========================[ (c) JME SOFT ]===================================
+FILE        : [vdev.c]
+CREATED     : 01/03/16 13:08:03		LAST SAVE    : 01/11/12 09:29:00
+WHO         : jerome@mycpu Linux 2.2.14
+REMARK      :
+================================================================================
+
+==============================================================================*/
+
+/* system include */
+#include <glib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <net/ethernet.h>
+#include <netinet/in.h>
+#include <netinet/ip_icmp.h>
+#include <string.h>
+#include <asm/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <sys/errno.h>
+//#include <linux/netlink.h>
+#include <net/if.h>
+#include <linux/sockios.h>
+#include <linux/if_packet.h>
+
+
+/* local include */
+#include "vdev.h"
+#include "util.h"
+#include "stun_out.h"
+#include "stunnel.h"
+#include "lport.h"
+#include "rawip.h"
+
+/****************************************************************
+ NAME	: vdev_prepare				01/03/16 13:21:29
+ AIM	:
+ REMARK	:
+****************************************************************/
+static gboolean vdev_prepare(gpointer source_data, GTimeVal *current_time,
+			gint *timeout, gpointer user_data)
+{
+//DBG("enter\n");
+	*timeout = -1;
+	return FALSE;
+}
+
+/****************************************************************
+ NAME	: vdev_check				01/03/16 13:22:18
+ AIM	:
+ REMARK	:
+****************************************************************/
+static gboolean vdev_check( gpointer source_data, GTimeVal *current_time,
+			gpointer user_data )
+{
+	vdev_t *vdev 	= source_data;
+//DBG("enter\n");
+	return vdev->gfd.revents & G_IO_IN;
+}
+
+/****************************************************************
+ NAME	: vdev_check				01/03/16 13:22:18
+ AIM	:
+ REMARK	:
+****************************************************************/
+static gboolean vdev_dispatch(gpointer source_data, GTimeVal *current_time,
+			gpointer user_data)
+{
+	vdev_t 		*vdev 	= source_data;
+	char		buf[YAV_STACK_MTU], *pkt = buf;
+	struct ether_header	*eth	= (struct ether_header *)(buf);
+	int		pkt_len;
+	stun_t		*stun;
+	
+	pkt_len = read( vdev->gfd.fd, pkt, sizeof(buf) );
+	if( pkt_len < ETHER_HDR_LEN )	return TRUE;
+
+	/* update to point on IP header */
+	pkt 	+= ETHER_HDR_LEN;
+	pkt_len	-= ETHER_HDR_LEN;
+
+	stun = lport_stun_from_pkt( vdev, pkt, pkt_len );
+DBG("stun=%p\n",stun);
+	if( stun ){
+		stun_out( stun, pkt, pkt_len, ntohs(eth->ether_type) );
+	} else {
+// WORK: why do i assume IPv4
+EXP_ASSERT( ntohs(eth->ether_type) == ETHERTYPE_IP );
+		/* if no established tunnel, report the dest. as unreachable */
+		icmp_xmit_reply( vdev, ICMP_DEST_UNREACH, ICMP_NET_UNREACH, 0
+				, pkt, pkt_len );
+	}
+
+	return TRUE;
+}
+
+/****************************************************************
+ NAME	: vdev_destroy				01/03/16 15:41:35
+ AIM	:
+ REMARK	:
+****************************************************************/
+static void vdev_destroy(gpointer data)
+{
+	vdev_t *vdev 	= data;
+	g_main_remove_poll( &vdev->gfd );
+}
+
+static GSourceFuncs vdev_srcfuncs = {
+	vdev_prepare,
+	vdev_check,
+	vdev_dispatch,
+	vdev_destroy
+};
+
+/****************************************************************
+ NAME	: vdev_bind				01/10/04 09:15:37
+ AIM	: bind the socket to a specific interface
+ REMARK	: from libpcap
+****************************************************************/
+static int vdev_bind(int fd, char *dev_name)
+{
+	struct ifreq	ifr;
+	struct sockaddr_ll	sll;
+
+	/* get the netif index */
+	memset(&ifr, 0, sizeof(ifr));
+	strncpy(ifr.ifr_name, dev_name, sizeof(ifr.ifr_name));
+	if (ioctl(fd, SIOCGIFINDEX, &ifr) == -1) {
+		perror("bind: errno");
+		return -1;
+	}
+
+	/* actually bind it */
+	memset(&sll, 0, sizeof(sll));
+	sll.sll_family		= AF_PACKET;
+	sll.sll_ifindex		= ifr.ifr_ifindex;;
+	sll.sll_protocol	= htons(ETH_P_ALL);
+	if (bind(fd, (struct sockaddr *) &sll, sizeof(sll)) == -1) {
+		DBG("bind: errno %d", errno);
+		return -1;
+	}
+	return 0;
+}
+
+/****************************************************************
+ NAME	: vdev_open				01/03/16 13:08:14
+ AIM	:
+ REMARK	:
+****************************************************************/
+int vdev_open( vdev_t *vdev, char *dev_name )
+{
+	int	fd 	= socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL) );
+	int	err;
+	DBG_ASSERT( fd != -1 );
+	if( fd == -1 )	return -1;
+
+	/* bind it to dev_name */
+	err = vdev_bind( fd, dev_name);
+	DBG_ASSERT( err == 0 );
+
+	/* WORK: not blocking ? */
+	vdev->dev_name = strdup( dev_name );
+	EXP_ASSERT( vdev->dev_name );
+
+	/* feed glib fd */
+	vdev->gfd.fd	= fd;
+	vdev->gfd.events= G_IO_IN | G_IO_HUP | G_IO_ERR;
+
+	/* add it to the source poll */
+	g_main_add_poll(&vdev->gfd, G_PRIORITY_DEFAULT);
+	vdev->gsrc_tag = g_source_add(G_PRIORITY_DEFAULT, FALSE,
+				&vdev_srcfuncs,
+				vdev,
+				NULL,
+				NULL);
+
+	return(0);
+}
+
+/****************************************************************
+ NAME	: vdev_close				01/04/01 22:35:33
+ AIM	: 
+ REMARK	:
+****************************************************************/
+void vdev_close( vdev_t *vdev )
+{
+	g_main_remove_poll( &vdev->gfd );
+	g_source_remove( vdev->gsrc_tag );
+	close( vdev->gfd.fd );
+}
+
+
+/****************************************************************
+ NAME	: vdev_xmit				01/03/17 16:40:52
+ AIM	:
+ REMARK	: the packet is assumed a IPv4 packet
+****************************************************************/
+int vdev_xmit( vdev_t *vdev, char *pkt, int pkt_len, int ethertype )
+{
+	char	buf[YAV_STACK_MTU];
+	struct ether_header *eth = (struct ether_header *)(buf);
+	int	buf_len = pkt_len + ETHER_HDR_LEN;
+
+	/* build the fake ethernet header */
+	memcpy( eth->ether_dhost, "\xfe\xfd\x00\x00\x00\x00",
+			sizeof(eth->ether_dhost) );
+	memset(eth->ether_shost, 0, sizeof(eth->ether_shost));
+	eth->ether_type = htons(ethertype);
+
+	/* copy the packet */
+	memcpy( buf+ETHER_HDR_LEN, pkt, pkt_len );
+//DBG("%s:bufLen=%d\n", vdev->dev_name, buf_len);DBG_DUMP( buf, buf_len );
+
+	/* send it */
+	return write(vdev->gfd.fd, buf, buf_len );
+}
+

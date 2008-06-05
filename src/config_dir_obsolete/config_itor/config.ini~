@@ -1,0 +1,11 @@
+[main]
+rdv_addr=udpv4://pphost.homelinux.org:20001
+#rdv_addr=udpv4://videographe.dyndns.org:20000
+rdv_addr_alt=udpv4://pphost.homelinux.org:20001
+no_daemon=true
+httpd_addr=tcpv4://127.0.0.1:8082
+
+[log]
+n_grp.c=debug
+script_grp.c=debug
+relipkt.c=debug

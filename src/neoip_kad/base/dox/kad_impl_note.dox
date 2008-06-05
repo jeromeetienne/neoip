@@ -1,0 +1,25 @@
+/*! \page neoip-kad-impl-node NeoIP Kademlia Implemention nodes
+
+- the network part, i.e. sending/receiving packet, is quite well abstracted 
+  in the cnx/ directory
+  - thus it should be easy to use various network layers...
+    - e.g. one using nudp for plain udp packet + cookie in STORE
+    - e.g. one using socket_t for having all the security attached to it
+      - and the connection establishement time overhead at each packet :)
+- TODO list all the RPC and their purpose
+- explain how to dump a database
+
+\section neoip-kad-rpc-findallval FINDALLVAL RPC
+This rpc allows to get duplicates values of a given key.
+
+- the request provide a keyid
+- the replies contains a list of duplicate records AND the list of the nclosest node to the key
+
+*/
+
+
+
+
+
+
+

@@ -1,0 +1,50 @@
+.\" -*- nroff -*-
+.TH NEOIP-UPNP 8 "Dec 2006" "neoip-upnp(1)" "neoip-upnp's Manual"
+.SH NAME
+neoip-upnp - http gateway to download file http/bittorrent/metalink
+.SH SYNOPSIS
+.B neoip-upnp
+[--config_dir dirname] [--help] [--version]
+.SH DESCRIPTION
+neoip-upnp is a deamon which allow to read files over the internet.
+Those files may be static http content, .torrent content or .metalink content.
+
+TODO this man page is just a stub. complete it
+TODO put some example of usage
+
+
+.SH OPTIONS
+.TP
+.I "-c, --config_dir dirname"
+set the configuration directory.
+If not specified, it uses /etc/neoip-upnp.
+.TP
+.I "-h, --help"
+display the inlined help
+.TP
+.I "-v, --version"
+display the version string
+
+.SH EXAMPLES
+To compile it and launch it from yavipin/src directory
+  ./m neoip-upnp && ./neoip-upnp -c config_dir_debug1 -d
+
+To download ubuntu iso thru it. NOTE: the localhost:4500 may change depending on the port neoip-upnp is listening on.
+  wget -O /dev/null http://localhost:4500/*link_type*torrent/*subfile*1/http/torrent.ubuntu.com:6969/file/ubuntu-7.04-desktop-i386.iso?info_hash=%1B%060%E6%BC%BF%1Bi%10%F5%20C%93%C9%85%C7%0Cq%AA%F5
+  
+.SH FILES
+\fI/etc/neoip-upnp\fR
+default configuration directory
+
+.SH LICENSE
+The license is proprietary and this programm should be used for testing purpose only
+
+.SH AUTHOR
+.B neoip-upnp
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP's homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.
+Note that the metalink support is experimental.

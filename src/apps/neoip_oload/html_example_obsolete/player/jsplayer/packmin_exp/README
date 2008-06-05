@@ -1,0 +1,14 @@
+This directory contains an experiementation with compressing all the javascript 
+files for the player into a single one. this aims to improve the latency of
+downloading a page.
+
+total uncompress = 200k
+total compressed = 45k
+total post gzip  = 18k (so 9% of the original not bad)
+
+large compression ratio + a single file (instead of 20) should improve the 
+latency significantly
+
+- TODO integrate it. this is currently not integrated.
+  - depends on how it is organized at the end
+  - but for sure js compression is something to do

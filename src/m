@@ -1,0 +1,52 @@
+# set teh variable to build a debug version
+export DEBUG_BUILD=1
+# make the makefile
+
+# local build
+#exec /bin/nice -n 19 make -f Makefile.static $*
+
+# use the base directory name to insert a NEOIP_TARGET appropriatly
+# - this allow to symply simlink this script in the build directory and get the
+#   NEOIP_TARGET automatically set
+# - if basename $PWD is == "build_linux" append NEOIP_TARGET=linux to the make cmdline
+# - if basename $PWD is == "build_win32" append NEOIP_TARGET=win32 to the make cmdline
+# - in other case do nothing
+BASE_DIR=`basename $PWD`
+if [ "$BASE_DIR" = "build_linux" ]; then
+	TARGET_OPT="NEOIP_TARGET=linux"
+elif [ "$BASE_DIR" = "build_win32" ]; then
+	TARGET_OPT="NEOIP_TARGET=win32"
+fi
+
+# remote compilation via ssh+nfs on jmehost2
+# - pro: jmehost2 doesnt have overheat issue like jmehost1
+# - pro: jmehost1 got the free cpu/ram during compilation, so more confortable to code
+#exec ssh jmehost2 "cd $PWD && make -j2 -f ~/workspace/yavipin/src/Makefile.static $TARGET_OPT $*"
+#exec ssh jmehost3 "cd $PWD && make -j2 -f ~/workspace/yavipin/src/Makefile.static $TARGET_OPT $*"
+
+# Distributed build using distcc - using jmehost2 and jmehost3
+# - i dunno why jmehost3 is never saturated.
+# - it use jmehost2 as base and distcc on jmehost3
+# - as jmehost3 got 2gbyte of ram, and more cpu, would make more sense to use it as base 
+if [ "$BASE_DIR" = "build_linux" ]; then
+	CXX_VAL="ccache distcc g++"
+elif [ "$BASE_DIR" = "build_win32" ]; then
+	CXX_VAL="ccache distcc i586-mingw32msvc-g++"
+fi
+#exec ssh jmehost2 "cd $PWD && export DISTCC_HOSTS=\"jmehost3,lzo localhost\" && make -j8 -f ../src/Makefile.static CXX=\"$CXX_VAL\" $TARGET_OPT $*"
+#exec ssh jmehost3 "cd $PWD && export DISTCC_HOSTS=\"localhost jmehost2,lzo\" && make -j8 -f ../src/Makefile.static CXX=\"$CXX_VAL\" $TARGET_OPT $*"
+
+if [ "$BASE_DIR" = "build_linux" ]; then
+	CXX_VAL="ccache g++"
+elif [ "$BASE_DIR" = "build_win32" ]; then
+	CXX_VAL="ccache i586-mingw32msvc-g++"
+fi
+exec make -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
+
+# Distributed build using distcc
+#export DISTCC_HOSTS="jmehost2"
+#export DISTCC_HOSTS="localhost jmehost2,lzo"
+# jme - cpu_temp_watchdog.sh waits until the cpu is 67 C if it reach 73 C.
+#     - may be removed without any impact. it is very very specific to my laptop
+#       which overheats.
+#exec make -f Makefile.static -j2 CXX="/home/jerome/bin/cpu_temp_watchdog.sh 70 73 && distcc" $*

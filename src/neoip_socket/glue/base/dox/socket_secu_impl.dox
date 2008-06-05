@@ -1,0 +1,19 @@
+/*! \page neoip-socket-secu-impl NeoIP Socket Security Layer Implementation Note
+
+\par Alternate Received Keys
+The cookie or cost-function key and the diffie-hellman key are periodically
+renewed. In order to avoid disruption, the previous key needs still accepted for
+a while after the renewal.
+- The amount of time may be tunable by a delay, e.g. for 30 seconds.
+  - with a maximum of the renewal period.
+  
+\par Cookie double spent database
+- As the cookie local secret may be used for several connections and 
+  as an attacker may replay a valid cookie, each cookie MUST be accepted only
+  once.
+  - so a double spend database MUST store accepted cookie for a given
+    cookie local secret.
+  - When the cookie local secret is no more acceptable, aka not as main
+    and alternate key, the double spend database is discarded.
+
+*/

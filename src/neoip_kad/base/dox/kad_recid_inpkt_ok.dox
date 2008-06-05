@@ -1,0 +1,36 @@
+/*! \page neoip-kad-recid_inpkt recid_inpkt_ok profile option ?
+
+Some notes about the concept but no implementation done.
+
+\par Principle
+if the kad_db_profile_t::keyid_nodups_ok() is true, the kad_recid_t may be
+directly derived from the kad_keyid_t. As a consequence, the kad_recid_t may
+be ommnited in the exchanged packets and thus reduces the consume network 
+rescources
+
+\par Notes
+- in kad_profile_t check that if recid_inpkt_ok == false then keyid_nodups_ok = true
+- this requires to know the profile status when serializing kad_rec_t
+  - currently this is not possible. 
+  - possible solution: do something similar to pkttype_profile_t
+- this involves modication of kad_recdups_t too as it has its own serialization
+  of kad_rec_t
+- Some API, e.g. kad_delete_t/kad_delete_rpc_t/kad_findallval_t, contains a 
+  kad_recid_t... how to handle this ?
+  - i think the best would be to allow a null kad_recid_t.
+  - possible solution: (only in the case of recid_inpkt_ok == false)
+    - if the kad_recid_t is not null, do a sanity check to ensure it is the one
+      directly derived from the kad_keyid_t
+    - if the kad_recid_t is null, derive it from the kad_keyid_t
+- The algorithm to derive the kad_recid_t directly from the kad_keyid_t is the 
+  usual gen_id convertion
+  - kad_recid = kad_keyid.to_canonical_string()
+
+*/
+
+
+
+
+
+
+

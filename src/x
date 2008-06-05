@@ -1,0 +1,16 @@
+# ! /bin/sh
+
+# ask the shell to exit at the first command which fails
+set -e
+
+# ask the kernel NOT to add the pid when dumping a core - only root user can do this
+#echo 0 >/proc/sys/kernel/core_uses_pid
+
+# set the core file limit to unlimited - only root user can do this
+#ulimit -c unlimited
+
+# put the current directory into the library path
+export LD_LIBRARY_PATH=`pwd`:$LD_LIBRARY_PATH
+
+# launch the exe
+exec $*

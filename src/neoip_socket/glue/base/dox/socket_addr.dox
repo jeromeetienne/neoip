@@ -1,0 +1,44 @@
+/*! \page neoip-socket-addr NeoIP Socket Address
+
+\ref neoip-socket-addr are splitted into 3 parts
+-# the peer address which identify the other peer (aka application)
+  - In IP world, it is similar to the ip address.
+-# the port which partly identify a given connection
+  - to fully identify a connection between two peers, both ports are required
+  - the port has the same meaning in IP and in \ref neoip.
+-# the otsp address, otsp stands for outter transport, which provide the address
+  of the connection over which the \ref neoip-socket is transported.
+
+\par Notes
+- if the protocol isnt raw, you can obtain the other peer id, else return null
+- no distinction of type between source and destination for the type. 
+  - it is all socket_addr_t
+  - socket_addr_peer_t	get_peer()
+  - socket_addr_port_t	get_port()
+  - socket_addr_otsp_t	get_otsp()
+
+- if domain == raw tcp/udp
+        addr_peer = id_t null
+        addr_port = ipport_t
+        addr_otsp = null
+- if domain == cooked tcp/udp
+        addr_peer = id_t peerid
+        addr_port = ipport_t
+        addr_otsp = null
+- if domain == omni
+	addr_peer = id_t peerid
+	addr_port = id_t portid
+        addr_otsp = list of socket_addr_t if not yet connected destination address
+                    null if listening address
+                    single socket_addr_t if bounded source address
+=>	- socket_addr_peer_t == id_t
+	- socket_addr_port_t == id_t | ipport_t
+	- socket_addr_otsp_t == list of socket_addr_t
+
+\par Listening address
+- only a \ref socket-addr-port needs to be specified
+
+\par Destination address
+- peer, port and otsp MUST be specified
+
+*/

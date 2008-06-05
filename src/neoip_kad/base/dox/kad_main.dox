@@ -1,0 +1,39 @@
+/*! \page neoip-kad NeoIP Kademlia
+
+
+- Note about the security see \ref neoip-kad-sec
+- Note about the multiple record for a single key see \ref neoip-kad-recdups
+
+- TODO do a note on the bug in the paper
+  - the bootstrapping causing netplit
+  - the node search using only alpha nodes to start with
+  
+- what about the nodeid of a given realm ?
+  - should it be constant or random ?
+  - an issue with constant is :
+    1. if a node A goes down and then up
+    2. and keep its nodeid and listen_addr
+    => how other nodes that this node no more contains the record it had
+
+- Note about an algo to dump the whole database
+  - pick a node
+  - dump its database using the findgeval rpc
+    - FINDGEVAL request take a recid as parameter
+    - FINDGEVAL reply contains all the record with a record id >= at the 
+      one found in the request. up to a given size to avoid datagram fragmentation
+      - if none is found, return the nclosest node
+  - when the database is fully dumpted, use the nclosest node from 
+    the last FINDGEVAL, to determine the next node (e.g. the one on the right)
+- Note about an algo to do an inventory of each nodes
+  - pick a node from the local kbucket once bootstrap
+  - do a FINDNODE on it
+  - do a findnode on the nodeid just higher, until the first if found again
+
+*/
+
+
+
+
+
+
+

@@ -1,0 +1,19 @@
+{"playlist": {
+	"date"		: "Fri, 17 Aug 2007 20:07:25 GMT",
+	"identifier"	: "sample_stream",
+	"track"	: [
+		{
+		"title"		: "example of live stream",
+		"location"	: "http://localhost:8080/stream.flv",
+		"duration"	: 8852000,
+		"meta"		: { "content_type"	: "stream"
+				},
+		"extension"	: {
+			"casto"	: {
+				"cast_name"	: "superstream.flv",
+				"mdata_srv_uri"	: "http://jmehost1/~jerome/oload/cgi-bin/cast_mdata_echo_server.rb"
+				},
+			}	
+		}
+	]
+}}

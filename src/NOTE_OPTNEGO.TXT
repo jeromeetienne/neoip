@@ -1,0 +1,48 @@
+note about the option negotiation:
+----------------------------------
+- the fields to negotiate are:
+  o the compression of established tunnel
+  o the encryption/mac of established tunnel
+  o the tunnel establishment part 
+    + not sure of the fields in this
+- for the enc/mac and the compression, the options are
+  proposed in the itor_auth, and the chosen option are replyed in 
+  the resp_auth
+- for the tunnel establishement, the options are proposed in the 
+  cnxid_req packet and the chosen option are replied in the cnxid_rep
+- gen_hd payload name:
+  o comp_opt_proposed/chosen
+  o encmac_opt_proposed/chosen
+----------------------------------
+- the mechanism is the same for all fields
+- the client provide a list of possibles options
+  o each options is a 16-bit value
+- the server answers the chosen one
+---------------------------------------------------------
+CODING to build the payload:
+- optnego_build_proposed_payl()
+  o build the opt_proposed payload from a list provided by the caller
+  o memcpy the list of proposed option id
+  o build a valid gen_hd_t with the provided payload name
+- optnego_get_len_proposed_payl()
+  o get the length of the payload before building it
+  o help to allocate the memory to store the packet
+- optnego_choose_opt()
+  o the caller provide a list of proposed option (network order ?) 
+    and a list of possible option
+  o the function returns the chosen one (aka the first which match)
+- optnego_build_chosen_payl()
+- optnego_get_len_chosen_payl()
+-------------------------------------------------------
+CODING to register the plugin:
+- optnego_reg.c
+- optnego_reg_openlay/closelay
+- optnego_reg_add( char *field, uint16_t option[, char *name] )
+  o if the option is already registered, report error and log
+- optnego_reg_rem( char *field, uint16_t option )
+- char *optnego_reg_get_list( char *field, int *nb_option )
+- WORK: o how about the notion of order ?
+        o how about the options which are supported by the code and not wiched by the user ?
+
+        
+        

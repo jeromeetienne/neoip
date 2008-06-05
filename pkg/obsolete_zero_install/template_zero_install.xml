@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<?xml-stylesheet type='text/xsl' href='interface.xsl'?>
+<interface uri="http://jmehost.podzone.net:55000/0install/@APPS_NAME@.xml"
+	xmlns="http://zero-install.sourceforge.net/2004/injector/interface">
+  <name>@APPS_NAME@</name>
+  <summary>@APPS_SUMMARY@</summary>
+  <description>@APPS_DESCRIPTION@</description>
+  <homepage>http://off.net/~jme/</homepage>
+  <category>Network</category>
+  <implementation arch="Linux-i386"
+  	id="@APPS_MANIFEST@"
+	license="Other/Proprietary License"
+	main="@APPS_NAME@"
+	version="@APPS_VERSION@">
+    <archive extract="@APPS_BUILD_DIR@"
+    		href="http://jmehost.podzone.net:55000/0install/@ARCHIVE_NAME@"
+    		size="@ARCHIVE_SIZE@"
+    		type="@ARCHIVE_MIME@"/>
+  </implementation>
+</interface>

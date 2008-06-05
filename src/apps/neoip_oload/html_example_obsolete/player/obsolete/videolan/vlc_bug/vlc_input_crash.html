@@ -1,0 +1,37 @@
+<html>
+<head><title>firefox/vlcplugin crashing on using vlc.input stuff</title></head>
+<body>
+
+<p>This show a crash of firefox/vlc-plugin of svn Rev: 21313, a bug
+which is not in the 0.8.6 of ubuntu feisty.
+<ul>
+<li>0.8.6 throw an exception. as there is no input, this seems the proper behaviour.</li>
+<li>svn 21313 crash. which doesnt seems proper :)</li>
+</ul>
+</p>
+
+<h1>display</h1>
+<ul id="vlc_disp_data"></ul>
+<object type="application/x-vlc-plugin" pluginspage="http://www.videolan.org/"
+	version="VideoLAN.VLCPlugin.2"
+	id="vlc" width="400" height="300"/>
+<script>
+	function test(){
+		var 	vlc	= document.getElementById("vlc");
+		var 	tmp	= "";
+
+		try {
+			tmp	+= "<li>input.length=" + vlc.input.length() + "</li>";
+		}catch(e){
+			tmp	+= "<li>execption=" + e + "</li>";
+		}
+		
+		document.getElementById("vlc_disp_data").innerHTML = tmp;
+		
+		setTimeout("test()", 250);
+	}
+	setTimeout("test()", 250);
+</script>
+
+</body>
+</html>

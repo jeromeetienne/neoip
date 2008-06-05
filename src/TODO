@@ -1,0 +1,479 @@
+--------------------------------
+TODO TOMORROW
+- implement the new otsp see bug 26
+  o otsp_client.c otsp_server.c
+  o use it in a public address discovery client
+  o What about the server ? 
+    * do i port the unbound_inpkt.c ?
+    * write a special server just for the test ?
+  o as now the unbound_inpkt 'callback' are the same as before, the port should be quite easy
+  o refactor the protocol
+  o while writing it, think about the pool and how to make it more robust
+    * keep alive to keep the binding
+    * which policy to trigger discovery for the pool ?
+    * at code startup
+    * should i always keep one ?
+    * if i dont miss one, get three
+    * time it out after 10min or so
+- work on otsp.c and try to port some small client on it to see
+  o rdv_client
+  o pubaddrdisc
+  o reg_client
+  o see about a small server ? is there any server ? except a main one listening on :9000 ?
+- implement ip addr discovery
+  o am i behind nat 
+    + diagnostic the nat type
+    + do i have a netif with a public address on it ?
+    + consequence in the rdvpt, if im not behind nat, i dont need a rdv
+      * what about the firewall ?
+    + what we want is 'are we reachable from public internet'
+      * so preconfiguration which is bad
+      * better is autodiagnostic 
+      * require to test as it may rely on external informations (firewall)
+      * test and cache the result
+      * the cached result got invalidated when the connectivity is changing
+      * it is periodically timedout in case of modification of external informations
+      * it may be manually invalidated too
+  o is the box movin ?
+    + not urgent
+    + badly asked question! the real one is 'is the connectivity changing'
+    + hear, does connectivity include temporary changes e.g. a link going down
+    + is it onl direct connectivity
+    + usefull information to handle stuff
+    + get a footprint of the network.
+    + the local mac addresses ? 
+      * well if the box is moving so are the interface with it
+    + the mac address of the gw ?
+  o another interest would be to have the local network address space
+    + it would open the inner address allocation on tunnel establishement
+    + it allow to hint the answer for 'what is my local address space ?'
+    + local address space = all the address which can be reached without going thru a public internet
+      * does such stuff exist
+- replace all direct access to otsp_addr_t by function
+  o then change uint32_t addr to ip_addr_t
+--------------------------------
+KNOWN BUG:
+- BIG BUGS in temp_addr_on_login
+  o if the server fails, the whole addressing system is out of sync!!!
+  o people can have the same address and all
+  o find a way to handle this properly
+  o to store the next_iaddr on disk would help
+  o people who use addresses should renew their lease
+    + would create bad tradeoff. the shorter the timer is better it is in this case
+    + the load of the server would be higher in normal case
+    + so worst case in normal situation
+- what about people resolving hostname, going thru neoip and then the packet leaks
+  o for example if the inner address is reused by somebody else
+  o if neoip is no more running and the packet goes on the internet 
+  o this is a big SHIT !!!!!
+  o an address used by a given host should not be used by any other host for XXX times
+    + is XXX is infinite it is cool => but implies fix address per host (ok for ipv6, but not for ipv4)
+    + else how long enougth is XXX ? 
+- if there the dns request packet doesnt go out of the box because there is no route to go out
+  the packet isnt interecept and dnsgrab fail
+  o is it an issue ? if there no network connected, dns isnt supposed to work anyway
+--------------------------------
+MISC:
+- change the ip address stuff not to use uint32_t but more something that will be compatible with ipv6
+  o in relation with otsp_addr_t
+  o started a ip_addr_t too
+-----------------------------------
+PROTOCOLS and SECURITY:
+- the netif part come back strong in the priority
+  o the functions to get/set an ip address from an interface name
+  o the function to get the list of all interface name
+  => this would allow a true support of samenat probe
+     + currently the remote address isnt really done
+     + i should send a list of all otsp_addr_t i can listen on
+- fix the auth cert to actually check something
+  o now it is checking the signature and the certificate trust
+  => still need to check if the sender is actually the guy he claims to be
+- next step in registration
+  o create the configuration file during registration
+  o put the root_ca_cert.pem in a file
+    + from a local var hardcoded in the source ?
+  o the basic config.ini looks like a config_itor/config.ini
+  o rather simple stuff in fact
+- i think i should rename the whole tunnel thing
+  o first try
+  o stun_t		into nip_cnx_t
+  o itor_t		into nip_itor_t
+  o resp_t		into nip_resp_t
+  o udp_peer	into otsp_addr_t	<- this one is good
+  o cnx_addr_t	into otsp_caddr_t 	<- not really good, but i dont think i can do better
+- change the nodeid in something more generic
+  o look at jxta stuff
+  o the nodeid is cool for ip packet interception
+    + it is unsuitable for the socket interception things
+    + 2 nodes can have several socket between each other
+  o a cnxid_t would be more in the mood
+  o cnx_pt_t = ip address : port <- exported concept
+  o a connection between 2 point... this concept isnt yet named try to find a // in internet or linux kernel
+- remove the cnxid_r, cnxid_i from all the registration/rdv protocol
+  o part of the otsp refactoring
+- note about address allocation
+  o if the packet received by onet isnt able to find a rdvpoint, maybe you could try a reverse search
+    to find the name... but it would a lack of security because we arent sure of the name
+- note about dnsgrab and its interaction with nameser
+  o the nameser is currently stored only on a single server
+  o dnsgrab intercept dnsrequest
+  o nipns_client.c
+  o nipns_req with pkt_rxmit, a callback to call on answer/no answer
+  o STATUS
+    + the client is almost done, 
+    + handle the server part to reply request
+    + who populate the server ? goes on the hack of the temp_iaddr_on_login ?
+- why the temp_iaddr_on_login isnt yet enable !?!?!
+  o i remember something were missing but i dont remember what
+  o well the name resolution with the dynamic address
+- temp_addr_on_login
+  o put a big IFDEF on top of all this
+  o how to handle the name resolution now that the inner address allocation is done
+  o big trouble !!!! if the server fails, the whole addressing system is off!!!
+  o TODO what if the ip address recevied by the client changed ? 
+    + when to set it ?
+  o hack to get it to work asap
+    + then do experimentation with the temp_addr_on_esta
+  o rdv_client put a special request payload in the rdvreg_req
+    + this payload contains a nodename
+  o rdv_server receive it
+    + allocate a temp_addr for it
+    + build a reply payload for it
+    + send the reply payload to the rdv_client
+  o rdv_client receives the replied payload
+    + store the allocated address somewhere... in the onet.c for example
+  => it is all for the allocation of a temp_addr_on_login
+    + this tech is unscalable because the amount of ip address is limited
+    + the scalability isnt that bad because the address is only allocated only during the run of the deamon
+    + it is a kludge but it is ok for the first version of the inner address allocation
+    + moreover the address space is hardcoded aka all deamons must reserve this address space for this usage
+    + what would be the address space ? a rfc1918 space ? an unallocated space ?
+      * unallocated space will ensure no conflict
+      * why not use it ? to be kasher with ietf ? in anycase when it gonna start to be a problem ?
+  o my inner address should be sent in the tunnel establishement for the other peer to update its routing table
+    + some function in netif.c to update the routing table and set local ip address
+    + do the ipaddr_t stuff in a ipaddr.c with sanity check for ipv4 and ipv6
+- handle the inner address system
+  o how ?
+  o with a address provided from a fixed range on deamon init ?
+  o with a automatically negociated address ?
+  o the possibilities are:
+    - a fixed address on registration
+      + cant be done with ipv4
+    - an temporary address provided on login with a lease and lease renewal
+      + require an actual protocol for name resolution
+      + just a hack in the rdv registration would do it for now
+    - a temporary address neogciated on tunnel establishement
+      + require to establish the tunnel when intercepting the dns request, and then reply to the dns request
+- handle the network location stuff
+  o am i moving ? aka is there network interface going up and down ?
+    + what about all the network interface going up and down to detect variations 
+    + help a lot to detect mobility
+  o am i behind nat ?
+    + look at address of local netif, are they from rfc1918 ?
+    + the netlink interface there for that... the man pages seems crap
+    + look at zebra/rt_netlink.c source instead, they are doing what i want to do
+  o determine the type of nat 
+    + require 2 pubaddr server on public ip
+    + look at the proper page http://midcom-p2p.sourceforge.net/
+    + proper diagnostic would be usefull
+  o what is the address spaces behind the nat 
+  o do i need to several pubaddr server for the NAT diagnostic
+- complete icmpc
+  o expiration of icmpc_cache
+  o add real cookie. DONE
+- enable short key renewal
+- when a tunnel is stopped on timeout or explicit shutdown, adapt to this info
+  o remove the hostname
+  o prevent other use of the inner ip addr to avoid info leaks
+- asymkey to handle crl too 
+- handle ipv6 as inner protocol in message interception
+  o would help gain in genericity
+  o should i go up to any ethernet protocol ?
+- negociate the kind of key establishement and authentication during the key establishment
+- see the security of rdv_registration, rdv_communication, pubaddrdisc
+  o pubaddrdisc security: is a cookie enougth ? and only from the itor
+  o for rdv_registration, only a cookie security would mean that anybody is able to impersonate me
+  o for pubaddrdisc, cookie only should be ok as it would only produce a DOS and would require to be
+    on the path
+  o require to think about it some more
+- encryption: implement AES
+  o with the new nist mode (encryption+authentication in one pass)
+  o with the funky mode i got without IV
+  o can i do the new nist mode with the nist mode ?
+- review the tunnel protocol 
+  o the packet parsing and its code security
+  o the short key renewal
+  o the multiple itor at the same time for the responder
+- the packet fragmentation for the signaling stuff
+  o currently there is no use for it
+    + will likely come with the certificate
+- support the partly anonymous tunnel establishement
+  o currently there is no use for it
+  o what are the limits of security ? active attacks
+- handle the name resolution
+  o it isnt required now because i have a single rdv. think more about it  
+-------------------------------------------
+ASYNC DNS RESOLVER integration:
+- ok finnaly i choosed to resolve the dns name from the default rendezvous at launch-time
+  o thus no more deadlock and no need of async dns resolver
+- it is up to the node publishing its own name+rdvpt to resolve the address
+  o so no need of this async dns stuff
+  o in anycase as a node is permanently connected to its rdvpt, it would be aware of a address change
+  o you may change the rdv_client stuff to support async dns request
+  => i like this solution
+====== NOTES from the past
+- thread + async dns resolver
+  o to integrate it in the code, put it in the itor_start
+  o change itor_start to (nodename, ethertype, pkt, pkt_len)
+  o if pkt == NULL there is no triggering packet
+  o allocate the itor in itor_start
+  o set the state to YAV_ITOR_DNS_RESOLVING
+  => start to be quite crappy... retry to integrate it in onet
+  o ok try to code it first, and then integrate it. it is clearly uneasy to integrate it
+- about async dns resolver integration in onet
+  o from the destname, i got the rdvpt hostname
+  o i try to resolve it
+  o so i build a special struct which contain ethertype, pkt, pkt_len, destnodename
+  o the function will get the nameser_t from the destnodename
+  o try to resolve the rdv hostname
+  o trigger the itor once an answer is receivedd...
+  => dmaned fuck another trouble with already started itor
+  o ok yeah i gonna malloc+memcpy uselessly here, but it is to avoid trouble by dirty coding
+  o in security product dirty coding is bad
+  o anyway i already copy packet + encrypt + mac all packet so the different will be insignificant
+- the resolution of the rdv point hostname needed to be async
+  o how to integrate it ?
+  o in itor 
+    + add another state _RESOLVING_RDVPT_HOSTNAME
+    + add complexity to an already complex code
+    + can still ensure the 'itor is already running' in onet
+  o in onet
+    + cant ensure the already running stuff
+    + kind of cleaner because it is rather simple code
+  o in another module completly ?
+    + something which handle the name resolution and which is probed by user
+    + much cleaner but unsure it resolve anything
+    + what if the caller want a hostname ip addr and it isnt available ? it probes later ?
+- problem of chicken-egg with the dns resolution
+  o i try to resolve the rdvpt hostname while rdv_registering
+  o as it is a blocking call and the resolution cant happen until it is unblocked, it is failing
+  o adns is GPL so unusable
+  o getaddrinfo_a was provided by glibc at a given point but it doesnt seems the case anymore
+  o djbdns client library is public domain and support async
+  o a more classical and homemade solution would be to do gethostbyname in a thread
+    but i dont know how to code thread in C :) glib2 provides threads
+  o i do have glib thread now :)
+-------------------------------------------    
+FEATURE:
+- perform automatic test for qa
+  + how to do that ?
+- provide a way to receive connection from people which doesnt have yav
+  but take advantage of yav if the itor has installed it
+  o handle this from a single hostname
+- handle the pubaddrpool to handle multiple answers and multiple rdvs
+  o for now, it is not necessary to handle multiple rdv now because i have single hardcoded rdv
+- a msn-messager like client text+video+audio+picture
+  o see the libraries available in lgpl
+  o the text first, then audio+video+picture are only features on top of it
+  o apparently msn is way better from a quality point of view than skype
+- support upnp thru intel sdk
+  o http://upnp.sourceforge.net/ under BSD license
+- support sock
+  o failed to find one with a license i could use
+  o gnet has sock support and is lgpl : seems low support
+  o in anycase socks seems a simple protocol, i could implement it myself
+- get onet packet from a socket like tcp:8090 or udp:7000
+  o would allow somebody to use this demaon without high interaction with core system
+  o so easier to install
+- support ip over http to go thru anyfirewall
+  o see rfc3093 fep - published a first april and found no implementation.
+  o along the same line, tunneling thru dns, how cool would it be to support web server from an airport
+  o for tunneling purpose the transport must only be able to send datagram, without special address
+  o one key problem is that im not sure i comply to this rules
+  o the cnx_addr_t is good, do i handle it as an opaque stt ? i should
+- if i ever want to implement ike for authentication
+  o http://www.cipherica.com/libike/
+  o http://www.cipherica.com for paper about vpn on top of tcp
+  o http://www.cipherica.com for a commercial lib of bpf on window
+- interception of html page and put advertisement in it
+- privacy invasive stuff
+  o which email are alive
+  o what is the content of emails
+-------------------------------------------
+ADMIN:
+- maybe some snmp stuff to monitor the activity of it
+  o see if there is a good lib for that
+  o net-snmp seems to be good and is BSD, zebra uses it too
+- handle a firewall for onet netif
+-------------------------------------------
+TRIVIAL:
+- the cnxid of the connection establishement should be renamed nounce and cookie
+  o in order to avoid confusion with nip_id_t stuff
+- replace old uint32_t ipaddr with ip_addr_t
+  o it would be part of the otsp stuff
+  o partly done
+- TODO may be cleaned up a bit by replacing pkt_rxmit->running_f by zeroing
+  the timer tag when it isnt running
+  o unclear that the timer tag is never null in glib
+  o seems risky to do it until im sure it is never so
+-------------------------------------------
+DONE:
+- implement a packet scrambler in the udp xmit and recv
+  o very usefull to debug border case
+  o packet delaying
+  o packet drop
+  o packet corruption
+    + corruption of length
+    + corruption of content
+- to complete --pkt_delay stuff incoming stuff
+- option negociation in the stunnel establishement
+  o see how tls does it
+  o what needs to be negociated ?
+    + the encryption/authentication algorithm
+- buffer the last packet which triggered itor and send it once the connection is established
+  o look at arp to see how it does it
+  o set a function itor_set_trigger_packet( itor, pkt, pkt_len ) and call it in onet.c
+  o send the trigger packet once the stunnel is established
+- remove the spmtu parameter from udp_loc_xmit and update all references
+- handle the certificate in the authentication
+  o look at libgcrypt/lgpl for low level crypto
+  o gnutls/lgpl for certifcate x509/openpgp
+  o http://www.gnu.org/software/gnutls/manual/html_node/Certificate-request-generation.html#Certificate-request-generation
+    for an example to create ca and stuff
+    + try to play with it
+  o see about libgcrypt to enc/mac
+    + try to implement a AES stuff with it to see how it work
+    + try to implement it generically in order to support all mode with all encryption 
+  o required operation for tunnel establishement authentication
+    + from a ca-cert and a node-cert, if this node-cert authenticated by this ca-cert
+    + from a verified cert, is this signature over this data has been done byt this cert owner
+    + from a private key and a data, produce a signature
+    + i have all 3 from gnutls, now what do i do with it ?
+    + how do i organize it in neo-ip now ?
+- change the auth_t to handle auth_type_t
+  o a type and a union for data depending on the type
+- registration and rendez-vous will be on vg box
+  o dont do the onet+resp+dnsgrab+icmp_recv => --no_tunnel --no_dnsgrab
+  o compile it on redhat 9 ? statically to avoid error due to missing/installed shared lib ?
+  o the only thing is the RAW socket which should be ok even on old linux distribution
+  o some weird interaction with gethostbyname which cant be statically linked apparently
+  o i tried and it worked, so it is cool. i ignore the gethostbyname for now
+- the registration process:
+  o it doesnt have to be in the same process, because only one center should support auth
+  o produce a private key locally
+  o produce a certificate request locally
+  o send the cert to the registration node
+  o the registration node receive the crt and record it
+    + how to do it is unclear ?
+  o the registration node reply the result
+  o the reg client save the result in a file
+- change GEN_PL_LEN into GEN_HD_PAYL_LEN
+- change the name in nip_cert.c to be more consistent
+  o e.g. nip_cert_load_privkey_file should become nip_cert_privkey_load_file
+- change the names in nip_cert.c to be more consistent
+  o e.g. nip_cert for certificate stuff
+  o which name space to use ?
+    + replace nip_cert_ by asymkey_ 
+    + use asymkey_cert for cert
+    + asymkey_privkey and asymkey_certreq
+- payl_rdv_reg_reply_t replace it by payl_status_t in a gen_hd
+- put pubaddr server in its own .c
+- when closing the programm, udp_loc_destroy is called twice for the same pointer
+  o is this normal ? doesnt think so at first sight. in fact it is quite unlikely
+  => this was a bug of me calling remove_souce in destroy and calling explicitly destroy
+     instead of just calling remove_source
+- handle a configuration directory in the user configuration
+  o start by storing the certificate in it
+  o for the registration server, store the ca cert+privkey in it and all the generated certificate
+  o for the nodes, store the privkey+cert of the user and the ca_cert in it
+- registration next step
+  o the client store the private key and certificate
+  o the server store the certicate of registered client
+  o the server check on registration if the client certificate already exist
+    + if so, report an error
+  o when the node comes up in a non registering mode
+    + check if the private key + certificate are present
+    + if not, report the error and ask for registration
+  o thus it would work even if not perfect. it is a good first version
+  o client cmdline option --register nodename.4afree.net
+  o then client is usable
+- about the icmp error, it should be reported thru the lport thing
+  o change lport_pkt_dispatch to recevie local_addr + remote_addr instead of udp_loc DONE
+  o likely require to change the lport_cb stuff
+  o create a type lport_err_t which describe the error and pass it as a pointer in the callback
+- check if the proper certificate are present on start
+  o client: do not try to register if the certificate is already there
+  o server: do not start if the root_ca cert+privkey arent there
+  o client: if no privkey+cert for the given node_name fail on startup
+- how to handle registration ?
+  o the basics are already there. in reg_client.c and reg_server.c
+  o see about the border case.
+  o what if the reg_client is already registered in the reg_server
+  o check if the reg_client doesnt have the root_ca_privkey.pem
+  o what about scheduling and rate limiter
+- rename nipcert.c into asymkey.c
+- in pubaddrdisc_t, the pkt/pkt_len are useless in this struct remove them
+- maybe good to switch to glib2 at a given point
+- handle a configuration file
+  o glib2 2.6 handle them. see g_key_file for .ini like file
+  o it wasnt in glib2 because i have 2.4
+- use cookie_t in responder.c
+- add a optional debug str in pkt_rxmit
+  o will make the trace more explicit
+- parse the option file	DONE
+- pass cmdline parsing into usercfg.c DONE
+- auth_payl_check_cert() in auth.c
+  o apparently it doenst check anything ?!?!?!?!
+  o fixed
+- cndid_set() and cnxid_check() in responder.c are useless
+- install a bugzilla to keep track of my bugs
+  o would be better
+- add the cookie in a cookie.c and use it in itor/resp too  
+  o a cookie.c is here now
+  o icmpc.c already uses it
+  o it is unclear to see how itor can use it
+  o to have resp to use it should be without trouble and make resp code lighter
+- Next step for the 2 peers behind the same nat
+  o the tunnel initiator receive the response from the responder
+  o start a reachable probe thru the usual address, as usual
+  o additionnaly itor send a probe (thru pkt_rxmit) to the listening address of the responder
+  o the packet is encoded as in stun_out.c (split the function in 2, one for packet building, one for packet sending)
+  o the packet is receied in the udp_server.c function which is parsed by the usual code
+  o the packet is decoded as in stun_in (same thing as in stun_out, split the function into decrypt/auth)
+  o how the receiver is able to identify the proper tunnel
+    + the assumption that there is only one tunnel between 2 nodename ?
+    + yep i like this one
+- handle the direct connection when the 2 peers are behind the same NAT
+  o as i already have an encrypted tunnel, handle this by a encrypted homemade ping
+  o required another port handler for the tunnel, and to switch when the ping is replied
+  o the wireless router sagem1400 isnt supporting the NAT loopback !!
+    + ideal moment to test this
+    + 2 peer on my box and a rdv on vg
+  o TODO to use established tunnel security would be good because we know it is secure
+    + this require to be able to receive tunnel data from multiple udp cnx
+    + this may happen too in the case of multiple udp relay
+    + maybe a good idea to provide a good support for it
+  o ok the deamon already have a listening address, have a special packet on this port
+    + currently not yet implemented in initiator ? is it true ? i do start responder if the node is acting as tunneler
+    + send a ping to this port and a special reception for authentication for this packet
+    + from the tunnel itor to the responder
+    + the itor connect the listening port of the responder, send the authenticated probe, with pkt_rxmit
+    + if a answer is received, 
+- when a tunnel is stopped on timeout or explicit shutdown, adapt to this info
+  o remove the hostname
+  o prevent other use of the inner ip addr to avoid info leaks
+- rename udp_server.c by a better name explicitly taking about unbound connection
+  o ok but which name ?
+  o unbound_inpkt.c <- seems good
+- replace node_id_t by cnxid_t
+  o may be confusing with cnxid from connection establishement
+- rdv_srv_seed as in bugzilla
+- rdv protocol not to use payl_rdv_reg_request_t
+  o payl_nodeid_t
+- TODO get the netmask from the main server on the rdv_client/server
+  o put the main route in the onet
+  o relation with the innerAddressAllocation
+- bug36 subnet in rdv config.ini
+- remove ipv4_addr_str in util.c and replace it by ip_addr.c stuff
+- rename payl_nodeid_t intro payl_nipid_t

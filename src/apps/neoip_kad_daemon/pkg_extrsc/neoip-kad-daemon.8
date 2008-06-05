@@ -1,0 +1,43 @@
+.\" -*- nroff -*-
+.TH NEOIP-KAD-DEAMON 8 "Dec 2006" "neoip-kad-deamon(1)" "neoip-kad-deamon's Manual"
+.SH NAME
+neoip-kad-deamon - a daemon handling a kademlia DHT
+.SH SYNOPSIS
+.B neoip-kad-deamon
+[--config_dir dirname] [--help] [--version]
+.SH DESCRIPTION
+neoip-kad-deamon is a deamon maintains a kademlia DHT. All functions are accessible
+via xmlrpc.
+
+TODO this man page is a stub, extend it and complete it
+
+.SH OPTIONS
+.TP
+.I "-c, --config_dir dirname"
+set the configuration directory.
+If not specified, it uses /etc/neoip.
+.TP
+.I "-h, --help"
+display a short inlined help
+.TP
+.I "-v, --version"
+display the version string
+
+
+.SH FILES
+This sections describes the various files and directory used by the neoip-kad-deamon :
+.TP
+.I /etc/neoip
+default configuration directory
+
+.SH LICENSE
+The license is proprietary and this programm should be used for testing purpose only
+
+.SH AUTHOR
+.B neoip-kad-deamon
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP's homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.

@@ -1,0 +1,45 @@
+dnl
+dnl Yavipin autoconf: jme@off.net
+dnl
+
+AC_INIT(src/main.c)
+AC_PREFIX_DEFAULT(/usr/local)
+
+AC_PROG_CC
+AC_PROG_INSTALL
+
+AC_CHECK_PROG(HAVE_GLIB_CONFIG, glib-config, "yes", "no")
+if test $HAVE_GLIB_CONFIG = "no" ; then
+    AC_MSG_ERROR("glib not installed or glib-config not in path");
+fi
+
+# Need to set CPPFLAGS so that it can find gmodule.h
+CPPFLAGS=`glib-config --cflags glib`
+AC_CHECK_HEADERS(glib.h, , AC_MSG_ERROR("glib includes not installed"))
+CPPFLAGS=
+AC_CHECK_LIB(glib, g_list_alloc, , AC_MSG_ERROR("glib not installed"))
+
+# check for zlib
+AC_CHECK_HEADERS(zlib.h, , AC_MSG_ERROR("zlib includes not installed"))
+AC_CHECK_LIB(z, zlibVersion, , AC_MSG_ERROR("zlib not installed"))
+
+# check for libcrypto -jme include libcrypto not libssl
+AC_CHECK_HEADERS(openssl/ssl.h, , AC_MSG_ERROR("OpenSSL libcrypto includes not installed"))
+AC_CHECK_LIB(crypto, BN_new, , AC_MSG_ERROR("OpenSSL libcrypto not installed"), -L/usr/local/ssl/lib )
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h sys/ioctl.h syslog.h unistd.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_PID_T
+AC_TYPE_SIZE_T
+
+dnl Checks for library functions.
+AC_PROG_GCC_TRADITIONAL
+AC_FUNC_MEMCMP
+AC_TYPE_SIGNAL
+AC_CHECK_FUNCS(socket strdup strerror)
+
+AC_OUTPUT(Makefile src/Makefile.inc)

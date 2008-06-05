@@ -1,0 +1,115 @@
+/*! \page n-key NeoIP Key
+
+\ref n-key is a way to unify the cryptographic operations, i.e. encryption and authentication, independantly
+of the scheme, i.e. password or certficate, to obtain them.
+
+- it is used in \ref n-cred and \ref n-acl
+
+\htmlonly<hr>\endhtmlonly\htmlonly<hr>\endhtmlonly
+
+\section n-key-component NeoIP Key Component
+\htmlonly<hr>\endhtmlonly
+A \ref n-key has 3 components: \ref n-key-private and \ref n-key-public. Both linked 
+together with \ref n-key-id.
+
+\subsection n-key-private NeoIP Private Key
+- note that several \ref neoip-peer can own a same \ref n-key-private (It is even 
+sure if the \ref n-key-scheme is \ref n-key-password.
+- Its distribution is limited
+
+\subsection n-key-public NeoIP Public Key
+- Its distribution may or may not be limited depending on the \ref n-key-scheme
+  - with \ref n-key-certificate, the \ref n-key-public contains no secret and may be distributed
+    freely
+  - with \ref n-key-password, the \ref n-key-public contains the same content than the 
+    \ref n-key-private and so must be distributed with the same care.
+    - here the PUBLIC in the \ref n-key-public name is confusing, but it allows a clean API
+      independant of the \ref n-key-scheme. I leave it as is for now.
+
+\subsection n-key-id NeoIP Key Identificator
+- it may be a integer number, it may be a string
+- it is shared by the \ref n-key-private and \ref n-key-public
+- the point is that it should uniquely define a given \ref n-key among all available \ref n-key
+
+\subsection n-key-owner NeoIP Key Owner
+A \ref n-key-owner of a given \ref n-key is a \ref neoip-peer able to perform \ref n-key-op-sign-produce or 
+\ref n-key-decrypt with this \ref n-key.
+To put it another way, a \ref neoip-peer owns a \ref n-key if it is able to perform operations implying that
+it knows a secret.
+
+<b>Note that multiple \ref neoip-peer may own a single \ref n-key !!!</b>
+
+\htmlonly<hr>\endhtmlonly\htmlonly<hr>\endhtmlonly
+
+\section n-key-op NeoIP Key Operation
+\htmlonly<hr>\endhtmlonly
+This section describes defines the 4 operations (\ref n-key-op-sign-produce, \ref n-key-op-sign-verify,
+\ref n-key-op-encrypt and \ref n-key-op-decrypt) provided by \ref n-key independantly of the \ref n-key-scheme.
+\subsection n-key-op-sign-produce NeoIP Key Signature Production
+- \b Definition: If a \ref n-key-private owner wish to sign data to proove that it agrees with them, it uses its
+     own \ref n-key-private to do:
+  - sign_datum = neoip_key_sign_produce( data_datum, neoip_key_private )
+- \b Requirement: It uses one of the locally owned \ref n-key-private.
+
+\subsection n-key-op-sign-verify NeoIP Key Signature Verification
+- \b Definition: If a \ref neoip-peer wish to ensure the claimed signer is actually the real signer, it uses
+     the claimed signer \ref n-key-public to do:
+  - boolean = neoip_key_sign_verify( data_datum, sign_datum, neoip_key_public )
+- \b Requirement: It uses the \ref n-key-public of the claimed signer.
+
+\subsection n-key-op-encrypt NeoIP Key Encryption
+- \b Definition: If a \ref neoip-peer wish to ensure that only the owners of a given \ref n-key-private will be 
+  able to read some data, it uses the \ref n-key-public of this \ref n-key-private to do:
+  - ciph_text_datum = neoip_key_encrypt( plain_text_datum, neoip_key_public )
+- \b Requirement: It uses the \ref n-key-public of the destination
+
+\subsection n-key-op-decrypt NeoIP Key Decryption
+- \b Definition: If a \ref n-key-private owner wish to read data only intended to it, it uses its own \ref
+  n-key-private to do:
+  - plain_text_datum = neoip_key_decrypt( ciph_text_datum, neoip_key_private )
+- \b Requirement: It uses one of the locally owned \ref n-key-private.
+
+\htmlonly<hr>\endhtmlonly\htmlonly<hr>\endhtmlonly
+
+\section n-key-scheme NeoIP Key Scheme
+Any \ref n-key-scheme MUST define:
+-# what is a \ref n-key-id
+-# the content of the \ref n-key-private
+-# the content of the \ref n-key-public
+-# \ref n-key-op-sign-produce
+-# \ref n-key-op-sign-verify
+-# \ref n-key-op-encrypt
+-# \ref n-key-op-decrypt
+
+\subsection n-key-password NeoIP Key Password Scheme
+A password is, in formal term, a shared symmetric key.
+- In this scheme, the content of \ref n-key-private and \ref n-key-public is the same
+  - a key identificator
+  - the password itself
+- So this scheme doesnt seperate the \ref n-key-private owners from the \ref n-key-public owners
+  - It should be taken into account when using it.
+- The signature production is a MAC computed over the data to sign using the password in the \ref n-key-private.
+- The signature verification is recomputing the MAC with the password in the \ref n-key-public and checking
+  if it matches the one to be verified.
+- The encryption is encrypting the data with an symmetric encryption algorithm (e.g. AES/IV/MAC) using 
+  the password in the \ref n-key-public.
+- The decryption is decrypting the data with an symmetric encryption algorithm (e.g. AES/IV/MAC) using 
+  the password in the \ref n-key-private.
+
+\subsection n-key-certificate NeoIP Key Certificate Scheme
+\ref n-key-certificate is, in formal term, a asymmetric key scheme.
+- the content of \ref n-key-private is 
+  - a key identificator
+  - a asummetric private key 
+- the content of \ref n-key-private is 
+  - a key identificator
+  - a asummetric public key 
+- The signature production is a asymmetric key signature using the \ref n-key-private key.
+- The signature verification is a asymmetric key signature using the \ref n-key-public key.
+- The encryption is an as asymmetric key encryption using a \ref n-key-public key.
+- The decryption is an as asymmetric key decryption using a \ref n-key-private key.
+
+
+*/
+
+

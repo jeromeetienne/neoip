@@ -1,0 +1,32 @@
+/*===========================[ (c) JME SOFT ]===================================
+FILE        : [vdev.h]
+CREATED     : 01/03/16 13:09:41		LAST SAVE    : 01/11/06 23:40:19
+WHO         : jerome@mycpu Linux 2.2.14
+REMARK      :
+================================================================================
+
+==============================================================================*/
+
+#ifndef __VDEV_H__
+#define __VDEV_H__
+/* system include */
+#include <glib.h>
+
+/* local include */
+
+typedef struct {
+	GPollFD	gfd;
+	char	*dev_name;
+	int	gsrc_tag;	/* glib src tag */
+} vdev_t;
+
+/*@$#[vdev.c] global proto. AutoProtoSigV1.1. date: 01/11/06 23:40:18 */
+#include "proto.h"
+int vdev_open PROTO((vdev_t *vdev, char *dev_name));
+void vdev_close PROTO((vdev_t *vdev));
+int vdev_xmit PROTO((vdev_t *vdev, char *pkt, int pkt_len, int ethertype));
+/*@$% end of AutoProtoSigV1.1 (Dont remove this line) []*/
+
+
+#endif	/* __VDEV_H__ */
+

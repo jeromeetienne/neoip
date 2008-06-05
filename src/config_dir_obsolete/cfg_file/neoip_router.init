@@ -1,0 +1,106 @@
+#!/bin/bash
+#
+# Startup script for neoip_router
+#
+#
+#       /etc/rc.d/init.d/neoip_router
+#
+# Starts the neoip_router daemon
+#
+# chkconfig: 345 55 45
+# description: NeoIP router restores IP end-to-end and provides ip security. \
+#			A more simple and understandable version, the users of NeoIp router \
+#			no more have to care about NAT and about configuring VPN.
+# processname: neoip_router
+# config: /etc/neoip_router/config.ini
+# config: /etc/neoip_router/root_ca_cert.pem
+# pidfile: /var/run/neoip_router.pid
+
+# Make sure relevant files exist
+[ -f /usr/lib/neoip_router/neoip_router-bin ] 	|| exit 0
+[ -f /usr/bin/neoip_router ] 			|| exit 0
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+
+prog="neoip_router"
+pidfile=/var/run/neoip_router.pid
+RETVAL=0
+
+start() {
+    # check if the daemon exists
+    if [ -n "`pidfileofproc neoip_router`" ]; then
+        echo "$prog: already running"
+       	return 1
+    fi
+    # start the daemon
+    echo -n $"Starting : "
+    neoip_router
+    RETVAL=$?
+    [ $RETVAL -ne 0 ] && failure $"$prog startup"
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/neoip_router && success $"$prog startup"
+    echo
+    return $RETVAL
+}
+
+stop() {
+    # Stop daemons.
+    echo -n $"Shutting down $prog: "
+    killproc neoip_router -15
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/neoip_router
+    # remove the pidfile
+    rm -f $pidfile
+    return $RETVAL
+}
+
+my_status() {
+    PID=`pidfileofproc neoip_router`
+	if [ "$PID" == "" ]; then
+		echo neoip router is stopped
+		return 3
+	fi
+	kill -0 $PID
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && echo NeoIP router is running with pid $PID
+	[ $RETVAL -ne 0 ] && echo NeoIP router pidfile provides pid $PID but no process has this pid
+}
+
+# See how we were called.
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart|reload)
+		stop
+		start
+		RETVAL=$?
+		;;
+	condrestart)
+ 	        if [ -f /var/lock/subsys/neoip_router ]; then
+        	   stop
+  	       	   start
+           	   RETVAL=$?
+       		fi
+       		;;
+
+	status)
+		my_status
+		RETVAL=$?
+		;;
+	*)
+		echo $"Usage: neoip_router  {start|stop|restart|reload|condrestart|status}"
+		RETVAL=1
+esac
+exit $RETVAL
+

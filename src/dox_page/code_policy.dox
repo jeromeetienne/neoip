@@ -1,0 +1,18 @@
+/*! \page neoip-code-policy NeoIP Code Policy
+
+This page describes the convention applied to \ref neoip code.
+
+- It is coded in C for portability and speed but still it is coded as object
+- The API of each part should be clearly defined
+  - the internal type MUST NOT appears in the caller code
+    - use the typedef struct slota_stt *slota trick
+    - use the int fd as most unix syscall
+- each object should have a _open() and _close() which act as contructor/destructor
+  - open() start the object immediatly
+  - if the object needs a lot of parameters, some being optionnal do
+    - _init()
+    - _set_para() as many time as suitable
+    - _start() to actually start
+    - for those objects, _open() is written with _init(), _set_para(), _start()
+
+*/

@@ -1,0 +1,6 @@
+# this is the neoip_lib configuration file
+lib_httpd_listen=:9080
+# name is a dummy variable to identify multiple instance
+# TODO lame stuff still used in obsolete scnx code
+# - to remote this and the associated file once the scnx key+userid got refactored
+name=netcat1.4afree.net

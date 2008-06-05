@@ -1,0 +1,77 @@
+%product libnss_neoip: libnss plugin to forward nss query to neoip-router
+%copyright 2007
+%vendor Jerome Etienne <jme@off.net>
+%description libnss plugin to forward nss query to neoip-router
+%version 0.1
+%readme "Read http://off.net/~jme"
+%license "http://donotusethissoft.ever"
+%provides libnss-neoip
+
+################################################################################
+#		file list
+################################################################################
+f 755 root root /usr/lib/libnss_neoip.so.2 ../libnss_neoip.so.2
+d 755 root root /etc/libnss_neoip.d
+
+################################################################################
+#		postinstall/postremove script
+#
+# NOTE: 
+# - this is executed as /bin/sh and NOT /bin/bash
+# - all shell variable MUST have a double $$ because EPM will do a pass
+#   on its own variable.
+################################################################################
+%postinstall <<EOF
+	doinstall_nsswitch() {
+		# setup some variable
+		local ORIGIN_FNAME="/etc/nsswitch.conf"
+		local BACKUP_FNAME="/etc/nsswitch.conf.pre_install.libnss_neoip.backup"
+	
+		# test if it is nss is already in nssswitch.conf
+		grep -e "^hosts:.*neoip.*" $$ORIGIN_FNAME >/dev/null
+		local not_present="$$?"	
+		# if already present, return now
+		if [ "$$not_present" = "0" ]; then
+			return 0
+		fi
+			
+		# copy the original file into the backup one
+		echo "backup $$ORIGIN_FNAME into $$BACKUP_FNAME"
+		cp $$ORIGIN_FNAME $$BACKUP_FNAME
+		# modify ORIGIN_FNAME to add the 'neoip' in hosts:
+		echo "modify $$ORIGIN_FNAME to add 'neoip' to the hosts: line"
+		sed 's/\(^hosts:.*files\)\(.*\)/\1 neoip\2/' < $$BACKUP_FNAME > $$ORIGIN_FNAME
+	}
+
+	# update the nss_switch
+	doinstall_nsswitch
+	# update the ld.so cache - to get the library in it
+	ldconfig
+EOF
+%postremove <<EOF
+	uninstall_nsswitch() {
+		# setup some variable
+		local ORIGIN_FNAME="/etc/nsswitch.conf"
+		local BACKUP_FNAME="/etc/nsswitch.conf.pre_uninstall.libnss_neoip.backup"
+	
+		# test if it is nss is already in nssswitch.conf
+		grep -e "^hosts:.*neoip.*" $$ORIGIN_FNAME >/dev/null
+		local not_present="$$?"
+		# if not present, no need to uninstall so return now
+		if [ "$$not_present" = "1" ]; then
+			return 0
+		fi
+		
+		# copy the original file into the backup one
+		echo "backup $$ORIGIN_FNAME into $$BACKUP_FNAME"
+		cp $$ORIGIN_FNAME $$BACKUP_FNAME
+		# modify ORIGIN_FNAME to remove the 'neoip' in hosts:
+		echo "modify $$ORIGIN_FNAME to remove 'neoip' from the hosts: line"
+		sed 's/\(^hosts:.*\)neoip[ ]\(.*\)/\1\2/' < $$BACKUP_FNAME > $$ORIGIN_FNAME
+	}
+
+	# update the nss_switch
+	uninstall_nsswitch
+	# update the ld.so cache - to get the library out of it
+	ldconfig
+EOF

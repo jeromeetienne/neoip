@@ -1,0 +1,32 @@
+{	"playlist_title": "youtube UFO",
+	"playlist_id"	: "youtube_ufo",
+	"trackgen_info"	: [
+		{	"cmd"	: "pick_one_randomly",
+			"arg"	: [
+				{	"precedence"	: 50,
+					"trackgen_info"	: [{	"cmd"	: "concat",
+								"arg"	: {	"space"	: "youtube",
+										"desc"	: {	"cmd"	: "videos_by_tag",
+												"arg"	: {	"tag"	: "ufo"
+													}
+											}
+									}
+							}]
+				},
+				{	"precedence"	: 50,
+					"trackgen_info"	: [{	"cmd"	: "concat",
+								"arg"	: {	"space"	: "youtube",
+										"desc"	: {	"cmd"	: "videos_by_tag",
+												"arg"	: {	"tag"	: "alien"
+													}
+											}
+									}
+							}]
+				}
+				]
+		},
+		{	"cmd"	: "select_random_contiguous",
+			"arg"	: { "nb_contiguous"	: 3	}
+		}
+		]
+}

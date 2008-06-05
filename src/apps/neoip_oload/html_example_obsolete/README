@@ -1,0 +1,9 @@
+this directory contains a sample html page making use of neoip with the web.
+
+For example:
+- neoip-casti/neoip-casto usage from webpage
+- cast_mdata server for storing bt_cast_mdata_t on separate servers
+- various usage of neoip-oload
+- wikidbg_probe: to get the neoip applications running on the browser computer
+
+

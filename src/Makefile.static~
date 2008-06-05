@@ -1,0 +1,789 @@
+# makefile of yavipin
+# special makefile to debug in static
+PROJECT=yavipin
+
+NEOIP_INET_DIR=neoip_inet
+NEOIP_INET_INC=-I$(NEOIP_INET_DIR) -I$(NEOIP_INET_DIR)/address		\
+		-I$(NEOIP_INET_DIR)/tcp -I$(NEOIP_INET_DIR)/tcp/utest	\
+		-I$(NEOIP_INET_DIR)/udp -I$(NEOIP_INET_DIR)/udp/utest
+		
+NEOIP_INET_OBJS =							\
+	$(NEOIP_INET_DIR)/udp/neoip_inet_udp_layer.o			\
+	$(NEOIP_INET_DIR)/udp/neoip_inet_udp_event.o			\
+	$(NEOIP_INET_DIR)/udp/utest/neoip_inet_udp_utest.o		\
+	$(NEOIP_INET_DIR)/udp/neoip_inet_udp_resp.o			\
+	$(NEOIP_INET_DIR)/udp/neoip_inet_udp_full.o			\
+	$(NEOIP_INET_DIR)/udp/neoip_inet_udp_itor.o			\
+	$(NEOIP_INET_DIR)/tcp/neoip_inet_tcp_layer.o			\
+	$(NEOIP_INET_DIR)/tcp/neoip_inet_tcp_event.o			\
+	$(NEOIP_INET_DIR)/tcp/neoip_inet_tcp_resp.o			\
+	$(NEOIP_INET_DIR)/tcp/neoip_inet_tcp_full.o			\
+	$(NEOIP_INET_DIR)/tcp/neoip_inet_tcp_itor.o			\
+	$(NEOIP_INET_DIR)/tcp/utest/neoip_inet_tcp_utest.o		\
+	$(NEOIP_INET_DIR)/tcp/utest/neoip_inet_tcp_echo_server.o	\
+	$(NEOIP_INET_DIR)/tcp/utest/neoip_inet_tcp_chargen_server.o	\
+	$(NEOIP_INET_DIR)/address/neoip_inet_ipport_addr.o		\
+	$(NEOIP_INET_DIR)/address/neoip_inet_ip_netaddr.o		\
+	$(NEOIP_INET_DIR)/address/neoip_inet_ip_addr.o
+
+NEOIP_INET2_DIR=neoip_inet2
+NEOIP_INET2_INC=-I$(NEOIP_INET2_DIR) 					\
+			-I$(NEOIP_INET2_DIR)/udp			\
+			-I$(NEOIP_INET2_DIR)/udp/resp			\
+			-I$(NEOIP_INET2_DIR)/udp/full			\
+			-I$(NEOIP_INET2_DIR)/udp/itor			\
+			-I$(NEOIP_INET2_DIR)/udp/event			\
+			-I$(NEOIP_INET2_DIR)/udp/utest			\
+			-I$(NEOIP_INET2_DIR)/tcp			\
+			-I$(NEOIP_INET2_DIR)/tcp/resp			\
+			-I$(NEOIP_INET2_DIR)/tcp/full			\
+			-I$(NEOIP_INET2_DIR)/tcp/itor			\
+			-I$(NEOIP_INET2_DIR)/tcp/event			\
+			-I$(NEOIP_INET2_DIR)/tcp/service		\
+			-I$(NEOIP_INET2_DIR)/tcp/utest			\
+			-I$(NEOIP_INET2_DIR)/address			\
+			-I$(NEOIP_INET2_DIR)/address/utest		
+NEOIP_INET2_OBJS =							\
+	$(NEOIP_INET2_DIR)/neoip_inet2_err.o				\
+	$(NEOIP_INET2_DIR)/tcp/resp/neoip_inet2_tcp_resp.o		\
+	$(NEOIP_INET2_DIR)/tcp/full/neoip_inet2_tcp_full.o		\
+	$(NEOIP_INET2_DIR)/tcp/itor/neoip_inet2_tcp_itor.o		\
+	$(NEOIP_INET2_DIR)/tcp/event/neoip_inet2_tcp_event.o		\
+	$(NEOIP_INET2_DIR)/tcp/service/neoip_inet2_tcp_chargen_server.o	\
+	$(NEOIP_INET2_DIR)/tcp/service/neoip_inet2_tcp_echo_server.o	\
+	$(NEOIP_INET2_DIR)/tcp/utest/neoip_inet2_tcp_utest.o		\
+	$(NEOIP_INET2_DIR)/tcp/utest/neoip_inet2_tcp_utest_resp.o	\
+	$(NEOIP_INET2_DIR)/tcp/utest/neoip_inet2_tcp_utest_itor.o	\
+	$(NEOIP_INET2_DIR)/udp/resp/neoip_inet2_udp_resp.o		\
+	$(NEOIP_INET2_DIR)/udp/full/neoip_inet2_udp_full.o		\
+	$(NEOIP_INET2_DIR)/udp/itor/neoip_inet2_udp_itor.o		\
+	$(NEOIP_INET2_DIR)/udp/event/neoip_inet2_udp_event.o		\
+	$(NEOIP_INET2_DIR)/udp/utest/neoip_inet2_udp_utest.o		\
+	$(NEOIP_INET2_DIR)/udp/utest/neoip_inet2_udp_utest_resp.o	\
+	$(NEOIP_INET2_DIR)/udp/utest/neoip_inet2_udp_utest_itor.o	\
+	$(NEOIP_INET2_DIR)/address/utest/neoip_inet2_addr_utest.o	\
+	$(NEOIP_INET2_DIR)/address/neoip_inet2_ip_addr.o		\
+	$(NEOIP_INET2_DIR)/address/neoip_inet2_ipport_addr.o		\
+	$(NEOIP_INET2_DIR)/address/neoip_inet2_ip_netaddr.o
+
+NEOIP_CRYPTO_DIR=neoip_crypto
+NEOIP_CRYPTO_INC=-I$(NEOIP_CRYPTO_DIR) 					\
+			-I$(NEOIP_CRYPTO_DIR)/skey/auth			\
+			-I$(NEOIP_CRYPTO_DIR)/skey/auth/utest		\
+			-I$(NEOIP_CRYPTO_DIR)/skey/ciph			\
+			-I$(NEOIP_CRYPTO_DIR)/skey/ciph/utest		\
+			-I$(NEOIP_CRYPTO_DIR)/skey			\
+			-I$(NEOIP_CRYPTO_DIR)/rnd_pool			\
+			-I$(NEOIP_CRYPTO_DIR)/dh			\
+			-I$(NEOIP_CRYPTO_DIR)/dh/utest			\
+			-I$(NEOIP_CRYPTO_DIR)/pkcs5_derivkey		\
+			-I$(NEOIP_CRYPTO_DIR)/pkcs5_derivkey/utest	\
+			-I$(NEOIP_CRYPTO_DIR)/x509			\
+			-I$(NEOIP_CRYPTO_DIR)/x509/utest
+NEOIP_CRYPTO_OBJS =								\
+	$(NEOIP_CRYPTO_DIR)/neoip_crypto_layer.o				\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/neoip_crypto_skey_auth_algo.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/neoip_crypto_skey_auth_mode.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/neoip_crypto_skey_auth_type.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/neoip_crypto_skey_auth.o			\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/utest/neoip_crypto_skey_auth_utest.o	\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/neoip_crypto_skey_ciph_iv.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/neoip_crypto_skey_ciph_algo.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/neoip_crypto_skey_ciph_mode.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/neoip_crypto_skey_ciph_type.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/neoip_crypto_skey_ciph.o			\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/utest/neoip_crypto_skey_ciph_utest.o	\
+	$(NEOIP_CRYPTO_DIR)/rnd_pool/neoip_crypto_rnd_pool.o		\
+	$(NEOIP_CRYPTO_DIR)/dh/neoip_crypto_dh_param.o			\
+	$(NEOIP_CRYPTO_DIR)/dh/neoip_crypto_dh_pubkey.o			\
+	$(NEOIP_CRYPTO_DIR)/dh/neoip_crypto_dh_privkey.o		\
+	$(NEOIP_CRYPTO_DIR)/dh/neoip_crypto_dh_shsecret.o		\
+	$(NEOIP_CRYPTO_DIR)/dh/utest/neoip_crypto_dh_utest.o		\
+	$(NEOIP_CRYPTO_DIR)/pkcs5_derivkey/neoip_pkcs5_derivkey.o		\
+	$(NEOIP_CRYPTO_DIR)/pkcs5_derivkey/utest/neoip_pkcs5_derivkey_utest.o	\
+	$(NEOIP_CRYPTO_DIR)/x509/neoip_crypto_x509_gnutls.o		\
+	$(NEOIP_CRYPTO_DIR)/x509/neoip_crypto_x509_privkey.o		\
+	$(NEOIP_CRYPTO_DIR)/x509/neoip_crypto_x509_cert.o		\
+	$(NEOIP_CRYPTO_DIR)/x509/neoip_crypto_x509_request.o		\
+	$(NEOIP_CRYPTO_DIR)/x509/utest/neoip_crypto_x509_utest.o
+
+NEOIP_COMPRESS_DIR=neoip_compress
+NEOIP_COMPRESS_INC=-I$(NEOIP_COMPRESS_DIR) 				\
+			-I$(NEOIP_COMPRESS_DIR)/compress_null		\
+			-I$(NEOIP_COMPRESS_DIR)/compress_gzip		\
+			-I$(NEOIP_COMPRESS_DIR)/compress_bzip		\
+			-I$(NEOIP_COMPRESS_DIR)/utest
+NEOIP_COMPRESS_OBJS =							\
+	$(NEOIP_COMPRESS_DIR)/compress_null/neoip_compress_null.o	\
+	$(NEOIP_COMPRESS_DIR)/compress_gzip/neoip_compress_gzip.o	\
+	$(NEOIP_COMPRESS_DIR)/compress_bzip/neoip_compress_bzip.o	\
+	$(NEOIP_COMPRESS_DIR)/neoip_compress_type.o			\
+	$(NEOIP_COMPRESS_DIR)/neoip_compress.o				\
+	$(NEOIP_COMPRESS_DIR)/utest/neoip_compress_utest.o
+	
+NEOIP_BASE_DIR=neoip_base
+NEOIP_BASE_INC=-I$(NEOIP_BASE_DIR) 				\
+		-I$(NEOIP_BASE_DIR)/base_except			\
+		-I$(NEOIP_BASE_DIR)/debug			\
+		-I$(NEOIP_BASE_DIR)/tools			\
+		-I$(NEOIP_BASE_DIR)/tools/strmap		\
+		-I$(NEOIP_BASE_DIR)/tools/strmap/utest		\
+		-I$(NEOIP_BASE_DIR)/tools/strtype		\
+		-I$(NEOIP_BASE_DIR)/tools/strtype/utest		\
+		-I$(NEOIP_BASE_DIR)/tools/errtype		\
+		-I$(NEOIP_BASE_DIR)/tools/errtype/utest		\
+		-I$(NEOIP_BASE_DIR)/core_loop			\
+		-I$(NEOIP_BASE_DIR)/cpp				\
+		-I$(NEOIP_BASE_DIR)/cpp/obj_factory		\
+		-I$(NEOIP_BASE_DIR)/cpp/obj_factory/utest	\
+		-I$(NEOIP_BASE_DIR)/cpp/cb_functor		\
+		-I$(NEOIP_BASE_DIR)/cpp/cb_functor/utest	\
+		-I$(NEOIP_BASE_DIR)/cpp/demangle		\
+		-I$(NEOIP_BASE_DIR)/cpp/demangle/utest		\
+		-I$(NEOIP_BASE_DIR)/cpp/stack			\
+		-I$(NEOIP_BASE_DIR)/cpp/stack/utest		\
+		-I$(NEOIP_BASE_DIR)/memory			\
+		-I$(NEOIP_BASE_DIR)/memory/bytearray		\
+		-I$(NEOIP_BASE_DIR)/memory/bytearray/utest	\
+		-I$(NEOIP_BASE_DIR)/memory/bytearray2		\
+		-I$(NEOIP_BASE_DIR)/memory/bytearray2/utest	\
+		-I$(NEOIP_BASE_DIR)/memory/datum		\
+		-I$(NEOIP_BASE_DIR)/memory/datum/utest		\
+		-I$(NEOIP_BASE_DIR)/httpd			\
+		-I$(NEOIP_BASE_DIR)/file			\
+		-I$(NEOIP_BASE_DIR)/time/zerotimer		\
+		-I$(NEOIP_BASE_DIR)/time/timeout		\
+		-I$(NEOIP_BASE_DIR)/time/delay			\
+		-I$(NEOIP_BASE_DIR)/time/delay/utest		\
+		-I$(NEOIP_BASE_DIR)/time/date			\
+		-I$(NEOIP_BASE_DIR)/time/date/utest		\
+		-I$(NEOIP_BASE_DIR)/time/timer_policy		\
+		-I$(NEOIP_BASE_DIR)/time/only_for_ns_to_backport\
+		-I$(NEOIP_BASE_DIR)/time
+		
+NEOIP_BASE_OBJS =								\
+	$(NEOIP_BASE_DIR)/neoip_lib_session.o					\
+	$(NEOIP_BASE_DIR)/neoip_lib_httpd.o					\
+	$(NEOIP_BASE_DIR)/file/neoip_fread.o					\
+	$(NEOIP_BASE_DIR)/file/neoip_fwrite.o					\
+	$(NEOIP_BASE_DIR)/tools/strmap/utest/neoip_strmap_utest.o		\
+	$(NEOIP_BASE_DIR)/tools/strtype/utest/neoip_strtype_utest.o		\
+	$(NEOIP_BASE_DIR)/tools/errtype/utest/neoip_errtype_utest.o		\
+	$(NEOIP_BASE_DIR)/tools/neoip_property.o				\
+	$(NEOIP_BASE_DIR)/tools/neoip_string.o					\
+	$(NEOIP_BASE_DIR)/tools/neoip_event_hook.o				\
+	$(NEOIP_BASE_DIR)/tools/neoip_version.o					\
+	$(NEOIP_BASE_DIR)/cpp/demangle/neoip_cpp_demangle.o			\
+	$(NEOIP_BASE_DIR)/cpp/demangle/utest/neoip_cpp_demangle_utest.o		\
+	$(NEOIP_BASE_DIR)/cpp/cb_functor/utest/neoip_cb_functor_utest.o		\
+	$(NEOIP_BASE_DIR)/cpp/stack/neoip_cpp_location.o			\
+	$(NEOIP_BASE_DIR)/cpp/stack/neoip_cpp_backtrace.o			\
+	$(NEOIP_BASE_DIR)/cpp/stack/utest/neoip_cpp_stack_utest.o		\
+	$(NEOIP_BASE_DIR)/cpp/obj_factory/utest/neoip_obj_factory_utest.o	\
+	$(NEOIP_BASE_DIR)/core_loop/neoip_fdwatch.o				\
+	$(NEOIP_BASE_DIR)/core_loop/neoip_fdwatch_cond.o			\
+	$(NEOIP_BASE_DIR)/time/zerotimer/neoip_zerotimer.o			\
+	$(NEOIP_BASE_DIR)/time/timeout/neoip_timeout2.o				\
+	$(NEOIP_BASE_DIR)/time/delay/utest/neoip_delay2_utest.o			\
+	$(NEOIP_BASE_DIR)/time/delay/neoip_delay2.o				\
+	$(NEOIP_BASE_DIR)/time/date/utest/neoip_date2_utest.o			\
+	$(NEOIP_BASE_DIR)/time/date/neoip_date2.o				\
+	$(NEOIP_BASE_DIR)/time/timer_policy/neoip_timer_expbackoff2.o			\
+	$(NEOIP_BASE_DIR)/time/timer_policy/neoip_timer_probing.o			\
+	$(NEOIP_BASE_DIR)/time/only_for_ns_to_backport/neoip_timeout.o			\
+	$(NEOIP_BASE_DIR)/time/only_for_ns_to_backport/neoip_timer_expbackoff.o		\
+	$(NEOIP_BASE_DIR)/time/only_for_ns_to_backport/neoip_delay.o			\
+	$(NEOIP_BASE_DIR)/time/only_for_ns_to_backport/neoip_date.o			\
+	$(NEOIP_BASE_DIR)/debug/neoip_log2.o			\
+	$(NEOIP_BASE_DIR)/memory/bytearray/utest/neoip_bytearray_utest.o	\
+	$(NEOIP_BASE_DIR)/memory/bytearray/neoip_bytearray.o			\
+	$(NEOIP_BASE_DIR)/memory/bytearray2/utest/neoip_bytearray2_utest.o	\
+	$(NEOIP_BASE_DIR)/memory/bytearray2/neoip_bytearray2.o			\
+	$(NEOIP_BASE_DIR)/memory/datum/utest/neoip_datum2_utest.o		\
+	$(NEOIP_BASE_DIR)/memory/datum/neoip_datum2.o				\
+	$(NEOIP_BASE_DIR)/memory/neoip_mem2.o			\
+	$(NEOIP_BASE_DIR)/memory/neoip_bytequeue.o		\
+	$(NEOIP_BASE_DIR)/memory/neoip_serial.o			\
+	$(NEOIP_BASE_DIR)/httpd/neoip_httpd.o
+
+NEOIP_RDGRAM_DIR=neoip_rdgram
+NEOIP_RDGRAM_INC=-I$(NEOIP_RDGRAM_DIR)					\
+			-I$(NEOIP_RDGRAM_DIR)/utest
+NEOIP_RDGRAM_OBJS =							\
+	$(NEOIP_RDGRAM_DIR)/utest/neoip_rdgram_utest.o			\
+	$(NEOIP_RDGRAM_DIR)/neoip_rdgram_event.o			\
+	$(NEOIP_RDGRAM_DIR)/neoip_rdgram_err.o				\
+	$(NEOIP_RDGRAM_DIR)/neoip_rdgram_pkttype.o			\
+	$(NEOIP_RDGRAM_DIR)/neoip_rdgram.o
+
+NEOIP_UNREACHDETECT_DIR=neoip_unreachdetect
+NEOIP_UNREACHDETECT_INC=-I$(NEOIP_UNREACHDETECT_DIR)			\
+			-I$(NEOIP_UNREACHDETECT_DIR)/utest
+NEOIP_UNREACHDETECT_OBJS =						\
+	$(NEOIP_UNREACHDETECT_DIR)/utest/neoip_unreachdetect_utest.o	\
+	$(NEOIP_UNREACHDETECT_DIR)/neoip_unreachdetect_pkttype.o	\
+	$(NEOIP_UNREACHDETECT_DIR)/neoip_unreachdetect_event.o		\
+	$(NEOIP_UNREACHDETECT_DIR)/neoip_unreachdetect.o
+
+NEOIP_PKT_REASM_DIR=neoip_pkt_reasm
+NEOIP_PKT_REASM_INC=-I$(NEOIP_PKT_REASM_DIR)				\
+			-I$(NEOIP_PKT_REASM_DIR)/utest
+NEOIP_PKT_REASM_OBJS =							\
+	$(NEOIP_PKT_REASM_DIR)/utest/neoip_pkt_reasm_utest.o		\
+	$(NEOIP_PKT_REASM_DIR)/neoip_pkt_reasm_pkttype.o		\
+	$(NEOIP_PKT_REASM_DIR)/neoip_pkt_reasm_fraglist.o		\
+	$(NEOIP_PKT_REASM_DIR)/neoip_pkt_reasm_err.o			\
+	$(NEOIP_PKT_REASM_DIR)/neoip_pkt_reasm.o
+
+NEOIP_SCNX_DIR=neoip_scnx
+NEOIP_SCNX_INC=-I$(NEOIP_SCNX_DIR)					\
+			-I$(NEOIP_SCNX_DIR)/base/			\
+			-I$(NEOIP_SCNX_DIR)/resp/			\
+			-I$(NEOIP_SCNX_DIR)/itor/			\
+			-I$(NEOIP_SCNX_DIR)/full/			\
+			-I$(NEOIP_SCNX_DIR)/	
+NEOIP_SCNX_OBJS =							\
+	$(NEOIP_SCNX_DIR)/resp/neoip_scnx_resp.o			\
+	$(NEOIP_SCNX_DIR)/itor/neoip_scnx_itor.o			\
+	$(NEOIP_SCNX_DIR)/full/neoip_scnx_full_xmit.o			\
+	$(NEOIP_SCNX_DIR)/full/neoip_scnx_full_recv.o			\
+	$(NEOIP_SCNX_DIR)/full/neoip_scnx_full_rkey.o			\
+	$(NEOIP_SCNX_DIR)/full/neoip_scnx_full.o			\
+	$(NEOIP_SCNX_DIR)/base/neoip_scnx_event.o			\
+	$(NEOIP_SCNX_DIR)/base/neoip_scnx_pkttype.o			\
+	$(NEOIP_SCNX_DIR)/base/neoip_scnx_err.o
+	
+NEOIP_NETLAY_DIR=neoip_netlay
+NEOIP_NETLAY_INC=-I$(NEOIP_NETLAY_DIR)					\
+			-I$(NEOIP_NETLAY_DIR)/netlay_scnx/		\
+			-I$(NEOIP_NETLAY_DIR)/dgram2bstream/		\
+			-I$(NEOIP_NETLAY_DIR)/scrambler/
+NEOIP_NETLAY_OBJS =							\
+	$(NEOIP_NETLAY_DIR)/scrambler/neoip_netlay_scrambler.o		\
+	$(NEOIP_NETLAY_DIR)/dgram2bstream/neoip_netlay_dgram2bstream.o	\
+	$(NEOIP_NETLAY_DIR)/netlay_scnx/neoip_netlay_scnx_resp.o	\
+	$(NEOIP_NETLAY_DIR)/netlay_scnx/neoip_netlay_scnx_itor.o	\
+	$(NEOIP_NETLAY_DIR)/netlay_scnx/neoip_netlay_scnx_full.o	\
+	$(NEOIP_NETLAY_DIR)/neoip_netlay_stack.o
+
+NEOIP_NETUTILS_DIR=neoip_netutils
+NEOIP_NETUTILS_INC=-I$(NEOIP_NETUTILS_DIR)				\
+			-I$(NEOIP_NETUTILS_DIR)/acl/			\
+			-I$(NEOIP_NETUTILS_DIR)/acl/utest		\
+			-I$(NEOIP_NETUTILS_DIR)/slidwin/		\
+			-I$(NEOIP_NETUTILS_DIR)/slidwin/utest		\
+			-I$(NEOIP_NETUTILS_DIR)/cookie/			\
+			-I$(NEOIP_NETUTILS_DIR)/id/			\
+			-I$(NEOIP_NETUTILS_DIR)/pkt/			\
+			-I$(NEOIP_NETUTILS_DIR)/pkttype/		\
+			-I$(NEOIP_NETUTILS_DIR)/pkttype/utest		\
+			-I$(NEOIP_NETUTILS_DIR)/option_list/		\
+			-I$(NEOIP_NETUTILS_DIR)/option_list/utest	\
+			-I$(NEOIP_NETUTILS_DIR)/negorange/		\
+			-I$(NEOIP_NETUTILS_DIR)/negorange/utest		\
+			-I$(NEOIP_NETUTILS_DIR)/wai/			\
+			-I$(NEOIP_NETUTILS_DIR)/wai/utest
+NEOIP_NETUTILS_OBJS =								\
+	$(NEOIP_NETUTILS_DIR)/acl/utest/neoip_acl_utest.o			\
+	$(NEOIP_NETUTILS_DIR)/acl/neoip_acl_action.o				\
+	$(NEOIP_NETUTILS_DIR)/cookie/neoip_cookie.o				\
+	$(NEOIP_NETUTILS_DIR)/pkt/neoip_pkt.o					\
+	$(NEOIP_NETUTILS_DIR)/id/neoip_id2.o					\
+	$(NEOIP_NETUTILS_DIR)/pkttype/utest/neoip_pkttype_utest.o		\
+	$(NEOIP_NETUTILS_DIR)/slidwin/utest/neoip_slidwin_utest.o		\
+	$(NEOIP_NETUTILS_DIR)/option_list/utest/neoip_option_list_utest.o	\
+	$(NEOIP_NETUTILS_DIR)/negorange/utest/neoip_negorange_utest.o		\
+	$(NEOIP_NETUTILS_DIR)/wai/utest/neoip_wai_utest.o
+	
+NEOIP_NS_DIR=neoip_ns
+NEOIP_NS_INC=-I$(NEOIP_NS_DIR) 			\
+		-I$(NEOIP_NS_DIR)/ns_db		\
+		-I$(NEOIP_NS_DIR)/ns_client	\
+		-I$(NEOIP_NS_DIR)/ns_server	\
+		-I$(NEOIP_NS_DIR)/ns_realm	\
+		-I$(NEOIP_NS_DIR)/ns_record	\
+		-I$(NEOIP_NS_DIR)/ns_tools
+NEOIP_NS_OBJS =							\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db.o			\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_udate.o		\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_odate.o		\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_fsave.o		\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_fload.o		\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_get.o			\
+	$(NEOIP_NS_DIR)/ns_client/neoip_ns_client.o		\
+	$(NEOIP_NS_DIR)/ns_client/neoip_ns_client_getting.o	\
+	$(NEOIP_NS_DIR)/ns_client/neoip_ns_client_putting.o	\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_server.o		\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_flood_server.o	\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_flood_getting.o	\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_flood_putting.o	\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_flood_negcache.o	\
+	$(NEOIP_NS_DIR)/ns_realm/neoip_ns_realm.o		\
+	$(NEOIP_NS_DIR)/ns_realm/neoip_ns_realm_get.o		\
+	$(NEOIP_NS_DIR)/ns_realm/neoip_ns_realm_put.o		\
+	$(NEOIP_NS_DIR)/ns_record/neoip_ns_uid_db.o		\
+	$(NEOIP_NS_DIR)/ns_record/neoip_ns_record.o		\
+	$(NEOIP_NS_DIR)/ns_record/neoip_ns_ksearch.o		\
+	$(NEOIP_NS_DIR)/neoip_ns_packet.o			\
+	$(NEOIP_NS_DIR)/neoip_ns_layer.o			\
+	$(NEOIP_NS_DIR)/ns_tools/neoip_ns_realm_get_w_peer.o	\
+	$(NEOIP_NS_DIR)/neoip_ns_utest.o
+
+NEOIP_SOCKET3_DIR=neoip_socket3
+NEOIP_SOCKET3_INC=-I$(NEOIP_SOCKET3_DIR)			\
+			-I$(NEOIP_SOCKET3_DIR)/base/addr	\
+			-I$(NEOIP_SOCKET3_DIR)/base/type	\
+			-I$(NEOIP_SOCKET3_DIR)/base/event	\
+			-I$(NEOIP_SOCKET3_DIR)/base/error	\
+			-I$(NEOIP_SOCKET3_DIR)/base/domain	\
+			-I$(NEOIP_SOCKET3_DIR)/base/policy	\
+			-I$(NEOIP_SOCKET3_DIR)/resp		\
+			-I$(NEOIP_SOCKET3_DIR)/itor		\
+			-I$(NEOIP_SOCKET3_DIR)/full		\
+			-I$(NEOIP_SOCKET3_DIR)/utest
+NEOIP_SOCKET3_OBJS=						\
+	$(NEOIP_SOCKET3_DIR)/base/type/neoip_socket3_type.o	\
+	$(NEOIP_SOCKET3_DIR)/base/event/neoip_socket3_event.o	\
+	$(NEOIP_SOCKET3_DIR)/base/error/neoip_socket3_err.o	\
+	$(NEOIP_SOCKET3_DIR)/base/domain/neoip_socket3_domain.o	\
+	$(NEOIP_SOCKET3_DIR)/base/addr/neoip_socket3_addr.o	\
+	$(NEOIP_SOCKET3_DIR)/itor/neoip_socket3_itor.o		\
+	$(NEOIP_SOCKET3_DIR)/resp/neoip_socket3_resp.o		\
+	$(NEOIP_SOCKET3_DIR)/neoip_socket3_layer.o		\
+	$(NEOIP_SOCKET3_DIR)/utest/neoip_socket3_utest.o	\
+	$(NEOIP_SOCKET3_DIR)/utest/neoip_socket3_utest_resp.o	\
+	$(NEOIP_SOCKET3_DIR)/utest/neoip_socket3_utest_itor.o
+
+NEOIP_SOCKET3_UDP_DIR=neoip_socket3_udp
+NEOIP_SOCKET3_UDP_INC=-I$(NEOIP_SOCKET3_UDP_DIR)			\
+			-I$(NEOIP_SOCKET3_UDP_DIR)/addr			\
+			-I$(NEOIP_SOCKET3_UDP_DIR)/resp			\
+			-I$(NEOIP_SOCKET3_UDP_DIR)/itor			\
+			-I$(NEOIP_SOCKET3_UDP_DIR)/full
+NEOIP_SOCKET3_UDP_OBJS=							\
+	$(NEOIP_SOCKET3_UDP_DIR)/addr/neoip_socket3_addr_udp.o		\
+	$(NEOIP_SOCKET3_UDP_DIR)/resp/neoip_socket3_resp_udp.o		\
+	$(NEOIP_SOCKET3_UDP_DIR)/itor/neoip_socket3_itor_udp.o		\
+	$(NEOIP_SOCKET3_UDP_DIR)/full/neoip_socket3_full_udp.o	
+
+NEOIP_SOCKET2_DIR=neoip_socket2
+NEOIP_SOCKET2_INC=-I$(NEOIP_SOCKET2_DIR)			\
+			-I$(NEOIP_SOCKET2_DIR)/utest		\
+			-I$(NEOIP_SOCKET2_DIR)/socket_api	\
+			-I$(NEOIP_SOCKET2_DIR)/socket_tcp	\
+			-I$(NEOIP_SOCKET2_DIR)/socket_udp	\
+			-I$(NEOIP_SOCKET2_DIR)/socket_service
+NEOIP_SOCKET2_OBJS =								\
+	$(NEOIP_SOCKET2_DIR)/neoip_socket_event.o				\
+	$(NEOIP_SOCKET2_DIR)/neoip_socket_type.o				\
+	$(NEOIP_SOCKET2_DIR)/socket_api/neoip_socket_port.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_api/neoip_socket_daddr.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_api/neoip_socket_full.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_api/neoip_socket_impl.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_tcp/neoip_socket_tcp_impl.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_tcp/neoip_socket_tcp_port.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_tcp/neoip_socket_tcp_daddr.o		\
+	$(NEOIP_SOCKET2_DIR)/socket_tcp/neoip_socket_tcp_resp.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_tcp/neoip_socket_tcp_full.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_tcp/neoip_socket_tcp_itor.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_udp/neoip_socket_udp_impl.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_udp/neoip_socket_udp_port.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_udp/neoip_socket_udp_daddr.o		\
+	$(NEOIP_SOCKET2_DIR)/socket_udp/neoip_socket_udp_resp.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_udp/neoip_socket_udp_full.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_udp/neoip_socket_udp_itor.o			\
+	$(NEOIP_SOCKET2_DIR)/socket_service/neoip_socket_echo_server.o		\
+	$(NEOIP_SOCKET2_DIR)/socket_service/neoip_socket_chargen_server.o	\
+	$(NEOIP_SOCKET2_DIR)/socket_service/neoip_socket_chargen_client.o	\
+	$(NEOIP_SOCKET2_DIR)/utest/neoip_socket_utest.o
+
+NEOIP_SOCKET_DIR=old_neoip_socketo
+NEOIP_SOCKET_INC=-I$(NEOIP_SOCKET_DIR)
+NEOIP_SOCKET_OBJS =					\
+	$(NEOIP_SOCKET_DIR)/neoip_socketo_itor_acast.o\
+	$(NEOIP_SOCKET_DIR)/neoip_socketo_itor.o	\
+	$(NEOIP_SOCKET_DIR)/neoip_socketo_resp.o	\
+	$(NEOIP_SOCKET_DIR)/neoip_socketo_full.o	\
+	$(NEOIP_SOCKET_DIR)/neoip_socketo_otsp.o	\
+	$(NEOIP_SOCKET_DIR)/neoip_socketo_echo.o
+	
+NEOIP_TOOLS_DIR=old_neoip_tools_cpp
+NEOIP_TOOLS_INC=-I$(NEOIP_TOOLS_DIR)
+NEOIP_TOOLS_OBJS =					\
+	$(NEOIP_TOOLS_DIR)/neoip_id.o			\
+	$(NEOIP_TOOLS_DIR)/neoip_datum_old.o		\
+	$(NEOIP_TOOLS_DIR)/testcpp.o			\
+	$(NEOIP_TOOLS_DIR)/testc.o
+
+NEOIP_HTTP_DIR=old_neoip_http
+NEOIP_HTTP_INC=-I$(NEOIP_HTTP_DIR)
+NEOIP_HTTP_OBJS =					\
+	$(NEOIP_HTTP_DIR)/neoip_http_handler.o
+
+NEOIP_UTILS_DIR=old_neoip_utils
+NEOIP_UTILS_INC=-I$(NEOIP_UTILS_DIR)
+NEOIP_UTILS_OBJS =					\
+	$(NEOIP_UTILS_DIR)/slidwin.o			\
+	$(NEOIP_UTILS_DIR)/bitfield.o			\
+	$(NEOIP_UTILS_DIR)/intval.o			\
+	$(NEOIP_UTILS_DIR)/bdelta.o			\
+	$(NEOIP_UTILS_DIR)/rollsum.o			\
+	$(NEOIP_UTILS_DIR)/bfilter.o			\
+	$(NEOIP_UTILS_DIR)/hook_list.o
+
+NEOIP_FT_DIR=old_neoip_ft
+NEOIP_FT_INC=-I$(NEOIP_FT_DIR)
+NEOIP_FT_OBJS =				\
+	$(NEOIP_FT_DIR)/ft_fsum.o	\
+	$(NEOIP_FT_DIR)/ft_blk_io.o	\
+	$(NEOIP_FT_DIR)/ft_share.o	\
+	$(NEOIP_FT_DIR)/ft_blk.o	\
+	$(NEOIP_FT_DIR)/ft_finfo.o	\
+	$(NEOIP_FT_DIR)/ft_ui.o
+
+OLD_NEOIPLIB_C_DIR=old_neoiplib_c
+OLD_NEOIPLIB_C_INC=-I$(OLD_NEOIPLIB_C_DIR)
+OLD_NEOIPLIB_C_OBJS=					\
+	$(OLD_NEOIPLIB_C_DIR)/util.o			\
+	$(OLD_NEOIPLIB_C_DIR)/rate_estim.o 		\
+	$(OLD_NEOIPLIB_C_DIR)/rate_limit.o 		\
+	$(OLD_NEOIPLIB_C_DIR)/ndir.o  			\
+	$(OLD_NEOIPLIB_C_DIR)/logmsg.o 			\
+	$(OLD_NEOIPLIB_C_DIR)/nipmem.o			\
+	$(OLD_NEOIPLIB_C_DIR)/rand.o \
+	$(OLD_NEOIPLIB_C_DIR)/usercfg.o \
+	$(OLD_NEOIPLIB_C_DIR)/prop.o \
+	$(OLD_NEOIPLIB_C_DIR)/prop_util.o \
+	$(OLD_NEOIPLIB_C_DIR)/prop_db.o \
+	$(OLD_NEOIPLIB_C_DIR)/unbound_inpkt.o \
+	$(OLD_NEOIPLIB_C_DIR)/relay_cli.o \
+	$(OLD_NEOIPLIB_C_DIR)/relay_srv.o \
+	$(OLD_NEOIPLIB_C_DIR)/relay_status.o \
+	$(OLD_NEOIPLIB_C_DIR)/responder.o \
+	$(OLD_NEOIPLIB_C_DIR)/initiator.o \
+	$(OLD_NEOIPLIB_C_DIR)/auth.o \
+	$(OLD_NEOIPLIB_C_DIR)/asymkey.o \
+	$(OLD_NEOIPLIB_C_DIR)/dh_xchg.o \
+	$(OLD_NEOIPLIB_C_DIR)/nsock_ra.o \
+	$(OLD_NEOIPLIB_C_DIR)/mac.o \
+	$(OLD_NEOIPLIB_C_DIR)/enc.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkcs5.o \
+	$(OLD_NEOIPLIB_C_DIR)/comp.o \
+	$(OLD_NEOIPLIB_C_DIR)/comp_zlib.o \
+	$(OLD_NEOIPLIB_C_DIR)/stunnel.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_out.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_in.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_reach.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_rtt.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_samenat.o \
+	$(OLD_NEOIPLIB_C_DIR)/skey.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_secu.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_httpd.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_scramb.o \
+	$(OLD_NEOIPLIB_C_DIR)/nsock_err.o \
+	$(OLD_NEOIPLIB_C_DIR)/relipkt.o \
+	$(OLD_NEOIPLIB_C_DIR)/rdgram.o \
+	$(OLD_NEOIPLIB_C_DIR)/rdgram_utest.o \
+	$(OLD_NEOIPLIB_C_DIR)/rdgram_bufxmit.o \
+	$(OLD_NEOIPLIB_C_DIR)/rstream.o \
+	$(OLD_NEOIPLIB_C_DIR)/rstream_utest.o \
+	$(OLD_NEOIPLIB_C_DIR)/optnego_reg.o \
+	$(OLD_NEOIPLIB_C_DIR)/optnego_payl.o \
+	$(OLD_NEOIPLIB_C_DIR)/optnego_encmac.o \
+	$(OLD_NEOIPLIB_C_DIR)/nipid.o \
+	$(OLD_NEOIPLIB_C_DIR)/netif.o \
+	$(OLD_NEOIPLIB_C_DIR)/payl.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_gram.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_err.o \
+	$(OLD_NEOIPLIB_C_DIR)/cookie.o \
+	$(OLD_NEOIPLIB_C_DIR)/ip_addr.o \
+	$(OLD_NEOIPLIB_C_DIR)/rdvpt.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_addr.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_relay_client.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_udpv4.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_tcpv4.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_tcpv4_cnx.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_keepalive.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_rxmit.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_db.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_util.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_realm.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_unittest.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_publish.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_query.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_negcache.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_clicnx.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_server.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_result.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_rec_gram.o \
+	$(OLD_NEOIPLIB_C_DIR)/httpd.o \
+	$(OLD_NEOIPLIB_C_DIR)/pubaddr_server.o \
+	$(OLD_NEOIPLIB_C_DIR)/pubaddr_pool.o \
+	$(OLD_NEOIPLIB_C_DIR)/pubaddr_disc.o \
+	$(OLD_NEOIPLIB_C_DIR)/reg_client.o \
+	$(OLD_NEOIPLIB_C_DIR)/reg_server.o \
+	$(OLD_NEOIPLIB_C_DIR)/natdiag_sym.o \
+	$(OLD_NEOIPLIB_C_DIR)/natdiag_loop.o \
+	$(OLD_NEOIPLIB_C_DIR)/netdiag.o \
+	$(OLD_NEOIPLIB_C_DIR)/netdiag_upd.o \
+	$(OLD_NEOIPLIB_C_DIR)/inetreach_client.o \
+	$(OLD_NEOIPLIB_C_DIR)/inetreach_server.o \
+	$(OLD_NEOIPLIB_C_DIR)/libmain.o \
+	$(OLD_NEOIPLIB_C_DIR)/afile_io.o \
+	$(OLD_NEOIPLIB_C_DIR)/ncoord.o \
+	$(OLD_NEOIPLIB_C_DIR)/ncoord2.o \
+	$(OLD_NEOIPLIB_C_DIR)/watchdog.o \
+	$(OLD_NEOIPLIB_C_DIR)/emergency_exit.o \
+	$(NEOIP_UTILS_OBJS) \
+	$(NEOIP_FT_OBJS)
+
+
+
+#	n_grp.o \
+#	memb_ship.o memb_ship_httpd.o memb_ship_get_leader.o memb_ship_be_smemb.o memb_ship_connect_leader.o memb_ship_be_leader.o \
+#	memb_list.o memb_info.o \
+#	memb_query.o memb_query_cnx.o \
+#	rdv_client.o rdv_server.o \
+#	nipns_db.o nipns_client.o nipns_server.o nipns_negcache.o\
+#	crypt_enc.o enc_des_cbc.o enc_bf_sbc.o enc_null.o \
+#	crypt_mac.o mac_hmac_md5_96.o \
+#	udp_loc.o lport.o	
+#	icmpc.o icmpc_path.o icmp_recv.o \
+#	pkt_rxmit.o \
+#	otsp.o otsp_client.o otsp_server.o otsp_route.o\
+#	otsp_udpv4_client.o otsp_tcpv4_client.o \
+#	otsp_udpv4_server.o otsp_tcpv4_server.o otsp_tcpv4_cnx.o \
+# sec_pmtu.o skey.o sec_malloc.o pubaddrdisc.o 
+#	sec_ctx.o \
+
+APP_NETCAT_DIR=apps/neoip_netcat
+APP_NETCAT_INC=-I$(APP_NETCAT_DIR)		\
+		-I$(APP_NETCAT_DIR)/cnxfwd	\
+		-I$(APP_NETCAT_DIR)/test_socket
+APP_NETCAT_OBJS = 				\
+	$(NEOIP_BASE_OBJS)			\
+	$(NEOIP_INET_OBJS)			\
+	$(NEOIP_CRYPTO_OBJS)			\
+	$(NEOIP_COMPRESS_OBJS)			\
+	$(NEOIP_ACL_OBJS)			\
+	$(NEOIP_INET2_OBJS)			\
+	$(NEOIP_SOCKET3_OBJS)			\
+	$(NEOIP_SOCKET3_UDP_OBJS)		\
+	$(NEOIP_SOCKET2_OBJS)			\
+	$(NEOIP_SCNX_OBJS)				\
+	$(NEOIP_RDGRAM_OBJS)				\
+	$(NEOIP_PKT_REASM_OBJS)				\
+	$(NEOIP_UNREACHDETECT_OBJS)				\
+	$(NEOIP_NETLAY_OBJS)				\
+	$(NEOIP_NETUTILS_OBJS)				\
+	$(APP_NETCAT_DIR)/cnxfwd/cnxfwd_main.o		\
+	$(APP_NETCAT_DIR)/cnxfwd/cnxfwd_full.o		\
+	$(APP_NETCAT_DIR)/cnxfwd/cnxfwd_itor.o		\
+	$(APP_NETCAT_DIR)/test_socket/nc_server.o	\
+	$(APP_NETCAT_DIR)/test_socket/nc_client.o	\
+	$(APP_NETCAT_DIR)/main.o
+
+APP_ROUTER_SRC_DIR=apps/neoip_router
+APP_ROUTER_OBJS = 					\
+	$(APP_ROUTER_SRC_DIR)/main.o 			\
+	$(APP_ROUTER_SRC_DIR)/main_router.o 		\
+	$(APP_ROUTER_SRC_DIR)/rawip.o 			\
+	$(APP_ROUTER_SRC_DIR)/vdev.o			\
+	$(APP_ROUTER_SRC_DIR)/onet.o 			\
+	$(APP_ROUTER_SRC_DIR)/dst_iaddr_negcache.o	\
+	$(APP_ROUTER_SRC_DIR)/dnsgrab.o			\
+	$(APP_ROUTER_SRC_DIR)/nodeid_iaddr.o 		\
+	$(APP_ROUTER_SRC_DIR)/iaddr_log_server.o	\
+	$(APP_ROUTER_SRC_DIR)/iaddr_log_client.o	\
+	libneoip.a					\
+	libneoip_ns.a					\
+	libneoip_socket.a				\
+	libneoip_tools_cpp.a				\
+	$(NEOIP_BASE_OBJS)			\
+	$(NEOIP_CRYPTO_OBJS)			\
+	$(NEOIP_NETUTILS_OBJS)			\
+	$(NEOIP_INET_OBJS)			\
+	$(NEOIP_SOCKET2_OBJS)			\
+	libneoip_http.a
+
+
+
+MAIN_OPT=
+PROF_OPT=
+# -pg
+LINK_OPT= -Liniparser-2.14/
+DBG_OPT= -Wall
+INCLUDEOPT=  -Iiniparser-2.14/src -I. `pkg-config --cflags glib-2.0 gmodule-2.0 gthread-2.0` 	\
+			$(NEOIP_UTILS_INC) $(NEOIP_TOOLS_INC) $(NEOIP_HTTP_INC)			\
+			$(OLD_NEOIPLIB_C_INC) $(NEOIP_FT_INC)					\
+			$(NEOIP_SOCKET_INC) 							\
+			$(NEOIP_NS_INC) $(NEOIP_INET_INC) $(NEOIP_CORE_INC) $(NEOIP_BASE_INC)	\
+			$(NEOIP_SOCKET2_INC) $(NEOIP_SOCKET3_INC) $(NEOIP_SOCKET3_UDP_INC) 	\
+			$(NEOIP_INET2_INC)							\
+			$(NEOIP_CRYPTO_INC) 							\
+			$(NEOIP_NETUTILS_INC)							\
+			$(NEOIP_COMPRESS_INC) $(APP_NETCAT_INC) $(NEOIP_NETLAY_INC) 		\
+			$(NEOIP_SCNX_INC) $(NEOIP_RDGRAM_INC) $(NEOIP_PKT_REASM_INC)		\
+			$(NEOIP_UNREACHDETECT_INC)
+
+LINKLIB = `pkg-config --libs glib-2.0 gmodule-2.0 gthread-2.0` \
+		-lz -lbz2 -lipq -lgnutls -lgcrypt -lgpg-error \
+		-liniparser -lm
+
+DEBUG_BUILD=1
+#ifeq ($(DEBUG_BUILD),1)
+#	LINKLIB += -lefence
+#endif
+
+ifeq ($(DEBUG_BUILD),1)
+	DBG_OPT += -g 
+	DBG_OPT += -Werror 
+#	DBG_OPT += -O0
+#	DBG_OPT += -DNO_TRACE_AT_ALL
+else
+	DBG_OPT += -O3 -DNEOIP_NODEBUG_COMPIL=1 -DNO_DBG_TRACE 
+#-DNO_TRACE_AT_ALL
+endif
+
+ifeq ($(DISTRIBUTED_BUILD),1)
+	export DISTCC_HOSTS="jmehost2,lzo"
+	CXX=distcc
+endif
+		
+
+COMMON_CFLAGS= $(MAIN_OPT) $(INCLUDEOPT) $(PROF_OPT) $(DBG_OPT)
+
+# set to compile with GCC
+CC=gcc
+CFLAGS=$(COMMON_CFLAGS)
+CXXFLAGS=$(COMMON_CFLAGS)
+
+#ALL_EXE = neoip_router-bin
+ALL_EXE = neoip_netcat
+INSTALL_ROUTER_CONFIG_DIR=/etc/neoip_router
+INSTALL_ROUTER_BIN_DIR=/usr/bin
+INSTALL_ROUTER_PRIVATE_BIN_DIR=/usr/lib/neoip_router
+
+all: iniparser $(ALL_EXE)
+
+iniparser:
+	make -C iniparser-2.14
+
+libneoip.a: $(OLD_NEOIPLIB_C_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_inet.a: $(NEOIP_INET_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_core.a: $(NEOIP_CORE_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_base.a: $(NEOIP_BASE_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_ns.a: $(NEOIP_NS_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_socket.a: $(NEOIP_SOCKET_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_tools_cpp.a: $(NEOIP_TOOLS_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_http.a: $(NEOIP_HTTP_OBJS)
+	$(AR) rcs $@ $^
+
+neoip_router-bin: $(APP_ROUTER_OBJS)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ $(APP_ROUTER_OBJS) $(LINKLIB)
+
+neoip_netcat: $(APP_NETCAT_OBJS)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ $(APP_NETCAT_OBJS) $(LINKLIB)
+
+neoip_router-bin.static: $(APP_ROUTER_OBJS)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ $(APP_ROUTER_OBJS) $(LINKLIB)
+	strip $@
+
+install_router: neoip_router-bin
+	install -d -m 755 $(INSTALL_ROUTER_PRIVATE_BIN_DIR)
+	install -d -m 755 $(INSTALL_ROUTER_CONFIG_DIR)
+	install -d -m 755 $(INSTALL_ROUTER_CONFIG_DIR)/netdiag
+	strip neoip_router-bin
+	install -m 755 neoip_router-bin $(INSTALL_ROUTER_PRIVATE_BIN_DIR)
+	install -m 755 cfg_file/neoip_auto_register.sh $(INSTALL_ROUTER_BIN_DIR)/neoip_router
+	install -m 755 cfg_file/neoip_router_configurator.sh $(INSTALL_ROUTER_PRIVATE_BIN_DIR)
+	ln -fs $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router_configurator.sh $(INSTALL_ROUTER_BIN_DIR)/neoip_router_gui
+	ln -fs $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router_configurator.sh $(INSTALL_ROUTER_BIN_DIR)/neoip_router_tui
+	install -m 755 cfg_file/neoip_router.init /etc/init.d/neoip_router
+	install -m 644 cfg_file/neoip_router.desktop /usr/share/applications
+	install -m 644 cfg_file/neoip_router.png /usr/share/pixmaps
+	install -m 644 cfg_file/neoip_lib.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_lib_default.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_router.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_router_default.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/root_ca_cert.pem $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip.ico $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 neoip_router.8 /usr/man/man8
+
+uninstall_router:
+	rm $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router-bin
+	rm $(INSTALL_ROUTER_BIN_DIR)/neoip_router
+	rm $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router_configurator.sh
+	rm $(INSTALL_ROUTER_BIN_DIR)/neoip_router_gui
+	rm $(INSTALL_ROUTER_BIN_DIR)/neoip_router_tui
+	rm /etc/init.d/neoip_router
+	rm /usr/share/applications/neoip_router.desktop
+	rm /usr/share/pixmaps/neoip_router.png
+	rm /usr/man/man8/neoip_router.8
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip.ico
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_lib.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_lib_default.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_router.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_router_default.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/root_ca_cert.pem
+
+##############################################
+#  beyond this points only mangement target. #
+##############################################
+clean :
+	@echo Begin to clean
+	$(RM) $(ALL_EXE)
+	find -type f -and -name "core" -or -name "*.[oa]" -or -name "*.gch" | xargs rm 
+	make -C iniparser-2.14 clean
+	@echo Clean is completed
+
+mrproper : clean
+	@echo Begin to mrproper
+	$(RM) -r .depend .protect/
+	@echo Mrproper is completed
+
+strip :
+	@echo Begin to strip $(ALL_EXE)
+	$(STRIP) $(ALL_EXE)
+	@echo $(ALL_EXE) have been striped
+
+backup: mrproper cleanlog
+	@echo Backup to backup
+	(cd .. && tar cf - $(PROJECT) | gzip -9 >$(PROJECT).tgz)
+	sync
+	@echo Backup is completed
+
+precompile_include:
+	@echo Start to precompile include
+	for i in `find -name "*.h-removemetohaveCcode" -or -name "*.hpp"`; do $(CXX)  $(COMMON_CFLAGS) -x c++ -c $$i -o $$i.gch; done
+	@echo All include precompiled
+
+# only GCC. 
+depend dep:
+	@echo Start to build depedances in .depend
+	for i in `find -name "*.c-removemetohaveCcode" -or -name "*.cpp"`; do echo -n `dirname $$i`/;$(CPP) -M $(CFLAGS) $$i; done >.tmpdepend
+	mv -f .tmpdepend .depend
+	@echo Dependances completed
+
+#only GCC and good make
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif
+
+
+# DO NOT DELETE

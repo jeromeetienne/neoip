@@ -1,0 +1,32 @@
+{	"playlist_title": "Video Game",
+	"playlist_id"	: "video_game",
+	"trackgen_info"	: [
+		{	"cmd"	: "pick_one_randomly",
+			"arg"	: [
+				{	"precedence"	: 50,
+					"trackgen_info"	: [{	"cmd"	: "concat",
+								"arg"	: {	"space"	: "youtube",
+										"desc"	: {	"cmd"	: "videos_by_tag",
+												"arg"	: {	"tag"	: "tremulous"
+													}
+											}
+									}
+							}]
+				},
+				{	"precedence"	: 50,
+					"trackgen_info"	: [{	"cmd"	: "concat",
+								"arg"	: {	"space"	: "youtube",
+										"desc"	: {	"cmd"	: "videos_by_tag",
+												"arg"	: {	"tag"	: "video game"
+													}
+											}
+									}
+							}]
+				}]
+				
+		},
+		{	"cmd"	: "select_random_contiguous",
+			"arg"	: { "nb_contiguous"	: 3	}
+		}
+		]
+}

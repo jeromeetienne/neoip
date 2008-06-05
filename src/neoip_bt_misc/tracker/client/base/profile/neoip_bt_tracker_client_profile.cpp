@@ -1,0 +1,55 @@
+/*! \file
+    \brief Definition of the \ref bt_tracker_client_profile_t
+
+*/
+
+
+/* system include */
+/* local include */
+#include "neoip_bt_tracker_client_profile.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+// definition of \ref bt_tracker_client_profile_t constant
+// end of constants definition
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                              ctor/dtor
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+bt_tracker_client_profile_t::bt_tracker_client_profile_t()	throw()
+{
+	// put a maximum size of the tracker response in http_sclient profile
+	// - this avoid a DOS in case of error
+	http_sclient().reply_maxlen	(1*1024*1024);
+}
+
+/** \brief Destructor
+ */
+bt_tracker_client_profile_t::~bt_tracker_client_profile_t()	throw()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+//                     check function
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+
+/** \brief Check the validity of the profile
+ */
+bt_err_t	bt_tracker_client_profile_t::check()	const throw()
+{
+	// return no error
+	return bt_err_t::OK;
+}
+
+NEOIP_NAMESPACE_END
+

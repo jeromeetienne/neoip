@@ -1,0 +1,53 @@
+/*! \file
+    \brief Definition of the \ref bt_io_cache_profile_t
+
+*/
+
+
+/* system include */
+/* local include */
+#include "neoip_bt_io_cache_profile.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+// definition of \ref bt_io_cache_profile_t constant
+const bool	bt_io_cache_profile_t::WRITE_THRU		= false;
+const delay_t	bt_io_cache_profile_t::CLEANING_MAX_DELAY	= delay_t(delay_t::INFINITE_VAL);
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                              ctor/dtor
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+bt_io_cache_profile_t::bt_io_cache_profile_t()	throw()
+{
+	write_thru		(WRITE_THRU		);
+	cleaning_max_delay	(CLEANING_MAX_DELAY	);
+}
+
+/** \brief Destructor
+ */
+bt_io_cache_profile_t::~bt_io_cache_profile_t()	throw()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+//                     check function
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+
+/** \brief Check the validity of the profile
+ */
+bt_err_t	bt_io_cache_profile_t::check()	const throw()
+{
+	// return no error
+	return bt_err_t::OK;
+}
+
+NEOIP_NAMESPACE_END
+

@@ -1,0 +1,31 @@
+webrunner is a firefox without all the menus.
+- this directory contains a basic use of it as an experimentation
+- maybe i could use it as a raw desklet
+
+-------------------------------------------------------------
+report of this short experiment:
+- pro: mfinkle, the guy doing webrunner, is nice and very helpfull
+- con: it still have all the window decorations
+- con: it have a bothering status bar
+  - mfinkle told me it is removable with 'hidechrome=true'
+  - i tried a little and failed
+- it doesnt seems to provide all the nice interaction i would like to have with 
+  the window manager.
+  - no window decoration
+  - dock the window on bottom right
+  - have it visible on all desktop
+  - kde window manager provides all that but not programmatically (at least
+    to my knowledge)
+
+---------------------------------------------------------------
+bug encontered
+- if the webpage js call the flash very shortly after its creation, flash program
+  is not yet initialized and the call will fails
+  - webrunner is on a ff3 gecko, so it behaves differently
+  - workaround: before starting the js to flash, probe if the flash object is
+    already initialized (aka present in webpage and see if object function are
+    of typeof() 'function'), and if not, retry a bit later.
+- when creating a 'desktop shortcut' the icons inside the .webapp are not
+  properly copied.
+  - the .desktop do points to a location in ~/.webrunner but no icon there
+  - workaround: copy the icons manually and refresh the desktop :)

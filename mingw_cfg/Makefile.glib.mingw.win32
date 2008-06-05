@@ -1,0 +1,140 @@
+PREFIX_INST=$(PWD)/inst
+CFGFLAGS= --host=i586-mingw32msvc --build=i686-pc-linux-gnu 	\
+	--prefix=$(PWD)/inst --enable-static
+
+################################################################################
+################################################################################
+
+LIBGETTEXT_VERSION=0.14.5
+LIBGETTEXT_SO_VERSION=0-14-5
+LIBICONV_VERSION=1.9.2
+LIBICONV_SO_VERSION=2
+GLIB_VERSION=2.12.12
+GLIB_SO_VERSION=2.0-0
+LIBXML2_VERSION=2.6.29
+LIBXML2_SO_VERSION=2
+
+################################################################################
+################################################################################
+
+all: libiconv gettext glib libxml2
+clean: clean-libiconv clean-gettext clean-glib clean-libxml2
+	rm -rf src build inst
+
+################################################################################
+################################################################################
+# gettext
+################################################################################
+################################################################################
+
+src/gettext-$(LIBGETTEXT_VERSION)/configure: dist/gettext-$(LIBGETTEXT_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/gettext-$(LIBGETTEXT_VERSION).tar.gz
+	touch src/gettext-$(LIBGETTEXT_VERSION)/configure
+
+build/gettext-$(LIBGETTEXT_VERSION)/Makefile: src/gettext-$(LIBGETTEXT_VERSION)/configure
+	rm -rf build/gettext-$(LIBGETTEXT_VERSION)
+	mkdir -p build/gettext-$(LIBGETTEXT_VERSION) && \
+	cd build/gettext-$(LIBGETTEXT_VERSION) && \
+	../../src/gettext-$(LIBGETTEXT_VERSION)/configure $(CFGFLAGS)
+
+inst/bin/libgettextlib-$(LIBGETTEXT_SO_VERSION).dll: build/gettext-$(LIBGETTEXT_VERSION)/Makefile
+	make -C build/gettext-$(LIBGETTEXT_VERSION) install
+
+gettext: inst/bin/libgettextlib-$(LIBGETTEXT_SO_VERSION).dll
+	touch gettext
+
+clean-gettext:
+	-make -C build/gettext-$(LIBGETTEXT_VERSION) uninstall
+	rm -f gettext
+	rm -rf src/gettext-$(LIBGETTEXT_VERSION)
+	rm -rf build/gettext-$(LIBGETTEXT_VERSION)
+
+################################################################################
+################################################################################
+# libiconv
+################################################################################
+################################################################################
+
+src/libiconv-$(LIBICONV_VERSION)/configure: dist/libiconv-$(LIBICONV_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/libiconv-$(LIBICONV_VERSION).tar.gz
+	touch src/libiconv-$(LIBICONV_VERSION)/configure
+
+build/libiconv-$(LIBICONV_VERSION)/Makefile: src/libiconv-$(LIBICONV_VERSION)/configure
+	rm -rf build/libiconv-$(LIBICONV_VERSION)
+	mkdir -p build/libiconv-$(LIBICONV_VERSION) && \
+	cd build/libiconv-$(LIBICONV_VERSION) && \
+	../../src/libiconv-$(LIBICONV_VERSION)/configure $(CFGFLAGS) --enable-static
+
+inst/bin/libiconv-$(LIBICONV_SO_VERSION).dll: build/libiconv-$(LIBICONV_VERSION)/Makefile
+	make -C build/libiconv-$(LIBICONV_VERSION) install
+
+libiconv: inst/bin/libiconv-$(LIBICONV_SO_VERSION).dll
+	touch libiconv
+
+clean-libiconv:
+	-make -C build/libiconv-$(LIBICONV_VERSION) uninstall
+	rm -f libiconv
+	rm -rf src/libiconv-$(LIBICONV_VERSION)
+	rm -rf build/libiconv-$(LIBICONV_VERSION)
+
+################################################################################
+################################################################################
+# glib
+################################################################################
+################################################################################
+
+src/glib-$(GLIB_VERSION)/configure: dist/glib-$(GLIB_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/glib-$(GLIB_VERSION).tar.gz
+	touch src/glib-$(GLIB_VERSION)/configure
+
+build/glib-$(GLIB_VERSION)/Makefile: src/glib-$(GLIB_VERSION)/configure
+	rm -rf build/glib-$(GLIB_VERSION)
+	mkdir -p build/glib-$(GLIB_VERSION)			&& \
+	cd build/glib-$(GLIB_VERSION)				&& \
+	(echo glib_cv_long_long_format=I64 >win32.cache)	&& \
+	(echo glib_cv_stack_grows=no >>win32.cache)		&& \
+	(CFLAGS=-I$(PREFIX_INST)/include LDFLAGS=-L$(PREFIX_INST)/lib ../../src/glib-$(GLIB_VERSION)/configure $(CFGFLAGS) --cache-file=win32.cache)
+
+inst/bin/libglib-$(GLIB_SO_VERSION).dll: build/glib-$(GLIB_VERSION)/Makefile
+	make -C build/glib-$(GLIB_VERSION) install
+
+glib: inst/bin/libglib-$(GLIB_SO_VERSION).dll
+	touch glib
+
+clean-glib:
+	-make -C build/glib-$(GLIB_VERSION) uninstall
+	rm -f glib
+	rm -rf src/glib-$(GLIB_VERSION)
+	rm -rf build/glib-$(GLIB_VERSION)
+
+################################################################################
+################################################################################
+# libxml2
+################################################################################
+################################################################################
+
+src/libxml2-$(LIBXML2_VERSION)/configure: dist/libxml2-$(LIBXML2_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/libxml2-$(LIBXML2_VERSION).tar.gz
+	touch src/libxml2-$(LIBXML2_VERSION)/configure
+
+build/libxml2-$(LIBXML2_VERSION)/Makefile: src/libxml2-$(LIBXML2_VERSION)/configure
+	rm -rf build/libxml2-$(LIBXML2_VERSION)
+	mkdir -p build/libxml2-$(LIBXML2_VERSION) && \
+	cd build/libxml2-$(LIBXML2_VERSION) && \
+	../../src/libxml2-$(LIBXML2_VERSION)/configure $(CFGFLAGS) -with-python=no
+
+inst/bin/libxml2-$(LIBXML2_SO_VERSION).dll: build/libxml2-$(LIBXML2_VERSION)/Makefile
+	make -C build/libxml2-$(LIBXML2_VERSION) install
+
+libxml2: inst/bin/libxml2-$(LIBXML2_SO_VERSION).dll
+	touch libxml2
+
+clean-libxml2:
+	-make -C build/libxml2-$(LIBXML2_VERSION) uninstall
+	rm -f libxml2
+	rm -rf src/libxml2-$(LIBXML2_VERSION)
+	rm -rf build/libxml2-$(LIBXML2_VERSION)

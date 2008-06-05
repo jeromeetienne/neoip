@@ -1,0 +1,16 @@
+\par TODO refactor bt_peerpick_vapi_t init
+- all the init of bt_peerpick_vapi_t is crappy
+- the profile of *EACH* implementation is in bt_ezswarm_profile_t
+  - so less flexible
+- the bt_swarm_sched_full_t is notified of the bt_peerpick_vapi_t is notified
+  of the bt_peerpick_vapi_t pointer by a tech bypassing everything
+  - so easy to forget to set it up
+  - dirty code while setting it up
+  - POSSIBLE SOLUTION: have event with register ?
+    - but this is the only event and there is only one bt_peerpick_vapi_t to register
+    - so seems overkill
+
+- the ctor of bt_peerpick_vapi_t is crappy
+- many bt_peerpick_vapi_t function are similar, or even identical, from one impl to another
+  - so have a helper which centralize the similar logic
+  - DONE in bt_peerpick_helper_t

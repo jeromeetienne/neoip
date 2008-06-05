@@ -1,0 +1,47 @@
+this directory contains stuff to cross compile neoip under linux for window:
+---------------------------------------------------------------------------
+- on jmehost2:win32, it has the result of the previous experiment
+- currently it only compile the dependancy, no work has been done to 
+  compile neoip in itself
+  - gnutls is GPL under window so port it to openssl before publishing
+- wine blabla.exe may be used to execute the window executable on linux
+---------------------------------------------------------------------------
+COMPILER:
+- This is done with mingw32 compiler
+  - to install it: sudo apt-get install mingw32 mingw32-binutils mingw32-runtime
+  - to remove it: sudo dpkg -P mingw32 mingw32-binutils mingw32-runtime
+- apparently it stores the library and include in /usr/i586-mingw32msvc/
+  and /usr/i586-mingw32ms
+-----------------------------------------------------------
+FOR GNUTLS
+- the makefile are inspired from the one of gnutls4win
+  - http://josefsson.org/gnutls4win/
+- copy the whole directory and its dist/ directory too 
+- then make will produce gnutls.exe which is a installer for gnutls on window
+- TODO: apparently there is a conflict with libiconv
+  - if i compile my own libiconv in /usr/i586-mingw32msvc/ and then try to 
+    compile gnutls, there is a issue with the linking
+-----------------------------------------------------------
+- Makefile.aux.mingw.cross.win32 contains the makefile to compile libz, libbz2
+  and libevent.
+  - bzip2 and libevent have simple patches to allow the cross compiling
+- Makefile.glib.mingw.win32 contains the makefile to compile glib and libxml2
+  - it compile libiconv and gettext which are dependancies of those libraries
+  - http://www.gimp.org/~tml/gimp/win32/ contains stuff about window compiling
+- put all the .tgz of those library in a dist/ directory
+  - put the patch in it too
+- put the makefile at the root
+- then make will compile all 3 libraries and install them in inst/
+--------------------------------------------------------------------------------
+DIRECOTRY STRUCTURE:
+- dist/ contains the .tgz and the patch
+- inst/ contains the produced installation, aka library, include, binary
+  - Thus it doesnt 'pollute' the main directory and allow easy removal
+- build/ contains the temporary data created during the build
+- src/ contains the unpacked source, potentially patched if needed
+- "make" produces everything
+- "make clean" remove everything
+- "make glib" produce glib
+- "make clean-glib" remote glib
+- at the begining of each Makefile, it is possible to tune which version of the 
+  library will be compiled by some variables definitions

@@ -1,0 +1,16 @@
+/*! \page network-coord Network Coordinates
+
+\ref neoip-cnx provides a network coordinates system i.e. It is possible to determine
+the network distance, aka the latency, between 2 \ref neoip-peer <b>before</b> they 
+establish a connection together.
+
+It can be used when the application prefere to connect close \ref neoip-peer rather
+than any random \ref neoip-peer.
+
+\par Notes
+- It is based on the vivaldi system TODO put ref
+- It doesnt provide the current throughput between the 2 peers, only the current latency.
+- see ncoord2.c
+
+*/
+

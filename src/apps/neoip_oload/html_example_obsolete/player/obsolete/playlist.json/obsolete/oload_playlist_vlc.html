@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>Test NeoIP oload playlist with VLC</title></head>
+<body>
+
+<h1>Current status</h1>
+<ul>
+	<li>It does start at the proper position</li>
+	<li>i dunno how to handle the transition between movies of the playlist.
+		</li>
+		<ul>
+		<li>vlc mozilla pluging doesnt seems to notify anything</li>
+		<li>maybe i could probe the player periodically...</li>
+		<li>the test page from the source had some stuff about notifiying stuff 
+		    but it didnt work</li>
+		<li>another possibility would be to use the vlc playlist mechanism.
+		    with perhaps some resync if it goes too desynched with theorical
+		    result</li>
+		</ul>
+</ul>
+
+<script src="../../base/javascript/neoip_base64_safe.js"></script>
+<script src="../../base/javascript/neoip_nested_uri_builder.js"></script> 
+<script src="../../base/javascript/neoip_daemon_disc.js"></script> 
+<script>neoip.discover_daemon("oload", 4550, 4559)</script>
+<script>neoip.discover_daemon("casto", 4560, 4569)</script>
+<script src="../../base/javascript/neoip_vlc_object.js"></script> 
+<script src="neoip_oload_playlist_parser.js"></script> 
+
+<h1>Current status</h1>
+<ul>
+	<li><script>if( neoip.vlc_plugin_present() ){
+			document.write("vlc plugin <font color=\"green\">has been</font> found");
+		}else{
+			document.write("vlc plugin <font color=\"red\">has NOT been</font> found");
+		}</script></li>
+	<li><script>if( neoip.oload_present ){
+			document.write("neoip-oload <font color=\"green\">has been</font> found at " + neoip.oload_outter_uri);
+		}else{
+			document.write("neoip-oload <font color=\"red\">has NOT been</font> found to run on your computer.");
+		}</script></li>
+	<li><script>if( neoip.casto_present ){
+			document.write("neoip-casto <font color=\"green\">has been</font> found at " + neoip.casto_outter_uri);
+		}else{
+			document.write("neoip-casto <font color=\"red\">has NOT been</font> found to run on your computer.");
+		}</script></li>
+</ul>
+
+<script>
+	function input_stat(){
+		var 	vlc	= document.getElementById("vlc");
+		var 	tmp	= "";
+		if( vlc ){
+			tmp	+= "<li>versionInfo: " + vlc.versionInfo() + "</li>"; 
+		}
+		if( vlc && vlc.playlist.isPlaying ){
+			try {
+				tmp	+= "<li>Length: " + vlc.input.length + "</li>"; 
+				tmp	+= "<li>Position: " + (vlc.input.position * 100).toFixed(2) + "%</li>"; 
+				tmp	+= "<li>time: " + (vlc.input.time/1000).toFixed(4) + "-sec</li>"; 
+				tmp	+= "<li>state: " + vlc.input.state + "</li>"; 
+				tmp	+= "<li>rate: " + vlc.input.rate + "</li>";
+				// NOTE: BUG: this input.fps cause mozilla to crash!!!!!!
+				// - seems like a race which occurs when movies change inside vlc
+				// tmp	+= "<li>fps: " + vlc.input.fps + "</li>"; 
+				tmp	+= "<li>hasVout: " + vlc.input.hasVout + "</li>"; 
+			}catch(e){
+				tmp	+= "<li>Exception: " + e + "</li>"; 
+			}
+		}
+		// write the statistic list
+		document.getElementById("vlc_input_data").innerHTML = tmp;
+		
+		// relaunch the timer
+		setTimeout("input_stat()", 1000)
+	}
+	function play_tv(){
+		var playlist_json_test = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: ['
+			+'			{	"url"		: "http://192.168.1.3/~jerome/ntv002.mp4",'
+			+'		        	"start_time"	: 100,'
+			+'		        	"duration"	: 10,'
+			+'		        },'
+			+'			{	"url"		: "http://192.168.1.3/~jerome/ntv002.mp4",'
+			+'		        	"start_time"	: 200,'
+			+'		        	"duration"	: 10,'
+			+'		        },'
+			+'			{	"url"		: "http://192.168.1.3/~jerome/ntv002.mp4",'
+			+'		        	"start_time"	: 300,'
+			+'		        	"duration"	: 10,'
+			+'		        },'			
+			+'		]'
+			+'}';
+		var playlist_json_long = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: ['
+//			+'		     {    	"description"	: "second movie - go open",'
+//			+'				"url"		: "http://192.168.1.3/~jerome/go%20open.mp4",'
+//			+'		        	"duration"	: 1436.72,'
+//			+'		        },'
+			+'			{    	"description"	: "third movie - ntv002",'
+			+'				"url"		: "http://192.168.1.3/~jerome/ntv002.mp4",'
+			+'		        	"duration"	: 3558.04,'
+			+'				"outter_var"	: {'
+			+'						    "announce_uri": "http://jmehost.podzone.net:55001/announce",'
+			+'		        			   },'
+			+'		        },'
+			+'		]'
+			+'}';
+		// take pbs - take nerdtv video from the pbs site
+		var playlist_json_pbs = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: ['
+			+'			{    	"description"	: "third movie - ntv002",'
+			+'				"url"		: "http://distribution.nerdtv.net/video/ntv002/ntv002.mp4",'
+			+'		        	"duration"	: 3558.04,'
+			+'				"outter_var"	: {'
+			+'						    "announce_uri": "http://jmehost.podzone.net:55001/announce",'
+			+'						    "read_ahead": "128k",'
+			+'						    "piecelen": "32k",'
+			+'		        			   },'
+			+'		        },'
+			+'			{    	"description"	: "third movie - ntv003",'
+			+'				"url"		: "http://distribution.nerdtv.net/video/ntv003/ntv003.mp4",'
+			+'		        	"duration"	: 3427.17,'
+			+'				"outter_var"	: {'
+			+'						    "announce_uri": "http://jmehost.podzone.net:55001/announce",'
+			+'						    "read_ahead": "128k",'
+			+'						    "piecelen": "32k",'
+			+'		        			   },'
+			+'		        },'
+			+'		]'
+			+'}';
+		var playlist_json_short = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: [     {    	"description"	: "second movie - go open",'
+			+'				"url"		: "http://jmehost2/~jerome/short1.avi",'
+			+'		        	"duration"	: 22.68,'
+			+'		        }'
+			+'		]'
+			+'}';
+		// 1 movie from rubhowdown conference 
+		// - neoip-oload works but bug in vlc seeking
+		var playlist_json_rubyhoedown = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: [     {    	"description"	: "ruby movie - go open",'
+			+'				"url"		: "http://rubyhoedown2007.confreaks.com/videos/session03_200kbps_xvid_32kbps_mono_audio_640x240.avi",'
+			+'		        	"duration"	: 2755.82,'
+			+'		        }'
+			+'		]'
+			+'}';
+		// 1 movie from rmll2007
+		// - neoip-oload works but bug in vlc seeking
+		var playlist_json_rmll2007 = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: [     {    	"description"	: "debian movie",'
+			+'				"url"		: "http://www.rmll.info/v/417_small.avi",'
+			+'		        	"duration"	: 3566.36,'
+			+'		        }'
+			+'		]'
+			+'}';
+		// 1 mp3 song on jmehost2
+		// - works well on neoip-oload and vlc
+		var playlist_json_song = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: [     {    	"description"	: "first song",'
+			+'				"url"		: "http://jmehost2/~jerome/song1.mp3",'
+			+'		        	"duration"	: 236.00,'
+			+'		        },'
+			+'		]'
+			+'}';
+		// 2 song directly from jamendo torrent, in ogg
+		// - the neoip-oload part works (with usual latency issue) but vlc is bugged on ogg seeking
+		var playlist_json_jamendo = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: [     {    	"description"	: "first song",'
+			+'				"url"		: "http://torrent1.jamendo.com/1052/Drunksouls%20-%20On%20verra%20plus%20tard%20--%20Jamendo%20-%20OGG%20Vorbis%20q7%20-%202006.01.28%20%5Bwww.jamendo.com%5D.torrent",'
+			+'		        	"duration"	: 220.653,'
+			+'				"outter_var"	: {'
+			+'						    "subfile_path": "01%20-%20Pain%20of%20life.ogg",'
+			+'		        			   },'
+			+'		        },{    	"description"	: "second song",'
+			+'				"url"		: "http://torrent1.jamendo.com/1052/Drunksouls%20-%20On%20verra%20plus%20tard%20--%20Jamendo%20-%20OGG%20Vorbis%20q7%20-%202006.01.28%20%5Bwww.jamendo.com%5D.torrent",'
+			+'		        	"duration"	: 234.346,'
+			+'				"outter_var"	: {'
+			+'						    "subfile_path": "02%20-%20Give%20me%20a%20sign.ogg",'
+			+'		        			   },'
+			+'		        },'			
+			+'		]'
+			+'}';
+		
+		// playlist on elephant dream
+		// - NOTE: it shows some latency issue in neoip-oload, if the first pieces
+		//   are requested on slow hosts or on unreachable bt_ecnx_vapi_t
+		//   - fixable by slow/fast host and priority 
+		// - vlc is seeking ok
+		var playlist_json_elephant = '{'
+			+'"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",'
+			+'"item"	: [     {    	"description"	: "first song",'
+			+'				"url"		: "http://192.168.1.3/~jerome/Elephants_Dream_480-h264-st-aac.mov",'
+			+'		        	"duration"	: 653.79,'
+			+'				"outter_var"	: {'
+//			+'						    "dupuri_1"	: "http://ftp.drazzib.com/mirrors/elephants-dream/elephantsdream-480-h264-st-aac.mov",'
+//			+'						    "dupuri_2"	: "http://ftp.gui.uva.es/pub/multimedia/movies/elephantsdream/elephantsdream-480-h264-st-aac.mov",'
+//			+'						    "dupuri_3"	: "http://osaddict.com/files/elephantsdream-480-h264-st-aac.mov",'
+//			+'						    "dupuri_4"	: "http://jmehost2/~jerome/Elephants_Dream_480-h264-st-aac.mov",'
+			+'		        			   },'
+			+'		        }'
+			+'		]'
+			+'}';
+		var	playlist_json	= playlist_json_test;
+		var	playlist	= new neoip.oload_playlist_parser(playlist_json);
+		// if neoip-oload is present, 'oloadify' the playlist
+		if( neoip.oload_present )	playlist.oloadify(neoip.oload_outter_uri);
+		
+		var	current	= playlist.current();
+		var 	vlc	= document.getElementById("vlc");
+
+		// log to debug
+		console.log("vlc versionInfo=" + vlc.versionInfo());
+		console.log("current offset_time=" + current.offset_time);
+		console.log("current start_time=" + current.item.start_time);
+		console.log("current.item.url=" + current.item.url);
+		console.log("BEFORE count=" + vlc.playlist.items.count);
+
+try {
+		// if vlc is currently playing, stop it
+		if( vlc.playlist.isPlaying )		vlc.playlist.stop();
+}catch(e){
+	console.log("exception1=" + e);
+}
+
+try {
+		// if the vlc.playlist is is not empty, clear it
+		//if( vlc.playlist.items.count > 0 )	
+		vlc.playlist.clear();
+}catch(e){
+	console.log("exception0=" + e);
+}
+		console.log("just after clear count=" + vlc.playlist.items.count);
+		
+try {
+		// relaunch a new one
+		var 	opt	= new Array();
+		opt.push(":start-time=" + (current.item.start_time + current.offset_time));
+// to reduce the delay of input caching by vlc in ms
+		opt.push(":http-caching=50");
+// to force vlc to fill the output window
+//		opt.push(":crop");
+		vlc.playlist.add(current.item.url, null, opt);
+		vlc.playlist.play();
+}catch(e){
+	//console.log("exception2=" + e);
+}
+		//console.log("AFTER count=" + vlc.playlist.items.count);
+		// relaunch the play_tv when the remaining time is over
+		// - TODO clean all this
+		// - at least store the current timer to be able to cancel it
+		setTimeout("play_tv()",(current.item.duration - current.offset_time)*1000)		
+	}
+	
+	function stop_tv(){
+		var 	vlc	= document.getElementById("vlc");
+		try {
+			// if vlc is currently playing, stop it
+			if( vlc.playlist.isPlaying )		vlc.playlist.stop();
+			// if the vlc.playlist is is not empty, clear it
+			vlc.playlist.clear();
+		}catch(e){
+			console.log("exception0=" + e);
+		}
+	}
+	function vlc_player_build(){
+		var vlc_object	= new neoip.vlc_object('vlc', 320, 240);
+		vlc_object.write('vlc_objtest');
+	}
+
+	// to refresh the stat periodically
+	setTimeout("input_stat()", 1000);
+</script>
+
+<h3>The player</h3>
+<input type=button value="Play" onClick='play_tv()'>
+<input type=button value="Stop" onClick='stop_tv()'>
+
+<p id="vlc_objtest">Place to put the new vlc</p>
+
+<script>
+	vlc_player_build();
+</script>
+
+<h3>vlc input data</h3>
+<ul id="vlc_input_data"></ul>
+</body>
+
+<script>
+function json_playlist_get_insync(url)
+{
+	var	xmlhttp	= new XMLHttpRequest();
+	// do a open insync
+	xmlhttp.open("GET", url, false);
+	// start the request
+	xmlhttp.send();
+	// log to debug
+	console.log("response=" + xmlhttp.responseText);
+	// if request failed, return a null object 
+	if( xmlhttp.status != 200 )	return null;
+	// else return the content of the file as text
+	return xmlhttp.responseText;
+}
+</script>
+<input type=button value="get playlist" onClick='json_playlist_get_insync("example/chunk_ntv.json_playlist")'>
+
+</html>

@@ -1,0 +1,54 @@
+/*! \file
+    \brief Definition of the \ref btcli_profile_t
+
+*/
+
+
+/* system include */
+/* local include */
+#include "neoip_btcli_profile.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+// definition of \ref btcli_profile_t constant
+const delay_t		btcli_profile_t::LOOK_DIR_PERIOD		= delay_t::from_sec(60);
+const delay_t		btcli_profile_t::RESUMEDATA_AUTOSAVE_PERIOD	= delay_t::from_sec(60);
+// end of constants definition
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                              ctor/dtor
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+btcli_profile_t::btcli_profile_t()	throw()
+{
+	look_dir_period			(LOOK_DIR_PERIOD);
+	resumedata_autosave_period	(RESUMEDATA_AUTOSAVE_PERIOD);
+}
+
+/** \brief Destructor
+ */
+btcli_profile_t::~btcli_profile_t()	throw()
+{
+}
+
+
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+//                     check function
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+
+/** \brief Check the validity of the profile
+ */
+bt_err_t	btcli_profile_t::check()	const throw()
+{
+	// return no error
+	return bt_err_t::OK;
+}
+
+NEOIP_NAMESPACE_END
+

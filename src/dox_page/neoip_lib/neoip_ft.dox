@@ -1,0 +1,50 @@
+/*! \page neoip-ft NeoIP File Transfert
+
+This is a core part of the \ref neoip-lib. It allows to publish and download files inside a \ref ns-realm.
+
+It allows "swarming" i.e. if the file is available on several peers, the downloader will attempts to use them.
+
+\par Operation on files
+- the \ref neoip-ft provides the 2 basics operations on file sharing: (i) publish and (ii) download
+- \ref neoip-file will provides additionnal operations: (i) upload, (ii) backup, (iii) mirror
+
+\section neoip-ft-download NeoIP File Download
+\section neoip-ft-publish NeoIP File Publish
+\section neoip-ft-upload NeoIP File Upload
+- in short, to upload a file is sending a request of \ref neoip-ft-download to the destination \ref neoip-peer.
+- TODO later to improve the efficiency, \ref neoip-ft-mx needs to be implemented
+- obviously the right management needs to be correct as you dont want anybody to upload files anywhere
+
+\section neoip-ft-backup NeoIP File Backup
+- the steps of \ref neoip-ft-backup is:
+  -# periodically produce a delta describing what has been changed in the backedup files
+  -# then do a \ref neoip-ft-upload to the \ref neoip-peer on which you backup
+
+\section neoip-ft-mirror NeoIP File Mirror
+- the steps of \ref neoip-ft-mirror is:
+  - For the mirror
+    -# periodically do a \ref neoip-ft-download on the file
+  - for the mirrored
+    -# periodically produce a delta describing what has been changed in the mirrored files
+
+\section neoip-ft-mx NeoIP File MX
+- the name is bad and need to be changed
+- the concept is the same as with smtp mx, or file caching in web
+  - the mx download the files and republish it (caching only)
+  - optionaly it may try to send this file to another \ref neoip-peer (ala smtp mx)
+
+\section neoip-ft-possible-improvement Possible Improvement
+- in theory in a swarmed file transfert which limit the bandwidth, such as upload bandwidth
+should be roughly equal to download bandwith, each new peer should consume as much
+as it produces. So it should be infinitly scalable. and each peer should have a download rate
+equal to its upload rate.
+  - so if a peer's network does only file transfert, its upload bw should be saturated. 
+  - In practice this doesnt happens at all, WHY  ?
+    -# the 'rarest piece first' principle is good for many things but bittorrent protocol
+       has only a local view of it aka it knows only the rarest piece amoung all the
+       peer it is connected to.
+       - flood the present pieces amoung all nodes
+       - you may flood the presence too
+       - The nat traversal will reduce this problem has more nodes may be connected
+
+*/

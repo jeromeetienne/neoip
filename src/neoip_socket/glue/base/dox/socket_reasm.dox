@@ -1,0 +1,31 @@
+/*! \page neoip-socket-reasm NeoIP Socket Packet Reassembly
+
+\ref neoip-socket-reasm is a part of the \ref neoip-socket.
+
+-# fragmentation/reassembly layer
+  - see ipv4 rfc815 for that http://www.faqs.org/rfcs/rfc815.html
+  - see ipv6 in section 4.5  http://www.faqs.org/rfcs/rfc2460.html
+
+\section neoip-socket-fragmented-pktid NeoIP Fragmented Packet ID
+Each datagram to be fragmented is assigned a \ref neoip-socket-fragmented-pktid
+and each fragment of this packet include it.
+It allows to the receiver to identify which fragments are part of the same
+original datagram.
+
+\section neoip-socket-reasm-vs-ip Difference with IP reassembly
+In \ref neoip case, the packets are sent over a given connection, so the scope
+of the Fragmented ID is limited to this connection.
+- It differs from IP scheme where IP datagram are sent on the internet
+  unconnected and not over connections.
+- Received IPv4 fragment may overlap each other. It isn't the case
+  of \ref neoip-socket-reasm as it do the fragmentation is done by the originator.
+  - IPv4 fragmentation may overlap because IPv4 packets may be duplicated by
+    the internet and duplicates may be fragmented differently depending on 
+    the MTU of their respective path.
+  - I am not sure if IPv6 fragment may overlap, but i see no reason to as
+    IPv6 fragmentation is done by the originator too.
+
+\par Protocol
+- 
+
+*/

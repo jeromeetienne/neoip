@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<script src="http://localhost/~jerome/jsunit/app/jsUnitCore.js"></script>
+
+<script src="../../base/firebug/firebug.js"></script> 
+<script src="../../base/javascript/neoip_base64_safe.js"></script> 
+<script src="neoip_nested_uri_builder_t.js"></script>
+<body>
+
+<script>
+function testBasic() {
+	var nested_uri	= new neoip.nested_uri_builder_t()
+	nested_uri.outter_uri("http://localhost:4550");
+	nested_uri.inner_uri("http://example.com/file.flv?bla=gou");
+	assertEquals("test if equal", nested_uri.to_string()
+				, "http://localhost:4550/http://example.com/file.flv?bla=gou");
+}
+function testSubfilePath() {
+	var nested_uri	= new neoip.nested_uri_builder_t()
+	nested_uri.outter_uri	("http://localhost:4550");
+	nested_uri.inner_uri	("http://example.com/file.flv?bla=gou");
+	nested_uri.set_var	("subfile_path"	, "/test/file");
+	assertEquals("test if equal", nested_uri.to_string()
+				, "http://localhost:4550/*subfile_level*2/http://example.com/file.flv/test/file?bla=gou");
+}
+function testMod() {
+	var nested_uri	= new neoip.nested_uri_builder_t()
+	nested_uri.outter_uri	("http://localhost:4550");
+	nested_uri.inner_uri	("http://example.com/file.flv?bla=gou");
+	nested_uri.set_var	("mod"		, "flv");
+	assertEquals("test if equal", nested_uri.to_string()
+				, "http://localhost:4550/flv/http://example.com/file.flv?bla=gou");
+}
+</script>
+
+</body>
+</html>

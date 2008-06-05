@@ -1,0 +1,50 @@
+<html>
+<head><title>Demo of VLC mozilla plugin</title></head>
+
+<body>
+
+<h1>Demo of VLC mozilla plugin - streaming webcam</h1>
+this requires a small modification in getabsoluteurl in the mozilla plugin. there
+is a bug which make it interpret as a filename and thus prepends the base url.<br/>
+<embed type="application/x-vlc-plugin"
+	pluginspage="http://www.videolan.org/" version="VideoLAN.VLCPlugin.2"
+        id="video1"
+        autoplay="no" loop="yes" width="320" height="240"
+	/>
+<br />
+
+<script LANGUAGE="Javascript">
+<!--
+function vlc_init()
+{
+	var vlc = document.getElementById("video1");
+	var opt = new Array();
+	opt.push(":v4l-vdev=/dev/video0");
+	opt.push(":v4l-adev=/dev/dsp")
+	opt.push(":v4l-width=320")
+	opt.push(":v4l-height=240")
+	opt.push(":v4l-fps=25.0")
+	opt.push(":sout=#transcode{vcodec=mp4v,acodec=mpga,vb=25,ab=64}:duplicate{dst=display,dst=std{access=http,mux=ps,url=0.0.0.0:8080}}")
+	opt.push(":sout-ffmpeg-keyint=25")
+	opt.push(":sout-ffmpeg-strict-rc")
+	vlc.playlist.add("v4l://", null, opt);
+}
+
+function start_record()
+{
+	var vlc = document.getElementById("video1");
+	vlc.playlist.play();
+}
+function stop_record()
+{
+	var vlc = document.getElementById("video1");
+	vlc.playlist.stop();
+}
+
+vlc_init();
+-->
+</script>
+<input type=button value="Start recording" onClick='start_record();'>
+<input type=button value="Stop recording" onClick='stop_record();'>
+</body>
+</html>

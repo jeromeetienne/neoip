@@ -1,0 +1,138 @@
+/*! \page neoip-scnx-rekey NeoIP Secure Connection Shortterm Secret Rekeying
+
+- This exchange happens on top of the current security. So it is 
+  encrypted and authenticated by the soon-to-be-obsolete keys.
+- It can be initiated by any peer.
+  - So the rekey initiator doesn't have to be the same as the connection
+    initiator. the same applies for the responder.
+- a given peer MUST NOT do initiate a new rekeying exchange if the previous
+  one isn't completed
+
+
+\section neoip-scnx-rekey-motivation Shortterm Rekeying Motivation
+Periodically the short-term secret MUST be modified. the reason may be:
+  -# to get a new space for the sequence number in the antireplay
+    - A sequence number MUST be unique for a given key, so it will run out of
+      space at a given point. To get a new space, the key has to be changed
+      and it is done by the shortterm rekeying.
+  -# to ensure forward or backward secrecy.
+    - After a given time or amount of data, it may be desirable to change the key
+      to ensure that an attacker obtaining the current key is unable to break
+      into the security of past or futures packets.
+    - The kind of secrecy provided depends on the algorithm used to rekey.
+      -# hash chain rekeying provides forward secrecy but not backward one.
+      -# diffie-hellman rekeying provide forward and backward secrecy.
+
+\section neoip-scnx-rekey-protocol Shortterm rekeying Protocol
+- So there is 3 keys:
+  - XMIT_KEY = the key used to transmition
+  - RECV_KEY = the main key used for reception
+  - ARCV_KEY = the alternative key used for reception
+- the protocol requires only 2 packets to change the keys of both peers
+  - a REKEY_REQUEST sends by the rekey initiator
+  - a REKEY_REPLY sends by the rekey responder
+
+\verbatim
+    Initiator                                           Responder
+   ===========                                         ===========
+                  -------- Rekey Request ------->  
+                     [ nounce_i | rekey_type
+                      | rekey_data_i ]
+                                                      arcv_key = recv_key
+                                                      start arcv_key timeout
+                                                      generate a new recv_master_key
+                                                      recv_key = derived(recv_master_key)
+                  <------- Rekey Reply ---------- 
+                     [ nounce_i | rekey_type
+                      | rekey_data_r ]
+Generate a new xmit_master_key
+xmit_key = derived(xmit_master_key)
+
+\endverbatim
+
+
+\par Time-out
+- the alternative received key expires after a timeout. for 2 reasons:
+  - to reduce the local memory usage
+  - to reduce the impact of a possible of a DOS based on flooding packets. Thus
+    one MAC will be computed per packet when no alternative key are present, 
+    and two when it is present.
+
+\subsection neoip-scnx-rekey-data-payload Data Payload
+- \b Semantic: The couple rekey_data_i, rekey_data_r contains the whole information
+  to produce the new master key from which the xmit_key, recv_key and arcv_key will
+  be derived from.
+- It can have various types
+
+\par sloa
+- rekey_type determines if the rekeying is only forward secret or forward/backward
+  secret.
+  - TODO doc the rekey_type which isnt in the protocol diagram above
+
+\subsubsection neoip-scnx-rekey-data-hashchain Data Payload For Hash-chain rekeying
+- if the rekey_type is forward secret only, it is done with a hash chain
+  - aka new master key = hash(old master key)
+  - in this case, rekey_data_i and rekey_data_r are empty
+    
+\subsubsection neoip-scnx-rekey-data-diffiehellman Data Payload For Diffie-Hellman rekeying
+- if the rekey_type is forward/backward secret, it is done with a diffie hellman
+  key exchange.
+  - aka new master key = derivation(g^xy)
+  - in this case, rekey_data_i is g^x and rekey_data_r is g^y
+    
+\section neoip-scnx-rekey-arcv-key Shortterm Rekeying Smooth Transition
+In order not to loose any packet due to the rekeying, a smooth transition
+mechanism is provided. It is based on a alternate receive key.
+
+\par Alternate Key Expiration
+- It may expire after a timeout
+- the alternative reception key is obsoleted as soon as a received packet is 
+  accepted with the main reception key
+
+\par Processing Incoming Packets With Alternative Receive Key
+-# When a packet is received, it is attempted to authenticate and decrypt it
+   with the main receive key. 
+-# If it fails and if there is an alternative receive key, it is attempted to
+   authenticate and decrypt it with it.
+-# if it fails, the packets is considered illegitimate.
+
+\section neoip-scnx-rekey-bi-vs-unidirectional Bidirectional Rekeying vs Unidirectional Rekeying
+A birectional rekeying could be made and save 2 packets. Nevertheless the author
+choosed to keep a unidirectional rekeying for the following reasons:
+
+\par Bidirectional Pro
+- Bidirectional rekeying consume only 2 packets to change keys both ways.
+  - The bandwidth cost isn't very relevant as rekeying is rare enought
+    to make it negligible.
+- Bidirectional rekeying and the special case of using diffie-hellman.
+  - a single diffie-hellman exchange is required to change keys both ways.
+    While 2 diffie-hellman exchanges are needed for unidirectional rekeying.
+  
+\par Undirectional Pro
+A bidirectional rekeying is quite complex because both peer may require 
+a rekey at the same time. A protocol handling this case is prone to race
+condition, complex to design and implement.
+
+\par Discussion
+The unidirectional rekeying has been chosen because of its simplicity.
+The only CON in this solution is the CPU usage in case of diffie-hellman rekeying.
+But the diffie-hellman rekeying is usefull iif backward secrecy is needed. This is 
+a thread model much stronger than the typical one. Moreover it consume more CPU even
+in bidirectional rekeying. So it is assumed to be rarely used because of those two 
+reasons but mainly the first. So the complexity is imposed only to make a rare
+option more efficient. 
+
+The author considered the risk of design/implementation error largely overweight
+the advantages.
+
+\par TODO
+- the equal nounce thing is handled, document it 
+  - including how to triger the rekey and the case there
+- what about the arcv key when packet is received with the current key ?
+  - do i kill the timeout ?
+  - do i need this timeout with this process ?
+  - it doesnt seems so moreover it is a additional value to tune and more complex code
+- what about trying to initiate a rekey while already doing a new one ?
+  - how to handle it ?
+
+*/

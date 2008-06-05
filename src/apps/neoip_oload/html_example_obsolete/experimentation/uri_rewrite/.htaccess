@@ -1,0 +1,6 @@
+RewriteEngine On
+# ok the absolute path seems needed here... which is rather ugly
+RewriteBase	/~jerome/neoip_html/experimentation/uri_rewrite
+RewriteRule	^playlist/(.*)$		test_uri_rewrite.html?playlist_name=$1 [R]
+
+

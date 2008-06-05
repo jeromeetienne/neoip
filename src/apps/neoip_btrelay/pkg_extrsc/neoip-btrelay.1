@@ -1,0 +1,46 @@
+.\" -*- nroff -*-
+.TH NEOIP-OLOAD 1 "Dec 2006" "neoip-btrelay(1)" "neoip-btrelay's Manual"
+.SH NAME
+neoip-btrelay - Tool to relay a bittorrent swarm
+.SH SYNOPSIS
+.B neoip-btrelay
+[--config_dir dirname] [--help] [--version]
+.SH DESCRIPTION
+neoip-btrelay is a deamon which allow to read files over the internet.
+Those files may be static http content, .torrent content, .metalink or cast content.
+
+TODO this man page is just a stub. complete it
+TODO put some example of usage
+
+.SH OPTIONS
+.TP
+.I "-c, --config_dir dirname"
+set the configuration directory.
+If not specified, it uses /etc/neoip-btrelay.
+.TP
+.I "-h, --help"
+display the inlined help
+.TP
+.I "-v, --version"
+display the version string
+
+.SH EXAMPLES
+To launch it from yavipin/src directory and relay on ubuntu dvd torrent
+  ./neoip-btrelay -c config_dir_debug1 ~/downloaded/ubuntu-7.04-dvd-i386.torrent
+
+.SH FILES
+\fI/etc/neoip-btrelay\fR
+default configuration directory
+
+.SH LICENSE
+The license is proprietary and this programm should be used for testing purpose only
+
+.SH AUTHOR
+.B neoip-btrelay
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP's homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.
+Note that the metalink support is experimental.

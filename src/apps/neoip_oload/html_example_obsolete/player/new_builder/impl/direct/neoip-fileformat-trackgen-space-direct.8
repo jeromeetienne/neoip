@@ -1,0 +1,36 @@
+.TH NEOIP_FILEFORMAT_TRACKGEN_SPACE_DIRECT 8 "Dec 2006" "trackgen_space_direct file format(1)" "trackgen_space_direct file format's Manual"
+.SH NAME
+neoip trackgen_space_direct format extension
+.SH DESCRIPTION
+trackgen_space_direct is a source of track. It doesnt rely on external source
+to generate the track list. only the information into the arguements are used.
+The "space" description in "desc" field is an array of object, each one representing
+a track.
+
+
+.SH Description of each object
+.TP
+.I "title string"
+the string is a human readable title for the track
+.TP
+.I "uri string"
+the string is a uri pointing on the location of the track file
+
+
+.SH EXAMPLES
+[	{	"title"	=> "me in front of webcam",
+		"uri"	=> "http://jmehost2/~jerome/output.flv"
+	},
+	{	"title"	=> "Elephant dream",
+		"uri"	=> "http://jmehost2/~jerome/flash/elephantsdream_420_v4.flv"
+	}
+]
+
+.SH AUTHOR
+.B neoip-playlist-
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.

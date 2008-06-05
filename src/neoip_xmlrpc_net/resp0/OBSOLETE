@@ -1,0 +1,5 @@
+this is a poor implementation of the xmlrpc responder
+- the API is bad
+- this is on top of the old httpd_t
+
+- xmlrpc_listener_t/xmlrpc_resp_t obsolete this 

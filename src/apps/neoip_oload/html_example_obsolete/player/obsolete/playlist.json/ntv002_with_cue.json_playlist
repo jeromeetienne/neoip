@@ -1,0 +1,32 @@
+{
+	base_date	: "Fri, 17 Aug 2007 20:07:25 GMT",
+	item_arr	: [
+			{	address	: "http://192.168.1.3/~jerome/ntv002.mp4",
+			       	duration: 20,
+			       	meta : {
+			       		cue_arr: [
+				       		{ item_reltime: 0,
+				       		  data: {
+				       		  	"text" : "super text for cue-0",
+				       		  },
+				       		},
+				       		{ item_reltime: 5,
+				       		  data: {
+				       		  	"text" : "super text for cue-1",
+				       		  },
+				       		},
+				       		{ item_reltime: 10,
+				       		  data: {
+				       		  	"text" : "super text for cue-2",
+				       		  },
+				       		},
+				       		{ item_reltime: 15,
+				       		  data: {
+				       		  	"text" : "super text for cue-3",
+				       		  },
+				       		},
+			       		],
+			       	},
+			},
+		]
+}

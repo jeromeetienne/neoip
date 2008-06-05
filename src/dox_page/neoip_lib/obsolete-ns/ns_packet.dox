@@ -1,0 +1,41 @@
+/*! \page ns-packet NeoIP NS packet format
+
+The packets are :
+- \ref ns-packet-put-req sent by a client to a server to publish a record 
+- \ref ns-packet-put-resp replied by a server to a client which sent a \ref ns-packet-put-req
+- \ref ns-packet-unput-req sent by a client to a server to unpublish a record 
+- \ref ns-packet-unput-resp replied by a server to a client which sent a \ref ns-packet-unput-req
+
+- \ref ns-packet-get-req to query records
+- \ref ns-packet-get-resp to query records
+
+\section ns-packet-put-req Packet Format of Put Request
+- nounce: to identify the put request
+- followed by a \ref ns-record
+
+\section ns-packet-put-resp Packet Format of Put Response
+- nounce: to identify the put request (same as the \ref ns-packet-put-req)
+- return code
+- \ref ns-record-uid
+
+\section ns-packet-unput-req Packet Format of unPut Request
+- nounce: to identify the put request
+- \ref ns-record-uid
+
+\section ns-packet-unput-resp Packet Format of unPut Response
+- nounce: to identify the put request (same as the \ref ns-packet-put-req)
+- return code
+- \ref ns-record-uid
+
+\section ns-packet-get-req Packet Format of Get Request
+- nounce: to identify the get request
+- hop-limit (for \ref ns-arch-flood only)
+- timeout
+- \ref ns-search 
+
+\section ns-packet-get-resp Packet Format of Get Response
+- nounce: to identify the get request (same as the \ref ns-packet-get-req)
+- return code
+- \ref ns-record
+
+*/

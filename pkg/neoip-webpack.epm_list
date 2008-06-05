@@ -1,0 +1,49 @@
+%product neoip-webpack - bundle neoip-casti, neoip-casto and neoip-oload
+%copyright 2007
+%vendor NeoIP
+%version 0.0.1-200806050733
+%readme "Read http://www.web4web.tv" 
+%license "http://donotusethissoft.ever"
+%description sloaaaaaa one
+%description sloaaaaaa two
+%description sloaaaaaa three
+%description sloaaaaaa four
+
+f 755 root root /etc/neoip_webpack/neoip_apps_ctrl.sh neoip-webpack.build_dir/config_dir_sample/neoip_apps_ctrl.sh
+f 644 root root /etc/neoip_webpack/neoip_http.ico neoip-webpack.build_dir/config_dir_sample/neoip_http.ico
+f 644 root root /etc/neoip_webpack/neoip_session.conf neoip-webpack.build_dir/config_dir_sample/neoip_session.conf
+d 755 root root /etc/neoip_webpack/casto -
+f 644 root root /etc/neoip_webpack/casto/neoip_casto.conf neoip-webpack.build_dir/config_dir_sample/casto/neoip_casto.conf
+f 755 root root /etc/neoip_webpack/neoip-ui-launcher.sh neoip-webpack.build_dir/config_dir_sample/neoip-ui-launcher.sh
+f 644 root root /etc/neoip_webpack/neoip_log.conf neoip-webpack.build_dir/config_dir_sample/neoip_log.conf
+d 755 root root /etc/neoip_webpack/kad_bstrap -
+f 644 root root /etc/neoip_webpack/kad_bstrap/kad_realm_neoip_bt.fixfile neoip-webpack.build_dir/config_dir_sample/kad_bstrap/kad_realm_neoip_bt.fixfile
+f 644 root root /etc/neoip_webpack/kad_bstrap/kad_realm_ntudp.fixfile neoip-webpack.build_dir/config_dir_sample/kad_bstrap/kad_realm_ntudp.fixfile
+f 755 root root /etc/neoip_webpack/neoip-dnsresolve.sh neoip-webpack.build_dir/config_dir_sample/neoip-dnsresolve.sh
+d 755 root root /etc/neoip_webpack/casti -
+f 644 root root /etc/neoip_webpack/casti/neoip_casti.conf neoip-webpack.build_dir/config_dir_sample/casti/neoip_casti.conf
+d 755 root root /etc/neoip_webpack/oload -
+f 644 root root /etc/neoip_webpack/oload/neoip_oload.conf neoip-webpack.build_dir/config_dir_sample/oload/neoip_oload.conf
+f 755 root root /usr/lib/neoip_webpack/neoip-webpack-bin neoip-webpack.build_dir/neoip-webpack-bin-static
+f 755 root root /usr/bin/neoip-webpack-ctrl neoip-webpack.build_dir/pkg_extrsc/neoip-webpack-ctrl.sh
+f 755 root root /usr/local/man/man8/neoip-webpack.8 neoip-webpack.build_dir/pkg_extrsc/neoip-webpack.8
+f 644 root root /usr/xdg/autostart/neoip-webpack.desktop neoip-webpack.build_dir/pkg_extrsc/neoip-webpack.desktop
+%postinstall <<EOF
+	
+if [ "$$SUDO_USER" != "" ]; then
+	su $$SUDO_USER -c "neoip-webpack-ctrl start"
+fi
+	exit 0
+EOF
+%postremove <<EOF
+	
+	exit 0
+EOF
+%preinstall <<EOF
+	[ "`pidof neoip-webpack-bin`" != "" ] && killall neoip-webpack-bin
+	exit 0
+EOF
+%preremove <<EOF
+	[ "`pidof neoip-webpack-bin`" != "" ] && killall neoip-webpack-bin
+	exit 0
+EOF

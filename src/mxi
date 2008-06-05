@@ -1,0 +1,13 @@
+# ! /bin/sh
+
+EXE_NAME=neoip_nunitapps
+#EXE_NAME=neoip_nunitapps-bin-static
+#EXE_NAME=neoip_get
+#EXE_NAME=neoip_get-bin-static
+#EXE_NAME=neoip_routerd
+#EXE_NAME=neoip_buddy
+#EXE_NAME=neoip_kad_daemon
+
+CONFIG_DIR=config_dir_debug/
+
+exec ./mx $EXE_NAME -c $CONFIG_DIR $*

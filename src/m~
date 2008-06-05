@@ -1,0 +1,13 @@
+# set teh variable to build a debug version
+export DEBUG_BUILD=1
+# make the makefile
+
+# local build
+#exec /bin/nice -n 19 make -f Makefile.static $*
+
+# Distributed build
+export DISTCC_HOSTS="jmehost2,lzo"
+#export DISTCC_HOSTS="localhost jmehost2,lzo"
+# jme - cpu_temp_watchdog.sh waits until the cpu is 67 C if it reach 73 C.
+#     - may be removed without any impact. it is very very specific to my laptop which overheats.
+exec make -f Makefile.static -j1 CXX="/home/jerome/bin/cpu_temp_watchdog.sh 70 73 && distcc" $*

@@ -1,0 +1,130 @@
+/*! \page libnss_neoip_man libnss_neoip
+
+libnss_neoip is a nss module to reroute nss request to external processes
+through TCP. This allows more flexibility than the usual 'lets modify this
+static file to get new name'.
+
+\section brief_description Description
+libnss_neoip is a nss module which intercepts the requests for the "hosts" service
+and forward them to other processes, called handler.
+The library and the handler communicates through a specific protocol on top
+of TCP (see \ref protocol_description).
+
+The handler registers themselves and can be done at 2 differents levels: user
+or system.
+- When registered at the user level, only the request from this user will be
+  intercepted.
+- When registered at the system level, request from any user will be intercepted
+
+
+\section protocol_description Protocol Description
+The protocol has been designed to be simple to use and to stick as much as possible
+to the usual "hosts" service semantic (see gethostbyname and gethostbyaddr).
+It is an ASCII protocol. The timeline is :
+-# the caller perform a gethostbyname or gethostbyaddr
+-# libnss_neoip intercepts the calls
+-# the calls is converted into a request string
+-# libnss_neoip forwards it to each handler in order (see \ref handler_order)
+-# each handler process the request and reply a reply string
+
+
+The request string format is : function/name/addr_family
+- function:
+The request function is gethostbyname or gethostbyaddr depending on the function
+intercepted by libnss_neoip modules.
+- name:
+The request name is the one required by the function and ultimatly comes from
+the caller of the original gethostbyname/getbyaddr.
+- addr_family
+The address family to which the name belongs. Currently only AF_INET and AF_INET6
+are allowed.
+
+Some examples "gethostbyaddr/10.0.0.1/AF_INET" or "gethostbyname/jerome.neoip/AF_INET"
+
+The reply string format depends on the result:
+- if the request failed, the reply string is "notfound"
+- if the request suceed, the reply string is "found/name/list_of_aliases/addr_family/list_of_addr
+  - example "found/jerome.NfkfkeoIP/jerome.etienne@jeje/AF_INET/127.1.42.1@192.168.1.2"
+  - the list of alias is zero or more string which are separated by @
+  - the list of address is zero or more dotted decimal addresses which are separated by @
+  - it has been done to match the struct hostent from the gethostbyname/gethostbyaddr API
+
+
+\section handler_order Handler order
+The library processes the server handler in sequence and follow the following rules:
+-# Process the user directory (~/.libnss_neoip)
+-# Process the system directory (/etc/libnss_neoip.d)
+
+To order the handler file in a given directory:
+-# read all the name in the directory
+-# keep only the one starting by "prio*"
+-# sort them in alphabetical order
+
+To process a given handler:
+- if the file is older than 24hours, considere the handler invalid
+- parse the handler file
+  - see \ref Handler File Format
+- if an error occurs in the socket processing, considere the handler invalid
+  - as an example of socket error, connection refused or connection closed during the exchange.
+- if the servers requires more than invalid_delay seconds to answer, considere the 
+  handler invalid.
+
+
+If an handler is considered invalid, the library attempts to delete it. It may 
+fails if the invalid handler is system-wide, so likely created by root, and
+the library is running under a non root user.
+
+
+\section handler_file_format Handler File Format
+- the format of the filename
+  - the filename MUST start by a prioXXX where XXX is a number between
+    000 and 999 included. This determine the order of the handler between them
+    (similar than the /etc/init.d mechanism)
+- the format of the file is a single line 3 field separated by a single space
+  - ip number in dotted decimal
+  - tcp port 
+  - invalid_timeout
+- WARNING this timeout is not the one of the requests but the one after which the handler is 
+  considered invalid
+- this timeout is used in case the handler file is still present by the handler server
+is down, nevertheles another process uses the same tcp address, so connecting it
+will succeed even it is not a dns_grabber server. This case is expected to be 
+rather rare but should still be handled properly. If this unknown tcp server closes
+the connection or reply data which doesnt match a reply_str, the handler file is considered
+invalid. This timer is for the case of the tcp server keeping the connection and 
+doing nothing, thus blocking the libnss_neoip client for ever... this timer
+allows to freeze the libnss_neoip client only once and during a limited amount
+of time.
+
+\section handler_registration Handler Registration
+When the server registers its handlers, it put a file in the proper directory
+(see \ref handler_file_format).
+
+It rewrite it periodically. This serves as a proof of liveness for the libnss_neoip
+and allows to handle error case where the dns_grabber client considered wrongly the
+handler file invalid.
+
+\section lib_install Library Installation
+- put neoip in the host: line of /etc/nssswitch.conf after files
+
+\section libnss_files
+- /etc/libnss_neoip.d: Directory for system wide libnss_neoip client
+- ~/.libnss_neoip: Directory for user-specific libnss_neoip client
+
+\section Possible improvements
+- to add a name filter in the handler file
+- to add a pid and exec name in the protocol
+- to add a username/groupname in the protocol
+  - is it ok ? i mean the libnss may be installed by root if so it is ok
+  - but if it is launched by a user it isnt...
+  - so it doesnt seem ok
+- to add a version in the protocol
+
+*/
+
+
+
+
+
+
+

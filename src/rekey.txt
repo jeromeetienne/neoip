@@ -1,0 +1,32 @@
+assume state = USING
+state	 = rekeying      
+if arcv_timeout is running, stop it
+arcv_key = recv_key
+arcv_validity = 1
+renew skey core
+recv_cnt++
+recv_key = derive(skey_core)
+send rekey_req(recv_cnt)
+stop timer for skey core expiration
+start timer for rekey_req rxmit
+                 --------- REKEY-REQ(n) --------->  
+					if( rcved key_cnt == xmit_cnt )
+						send rekey_ack(xmit_cnt)
+						exit
+					if( rcved key_cnt != xmit_cnt+1 )
+						exit
+					if( itor_state == USING )
+	                                        start rekey as itor
+					xmit_cnt++;
+					xmit_key = derive(skey_core)
+					send rekey_ack(xmit_cnt)
+                 <----- REKEY-ACK(n) ---------
+if( recv_cnt != recved key_cnt )
+	exit
+if( itor_state != REKEYING )
+	exit
+start arcv timeout
+itor_state	= using
+start timer for skey core expiration
+
+

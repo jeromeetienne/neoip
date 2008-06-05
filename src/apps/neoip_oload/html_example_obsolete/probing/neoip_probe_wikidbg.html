@@ -1,0 +1,53 @@
+<html>
+<head><title>neoip wikidbg probe</title></head>
+<body>
+
+This page just probes all the local port usual designed for neoip wikidbg 
+layer. and if an neoip application is found, it display them below.
+This is done to ease the finding of those applications as the ports
+binding is dynamic (inside a range).
+
+<h1>List of running neoip apps with wikidbg</h1>
+<ul id="neoip_apps_list"></ul>
+
+<script>
+// defined the namespace if not yet done
+if( typeof neoip == 'undefined' )	var neoip	= {};
+
+neoip.wikidbg_port_probe = function(probe_port)
+{
+	var	html_str = "";
+	// build the html requite to probe this local_port
+	html_str	+= "<script>"
+				+ "canon_name = '';" 
+				+ "summary = '';" 
+				+ "<\/script>";
+	html_str	+= "<script src=\"http://127.0.0.1:" + probe_port + "/"
+				+ "apps_info.js\"<\/script>\n";
+	html_str	+= "<script>"
+				+ "if(canon_name != ''){"
+				+ "	var list	= document.getElementById('neoip_apps_list');"
+				+ "	var newLink	= document.createElement('a');"
+				+ "	newLink.setAttribute('href', 'http://127.0.0.1:"+probe_port+"');"
+				+ "	newLink.appendChild(document.createTextNode(canon_name));"
+				+ "	var newNode	= document.createElement('li');"
+				+ "	newNode.appendChild(newLink);"
+				+ " 	newNode.appendChild(document.createTextNode(' - ' + summary));"
+				+ " 	list.appendChild(newNode);"
+				+ "}"
+				+ "<\/script>";
+	// return the just built html_str
+	return html_str;
+}
+</script>
+
+<script>
+	// scan all the default wikidbg ports
+	for(var curr_port = 9080; curr_port < 9090; curr_port++){
+		document.write(neoip.wikidbg_port_probe(curr_port));
+	}
+</script>
+
+
+</body>
+</html>

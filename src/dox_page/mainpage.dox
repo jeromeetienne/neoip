@@ -1,0 +1,17 @@
+/*! \mainpage Neoip Project
+
+The NeoIP project is based on \ref neoip-lib.
+
+\section apps Several applications are/will be built on top of it:
+- \ref neoip-router		: to provide ip connectivity between computers
+- \ref neoip-file		: to exchange files
+- \ref neoip-contact	: for live communication between users
+
+\section Links
+- there is a \ref glossary
+- thread model
+  - no protection against bizantine attacks
+- Applying the "it just works"
+- \ref neoip-code-policy
+
+*/

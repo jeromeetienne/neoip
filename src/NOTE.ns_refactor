@@ -1,0 +1,80 @@
+Thing to do to refactor the ns:
+-------------------------------
+- ns_db private data to use standard format and to check their grammar
+  o call that ns_db_pdata_gram
+- ns_publishget put it in another .c
+- ns_publishget to support to be server
+- document the whole thing
+- write a unittest
+  o publish 10 random records
+  o check if the publisher can read it
+  o unpublish 5 of them
+  o check if the query return the proper result
+- write a ns_publish watchdog
+  o periodically check if the published record can be get from the server
+  o unclear it will work as ns_query will find it in the local db
+- LATER some function takes their own struct, others uses ns_realm
+  o e.g. ns_db_get use ns_db
+  o e.g. ns_publish use ns_realm
+  o make up your mind and make it consistent
+    + i think to use ns_realm only in the _open and their own struct on all other is more flexible
+      * unclear
+    + for sure, not to always use ns_realm make the caller code more complex (bad for a library)
+- DONE rename ns_server_result_t to ns_result_t
+  o put it in specific .c
+  o have all layer use only those values
+- DONE ns_query to uniformize the local/remote query
+  o basically dont do any test during the open call
+  o perform the test on the next round
+  o remove the ns_query_req_is_local stuff and use the 0 timer stuff
+- DONE to support ns_publish and ns_query to be server
+  o the problem comes from the callback which cant happen immediatly
+  o what about the following
+    + init the whole struct as if will be sent over network
+    + if the local peer is server, start a 0 timer which perform the test and notify the result
+    + if the local peer isnt server, start the rxmit
+- LATER understand and fix the timers in NS
+  o looked at it a bit and it seems ok
+- DONE write a httpd display for nquery
+- DONE ns_publish to support to be a ns_server
+  o if the local peer is server for this realm, and realm is a star no need to send publish
+    + what about publishget ?
+- DONE in ns_publish add record in ns_publish_rec_create and remove them in ns_publish_rec_unpublish ?
+  o it isnt symmetrical 
+- DONE rewrite a full httpd display by realm
+- DONE ns_query to support to be a ns_server
+- DONE to propagate the expire_f of ns_db_add in all code
+  o currently they still provide a expire_ttl
+  o even if it is compatible, remove it to be cleaner
+- DONE all ns_* layer must return allocated struct and no more use static struct
+- DONE ns_realm to be init via a name, a peerid and its rdvpt
+  o the ns_clicnx_t to establish the nsock from it
+- DONE libmain to init all ns client layer by a ns_realm_open(realm_name)
+  o it open ns_publish, ns_query (which open ns_negcache), ns_clicnx_t
+  o ns_clicnx to find a server based on this realm_name
+  o if realm_name == "ns_mother", srv_peerid and srv_rdvpt are hardcoded
+- DONE ns_realm contains all the client informations for a realm
+  o ns_db, ns_server, ns_query, ns_publish, ns_clicnx
+- DONE ns_db fix the expire_ttl stuff
+- DONE ns_realm functions to return info and internal struct
+- DONE ns_query/ns_publish to use the ns_clicnx found in ns_realm
+- DONE if the ns_realm of a ns_query/ns_publish is null, use the default one
+- DONE ns_publish to remove ns_publishall
+- DONE ns_publish to handle publication with pkt_rxmit
+- DONE ns_server no more load/save the ns_db on disk
+- DONE ns_server functions to handle ns_server_cli and no more otsp_caddr
+- DONE ns_server check the pkt gram per packet
+- DONE ns_server to list all current clients in a list
+  o look at relay_srv
+- DONE ns_server to delete all record of a peerid when the client connection is closed
+- DONE ns_server to be init via a name
+  o build the cnxid from the name
+  o to listen on the proper connection from it
+- DONE ns_server to stored record in ns_db with no expiration
+  o thus any record in ns_db with an expiration is a record from another peer which has been locally cached here
+  o when a ns_server_cli is deleted, remove all record associated with this peerid
+- DONE ns_clicnx_t to support nsock
+  o look at relay_cli/srv
+  o if the client is disconnected, ns_publish must republish all record
+  o the connection must be reetablished
+  o maybe a idle timeout for this connection

@@ -1,0 +1,70 @@
+/*! \page neoip-ns NeoIP Name Service
+
+\ref neoip-ns is a core part of the \ref neoip-lib.
+It revolves aroung the concept of \ref ns-realm
+
+TODODODODODODDODODDODOD
+- do the stage of coding
+  - all the modules to code and THE ORDER
+  - \ref impl-ns-step
+- here is the \ref ns-packet
+- here is the \ref ns-api
+- flexible \ref ns-bootstrapping with a unified API
+- flexible \ref ns-arch with a unified API
+- flexible \ref ns-accesscontrol
+- flexible \ref ns-topology
+- tunable and dynamic \ref ns-role
+- \ref ns-record
+- \ref ns-search
+- \ref ns-topology
+
+\section neoip-ns-unanswered Unanswered questions
+- do i use stream connection or dgram connection ?
+- 
+
+\section ns-get Ns Get
+- TODO what are the feature of this operation
+  - how does this relate to the \ref ns-search
+  - see \ref ns-arch-flood-ns-get how does this relate to the \ref ns-arch 
+
+\section ns-put Ns Put
+- TODO what are the feature of this operation
+  - see \ref ns-arch-flood-ns-put how does this relate to the \ref ns-arch 
+  - what are the policy about uniqueness of records
+
+\section ns-db Ns Database
+The \ref ns-db is a database which store the \ref ns-record in a given \ref neoip-peer. 
+The \ref ns-server uses it to store the published \ref ns-record. The \ref ns-server and the
+\ref ns-client uses it to cache the \ref ns-record(s) (see \ref ns-record-ttl).
+
+\subsection ns-db-file Ns Database File
+- it is possible to load and save \ref ns-record(s) into \ref ns-db-file
+- this allows to keeps its contents across \ref neoip-peer launches.
+- An example of usage is the \ref ns-bootstrapping
+
+*/
+
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+/*!\page ns-api NS API
+
+\section basic notes on the API
+- inspire from gnutls style
+  - very neutral style which works well
+  - allow nice clean separation/protection of data type thanks to typedef struct slota_stt * slota
+- neoip_ns_realm = neoip_ns_realm_open( char *realm_name, neoip_ns_arch arch, neoip_ns_realm parent_realm )
+  - plus the credential management
+- neoip_ns_realm_close( neoip_ns_realm )
+- neoip_ns_realm_get_status
+- neoip_ns_search = neoip_ns_search_open()
+- neoip_ns_search_add(ablabl) stuff to actually build the search language
+- neoip_ns_search_close( neoip_ns_search )
+- neoip_ns_get = neoip_ns_get_open( neoip_ns_realm, neoip_ns_search, neoip_ns_record_cb callback, userptr )
+- neoip_ns_get_close( neoip_ns_get )
+  - needs a timeout
+
+- neoip_ns_put( neoip_ns_realm, neoip_ns_record )
+- neoip_ns_del( neoip_ns_realm, neoip_ns_record )
+
+*/

@@ -1,0 +1,1567 @@
+
+
+Internet Draft                                              P. Srisuresh
+Document: draft-srisuresh-behave-p2p-state-00.txt         Caymas Systems
+Expires: June 30, 2005                                           B. Ford
+                                                                  M.I.T.
+                                                                D. Kegel
+                                                               kegel.com
+                                                           December 2004
+
+
+                State of Peer-to-Peer(P2P) communication 
+                across Network Address Translators(NATs)
+
+
+Status of this Memo
+
+   By submitting this Internet-Draft, I certify that any applicable
+   patent or other IPR claims of which I am aware have been disclosed,
+   or will be disclosed, and any of which I become aware will be
+   disclosed, in accordance with RFC 3668.
+   
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups. Note that other
+   groups may also distribute working documents as Internet-Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/1id-abstracts.html
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html" 
+
+
+Abstract
+
+   This memo documents the methods known to be in use by the 
+   TCP/UDP based peer-to-peer (P2P) applications for communication 
+   in the presence of network address translators (NATs) at the 
+   current time. This memo is not an endorsement of the methods 
+   in use, but merely an attempt to undertsand the techniques used.   
+
+
+Table of Contents
+
+   1.  Introduction .................................................
+   2.  Terminology ..................................................
+
+
+
+Srisuresh, Ford & Kegel                                         [Page 1]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   3.  Techniques used by NAT-friendly P2P applications .............
+       3.1. Relaying ................................................
+       3.2. Connection reversal .....................................
+       3.3. UDP Hole Punching .......................................
+            3.3.1. Peers behind different NATs ......................
+            3.3.2. Peers behind the same NAT ........................
+            3.3.3. Peers separated by multiple NATs .................
+            3.3.4. Assumption of P2P-friendly NAT devices enroute ...
+       3.4. Simultaneous TCP Open ...................................
+       3.5. UDP port number prediction ..............................
+       3.6. TCP port number prediction ..............................
+   4.  Summary of observations ......................................
+       4.1. TCP/UDP hole punching ...................................
+       4.2. Symmetric NATs are not P2P friendly .....................
+       4.3. Peer discovery ..........................................
+       4.4. Hairpin translation .....................................
+   5.  Security considerations ......................................
+       5.1. IP address aliasing .....................................
+       5.2. Denial-of-service attacks ...............................
+       5.3. Man-in-the-middle attacks ...............................
+       5.4. Impact on NAT device security ...........................
+   6.  Acknowledgments ..............................................
+   7.  Informative References .......................................
+   8.  Authors' addresses ...........................................
+
+
+1. Introduction
+
+   Present-day Internet has seen ubiquitous deployment of network
+   address translators (NATs). There are a variety of NAT devices and
+   a variety of network topologies utilizing the NAT devices in the
+   deployments. The asymmetric addressing and connectivity regimes
+   established by the NAT devices has created unique problems for
+   peer-to-peer (P2P) applications and protocols, such as 
+   teleconferencing and multiplayer on-line gaming. These issues are
+   likely to persist even into the IPv6 world, where a NAT is used
+   as an IPv4 compatibility mechanism [NAT-PT].
+
+   Currently deployed NAT devices are designed primarily around the
+   client/server paradigm, in which relatively anonymous client machines
+   inside a private network initiate connections to public servers with
+   stable IP addresses and DNS names. NAT devices encountered enroute
+   provide dynamic address assignment for the client machines. The
+   anonymity and inaccessibility of the internal hosts behind a NAT
+   device is not a problem for applications such as web browsers, which
+   only need to initiate outgoing connections. This inaccessibility is
+   sometimes percieved as a privacy benefit.
+
+
+
+
+Srisuresh, Ford & Kegel                                         [Page 2]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   In the peer-to-peer paradigm, however, Internet hosts that would
+   normally be considered "clients" need to establish communication
+   sessions directly with each other. The initiator and the responder
+   might lie behind different NAT devices with neither endpoint 
+   having a permanent IP address or other form of public network
+   presence. A common on-line gaming architecture, for example,
+   is for the participating application hosts to contact a well-known
+   server for initialization and administration purposes. Subsequent
+   to this, the hosts establish direct connections with each other
+   for fast and efficient propagation of updates during game play. 
+   Similarly, a file sharing application might contact a well-known
+   server for resource discovery or searching, but establish direct
+   connections with peer hosts for data transfer. NAT devices create
+   problems for peer-to-peer connections because hosts behind a
+   NAT device normally have no permanently visible public ports on the
+   Internet to which incoming TCP or UDP connections from other peers
+   can be directed.  RFC 3235 [NAT-APPL] briefly addresses this issue.
+
+   In this document, we summarize the currently known methods by which
+   P2P applications work around the presence of NAT devices.
+
+
+2. Terminology
+
+   Readers are urged to refer [NAT-TERM] for information on NAT
+   taxonomy and terminology. Traditional NAT is the most common type
+   of NAT device deployed. Readers may refer [NAT-TRAD] for detailed
+   information on traditional NAT. Traditional NAT has two main
+   varieties - Basic NAT and Network Address/Port Translator (NAPT).
+
+   NAPT is by far the most commonly deployed NAT device. NAPT allows
+   multiple internal hosts to share a single public IP address
+   simultaneously. When an internal host opens an outgoing TCP or UDP
+   session through a NAPT, the NAPT assigns the session a public IP
+   address and port number so that subsequent response packets from
+   the external endpoint can be received by the NAPT, translated, and
+   forwarded to the internal host. The effect is that the NAPT
+   establishes a NAT session to translate the (private IP address, 
+   private port number) tuple to (public IP address, public port 
+   number) tuple and vice versa for the duration of the session. An
+   issue of relevance to P2P applications is how the NAT behaves when
+   an internal host initiates multiple simultaneous sessions from a
+   single (private IP, private port) endpoint to multiple distinct
+   endpoints on the external network. 
+
+   Additional terms that further classify NAPT implementation are
+   defined in more recent work [STUN] and are summarized below.
+
+
+
+
+Srisuresh, Ford & Kegel                                         [Page 3]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   Cone NAT
+      The fundamental property of Cone NAT is that it reuses port
+      binding assigned to a private host endpoint (identified by 
+      the combination of private IP address and protocol specific 
+      port number) for all sessions initiated by the private host
+      from the same endpoint, while the port binding is alive. Cone
+      NAT creates port binding between a (private IP, private port)
+      tuple and a (public IP, public port) tuple for translation
+      purposes.
+
+      For example, suppose Client A in figure 1 initiates two
+      simultaneous outgoing sessions through a cone NAT, from the same
+      internal endpoint (10.0.0.1:1234) to two different external
+      servers, S1 and S2. The cone NAT assigns just one public endpoint
+      155.99.25.11:62000 to both these sessions, ensuring that the
+      "identity" of the client's endpoint is maintained across address
+      translation. Since Basic-NAT devices do not modify port numbers
+      as packets traverse the device, Basic-NAT device can be viewed
+      as a degenerate form of Cone NAT.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Srisuresh, Ford & Kegel                                         [Page 4]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+
+           Server S1                                     Server S2
+        18.181.0.31:1235                              138.76.29.7:1235
+               |                                             |
+               |                                             |
+               +----------------------+----------------------+
+                                      |
+          ^  Session 1 (A-S1)  ^      |      ^  Session 2 (A-S2)  ^
+          |  18.181.0.31:1235  |      |      |  138.76.29.7:1235  |
+          | 155.99.25.11:62000 |      |      | 155.99.25.11:62000 |
+                                      |
+                                +--------------+
+                                | 155.99.25.11 |
+                                |              |
+                                | Any type of  |
+                                |   Cone NAT   |
+                                +--------------+
+                                      |
+          ^  Session 1 (A-S1)  ^      |      ^  Session 2 (A-S2)  ^
+          |  18.181.0.31:1235  |      |      |  138.76.29.7:1235  |
+          |   10.0.0.1:1234    |      |      |   10.0.0.1:1234    |
+                                      |
+                                   Client A
+                                10.0.0.1:1234
+
+
+      Figure 1: Cone NAT - Reuse of port binding for multiple sessions
+
+   Symmetric NAT
+      A symmetric NAT, in contrast, does not use port bindings.
+      A Symmetric NAT assigns a new public port to each new session
+      traversing the NAT device. For example, suppose Client A in
+      figure 2 initiates two outgoing sessions from the same endpoint,
+      one with S1 and another with S2. The same client endpoint is
+      connecting to the two external servers S1 and S2. When the first
+      session to server S1 traverses the symmetric NAT, the symmetric
+      NAT assigns port 62000 to translate the client end-point. When
+      the second session from the same client end-point to server S2
+      traverses the symmetric NAT, the symmetric NAT will assign a 
+      different port 62001 to translate the same client end-point. As
+      a result, server S1 sees the client endpoint as
+      155.99.25.11:62000, whereas server S2 sees the same client
+      endpoint differently as 155.99.25.11:62001. The symmetric NAT, 
+      however, is able to differentiate between the two sessions for
+      translation purposes because the external endpoints involved in
+      the two sessions (those of S1 and S2) differ, even as the
+      endpoint identity of the client application is lost across the
+      address translation boundary.     
+
+
+
+Srisuresh, Ford & Kegel                                         [Page 5]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+           Server S1                                     Server S2
+        18.181.0.31:1235                              138.76.29.7:1235
+               |                                             |
+               |                                             |
+               +----------------------+----------------------+
+                                      |
+          ^  Session 1 (A-S1)  ^      |      ^  Session 2 (A-S2)  ^
+          |  18.181.0.31:1235  |      |      |  138.76.29.7:1235  |
+          | 155.99.25.11:62000 |      |      | 155.99.25.11:62001 |
+                                      |
+                               +---------------+
+                               | 155.99.25.11  |
+                               |               |
+                               | Symmetric     |
+                               | NAT           |
+                               +---------------+
+                                      |
+          ^  Session 1 (A-S1)  ^      |      ^  Session 2 (A-S2)  ^
+          |  18.181.0.31:1235  |      |      |  138.76.29.7:1235  |
+          |   10.0.0.1:1234    |      |      |   10.0.0.1:1234    |
+                                      |
+                                   Client A
+                                10.0.0.1:1234
+
+
+       Figure 2: Symmetric NAT - Port binding not in use for sessions
+
+   Cone NAT is further classified according to how liberally the NAT
+   accepts incoming traffic directed to an already-established (public
+   IP, public port) tuple. The following Cone NAT variations are
+   defined in [STUN], but restated here for additional explanation.
+   This classification generally applies only to UDP traffic, since
+   NATs reject incoming TCP connection attempts unconditionally
+   unless specifically configured to do otherwise. 
+
+   Full Cone NAT
+      Subsequent to establishing port binding at the start of an
+      outgoing session, a full cone NAT will accept incoming traffic
+      to the corresponding public port from ANY external endpoint on
+      the public network. Full cone NAT is also sometimes referred 
+      as "promiscuous" NAT.
+
+   Address-restricted Cone NAT
+      Subsequent to establishing port binding at the start of an
+      outgoing session, Address-restricted Cone NAT will accept
+      incoming traffic to the corresponding public port from only
+      those external endpoints whose IP address match the address
+      of a node to which the internal host has previously sent one
+
+
+
+Srisuresh, Ford & Kegel                                         [Page 6]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+      or more outgoing packets.
+
+   Port-restricted Cone NAT
+      Subsequent to establishing port binding at the start of an
+      outgoing session, Port-restricted Cone NAT will accept
+      incoming traffic to the corresponding public port from only
+      those external endpoints to which the internal host has
+      previously sent one or more outgoing packets. Port-restricted
+      Cone NAT is the true-to-spirit implementation of NAPT, as
+      defined. 
+
+      Port-restricted Cone NAT provides internal nodes the same
+      level of protection against unsolicited incoming UDP traffic
+      as does a symmetric NAT. This is because Port-restricted Cone
+      NAT and Symmetric NAT have one thing in common. They both
+      maintain granular NAT-sessions. I.e., every single 5-tuple UDP
+      session permitted for traversal by the NAT is maintained within
+      the NAT as a NAT-session. As a result, incoming packet traffic
+      is limited to only those sessions for which the NAT is aware of
+      an outgoing NAT-session.
+
+      This is not the case with Address-restricted Cone NAT and Full
+      Cone NAT. NAT sessions maintained by Address-restricted Cone
+      NAT and Full Cone NAT are less granular. The NAT-sessions
+      maintained by an Address-restricted Cone NAT, for example, use
+      wildcard match on the external UDP port. The NAT-sessions
+      maintained by a Full Cone NAT, for example, use wildcard match
+      on the external address as well as the external UDP port. As a
+      result, the NAT will permit new UDP sessions initiated from an
+      external endpoint to the public port bound to the private
+      endpoint, even as the private endpoint did not originate an
+      outgoing session to the external endpoint. Address-restricted
+      Cone NAT as well as Full Cone NAT will permit traversal of the
+      new incoming session traffic. 
+
+   Finally, we define the following new terms for classifying 
+   P2P-relevant behavior across NAT devices.
+
+   P2P-Application
+      P2P-application as used in this document is an application in
+      which each P2P participant registers with a public
+      registration server, and subsequently uses either its 
+      private endpoint, or public endpoint, or both, to establish
+      peering sessions.
+
+   NAT-friendly P2P application
+      NAT-friendly P2P application is a P2P application that is 
+      designed to work effectively even as peering nodes are
+
+
+
+Srisuresh, Ford & Kegel                                         [Page 7]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+      located in multiple distinct IP address realms, connected 
+      by one or more NATs. 
+ 
+   P2P-friendly NAT
+      P2P-friendly NAT is a NAT device that permits the traversal
+      of P2P application traffic across itself. A key requirement
+      for a P2P-friendly NAT is the ability to maintain endpoint
+      identity of a P2P application host when the P2P application
+      is initiated. All variations of Cone NAT are good examples
+      of P2P-friendly NAT devices. Symmetric NAT is a good example
+      of a NAT device that is not P2P friendly.
+
+   Loopback translation / Hairpin translation
+      When a host in the private domain of a NAT device attempts to
+      connect with another host behind the same NAT device using
+      the public address of the host, the NAT device performs the 
+      equivalent of a "Twice-nat" translation on the packet as
+      follows. The originating host's private endpoint is translated
+      into its assigned public endpoint, and the target host's public
+      endpoint is translated into its private endpoint, before 
+      the packet is forwarded to the target host. We refer the above
+      translation performed by a NAT device as "Loopback translation".
+      This is also referred sometimes as "Hairpin translation".
+
+
+3. Techniques used by P2P applications to work with NATs
+
+   This section reviews in detail the currently known techniques for
+   implementing peer-to-peer communication over existing NAT devices,
+   from the perspective of the application or protocol designer. The
+   readers will note that the applications assume an 
+   Address/Port-restricted Cone NAT in majority of the cases below.
+
+3.1. Relaying 
+
+   The most reliable, but least efficient method of implementing peer-
+   to-peer communication in the presence of a NAT device is to make the
+   peer-to-peer communication look to the network like client/server
+   communication through relaying.  For example, suppose two client
+   hosts A and B, in figure 3, have each initiated TCP or UDP 
+   connections to a well-known server S, which has a permanent IP
+   address.  The clients reside on separate private networks, and
+   their respective NAT devices prevent either client from directly
+   initiating a connection to the other.
+
+
+
+
+
+
+
+Srisuresh, Ford & Kegel                                         [Page 8]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+                                 Server S
+                              18.181.0.31:1234
+                                     |
+        +----------------------------+----------------------------+
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+        | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+        | | 155.99.25.11:62000     |   |  138.76.29.7:31000     | |
+        |                                                         |
+      +--------------+                                 +--------------+
+      | 155.99.25.11 |                                 | 138.76.29.7  |
+      |              |                                 |              |
+      | Symmetric or |                                 | Symmetric or |
+      | Cone NAT A   |                                 | Cone NAT B   |
+      +--------------+                                 +--------------+
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+        | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+        | |     10.0.0.1:1234      |   |     10.1.1.3:1234      | |
+        |                                                         |
+        |                                                         |
+     Client A                                                 Client B
+     10.0.0.1:1234                                        10.1.1.3:1234
+
+   Figure 3: Use of Client-Server sessions & relay server to emulate P2P
+
+   Instead of attempting a direct connection, the two clients can simply
+   use the server S to relay messages between them.  For example, to
+   send a message to client B, client A simply sends the message to
+   server S along its already-established client/server connection, and
+   server S then sends the message on to client B using its existing
+   client/server connection with B.
+
+   This method has the advantage that it will always work as long as
+   both clients have connectivity to the server. The enroute NAT device
+   is not assumed to be P2P friendly. Its obvious disadvantages are that
+   it consumes the server's processing power and network bandwidth, and
+   communication latency between the peering clients is likely to be
+   increased even if the server is well-connected. The TURN protocol
+   [TURN] defines a method of implementing relaying in a relatively
+   secure fashion.
+
+3.2. Connection reversal
+
+   The following connection reversal technique for a direct P2P
+   communication works only when one of the clients (i.e., peers) is
+   behind a NAT device. For example, suppose client A is behind a NAT
+   but client B has a globally routable IP address, as in figure 4.
+
+
+
+Srisuresh, Ford & Kegel                                         [Page 9]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+
+                                 Server S
+                              18.181.0.31:1234
+                                     |
+        +----------------------------+----------------------------+
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+        | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+        | | 155.99.25.11:62000     |   |  138.76.29.7:1234      | |
+        |                                                         |
+        | ^ P2P Session (A-B)      ^   |  P2P Session (B-A)     | |
+        | |  138.76.29.7:1234      |   |  155.99.25.11:62000    | |
+        | | 155.99.25.11:62000     |   v  138.76.29.7:31000     v |
+        |                                                         |
+      +--------------+                                            |    
+      | 155.99.25.11 |                                            |
+      |              |                                            |
+      | Address/Port |                                            |
+      | Restricted   |                                            |
+      | Cone NAT A   |                                            |
+      +--------------+                                            |
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^                              |
+        | |  18.181.0.31:1234      |                              |
+        | |     10.0.0.1:1234      |                              |
+        |                                                         |
+        | ^ P2P Session (A-B)      ^                              |
+        | |  138.76.29.7:1234      |                              |
+        | |     10.0.0.1:1234      |                              |
+        |                                                         |
+     Private Client A                                 Public Client B
+     10.0.0.1:1234                                    138.76.29.7:1234
+
+   Figure 4: Force private client to initiate session for Direct-P2P
+
+   Client A has private IP address 10.0.0.1, and the application is
+   using TCP port 1234.  This client has established a connection with
+   server S at public IP address 18.181.0.31 and port 1235.  NAT A has
+   assigned TCP port 62000, at its own public IP address 155.99.25.11,
+   to serve as the temporary public endpoint address for A's session
+   with S: therefore, server S believes that client A is at IP address
+   155.99.25.11 using port 62000.  Client B, however, has its own
+   permanent IP address, 138.76.29.7, and the peer-to-peer application
+   on B is accepting TCP connections at port 1234.
+
+   Now suppose client B would like to initiate a peer-to-peer
+   communication session with client A.  B might first attempt to
+   contact client A either at the address client A believes itself to
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 10]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   have, namely 10.0.0.1:1234, or at the address of A as observed by
+   server S, namely 155.99.25.11:62000.  In either case, however, the
+   connection will fail.  In the first case, traffic directed to IP
+   address 10.0.0.1 will simply be dropped by the network because
+   10.0.0.1 is not a publicly routable IP address.  In the second case,
+   the TCP SYN request from B will arrive at NAT A directed to port
+   62000, but NAT A will reject the connection request because only
+   outgoing connections are allowed.
+
+   After attempting and failing to establish a direct connection to A,
+   client B can use server S to relay a request to client A to initiate
+   a "reversed" connection to client B.  Client A, upon receiving this
+   relayed request through S, opens a TCP connection to client B at B's
+   public IP address and port number.  NAT A allows the connection to
+   proceed because it is originating inside the firewall, and client B
+   can receive the connection because it is not behind a NAT device.
+
+   A variety of current peer-to-peer applications implement this
+   technique. Its main limitation, of course, is that it only works so
+   long as only one of the communicating peers is behind a NAT and the
+   NAT is P2P-friendly, such as a Cone NAT. In the increasingly common
+   case where both peers can be behind NATs, the method fails. Because
+   connection reversal is not a general solution to the problem, it is
+   NOT recommended as a primary strategy. NAT-friendly P2P 
+   applications may choose to attempt connection reversal, but should
+   be able to fall back automatically to another mechanism such as
+   relaying if neither a "forward" nor a "reverse" connection can be
+   established.
+
+3.3. UDP hole punching
+
+   UDP hole punching relies on the properties of common firewalls and
+   cone NATs to allow appropriately designed peer-to-peer applications
+   to "punch holes" through the NAT device and establish direct
+   connectivity with each other, even when both communicating hosts
+   lie behind NAT devices. This technique was mentioned briefly in
+   section 5.1 of RFC 3027 [NAT-PROT], described in [KEGEL], and used
+   in some recent protocols [TEREDO, ICE]. This technique has been
+   used primarily with UDP applications, but not as reliably with TCP
+   applications. Readers may refer Section 3.4 for details on 
+   "Simultaneous TCP open", also known sometimes as "TCP hole 
+   punching".
+  
+   We will consider two specific scenarios, and how applications are
+   designed to handle both of them gracefully.  In the first situation,
+   representing the common case, two clients desiring direct peer-to-
+   peer communication reside behind two different NATs.  In the second,
+   the two clients actually reside behind the same NAT, but do not
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 11]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   necessarily know that they do.
+
+3.3.1. Peers behind different NATs
+
+   Suppose clients A and B both have private IP addresses and lie behind
+   different network address translators as in figure 5.  The 
+   peer-to-peer application running on clients A and B and on server S
+   each use UDP port 1234. A and B have each initiated UDP communication
+   sessions with server S, causing NAT A to assign its own public UDP
+   port 62000 for A's session with S, and causing NAT B to assign its
+   port 31000 to B's session with S, respectively.
+
+                                 Server S
+                              18.181.0.31:1234
+                                     |
+        +----------------------------+----------------------------+
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+        | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+        | | 155.99.25.11:62000     |   |  138.76.29.7:31000     | |
+        |                                                         |
+        | ^ P2P Session (A-B)      ^   ^  P2P Session (B-A)     ^ |
+        | |  138.76.29.7:31000     |   |  155.99.25.11:62000    | |
+        | | 155.99.25.11:62000     |   |  138.76.29.7:31000     | |
+        |                                                         |
+      +--------------+                                 +--------------+
+      | 155.99.25.11 |                                 | 138.76.29.7  |
+      |              |                                 |              |
+      | Address/Port |                                 | Address/port |
+      | Restricted   |                                 | Restricted   |
+      | Cone NAT A   |                                 | Cone NAT B   |
+      +--------------+                                 +--------------+
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+        | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+        | |     10.0.0.1:1234      |   |     10.1.1.3:1234      | |
+        |                                                         |
+        | ^ P2P Session (A-B)      ^   ^  P2P Session (B-A)     ^ |
+        | |  138.76.29.7:31000     |   |  155.99.25.11:62000    | |
+        | |     10.0.0.1:1234      |   |      10.1.1.3:1234     | |
+        |                                                         |
+     Client A                                                 Client B
+     10.0.0.1:1234                                        10.1.1.3:1234
+
+   Figure 5: Coordinate simultaneous outgoing sessions for Direct-P2P 
+
+   Now suppose that client A wants to establish a UDP communication
+   session directly with client B.  If A simply starts sending UDP
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 12]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   messages to B's public address, 138.76.29.7:31000, then NAT B will
+   typically discard these incoming messages (unless it is a full cone
+   NAT), because the source address and port number does not match those
+   of S, with which the original outgoing session was established.
+   Similarly, if B simply starts sending UDP messages to A's public
+   address and port number, then NAT A will typically discard these
+   messages.
+
+   Suppose A starts sending UDP messages to B's public address, however,
+   and simultaneously relays a request through server S to B, asking B
+   to start sending UDP messages to A's public address.  A's outgoing
+   messages directed to B's public address (138.76.29.7:31000) cause NAT
+   A to open up a new communication session between A's private address
+   and B's public address.  At the same time, B's messages to A's public
+   address (155.99.25.11:62000) cause NAT B to open up a new
+   communication session between B's private address and A's public
+   address.  Once the new UDP sessions have been opened up in each
+   direction, client A and B can communicate with each other directly
+   without further burden on the "introduction" server S.
+
+   The UDP hole punching technique has several useful properties. Once
+   a direct peer-to-peer UDP connection has been established between two
+   clients behind NAT devices, either party on that connection can in
+   turn take over the role of "introducer" and help the other party
+   establish peer-to-peer connections with additional peers, minimizing
+   the load on the initial introduction server S.  The application does
+   not need to attempt to detect the kind of NAT device it is behind, 
+   if any [STUN], since the procedure above will establish peer-to-peer
+   communication channels equally well if either or both clients do not
+   happen to be behind a NAT device. The UDP hole punching technique
+   even works automatically with multiple NATs, where one or both
+   clients are removed from the public Internet via two or more levels
+   of address translation.
+
+3.3.2. Peers behind the same NAT
+
+   Now consider the scenario in which the two clients (probably
+   unknowingly) happen to reside behind the same NAT, and are therefore
+   located in the same private IP address space, as in figure 6. 
+   Client A has established a UDP session with server S, to which the
+   common NAT has assigned public port number 62000. Client B has
+   similarly established a session with S, to which the NAT has
+   assigned public port number 62001.
+
+
+
+
+
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 13]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+                                Server S
+                            18.181.0.31:1234
+                                    |
+        ^ Relay-Req Session(A-S) ^  | ^ Relay-Req Session(B-S) ^
+        |  18.181.0.31:1234      |  | |  18.181.0.31:1234      |
+        | 155.99.25.11:62000     |  | |  155.99.25.11:62001    |
+                                    |
+                             +--------------+
+                             | 155.99.25.11 |
+                             |              |
+                             | Address/Port |
+                             | Restricted   |
+                             | Cone NAT     |
+                             +--------------+
+                                    |
+      +-----------------------------+----------------------------+
+      |                                                          |
+      |                                                          |  
+      | ^ Relay-Req Session(A-S) ^    ^ Relay-Req Session(B-S) ^ |
+      | |  18.181.0.31:1234      |    |  18.181.0.31:1234      | |
+      | |     10.0.0.1:1234      |    |     10.1.1.3:1234      | |
+      |                                                          |
+      | ^ P2P Session-try1(A-B)  ^    ^  P2P Session-try1 (B-A)^ |
+      | |     10.1.1.3:1234      |    |      10.0.0.1:1234     | |
+      | |     10.0.0.1:1234      |    |      10.1.1.3:1234     | |
+      |                                                          |
+      | ^ P2P Session-try2 (A-B) ^    ^  P2P Session-try2 (B-A)^ |
+      | | 155.99.25.11:62001     |    |  155.99.25.11:62000    | |
+      | |     10.0.0.1:1234      |    |      10.1.1.3:1234     | |
+      |                                                          |
+   Client A                                                   Client B
+   10.0.0.1:1234                                         10.1.1.3:1234
+
+   Figure 6: Register private identity & NAT identity with Relay server.
+
+   Suppose that A and B use the UDP hole punching technique as outlined
+   above to establish a communication channel using server S as an
+   introducer.  Then A and B will learn each other's public IP addresses
+   and port numbers as observed by server S, and start sending each
+   other messages at those public addresses.  The two clients will be
+   able to communicate with each other this way as long as the NAT
+   allows hosts on the internal network to open translated UDP sessions
+   with other internal hosts and not just with external hosts. We refer
+   to this situation as "loopback translation," because packets arriving
+   at the NAT from the private network are translated and then "looped
+   back" to the private network rather than being passed through to the
+   public network.  For example, when A sends a UDP packet to B's public
+   address, the packet initially has a source IP address and port number
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 14]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   of 10.0.0.1:124 and a destination of 155.99.25.11:62001.  The NAT
+   receives this packet, translates it to have a source of
+   155.99.25.11:62000 (A's public address) and a destination of
+   10.1.1.3:1234, and then forwards it on to B.  Even if loopback
+   translation is supported by the NAT, this translation and forwarding
+   step is obviously unnecessary in this situation, and is likely to add
+   latency to the dialog between A and B as well as burdening the NAT.
+
+   The solution to this problem is straightforward, however.  When A and
+   B initially exchange address information through server S, they
+   should include their own IP addresses and port numbers as "observed"
+   by themselves, as well as their addresses as observed by S.  The
+   clients then simultaneously start sending packets to each other at
+   each of the alternative addresses they know about, and use the first
+   address that leads to successful communication.  If the two clients
+   are behind the same NAT, then the packets directed to their private
+   addresses are likely to arrive first, resulting in a direct
+   communication channel not involving the NAT.  If the two clients are
+   behind different NATs, then the packets directed to their private
+   addresses will fail to reach each other at all, but the clients will
+   hopefully establish connectivity using their respective public
+   addresses.  It is important that these packets be authenticated in
+   some way, however, since in the case of different NATs it is entirely
+   possible for A's messages directed at B's private address to reach
+   some other, unrelated node on A's private network, or vice versa.
+
+3.3.3. Peers separated by multiple NATs 
+
+   In some topologies involving multiple NAT devices, it is not
+   possible for two clients to establish an "optimal" P2P route between
+   them without specific knowledge of the topology.  Consider for
+   example the situation, depicted in figure 7.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 15]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+                                Server S
+                            18.181.0.31:1234
+                                   |
+        ^ Relay-Req Session(A-S) ^ | ^ Relay-Req Session(B-S) ^
+        |  18.181.0.31:1234      | | |  18.181.0.31:1234      |
+        | 155.99.25.11:62000     | | | 155.99.25.11:62001     |
+                                   |
+                            +--------------+
+                            | 155.99.25.11 |
+                            |              |
+                            | Address/Port |
+                            | Restricted   |
+                            | Cone NAT X   |
+                            | (Supporting  |
+                            | Loopback     |
+                            | Translation) |
+                            +--------------+
+                                   |
+      +----------------------------+----------------------------+
+      |                                                         |
+      | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+      | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+      | |  192.168.1.1:30000     |   |  192.168.1.2:31000     | |
+      |                                                         |
+      | ^ P2P Session (A-B)      ^   ^  P2P Session (B-A)     ^ |
+      | |  155.99.25.11:62001    |   |   155.99.25.11:62000   | |
+      | |   192.168.1.1:30000    |   |    192.168.1.2:31000   | |
+      |                                                         |
+   +--------------+                                  +--------------+
+   | 192.168.1.1  |                                  | 192.168.1.2  |
+   |              |                                  |              |
+   | Address/Port |                                  | Address/Port |
+   | Restricted   |                                  | Restricted   |
+   | Cone-NAT A   |                                  | Cone-NAT B   |
+   +--------------+                                  +--------------+
+       |                                                        |
+       | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S)^ |
+       | |  18.181.0.31:1234      |   |  18.181.0.31:1234     | |
+       | |     10.0.0.1:1234      |   |     10.1.1.3:1234     | |
+       |                                                        |
+       | ^ P2P Session (A-B)      ^   ^  P2P Session (B-A)    ^ |
+       | |  155.99.25.11:62001    |   |  155.99.25.11:62000   | |
+       | |      10.0.0.1:1234     |   |      10.1.1.3:1234    | |
+       |                                                        |
+   Client A                                                  Client B
+   10.0.0.1:1234                                        10.1.1.3:1234
+
+   Figure 7: Use of Loopback translation to facilitate Direct-P2P
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 16]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+
+   Suppose NAT X is a large industrial Cone NAT deployed by an internet
+   service provider (ISP) to multiplex many customers onto a few public
+   IP addresses, and NATs A and B are small consumer NAT gateways
+   deployed independently by two of the ISP's customers to multiplex
+   their private home networks onto their respective ISP-provided IP
+   addresses.  Only server S and NAT X have globally routable IP
+   addresses; the "public" IP addresses used by NAT A and NAT B are
+   actually private to the ISP's addressing realm, while client A's and
+   B's addresses in turn are private to the addressing realms of NAT A
+   and B, respectively.  Each client initiates an outgoing connection to
+   server S as before, causing NATs A and B each to create a single
+   public/private translation, and causing NAT X to establish a
+   public/private translation for each session.
+
+   Now suppose clients A and B attempt to establish a direct peer-to-
+   peer UDP connection.  The optimal method would be for client A to
+   send messages to client B's public address at NAT B,
+   192.168.1.2:31000 in the ISP's addressing realm, and for client B to
+   send messages to A's public address at NAT B, namely
+   192.168.1.1:30000.  Unfortunately, A and B have no way to learn these
+   addresses, because server S only sees the "global" public addresses
+   of the clients, 155.99.25.11:62000 and 155.99.25.11:62001.  Even if A
+   and B had some way to learn these addresses, there is still no
+   guarantee that they would be usable because the address assignments
+   in the ISP's private addressing realm might conflict with unrelated
+   address assignments in the clients' private realms.  The clients
+   therefore have no choice but to use their global public addresses as
+   seen by S for their P2P communication, and rely on NAT X to provide
+   loopback translation.
+
+3.3.4. Assumption of P2P-friendly NAT devices enroute
+
+   The UDP hole punching technique has a caveat in that it works only
+   if the traversing NAT is a P2P-friendly NAT, such as a Cone NAT.
+   When a symmetric NAT is encountered enroute, P2P application is 
+   unable to reuse an already-established translation endpoint for
+   communication with different external destinations and the
+   technique would fail. However, Cone NATs are widely deployed in
+   the Internet. That makes the UDP hole punching technique broadly
+   applicable; nevertheless a substantial fraction of deployed NATs
+   are symmetric NATs and do not support the UDP hole punching
+   technique.
+
+3.4. Simultaneous TCP Open
+
+   Simultaneous TCP open (also known sometimes as TCP hole punching)
+   technique is used in some cases to establish direct peer-to-peer
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 17]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   TCP connections between a pair of nodes that are both behind
+   P2P-friendly NAT devices that implement Cone NAT behavior on
+   their TCP traffic. Most TCP sessions start with one endpoint
+   sending a SYN packet, to which the other party responds with a
+   SYN-ACK packet. It is permissible, however, for two endpoints to
+   start a TCP session by simultaneously sending each other SYN
+   packets, to which each party subsequently responds with a
+   separate ACK. This procedure is referred as "simultaneous TCP
+   Open" technique. However, "Simultaneous TCP Open" is not
+   implemented correctly on many systems, including NAT devices.
+
+   If a NAT device receives a TCP SYN packet from outside the private
+   network attempting to initiate an incoming TCP connection, the
+   NAT device will normally reject the connection attempt by either
+   dropping the SYN packet or sending back a TCP RST (connection reset)
+   packet. In the case of SYN timeout or connection reset, the P2P
+   endpoint will continue to resend a SYN packet, until the peer did
+   the same from its end. 
+
+   When a SYN packet arrives with source and destination addresses and
+   port numbers that correspond to a TCP session that the NAT device
+   believes is already active, then the NAT device will allow the
+   packet to pass through. In particular, if the NAT device has just
+   recently seen and transmitted an outgoing SYN packet with the same
+   addresses and port numbers, then it will consider the session
+   active and allow the incoming SYN through. If clients A and B can
+   each initiate an outgoing TCP connection with the other client
+   timed so that each client's outgoing SYN passes through its local
+   NAT device before either SYN reaches the opposite NAT device,
+   then a working peer-to-peer TCP connection will result.
+
+   This technique may not always work reliably for the following
+   reason(s). If either node's SYN packet arrives at the remote
+   NAT device too quickly (before the peering node had a chance to
+   send the SYN packet), then the remote NAT device may either 
+   drop the SYN packet or reject the SYN with a RST packet. This
+   could cause the local NAT device in turn to close the new 
+   NAT-session immediately or initiate end-of-session timeout 
+   (refer section 2.6 of [NAT-TERM]) so as to close the
+   NAT-session at the end of the timeout. Even as both peering 
+   nodes simultaneously initiate continued SYN retransmission
+   attempts, some remote NAT devices might not let the incoming
+   SYNs through if the NAT session is in end-of-session timeout
+   state. This in turn would cause the TCP connection to be not
+   established.
+   
+
+3.5. UDP port number prediction
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 18]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+
+   A variant of the UDP hole punching technique exists that allows
+   peer-to-peer UDP sessions to be created in the presence of some
+   symmetric NATs.  This method is sometimes called the "N+1"
+   technique [BIDIR] and is explored in detail by Takeda [SYM-STUN].
+   The method works by analyzing the behavior of the NAT and attempting
+   to predict the public port numbers it will assign to future sessions.
+   Consider again the situation in which two clients, A and B, each
+   behind a separate NAT, have each established UDP connections with a
+   permanently addressable server S, as depicted in figure 8.
+
+                                 Server S
+                              18.181.0.31:1234
+                                     |
+        +----------------------------+----------------------------+
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+        | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+        | | 155.99.25.11:62000     |   |  138.76.29.7:31000     | |
+        |                                                         |
+        |                                                         |
+      +--------------+                                 +-------------+
+      | 155.99.25.11 |                                 | 138.76.29.7 |
+      |              |                                 |             |
+      |  Symmetric   |                                 |  Symmetric  |
+      |    NAT A     |                                 |    NAT B    |
+      +--------------+                                 +-------------+
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+        | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+        | |     10.0.0.1:1234      |   |     10.1.1.3:1234      | |
+        |                                                         |
+     Client A                                                 Client B
+     10.0.0.1:1234                                       10.1.1.3:1234
+  
+   Figure 8: Use Peer's Symmetric-NAT Identity to predict P2P port
+
+   NAT A has assigned its own UDP port 62000 to the communication
+   session between A and S, and NAT B has assigned its port 31000 to
+   the session between B and S. By communicating through server S, A
+   and B learn each other's public IP addresses and port numbers as
+   observed by S. Client A now starts sending UDP messages to port
+   31001 at address 138.76.29.7 (note the port number increment), and
+   client B simultaneously starts sending messages to port 62001 at
+   address 155.99.25.11. If NATs A and B assign port numbers to new
+   sessions sequentially, and if not much time has passed since the
+   A-S and B-S sessions were initiated, then a working bi-directional
+   communication channel between A and B should result. A's messages 
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 19]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   to B cause NAT A to open up a new session, to which NAT A will 
+   (hopefully) assign public port number 62001, because 62001 is next
+   in sequence after the port number 62000 it previously assigned to
+   the session between A and S. Similarly, B's messages to A will
+   cause NAT B to open a new session, to which it will (hopefully)
+   assign port number 31001. If both clients have correctly guessed
+   the port numbers each NAT assigns to the new sessions, then a
+   bi-directional UDP communication channel will have been 
+   established as shown in figure 9..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 20]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+                                 Server S
+                              18.181.0.31:1234
+                                     |
+                                     |
+        +----------------------------+----------------------------+
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+        | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+        | | 155.99.25.11:62000     |   |  138.76.29.7:31000     | |
+        |                                                         |
+        | ^ P2P Session (A-B)      ^   ^  P2P Session (B-A)     ^ |
+        | |  138.76.29.7:31001     |   |  155.99.25.11:62001    | |
+        | | 155.99.25.11:62001     |   |  138.76.29.7:31001     | |
+        |                                                         |
+      +--------------+                                 +-------------+
+      | 155.99.25.11 |                                 | 138.76.29.7 |
+      |              |                                 |             |
+      |  Symmetric   |                                 |  Symmetric  |
+      |    NAT A     |                                 |   NAT B     |
+      +--------------+                                 +-------------+
+        |                                                         |
+        | ^ Relay-Req Session(A-S) ^   ^ Relay-Req Session(B-S) ^ |
+        | |  18.181.0.31:1234      |   |  18.181.0.31:1234      | |
+        | |     10.0.0.1:1234      |   |     10.1.1.3:1234      | |
+        |                                                         |
+        | ^ P2P Session (A-B)      ^   ^  P2P Session (B-A)     ^ |
+        | |  138.76.29.7:31001     |   |  155.99.25.11:62001    | |
+        | |     10.0.0.1:1234      |   |      10.1.1.3:1234     | |
+        |                                                         |
+     Client A                                                 Client B
+     10.0.0.1:1234                                        10.1.1.3:1234
+
+
+   Figure 9: Use Port Prediction on Symmetric NATs to setup Direct-p2p 
+  
+   Clearly, there are many things that can cause this trick to fail.
+   If the predicted port number at either NAT already happens to be in
+   use by an unrelated session, then the NAT will skip over that port
+   number and the connection attempt will fail.  If either NAT sometimes
+   or always chooses port numbers non-sequentially, then the trick will
+   fail.  If a different client behind NAT A (or B respectively) opens
+   up a new outgoing UDP connection to any external destination after A
+   (B) establishes its connection with S but before sending its first
+   message to B (A), then the unrelated client will inadvertently
+   "steal" the desired port number.  This trick is therefore much less
+   likely to work when either NAT involved is under load.
+
+   Since in practice a P2P application implementing this trick would
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 21]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   still need to work if the NATs are cone NATs, or if one is a cone NAT
+   and the other is a symmetric NAT, the application would need to
+   detect beforehand what kind of NAT is involved on either end [STUN]
+   and modify its behavior accordingly, increasing the complexity of the
+   algorithm and the general brittleness of the network.  Finally, port
+   number prediction has no chance of working if either client is behind
+   two or more levels of NAT and the NAT(s) closest to the client are
+   symmetric.  For all of these reasons, it is NOT recommended that new
+   applications implement this trick. This technique is mentioned here 
+   only for historical and informational purposes.
+
+3.6. TCP port number prediction
+
+   This is a variant of the "Simultaneous TCP open" technique that
+   allows peer-to-peer TCP sessions to be created in the presence of
+   some symmetric NATs. 
+
+   Unfortunately, this trick may be even more fragile and timing-
+   sensitive than the UDP port number prediction trick described 
+   earlier. First, even as both NAT devices implement Cone NAT
+   behavior on the TCP traffic, all the same things can go wrong
+   with each side's attempt to predict the public port numbers
+   that the respective NATs will assign to the new sessions can
+   happen with TCP port prediction as well. In addition, if either
+   client's SYN arrives at the opposite NAT device too quickly, then
+   the remote NAT device may reject the SYN with a RST packet, 
+   causing the local NAT device in turn to close the new session 
+   and make future SYN retransmission attempts using the same port
+   numbers futile. For this reason, this trick is mentioned here 
+   only for historical reasons. It is NOT recommended for use by
+   applications.
+
+
+4. Summary of observations
+
+4.1. TCP/UDP hole punching
+
+   TCP/UDP hole punching is apparently the most efficient existing
+   method of establishing direct TCP/UDP peer-to-peer communication
+   between two nodes that are both behind NATs. These techniques
+   have been used with a wide variety of existing NATs. However,
+   applications should be prepared to fall back on simple relaying
+   when direct communication cannot be established. 
+
+4.2. Symmetric NATs are not P2P friendly
+
+   Symmetric NATs gained popularity with client-server applications
+   such as web browsers, which only need to initiate outgoing
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 22]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   connections. However, in the recent times, P2P applications such
+   as Instant messaging and audio conferencing have been in wide
+   use. Symmetric NATs do not support TCP/UDP port binding and are
+   not suitable for P2P applications. 
+
+   P2P-friendly NAT devices implement Cone NAT behavior, allowing
+   applications to establish robust P2P connectivity using the
+   TCP/UDP hole punching techniques. A Cone NAT maintains
+   port bindings for TCP and UDP endpoints. 
+
+4.3. Peer discovery
+ 
+   Applications should not assume all its peers to be outside its
+   NAT boundary. As such, an application should register all its
+   private IP addresses with the external server, so it can 
+   connect to some of its peers within the NAT boundary without
+   having to traverse the NAT device.
+
+4.4. Hairpin translation
+
+   Hairpin translation support is highly benficial to allow
+   hosts behind a p2p-friendly NAT to communicate with other hosts
+   behind the same NAT device through their public, possibly
+   translated endpoints. Support for hairpin translation is
+   particularly useful in the case of large-capacity NATs deployed
+   as the first level of a multi-level NAT scenario. As described
+   in section 3.3.3, hosts behind the same first-level NAT but
+   different second-level NATs do not have a way to communicate
+   with each other using TCP/UDP hole punching technique, unless
+   the first-level NAT also supports loopback translation. This 
+   would be the case even when all NAT devices in the deployment
+   preserve endpoint identities,
+
+
+5. Security considerations
+
+   This document does not inherently create new security issues. 
+   Nevertheless, security risks may be present in the techniques
+   described. This section describes security risks the
+   applications could inadvertently create in attempting to
+   support P2P communication across NAT devices. Also described
+   are implications for the security policies of P2P-friendly
+   NAT devices.
+
+5.1. IP address aliasing
+
+   NAT-friendly P2P applications must use appropriate authentication
+   mechanisms to protect their P2P connections from accidental
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 23]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   confusion with other P2P connections as well as from malicious
+   connection hijacking or denial-of-service attacks. NAT-friendly
+   P2P applications effectively must interact with multiple distinct 
+   IP address domains, but are not generally aware of the exact
+   topology or administrative policies defining these address
+   domains. While attempting to establish P2P connections via
+   TCP/UDP hole punching, applications send packets that may
+   frequently arrive at an entirely different host than the
+   intended one.
+
+   For example, many consumer-level NAT devices provide DHCP
+   services that are configured by default to hand out site-local
+   IP addresses in a particular address range. Say, a particular
+   consumer NAT device, by default, hands out IP addresses starting
+   with 192.168.1.100. Most private home networks using that NAT 
+   device will have a host with that IP address, and many of these
+   networks will probably have a host at address 192.168.1.101 as
+   well. If host A at address 192.168.1.101 on one private network
+   attempts to establish a connection by UDP hole punching with 
+   host B at 192.168.1.100 on a different private network, then as
+   part of this process host A will send discovery packets to 
+   address 192.168.1.100 on its local network, and host B will send
+   discovery packets to address 192.168.1.101 on its network. Clearly,
+   these discovery packets will not reach the intended machine since 
+   the two hosts are on different private networks, but they are very
+   likely to reach SOME machine on these respective networks at the
+   standard UDP port numbers used by this application, potentially
+   causing confusion, especially if the application is also running
+   on those other machines and does not properly authenticate its
+   messages.
+
+   This risk due to aliasing is therefore present even without a
+   malicious attacker. If one endpoint, say host A, is actually
+   malicious, then without proper authentication the attacker could
+   cause host B to connect and interact in unintended ways with
+   another host on its private network having the same IP address
+   as the attacker's (purported) private address. Since the two
+   endpoint hosts A and B presumably discovered each other through
+   a public server S, and neither S nor B has any means to verify
+   A's reported private address, all P2P applications must assume
+   that any IP address they find to be suspect until they successfully
+   establish authenticated two-way communication.
+
+5.2. Denial-of-service attacks
+
+   P2P applications and the public servers that support them must
+   protect themselves against denial-of-service attacks, and ensure
+   that they cannot be used by an attacker to mount denial-of-service
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 24]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   attacks against other targets. To protect themselves, P2P 
+   applications and servers must avoid taking any action requiring
+   significant local processing or storage resources until
+   authenticated two-way communication is established. To avoid being
+   used as a tool for denial-of-service attacks, P2P applications and
+   servers must minimize the amount and rate of traffic they send to
+   any newly-discovered IP address until after authenticated two-way
+   communication is established with the intended target.
+
+   For example, P2P applications that register with a public rendezvous
+   server can claim to have any private IP address, or perhaps multiple
+   IP addresses. A well-connected host or group of hosts that can
+   collectively attract a substantial volume of P2P connection attempts
+   (e.g., by offering to serve popular content) could mount a
+   denial-of-service attack on a target host C simply by including C's
+   IP address in their own list of IP addresses they register with the
+   rendezvous server. There is no way the rendezvous server can verify
+   the IP addresses, since they could well be legitimate private
+   network addresses useful to other hosts for establishing
+   network-local communication. The P2P application protocol must
+   therefore be designed to size- and rate-limit traffic to unverified
+   IP addresses in order to avoid the potential damage such a 
+   concentration effect could cause.
+
+5.3. Man-in-the-middle attacks
+
+   Any network device on the path between a P2P client and a
+   rendezvous server can mount a variety of man-in-the-middle
+   attacks by pretending to be a NAT.  For example, suppose 
+   host A attempts to register with rendezvous server S, but a 
+   network-snooping attacker is able to observe this registration
+   request. The attacker could then flood server S with requests
+   that are identical to the client's original request except with
+   a modified source IP address, such as the IP address of the
+   attacker itself.  If the attacker can convince the server to
+   register the client using the attacker's IP address, then the
+   attacker can make itself an active component on the path of all
+   future traffic from the server AND other P2P hosts to the
+   original client, even if the attacker was originally only able
+   to snoop the path from the client to the server.
+
+   The client cannot protect itself from this attack by
+   authenticating its source IP address to the rendezvous server,
+   because in order to be NAT-friendly the application must allow
+   intervening NATs to change the source address silently.  This
+   appears to be an inherent security weakness of the NAT paradigm.
+   The only defense against such an attack is for the client to
+   authenticate and potentially encrypt the actual content of its
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 25]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   communication using appropriate higher-level identities, so that
+   the interposed attacker is not able to take advantage of its
+   position.  Even if all application-level communication is
+   authenticated and encrypted, however, this attack could still be
+   used as a traffic analysis tool for observing who the client is
+   communicating with.
+
+5.4. Impact on NAT device security
+
+   Designing NAT devices to preserve endpoint identities does not
+   weaken the security provided by the NAT device. For example, a 
+   Port-restricted Cone NAT is inherently no more "promiscuous" 
+   than a Symmetric NAT in its policies for allowing either
+   incoming or outgoing traffic to pass through the NAT device.
+   As long as outgoing TCP/UDP sessions are enabled and the NAT
+   device maintains consistent binding between internal and external
+   TCP/UDP ports, the NAT device will filter out any incoming TCP/UDP
+   packets that do not match the active sessions initiated from
+   within the enclave. Filtering incoming traffic aggressively while
+   maintaining consistent port bindings thus allows a NAT device to
+   be P2P friendly without compromising the principle of rejecting
+   unsolicited incoming traffic.
+
+   Maintaining consistent port binding could arguably increase the
+   predictability of traffic emerging from the NAT device, by revealing
+   the relationships between different UDP sessions and hence about
+   the behavior of applications running within the enclave. This
+   predictability could conceivably be useful to an attacker in
+   exploiting other network or application level vulnerabilities.
+   If the security requirements of a particular deployment scenario
+   are so critical that such subtle information channels are of
+   concern, however, then the NAT device almost certainly should not be
+   configured to allow unrestricted outgoing TCP/UDP traffic in the
+   first place. Such a NAT device should only allow communication
+   originating from specific applications at specific ports, or
+   via tightly-controlled application-level gateways.  In this
+   situation there is no hope of generic, transparent peer-to-peer
+   connectivity across the NAT device (or transparent client/server
+   connectivity for that matter); the NAT device must either
+   implement appropriate application-specific behavior or disallow
+   communication entirely.
+
+
+6. Acknowledgments
+
+   The authors wish to thank Henrik, Dave, and Christian Huitema
+   for their valuable feedback.
+
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 26]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+
+7. Informative References
+
+[NAT-TERM] P. Srisuresh and M. Holdrege, "IP Network Address
+           Translator (NAT) Terminology and Considerations", RFC
+           2663, August 1999.
+
+[NAT-TRAD] P. Srisuresh and K. Egevang, "Traditional IP Network
+           Address Translator (Traditional NAT)", RFC 3022,
+           January 2001.
+
+[STUN]     J. Rosenberg, J. Weinberger, C. Huitema, and R. Mahy,
+           "STUN - Simple Traversal of User Datagram Protocol (UDP)
+           Through Network Address Translators (NATs)", RFC 3489,
+           March 2003.
+
+[NAT-APPL] D. Senie, "Network Address Translator (NAT)-Friendly
+           Application Design Guidelines", RFC 3235, January 2002.
+
+[NAT-PROT] M. Holdrege and P. Srisuresh, "Protocol Complications
+           with the IP Network Address Translator", RFC 3027,
+           January 2001.
+
+[NAT-PT]   G. Tsirtsis and P. Srisuresh, "Network Address
+           Translation - Protocol Translation (NAT-PT)", RFC 2766,
+           February 2000.
+
+[BIDIR]    Peer-to-Peer Working Group, NAT/Firewall Working Committee,
+           "Bidirectional Peer-to-Peer Communication with Interposing
+           Firewalls and NATs", August 2001.
+           http://www.peer-to-peerwg.org/tech/nat/
+
+[KEGEL]    Dan Kegel, "NAT and Peer-to-Peer Networking", July 1999.
+           http://www.alumni.caltech.edu/~dank/peer-nat.html
+
+[TCP]      "Transmission Control Protocol", RFC 793, September 1981.
+
+[TURN]     J. Rosenberg, J. Weinberger, R. Mahy, and C. Huitema,
+           "Traversal Using Relay NAT (TURN)",
+           draft-rosenberg-midcom-turn-01 (Work In Progress),
+           March 2003.
+
+
+8. Authors' Addresses
+
+   Pyda Srisuresh
+   Caymas Systems, Inc.
+   1179-A North McDowell Blvd.
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 27]
+
+Internet-Draft   State of P2P communication actoss NATs    December 2004
+
+
+   Petaluma, CA 94954
+   Phone: (707) 283-5063
+   E-mail: srisuresh@yahoo.com
+
+   Bryan Ford
+   Laboratory for Computer Science
+   Massachusetts Institute of Technology
+   77 Massachusetts Ave.
+   Cambridge, MA 02139
+   Phone: (617) 253-5261
+   E-mail: baford@mit.edu
+   Web: http://www.brynosaurus.com/
+
+   Dan Kegel
+   Kegel.com
+   901 S. Sycamore Ave.
+   Los Angeles, CA 90036
+   Phone: 323 931-6717    
+   Email: dank@kegel.com
+   Web: http://www.kegel.com/
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2004).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78, and
+   except as set forth therein, the authors retain all their rights."
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Srisuresh, Ford & Kegel                                        [Page 28]
+

@@ -1,0 +1,92 @@
+/*! \page neoip-scnx NeoIP Secure Connection
+
+\par NOTE
+- this is done to provide 
+  - identification of the other peers
+  - confidenciality of the data 
+  - authentication of the data
+- this can works on top of dgram, stream
+  - if on top of dgram, initiator must resent the packets
+- see \ref neoip-socket-secu-impl
+- the authentication and confidentiality algorithm are negociated at
+  the connection establishment.
+
+\par Note about todo
+- the confidentility and authentication are negociated during the establishement.
+  - the proposed options are sent by the initiator in the itor_auth packet
+  - the chosen option are replied by the responder in the resp_auth packet
+  - So it is up to the reponder to choose the option which gonna be used
+    - the initiator will only check it is one from the proposed list.
+
+\par Note about the protocol
+
+\verbatim
+    Initiator                                       Responder
+CnxID_i           -------- Cnx Request ------->
+
+                  <------- Cnx Reply ---------- CnxID_i, CnxID_r,
+                                                auth_r, g^x_r, sign_r
+
+CnxID_i, CnxID_r  -------- Itor auth --------->
+auth_i, g^y_i, 
+sign_i,
+proposed auth list,
+proposed ciph list,
+data_i,
+pop_i
+
+                  <------- Resp Auth ---------- CnxID_i, chosen_auth, chosen_ciph
+                                                data_r, pop_r
+\endverbatim
+
+- CnxID_r is cookie as in (rfc2522.3)
+  - may cost-function request later
+  - with hashcash as cost-function
+  - on which data the cookie is computed ?
+    - the itor full address and the resp full address
+- CnxID_i is a nounce
+  - may be a cost-function reply later
+  - how to handle the pressure on the cost-function
+- g^x_[ir] are the diffie-hellman public key for the initiator and responder
+  - it can be reused for several connections
+  - limited for forward/backward secrecy
+  - authenticated by auth_[ir]
+- auth_[ir] is a way to identify the sender and authenticate the g^x_[ir]
+  - The payload is a type of authentication followed by a data specific to the 
+    type.
+  - auth with preshared key is a 32bit key_id followed by a MAC covering
+    auth_[ir] + g^x_[ir]
+  - auth with public key is a x509 certificate and the g^x_[ir] is public 
+    signature
+- The authentication by pop_[ir] and encryption of data_[ir] algorithms 
+  may be negociated with during the cnx_request and cnx_reply packets.
+- data_[ir] is a bunch of opaque data which are provided by upper 
+  layer.
+  - it is authenticated by the pop_[ir] and may be encrypted too
+  - the encryption of it with aes128/ctr with a iv derived from the master key.
+  - it can be used to negociate parameters for the upper layer
+- pop_[ir] is a MAC computed over the whole packet with a zeroed MAC
+  - the MAC algorithm is a sha1/hmac/16, it cant be negociated because the 
+    responder havent yet received the proposed options
+  - pop stands for Proof of possetion i.e. to proove the sender knows
+    the secret key.
+  - the master key is derivated from CnxID_[ir] and g^xy.
+- g^xy may be the same between 2 connections made between the 2 same peers
+  as g^x_[ir] may be reused for several connections.
+- CnxID_[ir] is supposed to be staticaly unique per connection.
+- the full connection parameters are negociated during the itor_auth and 
+  resp_auth packets
+  
+\par Why the cookie is computed over the network path id AND the nounce_i
+- if the nounce_i isnt included:
+  -# a legitimate connection is open, then closed, then reopen using the same
+     outter connection addr/port
+  -# all that during the life time of a single cookie secret
+  -# the second legitimate connection will be refused as it would produce the same cookie
+     and as this cookie has already been accepted
+- if the nounce_i IS included:
+  - the second time will be accepted as the nounce_i, so the generated cookie, will be different
+  - the accepted database is usefull to prevent replay of itor_auth toward the 
+    responder to produce connection illegitimatly.
+
+*/

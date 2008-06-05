@@ -1,0 +1,359 @@
+<html debug=true>
+<head><title>NeoIP casti recording page</title></head>
+
+<body onload="start_probing()">
+
+<center><h1>NeoIP casti recording page</h1></center>
+TODO code a check on the vlc plugin version as some are unable to read v4l.
+namely currently only svn for the proper mrl parsing...
+<script src="../base/firebug/firebug.js"></script> 
+<script src="../base/javascript/neoip_vlc_object.js"></script> 
+<script src="../base/javascript/neoip_casti_ctrl_t.js"></script> 
+<script src="../base/javascript/neoip_xdomrpc_t.js"></script>
+<script src="../base/javascript/neoip_apps_detect_t.js"></script> 
+
+<script>
+</script>
+
+<p id="vlc_objtest">Place to put the new vlc</p>
+<input type=button value="Start recording" onClick='start_record();'>
+<input type=button value="Stop recording" onClick='stop_record();'>
+
+<h1>Current status</h1>
+<ul>
+	<li>neoip-casti <span id="neoip_casti_probe_result">is currently being probbed.</span></li>
+	<li>neoip-casti swarm is currently <span id="casti_swarm_state">unknown</span></li>
+</ul>
+
+<script LANGUAGE="Javascript">
+function	vlc_player_build(){
+	var vlc_object	= new neoip.vlc_object('vlc_player', 320, 240);
+	vlc_object.write('vlc_objtest');
+}
+function vlc_init()
+{
+	var vlc = document.getElementById("vlc_player");
+	var opt = new Array();
+	// build the options from the webcam parameter
+	opt.push(":v4l-vdev="	+ document.getElementById("vlc_vdev").value);
+	opt.push(":v4l-adev="	+ document.getElementById("vlc_adev").value)
+	opt.push(":v4l-width="	+ document.getElementById("vlc_width").value)
+	opt.push(":v4l-height=" + document.getElementById("vlc_height").value)
+	opt.push(":v4l-fps="	+ document.getElementById("vlc_fps").value)
+
+	// build the transcode line from the streaming parameters
+	var	str= ":sout=#transcode{"
+	str += "vcodec="	+ document.getElementById("vlc_vcodec").value
+	str += ",acodec="	+ document.getElementById("vlc_acodec").value
+	str += ",samplerate="	+ document.getElementById("vlc_samplerate").value
+	str += ",vb="		+ document.getElementById("vlc_vb").value
+	str += ",ab="		+ document.getElementById("vlc_ab").value
+	str += "}:duplicate{dst=display, dst=std{access=http"
+	str += ",mux="		+ document.getElementById("vlc_mux").value
+	str += ",dst="		+ document.getElementById("vlc_url").value
+	str += "}}"
+	opt.push(str);
+	console.log("sout=" + str);
+
+	// to insert a key frame every 25 frame
+	// - TODO make it tunable
+	opt.push(":sout-ffmpeg-keyint=25")
+	// to make ffmpeg to enforce the bitrate limitation
+	opt.push(":sout-ffmpeg-strict-rc")
+	
+	// to not show the video title on the video
+	opt.push(":no-video-title-show")
+
+	// clear the playlist
+	vlc.playlist.clear();
+	// put this element in the playlist
+	vlc.playlist.add("v4l://", null, opt);
+}
+
+function start_record()
+{
+	var vlc = document.getElementById("vlc_player");
+	vlc_init()
+	vlc.playlist.play();
+
+	casti_param_from_field();
+	casti_param_to_ctrl();
+	casti_ctrl.start_recording();
+}
+function stop_record()
+{
+	var vlc = document.getElementById("vlc_player");
+	if( vlc.playlist.isPlaying )	vlc.playlist.stop();
+
+	casti_param_to_ctrl();
+	casti_ctrl.stop_recording();
+	display_casti_state();
+}
+</script>
+
+<script>
+</script>
+
+<script>
+function webcam_param_reset_linux()
+{
+	document.getElementById("vlc_vdev").value	= "/dev/video0";
+	document.getElementById("vlc_adev").value	= "/dev/dsp";
+	document.getElementById("vlc_width").value	= "320";
+	document.getElementById("vlc_height").value	= "240";
+	document.getElementById("vlc_fps").value	= "25.0";
+}
+function stream_param_reset_mp4()
+{
+	document.getElementById("vlc_vcodec").value	= "mp4v";
+	document.getElementById("vlc_acodec").value	= "mpga";
+	document.getElementById("vlc_samplerate").value	= "";
+	document.getElementById("vlc_vb").value		= "256";
+	document.getElementById("vlc_ab").value		= "64";
+	document.getElementById("vlc_mux").value	= "ps";
+	document.getElementById("vlc_url").value	= "0.0.0.0:8080/stream.mp4";
+}
+function stream_param_reset_flv()
+{
+	document.getElementById("vlc_vcodec").value	= "FLV1";
+	document.getElementById("vlc_acodec").value	= "mp3";
+	document.getElementById("vlc_samplerate").value	= "22050";
+	document.getElementById("vlc_vb").value		= "128";
+	document.getElementById("vlc_ab").value		= "32";
+	document.getElementById("vlc_mux").value	= "";
+	document.getElementById("vlc_url").value	= "127.0.0.1:8080/stream.flv";
+}
+
+function casti_param_init()
+{
+	// vlc streaming parameters
+	casti_param['vlc_vcodec']	= null;
+	casti_param['vlc_acodec']	= null;
+	casti_param['vlc_samplerate']	= null;
+	casti_param['vlc_vb']		= null;
+	casti_param['vlc_ab']		= null;
+	casti_param['vlc_mux']		= null;
+	casti_param['vlc_url']		= null;
+
+	// vlc input parameter
+	casti_param['vlc_vdev']		= null;
+	casti_param['vlc_adev']		= null;
+	casti_param['vlc_width']	= null;
+	casti_param['vlc_height']	= null;
+	casti_param['vlc_fps']		= null;
+
+	// casti streaming parameter
+	casti_param['cast_name']	= null;
+	casti_param['httpi_mod']	= null;
+	casti_param['mdata_srv_uri']	= null;
+	casti_param['http_peersrc_uri']	= null;
+}
+
+function casti_param_reset_flv()
+{
+	document.getElementById("cast_name").value	= "superstream.flv";
+	document.getElementById("httpi_mod").value	= "flv";
+}
+function casti_param_reset_mp4()
+{
+	document.getElementById("cast_name").value	= "superstream.mp4";
+	document.getElementById("httpi_mod").value	= "raw";
+}
+function casti_param_reset_debug()
+{
+	document.getElementById("mdata_srv_uri").value	= "http://jmehost1/~jerome/neoip_html/cgi-bin/cast_mdata_echo_server.rb";
+}
+
+// copy all the casti_param to the html field
+function casti_param_to_field()
+{
+	for( var key in casti_param ){
+		document.getElementById(key).value	= casti_param[key];
+	}
+}
+
+// copy all the html_field to the casti_param
+function casti_param_from_field()
+{
+	for( var key in casti_param ){
+		casti_param[key] = document.getElementById(key).value;
+	}
+}
+
+// Store all the casti_param in cookie 
+function casti_param_to_cookie()
+{
+	// get the casti_param from the html fields
+	casti_param_from_field();
+
+	// set the expiration date
+	var	expire_date	= new Date()
+	expire_date.setDate(expire_date.getDate() + 30*24*60*60)
+	
+	// add all the casti_param into cookies
+	for( var key in casti_param ){
+		var str  = ' ' + key + '=' + escape(casti_param[key]) + '; ';
+		str	+= "expires=" + expire_date.toGMTString() + ';';
+		document.cookie	= str;
+	}
+}
+
+// fetch the casti_param from cookie 
+function casti_param_from_cookie()
+{
+	// add all the casti_param into cookies
+	for( var key in casti_param ){
+		// try to find this key
+		var c_start	= document.cookie.indexOf(key + "=")
+		// if not found, goto the next
+		if( c_start == -1 )	continue;
+		// skip the test of the key + '='
+		c_start	= c_start + key.length + 1;
+		// try to find the end of the value
+		var c_end	= document.cookie.indexOf(";", c_start);
+		// if not found, assume it is up to the end of the cookie
+		if( c_end==-1 )	c_end	= document.cookie.length;
+		// now actually set the casti_param with the value from the cookie
+		casti_param[key]	= unescape(document.cookie.substring(c_start,c_end));
+	}
+
+	// set the casti_param to the html fields
+	casti_param_to_field();
+}
+
+// fetch the casti_param from cookie 
+function casti_param_to_ctrl()
+{
+	casti_ctrl.webdetect_uri	( neoip.outter_uri('casti')		);
+	casti_ctrl.cast_name		( casti_param['cast_name']		);
+	casti_ctrl.mdata_srv_uri	( casti_param['mdata_srv_uri']		);
+	casti_ctrl.httpi_uri		( 'http://' + casti_param['vlc_url']	);
+	casti_ctrl.httpi_mod		( casti_param['httpi_mod']		);
+	casti_ctrl.http_peersrc_uri	( casti_param['http_peersrc_uri']	);
+}
+
+/** \brief casti_ctrl_t callback
+ */
+function	neoip_casti_ctrl_cb(notifier_obj, userptr, event_type, arg)
+{
+	// log to debug
+	console.info("enter_type=" + event_type);
+	
+	// forward to the proper handler depending on event_type
+	if( event_type == "changed_state" )	return display_casti_state(arg);
+}
+
+/** \brief Display the casti_ctrl_t state
+ */
+function	display_casti_state()
+{
+	var	str	= null;
+	// get the current_state
+	var	state	= casti_ctrl.swarm_state();
+	// display according to the current state
+	if( state == 'starting' ){
+		str	= state;
+	}else if( state == 'started' ){
+		str	= "<font color='green'>" + state + "</font>";
+	}else if( state == 'stopped' ){
+		str	= state;
+	}else{
+		str	= "<font color='red'>" + state + "</font>";
+		str	+= ". The webbrowser is unable to contact neoip-casti. check if it is running.";
+	}
+	// display the current str
+	document.getElementById("casti_swarm_state").innerHTML= str;
+}
+
+// declare the casti_param and initialize it
+var casti_param	= new Array();
+casti_param_init();
+</script>
+
+<input type=button value="Save Parameter" onClick='casti_param_to_cookie()'>
+<input type=button value="Load Parameter" onClick='casti_param_from_cookie()'>
+
+<h3>Streaming parameters</h3>
+<input type=button value="Reset for mp4" onClick='stream_param_reset_mp4()'>
+<input type=button value="Reset for flv" onClick='stream_param_reset_flv()'>
+<table>
+	<tr><td>Video Codec</td><td>: <input type="text" id="vlc_vcodec"	/></td></tr>
+	<tr><td>Audio Codec</td><td>: <input type="text" id="vlc_acodec"	/></td></tr>
+	<tr><td>Audio sameple rate</td><td>: <input type="text" id="vlc_samplerate"/></td></tr>
+	<tr><td>Video Bitrate</td><td>: <input type="text" id="vlc_vb"		/></td></tr>
+	<tr><td>Audio Bitrate</td><td>: <input type="text" id="vlc_ab"		/></td></tr>
+	<tr><td>Muxer</td><td>: <input type="text" id="vlc_mux"			/></td></tr>
+	<tr><td>Url</td><td>: <input type="text" id="vlc_url"			/></td></tr>
+</table>
+
+<h3>neoip-casti parameters</h3>
+<input type=button value="Reset for mp4" onClick='casti_param_reset_mp4()'>
+<input type=button value="Reset for flv" onClick='casti_param_reset_flv()'>
+<input type=button value="Reset for debug" onClick='casti_param_reset_debug()'>
+<table>
+	<tr><td>cast_name</td><td>: <input type="text" id="cast_name"		/></td></tr>
+	<tr><td>httpi_mod</td><td>: <input type="text" id="httpi_mod"		/></td></tr>
+	<tr><td>mdata_srv_uri</td><td>: <input type="text" id="mdata_srv_uri"	/></td></tr>
+	<tr><td>http_peersrc_uri</td><td>: <input type="text" id="http_peersrc_uri"/></td></tr>	
+</table>
+
+<h3>Webcam parameters</h3>
+<input type=button value="Reset for linux" onClick='webcam_param_reset_linux();'>
+<table>
+	<tr><td>Video Device</td><td>: <input type="text" id="vlc_vdev"		/></td></tr>
+	<tr><td>Audio Device</td><td>: <input type="text" id="vlc_adev"		/></td></tr>
+	<tr><td>Video Width</td><td>: <input type="text" id="vlc_width"		/></td></tr>
+	<tr><td>Video Height</td><td>: <input type="text" id="vlc_height"	/></td></tr>
+	<tr><td>Image per Second</td><td>: <input type="text" id="vlc_fps"	/></td></tr>
+</table>
+
+
+<script>
+function start_probing()
+{
+	// start probing neoip-apps
+	var	casti_detect	= new neoip.apps_detect_t("casti", 4570, 4579
+					, neoip.apps_detect_cb_t(apps_detect_cb));						
+}
+
+/** \brief Callback for all the neoip.apps_detect_t of this page
+ */
+function apps_detect_cb(apps_detect, userptr, result_str)
+{
+	var	suffix_name	= apps_detect.suffix_name();
+	// log the result
+	console.info("enter suffix_name=" + apps_detect.suffix_name() + " result_str=" + result_str);
+
+	// delete the apps_detect
+	apps_detect.destructor();
+
+	// build the string to display
+	var	str;
+	if( neoip.apps_present(suffix_name) ){
+		str	 = " <font color='green'>HAS been found</font> -";
+		str	+= " version " + neoip.apps_version(suffix_name);
+		str	+= " with outter_uri of " + neoip.outter_uri(suffix_name);
+	}else{
+		str	 = "<font color='red'>HAS NOT</font> been found";
+		str	+= " running on your computer.";
+	}
+	// display the current str
+	var	elem_id	= "neoip_" + suffix_name + "_probe_result";
+	document.getElementById(elem_id).innerHTML= str;
+}
+</script>
+<script>
+	vlc_player_build();
+	// on load, set the parameters for flv/linux
+	stream_param_reset_flv();
+	webcam_param_reset_linux();
+	// on load, read the casti_param_from_cookie
+	casti_param_from_cookie();
+	// init casti_ctrl
+	var casti_ctrl	= new neoip.casti_ctrl_t(neoip.casti_ctrl_cb_t(neoip_casti_ctrl_cb));
+	// display the casti_state
+	display_casti_state();
+</script>
+
+</body>
+</html>

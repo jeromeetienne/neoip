@@ -1,0 +1,14 @@
+[main]
+rdv_addr=udpv4://pphost.homelinux.org:20000
+rdv_addr_alt=udpv4://pphost.homelinux.org:20001
+no_daemon=true
+no_dnsgrab=true
+httpd_addr=tcpv4://127.0.0.1:8081
+
+[debug]
+tun_stub=true
+
+[log]
+n_grp.c=debug
+script_grp.c=debug
+

@@ -1,0 +1,142 @@
+.\" -*- nroff -*-
+.TH NEOIP-GET 8 "Dec 2006" "neoip-get(1)" "neoip-get's Manual"
+.SH NAME
+neoip-get - download file over the internet in http/bittorrent/metalink
+.SH SYNOPSIS
+.B neoip-get
+[--config_dir dirname] [--help] [--version] [--type metadata_type] metadata_link
+.SH DESCRIPTION
+neoip-get is a command line tool to download file over the internet.
+
+The metadata_link may be a http url or a local file.
+
+.SH Metadata Type
+The type of the metadata_link may be explicitly specified (see --type option)
+or deduced from the basename extension of the metadata_link.
+
+The various possible type are:
+.TP
+.I "static"
+In this case, metalink_link is a http url for a static content (aka not a dynamic one)
+.TP
+.I "resumedata"
+In this case, metalink_link is a local file for a previous download.
+.TP
+.I "torrent"
+In this case, metalink_link is a local file or a http url toward a .torrent file.
+.TP
+.I "metalink"
+In this case, metalink_link is a local file or a http url toward a .metalink file.
+.TP
+
+Algorithm to deduce the metadata_type from the metadata_link:
+.IP 1.
+if the metadata_link extention is ".metalink", use --type metalink
+.IP 2.
+if the metadata_link extention is ".torrent", use --type torrent
+.IP 3.
+if the metadata_link extension is ".resumedata", use --type resumedata
+.IP 4.
+in all other cases, use --type static
+
+.SH Resumable Download
+The download is resumable aka if the user interrupts the download and later restart
+it, the previously downloaded data wont be redownloaded. The state of the download
+are stored in a file with the file extension ".resumedata". 
+
+The filename of the ".resumedata" file depends on the metadata_link. It is composed
+of the destination directory (see --dest-dir option) with a given basename.
+If the metadata_link is already a resumedata, the ".resumedata" basename is the one of the metadata_link.
+If the metadata_link is a local file, the ".resumedata" filename is the basename of 
+metadata_link with the ".resumedata" appended to it.
+If the metadata_link is a http url, the ".resumedata" filename is the basename of the url with 
+".resumedata" appended to it.
+
+The ".resumedata" file is periodically saved during the download for robustness 
+in case of ungracefull shutdown. Additionnaly it is saved when the user explicitly
+interrupt the download (e.g using ctrl-c)
+
+.SH OPTIONS
+.TP
+.I "-t, --type metadata_type"
+Set the type of the metadata_link.
+If not specified, the type is deduced from the metadata_link based on the file extension.
+.TP
+.I "-d, --dest-dir dirname"
+Set the destination directory to store the downloaded data.
+If not explicitly specified, the current directory is used as destination directory.
+.TP
+.I "-s, --keep-seeding"
+This option make the program keep running, when it becomes a seed (aka when the
+whole files are downloaded). 
+If not explicitly specified, the program will exit.
+.TP
+.I "-k, --keep-resumedata"
+This option make the program not to delete the resumedata file when it is exiting
+because the download is completed.
+If not explicitly specified, the program will delete the resumedata file assuming
+it is no more needed.
+.TP
+.I "-x, --xmit-maxrate rate"
+Set the maximum rate for transmition. The rate is a number of byte per second.
+For convenience, common unit are supported e.g. rate may be "40k" or "2m".
+k or K mean Kilo-byte, m or M means Mega-byte, g or G means Giga-byte.
+.TP
+.I "-r, --recv-maxrate rate"
+Set the maximum rate for reception. The rate is expressed similarly to --xmit-maxrate.
+.TP
+.I "-c, --config_dir dirname"
+set the configuration directory.
+If not specified, it uses /etc/neoip-get.
+.TP
+.I "-h, --help"
+display the inlined help
+.TP
+.I "-v, --version"
+display the version string
+
+.SH EXAMPLES
+To download a static file over http :
+   neoip-get http://example.org/thefile.pdf
+
+to download the content of a .metalink file :
+   neoip-get http://example.org/myfavoriteiso.metalink
+   
+to download the content of a .torrent file from a web server:
+   neoip-get http://example.org/myfavoriteiso.torrent
+
+to download the content of a .torrent file from a local file :
+   neoip-get myfavoriteiso.torrent
+
+to download a .torrent file when it has no .torrent extension :
+   neoip-get -t torrent  http://example.org/12345
+   
+to download the content of a .torrent file with a maximum rate in transmition 
+of 200kbyte and putting the data in the /tmp directory:
+   neoip-get -r 200k -o /tmp myfavoriteiso.torrent
+
+to download a .torrent and keep the resumedata file when completed to seed it later
+   neoip-get -k myfavoriteiso.torrent
+
+to seed a previous download which has been completed
+   neoip-get -s myfavoriteiso.torrent
+ 
+to download a .torrent and keep seeding on it
+   neoip-get -k -s myfavoriteiso.torrent
+
+.SH FILES
+\fI/etc/neoip\fR
+default configuration directory
+
+.SH LICENSE
+The license is proprietary and this programm should be used for testing purpose only
+
+.SH AUTHOR
+.B neoip-get
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP's homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.
+Note that the metalink support is experimental.

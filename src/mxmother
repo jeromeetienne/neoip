@@ -1,0 +1,3 @@
+echo 0 >/proc/sys/kernel/core_uses_pid
+ulimit -c unlimited
+./m && exec ./neoip_router-bin --config_dir=config_rdv/

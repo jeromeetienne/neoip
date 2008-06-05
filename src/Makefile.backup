@@ -1,0 +1,3271 @@
+# makefile of neoip
+# TODO
+# - remove all the -I per library
+#   - this has obsoleted by the "make includedir"
+#   - the old solution was dirty, slow down the compilation a lot and actually
+#     hit the cmdline size limit under linux (which is 32kbyte) 
+# - make the OBJS dynamic
+
+PROJECT=yavipin
+
+NEOIP_ROUTER_DIR=neoip_router
+NEOIP_ROUTER_INC=-I$(NEOIP_ROUTER_DIR) 					\
+			-I$(NEOIP_ROUTER_DIR)/peer			\
+			-I$(NEOIP_ROUTER_DIR)/peer/base/nunit		\
+			-I$(NEOIP_ROUTER_DIR)/peer/base/wikidbg		\
+			-I$(NEOIP_ROUTER_DIR)/resp			\
+			-I$(NEOIP_ROUTER_DIR)/resp/wikidbg		\
+			-I$(NEOIP_ROUTER_DIR)/resp/cnx			\
+			-I$(NEOIP_ROUTER_DIR)/resp/cnx/wikidbg		\
+			-I$(NEOIP_ROUTER_DIR)/itor			\
+			-I$(NEOIP_ROUTER_DIR)/itor/wikidbg		\
+			-I$(NEOIP_ROUTER_DIR)/itor/cnx			\
+			-I$(NEOIP_ROUTER_DIR)/itor/cnx/wikidbg		\
+			-I$(NEOIP_ROUTER_DIR)/full			\
+			-I$(NEOIP_ROUTER_DIR)/full/wikidbg		\
+			-I$(NEOIP_ROUTER_DIR)/base			\
+			-I$(NEOIP_ROUTER_DIR)/base/acache		\
+			-I$(NEOIP_ROUTER_DIR)/base/acache/base/wikidbg	\
+			-I$(NEOIP_ROUTER_DIR)/base/acache/base/item	\
+			-I$(NEOIP_ROUTER_DIR)/base/acache/base/nunit	\
+			-I$(NEOIP_ROUTER_DIR)/base/acl			\
+			-I$(NEOIP_ROUTER_DIR)/base/acl/base/wikidbg	\
+			-I$(NEOIP_ROUTER_DIR)/base/acl/base/type	\
+			-I$(NEOIP_ROUTER_DIR)/base/acl/base/item	\
+			-I$(NEOIP_ROUTER_DIR)/base/acl/base/nunit	\
+			-I$(NEOIP_ROUTER_DIR)/base/err			\
+			-I$(NEOIP_ROUTER_DIR)/base/lident		\
+			-I$(NEOIP_ROUTER_DIR)/base/lident/base/nunit	\
+			-I$(NEOIP_ROUTER_DIR)/base/lident/base/wikidbg	\
+			-I$(NEOIP_ROUTER_DIR)/base/rident		\
+			-I$(NEOIP_ROUTER_DIR)/base/rident/base/nunit	\
+			-I$(NEOIP_ROUTER_DIR)/base/rident/base/wikidbg	\
+			-I$(NEOIP_ROUTER_DIR)/base/rootca		\
+			-I$(NEOIP_ROUTER_DIR)/base/rootca/base/arr	\
+			-I$(NEOIP_ROUTER_DIR)/base/rootca/base/nunit	\
+			-I$(NEOIP_ROUTER_DIR)/base/rootca/base/wikidbg	\
+			-I$(NEOIP_ROUTER_DIR)/base/pkttype		\
+			-I$(NEOIP_ROUTER_DIR)/base/profile		\
+			-I$(NEOIP_ROUTER_DIR)/base/nunit_gsuite
+NEOIP_ROUTER_OBJS =								\
+	$(NEOIP_ROUTER_DIR)/peer/neoip_router_peer.o				\
+	$(NEOIP_ROUTER_DIR)/peer/base/nunit/neoip_router_peer_nunit.o		\
+	$(NEOIP_ROUTER_DIR)/peer/base/wikidbg/neoip_router_peer_wikidbg.o	\
+	$(NEOIP_ROUTER_DIR)/resp/neoip_router_resp.o				\
+	$(NEOIP_ROUTER_DIR)/resp/wikidbg/neoip_router_resp_wikidbg.o		\
+	$(NEOIP_ROUTER_DIR)/resp/cnx/neoip_router_resp_cnx.o			\
+	$(NEOIP_ROUTER_DIR)/resp/cnx/wikidbg/neoip_router_resp_cnx_wikidbg.o	\
+	$(NEOIP_ROUTER_DIR)/itor/neoip_router_itor.o				\
+	$(NEOIP_ROUTER_DIR)/itor/wikidbg/neoip_router_itor_wikidbg.o		\
+	$(NEOIP_ROUTER_DIR)/itor/cnx/neoip_router_itor_cnx.o			\
+	$(NEOIP_ROUTER_DIR)/itor/cnx/wikidbg/neoip_router_itor_cnx_wikidbg.o	\
+	$(NEOIP_ROUTER_DIR)/full/neoip_router_full.o				\
+	$(NEOIP_ROUTER_DIR)/full/wikidbg/neoip_router_full_wikidbg.o		\
+	$(NEOIP_ROUTER_DIR)/base/acache/neoip_router_acache.o			\
+	$(NEOIP_ROUTER_DIR)/base/acache/base/wikidbg/neoip_router_acache_wikidbg.o	\
+	$(NEOIP_ROUTER_DIR)/base/acache/base/item/neoip_router_acache_item.o		\
+	$(NEOIP_ROUTER_DIR)/base/acache/base/nunit/neoip_router_acache_nunit.o		\
+	$(NEOIP_ROUTER_DIR)/base/acl/neoip_router_acl.o					\
+	$(NEOIP_ROUTER_DIR)/base/acl/base/wikidbg/neoip_router_acl_wikidbg.o		\
+	$(NEOIP_ROUTER_DIR)/base/acl/base/type/neoip_router_acl_type.o			\
+	$(NEOIP_ROUTER_DIR)/base/acl/base/item/neoip_router_acl_item.o			\
+	$(NEOIP_ROUTER_DIR)/base/acl/base/nunit/neoip_router_acl_nunit.o		\
+	$(NEOIP_ROUTER_DIR)/base/err/neoip_router_err.o					\
+	$(NEOIP_ROUTER_DIR)/base/lident/neoip_router_lident.o				\
+	$(NEOIP_ROUTER_DIR)/base/lident/base/nunit/neoip_router_lident_nunit.o		\
+	$(NEOIP_ROUTER_DIR)/base/lident/base/wikidbg/neoip_router_lident_wikidbg.o	\
+	$(NEOIP_ROUTER_DIR)/base/rident/neoip_router_rident.o				\
+	$(NEOIP_ROUTER_DIR)/base/rident/base/arr/neoip_router_rident_arr.o		\
+	$(NEOIP_ROUTER_DIR)/base/rident/base/nunit/neoip_router_rident_nunit.o		\
+	$(NEOIP_ROUTER_DIR)/base/rident/base/wikidbg/neoip_router_rident_wikidbg.o	\
+	$(NEOIP_ROUTER_DIR)/base/rootca/neoip_router_rootca.o				\
+	$(NEOIP_ROUTER_DIR)/base/rootca/base/arr/neoip_router_rootca_arr.o		\
+	$(NEOIP_ROUTER_DIR)/base/rootca/base/nunit/neoip_router_rootca_nunit.o		\
+	$(NEOIP_ROUTER_DIR)/base/rootca/base/wikidbg/neoip_router_rootca_wikidbg.o	\
+	$(NEOIP_ROUTER_DIR)/base/pkttype/neoip_router_pkttype.o			\
+	$(NEOIP_ROUTER_DIR)/base/profile/neoip_router_profile.o			\
+	$(NEOIP_ROUTER_DIR)/base/nunit_gsuite/neoip_router_nunit_gsuite.o
+
+
+NEOIP_BT_CORE_DIR=neoip_bt_core
+NEOIP_BT_CORE_INC=-I$(NEOIP_BT_CORE_DIR) 
+NEOIP_BT_CORE_OBJS =									\
+	$(NEOIP_BT_CORE_DIR)/base/iov/neoip_bt_iov.o					\
+	$(NEOIP_BT_CORE_DIR)/base/iov/iov_arr/neoip_bt_iov_arr.o			\
+	$(NEOIP_BT_CORE_DIR)/base/err/neoip_bt_err.o					\
+	$(NEOIP_BT_CORE_DIR)/base/id/neoip_bt_id.o					\
+	$(NEOIP_BT_CORE_DIR)/base/id/peerid_helper/neoip_bt_peerid_helper.o				\
+	$(NEOIP_BT_CORE_DIR)/base/id/peerid_helper/base/nunit/neoip_bt_peerid_helper_nunit.o		\
+	$(NEOIP_BT_CORE_DIR)/base/id/peerid_helper/base/style/neoip_bt_peerid_style.o		\
+	$(NEOIP_BT_CORE_DIR)/base/handshake/neoip_bt_handshake.o			\
+	$(NEOIP_BT_CORE_DIR)/base/protoflag/neoip_bt_protoflag.o			\
+	$(NEOIP_BT_CORE_DIR)/base/cmd/neoip_bt_cmd.o					\
+	$(NEOIP_BT_CORE_DIR)/base/cmdtype/neoip_bt_cmdtype.o				\
+	$(NEOIP_BT_CORE_DIR)/base/prange/neoip_bt_prange.o				\
+	$(NEOIP_BT_CORE_DIR)/base/prange/nunit/neoip_bt_prange_nunit.o			\
+	$(NEOIP_BT_CORE_DIR)/base/pieceavail/neoip_bt_pieceavail.o			\
+	$(NEOIP_BT_CORE_DIR)/base/pieceavail/nunit/neoip_bt_pieceavail_nunit.o		\
+	$(NEOIP_BT_CORE_DIR)/base/pieceprec/neoip_bt_pieceprec.o			\
+	$(NEOIP_BT_CORE_DIR)/base/pieceprec/arr/neoip_bt_pieceprec_arr.o		\
+	$(NEOIP_BT_CORE_DIR)/base/pieceprec/nunit/neoip_bt_pieceprec_nunit.o		\
+	$(NEOIP_BT_CORE_DIR)/base/mfile/neoip_bt_mfile.o				\
+	$(NEOIP_BT_CORE_DIR)/base/mfile/subfile/neoip_bt_mfile_subfile.o		\
+	$(NEOIP_BT_CORE_DIR)/base/mfile/base/helper/neoip_bt_mfile_helper.o		\
+	$(NEOIP_BT_CORE_DIR)/base/mfile/base/nunit/neoip_bt_mfile_nunit.o		\
+	$(NEOIP_BT_CORE_DIR)/base/mfile/base/wikidbg/neoip_bt_mfile_wikidbg.o		\
+	$(NEOIP_BT_CORE_DIR)/base/nunit_gsuite/neoip_bt_core_nunit_gsuite.o		\
+	$(NEOIP_BT_CORE_DIR)/base/unit/neoip_bt_unit.o					\
+	$(NEOIP_BT_CORE_DIR)/swarm/neoip_bt_swarm.o					\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/base/event/neoip_bt_swarm_full_event.o		\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/base/wikidbg/neoip_bt_swarm_full_wikidbg.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/prec/neoip_bt_swarm_full_prec.o				\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/prec/base/wikidbg/neoip_bt_swarm_full_prec_wikidbg.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/prec/base/profile/neoip_bt_swarm_full_prec_profile.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/sendq/neoip_bt_swarm_full_sendq.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/sendq/wikidbg/neoip_bt_swarm_full_sendq_wikidbg.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/utmsg/neoip_bt_swarm_full_utmsg.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/utmsg/wikidbg/neoip_bt_swarm_full_utmsg_wikidbg.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/sched/neoip_bt_swarm_full_sched.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/sched/wikidbg/neoip_bt_swarm_full_sched_wikidbg.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/full/neoip_bt_swarm_full.o					\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/base/profile/neoip_bt_swarm_sched_profile.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/base/wikidbg/neoip_bt_swarm_sched_wikidbg.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/base/piece/neoip_bt_swarm_sched_piece.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/base/piece/wikidbg/neoip_bt_swarm_sched_piece_wikidbg.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/base/block/neoip_bt_swarm_sched_block.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/base/block/wikidbg/neoip_bt_swarm_sched_block_wikidbg.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/base/request/neoip_bt_swarm_sched_request.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/base/request/wikidbg/neoip_bt_swarm_sched_request_wikidbg.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/ecnx/neoip_bt_swarm_sched_ecnx.o				\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/full/neoip_bt_swarm_sched_full.o				\
+	$(NEOIP_BT_CORE_DIR)/swarm/sched/neoip_bt_swarm_sched.o					\
+	$(NEOIP_BT_CORE_DIR)/swarm/peersrc/neoip_bt_swarm_peersrc.o					\
+	$(NEOIP_BT_CORE_DIR)/swarm/peersrc/itor/neoip_bt_swarm_itor.o				\
+	$(NEOIP_BT_CORE_DIR)/swarm/peersrc/itor/wikidbg/neoip_bt_swarm_itor_wikidbg.o		\
+	$(NEOIP_BT_CORE_DIR)/swarm/peersrc/base/wikidbg/neoip_bt_swarm_peersrc_wikidbg.o		\
+	$(NEOIP_BT_CORE_DIR)/swarm/utmsg/neoip_bt_swarm_utmsg.o					\
+	$(NEOIP_BT_CORE_DIR)/swarm/utmsg/base/wikidbg/neoip_bt_swarm_utmsg_wikidbg.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/event/neoip_bt_swarm_event.o					\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/reqauth_type/neoip_bt_reqauth_type.o				\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/helper/neoip_bt_swarm_helper.o				\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/resumedata/neoip_bt_swarm_resumedata.o		\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/resumedata/helper/neoip_bt_swarm_resumedata_helper.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/profile/neoip_bt_swarm_profile.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/profile/helper/neoip_bt_swarm_profile_helper.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/stats/neoip_bt_swarm_stats.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/stats/wikidbg/neoip_bt_swarm_stats_wikidbg.o	\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/nunit/neoip_bt_swarm_nunit.o			\
+	$(NEOIP_BT_CORE_DIR)/swarm/base/wikidbg/neoip_bt_swarm_wikidbg.o		\
+	$(NEOIP_BT_CORE_DIR)/session/base/wikidbg/neoip_bt_session_wikidbg.o		\
+	$(NEOIP_BT_CORE_DIR)/session/base/profile/neoip_bt_session_profile.o		\
+	$(NEOIP_BT_CORE_DIR)/session/cnx/neoip_bt_session_cnx.o			\
+	$(NEOIP_BT_CORE_DIR)/session/neoip_bt_session.o
+
+NEOIP_BT_PLUGIN_DIR=neoip_bt_plugin
+EOIP_BT_PLUGIN_INC=-I$(NEOIP_BT_PLUGIN_DIR)
+NEOIP_BT_PLUGIN_OBJS =								\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/base/event/neoip_bt_ecnx_event.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/base/profile/neoip_bt_http_ecnx_cnx_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/base/stats/neoip_bt_http_ecnx_cnx_stats.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/base/stats/helper/neoip_bt_http_ecnx_cnx_stats_helper.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/base/wikidbg/neoip_bt_http_ecnx_cnx_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/pool/neoip_bt_http_ecnx_pool.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/pool/base/profile/neoip_bt_http_ecnx_pool_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/pool/base/wikidbg/neoip_bt_http_ecnx_pool_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/herr/neoip_bt_http_ecnx_herr.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/herr/wikidbg/neoip_bt_http_ecnx_herr_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/iov/neoip_bt_http_ecnx_iov.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/iov/wikidbg/neoip_bt_http_ecnx_iov_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/req/neoip_bt_http_ecnx_req.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/req/wikidbg/neoip_bt_http_ecnx_req_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/ecnx/impl/http/neoip_bt_http_ecnx_cnx.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/io/base/mode/neoip_bt_io_mode.o					\
+	$(NEOIP_BT_PLUGIN_DIR)/io/base/stats/neoip_bt_io_stats.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/io/base/stats/wikidbg/neoip_bt_io_stats_wikidbg.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/block/neoip_bt_io_cache_block.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/block/wikidbg/neoip_bt_io_cache_block_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/state/neoip_bt_io_cache_state.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/blkrd/neoip_bt_io_cache_blkrd.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/blkrd/wikidbg/neoip_bt_io_cache_blkrd_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/blkwr/neoip_bt_io_cache_blkwr.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/blkwr/wikidbg/neoip_bt_io_cache_blkwr_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/pool/neoip_bt_io_cache_pool.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/pool/base/profile/neoip_bt_io_cache_pool_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/pool/base/wikidbg/neoip_bt_io_cache_pool_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/profile/neoip_bt_io_cache_profile.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/base/wikidbg/neoip_bt_io_cache_wikidbg.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/read/neoip_bt_io_cache_read.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/read/wikidbg/neoip_bt_io_cache_read_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/write/neoip_bt_io_cache_write.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/write/wikidbg/neoip_bt_io_cache_write_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/stopping/neoip_bt_io_cache_stopping.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/stopping/wikidbg/neoip_bt_io_cache_stopping_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/cache/neoip_bt_io_cache.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/sfile/base/wikidbg/neoip_bt_io_sfile_wikidbg.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/sfile/read/neoip_bt_io_sfile_read.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/sfile/write/neoip_bt_io_sfile_write.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/sfile/neoip_bt_io_sfile.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/pfile/read/neoip_bt_io_pfile_read.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/pfile/write/neoip_bt_io_pfile_write.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/pfile/neoip_bt_io_pfile.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/pfile/base/profile/neoip_bt_io_pfile_profile.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/pfile/base/wikidbg/neoip_bt_io_pfile_wikidbg.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/pfile/base/helper/asyncdel/neoip_bt_io_pfile_asyncdel.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/pfile/base/helper/asyncdel/base/policy/neoip_bt_io_pfile_asyncdel_policy.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/io/impl/pfile/base/helper/asyncdel/base/profile/neoip_bt_io_pfile_asyncdel_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/pselect/base/nunit/neoip_bt_pselect_nunit.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/pselect/base/policy/neoip_bt_pselect_policy.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/pselect/impl/slide/neoip_bt_pselect_slide.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/pselect/impl/slide/base/wikidbg/neoip_bt_pselect_slide_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/pselect/impl/slide/curs/neoip_bt_pselect_slide_curs.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/pselect/impl/slide/curs/base/arg/neoip_bt_pselect_slide_curs_arg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/pselect/impl/slide/curs/base/wikidbg/neoip_bt_pselect_slide_curs_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/pselect/impl/fixed/neoip_bt_pselect_fixed.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/pselect/impl/fixed/wikidbg/neoip_bt_pselect_fixed_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/base/mode/neoip_bt_peerpick_mode.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/base/profile/neoip_bt_peerpick_profile.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/base/helper/neoip_bt_peerpick_helper.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/impl/plain/neoip_bt_peerpick_plain.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/impl/plain/profile/neoip_bt_peerpick_plain_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/impl/relay/neoip_bt_peerpick_relay.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/impl/relay/profile/neoip_bt_peerpick_relay_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/impl/casti/neoip_bt_peerpick_casti.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/impl/casti/profile/neoip_bt_peerpick_casti_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/impl/casto/neoip_bt_peerpick_casto.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peerpick/impl/casto/profile/neoip_bt_peerpick_casto_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/base/event/neoip_bt_peersrc_event.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/base/helper/neoip_bt_peersrc_helper.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/base/peer/neoip_bt_peersrc_peer.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/http/neoip_bt_peersrc_http.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/http/base/profile/neoip_bt_peersrc_http_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/http/base/wikidbg/neoip_bt_peersrc_http_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/kad/neoip_bt_peersrc_kad.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/kad/base/profile/neoip_bt_peersrc_kad_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/kad/base/wikidbg/neoip_bt_peersrc_kad_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/nslan/neoip_bt_peersrc_nslan.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/nslan/base/wikidbg/neoip_bt_peersrc_nslan_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/utpex/neoip_bt_peersrc_utpex.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/utpex/cnx/neoip_bt_peersrc_utpex_cnx.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/utpex/cnx/wikidbg/neoip_bt_peersrc_utpex_cnx_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/utpex/base/profile/neoip_bt_peersrc_utpex_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/peersrc/impl/utpex/base/wikidbg/neoip_bt_peersrc_utpex_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/base/event/neoip_bt_utmsg_event.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/base/utmsgtype/neoip_bt_utmsgtype.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/bcast/neoip_bt_utmsg_bcast.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/bcast/handler/neoip_bt_utmsg_bcast_handler.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/bcast/cnx/neoip_bt_utmsg_bcast_cnx.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/bcast/cnx/wikidbg/neoip_bt_utmsg_bcast_cnx_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/bcast/base/profile/neoip_bt_utmsg_bcast_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/bcast/base/wikidbg/neoip_bt_utmsg_bcast_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/byteacct/neoip_bt_utmsg_byteacct.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/byteacct/cnx/neoip_bt_utmsg_byteacct_cnx.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/byteacct/cnx/wikidbg/neoip_bt_utmsg_byteacct_cnx_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/byteacct/base/profile/neoip_bt_utmsg_byteacct_profile.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/byteacct/base/wikidbg/neoip_bt_utmsg_byteacct_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/fstart/neoip_bt_utmsg_fstart.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/fstart/cnx/neoip_bt_utmsg_fstart_cnx.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/fstart/cnx/wikidbg/neoip_bt_utmsg_fstart_cnx_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/fstart/base/wikidbg/neoip_bt_utmsg_fstart_wikidbg.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/punavail/neoip_bt_utmsg_punavail.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/punavail/cnx/neoip_bt_utmsg_punavail_cnx.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/punavail/cnx/wikidbg/neoip_bt_utmsg_punavail_cnx_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/punavail/base/wikidbg/neoip_bt_utmsg_punavail_wikidbg.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/piecewish/neoip_bt_utmsg_piecewish.o				\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/piecewish/cnx/neoip_bt_utmsg_piecewish_cnx.o			\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/piecewish/cnx/wikidbg/neoip_bt_utmsg_piecewish_cnx_wikidbg.o	\
+	$(NEOIP_BT_PLUGIN_DIR)/utmsg/impl/piecewish/base/wikidbg/neoip_bt_utmsg_piecewish_wikidbg.o		\
+	$(NEOIP_BT_PLUGIN_DIR)/base/nunit_gsuite/neoip_bt_plugin_nunit_gsuite.o
+
+NEOIP_BT_EZ_DIR=neoip_bt_ez
+NEOIP_BT_EZ_INC=-I$(NEOIP_BT_EZ_DIR) 						\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm				\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/base/nunit			\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/base/state			\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/base/profile		\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/base/opt			\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/base/event			\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/alloc		\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/check		\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/share		\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/stopping		\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/stopped		\
+			-I$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/error		\
+			-I$(NEOIP_BT_EZ_DIR)/base/nunit_gsuite
+NEOIP_BT_EZ_OBJS =								\
+	$(NEOIP_BT_EZ_DIR)/ezsession/neoip_bt_ezsession.o			\
+	$(NEOIP_BT_EZ_DIR)/ezsession/base/opt/neoip_bt_ezsession_opt.o		\
+	$(NEOIP_BT_EZ_DIR)/ezsession/base/profile/neoip_bt_ezsession_profile.o	\
+	$(NEOIP_BT_EZ_DIR)/ezsession/base/wikidbg/neoip_bt_ezsession_wikidbg.o	\
+	$(NEOIP_BT_EZ_DIR)/ezsession/neoip_bt_ezsession.o			\
+	$(NEOIP_BT_EZ_DIR)/ezsession/base/opt/neoip_bt_ezsession_opt.o		\
+	$(NEOIP_BT_EZ_DIR)/ezsession/base/profile/neoip_bt_ezsession_profile.o	\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/neoip_bt_ezswarm.o				\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/base/wikidbg/neoip_bt_ezswarm_wikidbg.o	\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/base/nunit/neoip_bt_ezswarm_nunit.o		\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/base/state/neoip_bt_ezswarm_state.o		\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/base/opt/neoip_bt_ezswarm_opt.o		\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/base/event/neoip_bt_ezswarm_event.o		\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/base/profile/neoip_bt_ezswarm_profile.o	\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/alloc/neoip_bt_ezswarm_alloc.o			\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/alloc/wikidbg/neoip_bt_ezswarm_alloc_wikidbg.o	\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/check/neoip_bt_ezswarm_check.o			\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/check/wikidbg/neoip_bt_ezswarm_check_wikidbg.o	\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/share/neoip_bt_ezswarm_share.o			\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/share/wikidbg/neoip_bt_ezswarm_share_wikidbg.o	\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/stopping/neoip_bt_ezswarm_stopping.o		\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/stopping/wikidbg/neoip_bt_ezswarm_stopping_wikidbg.o\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/stopped/neoip_bt_ezswarm_stopped.o			\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/stopped/wikidbg/neoip_bt_ezswarm_stopped_wikidbg.o	\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/error/neoip_bt_ezswarm_error.o			\
+	$(NEOIP_BT_EZ_DIR)/ezswarm/stateobj/error/wikidbg/neoip_bt_ezswarm_error_wikidbg.o	\
+	$(NEOIP_BT_EZ_DIR)/base/nunit_gsuite/neoip_bt_ez_nunit_gsuite.o
+
+NEOIP_BT_MISC_DIR=neoip_bt_misc
+NEOIP_BT_MISC_INC=-I$(NEOIP_BT_MISC_DIR)
+NEOIP_BT_MISC_OBJS =								\
+	$(NEOIP_BT_MISC_DIR)/alloc/neoip_bt_alloc.o				\
+	$(NEOIP_BT_MISC_DIR)/alloc/base/policy/neoip_bt_alloc_policy.o		\
+	$(NEOIP_BT_MISC_DIR)/alloc/base/profile/neoip_bt_alloc_profile.o	\
+	$(NEOIP_BT_MISC_DIR)/alloc/base/nunit/neoip_bt_alloc_nunit.o		\
+	$(NEOIP_BT_MISC_DIR)/check/neoip_bt_check.o				\
+	$(NEOIP_BT_MISC_DIR)/check/base/policy/neoip_bt_check_policy.o		\
+	$(NEOIP_BT_MISC_DIR)/check/base/nunit/neoip_bt_check_nunit.o		\
+	$(NEOIP_BT_MISC_DIR)/mfile_cpuhash/neoip_bt_mfile_cpuhash.o			\
+	$(NEOIP_BT_MISC_DIR)/mfile_cpuhash/nunit/neoip_bt_mfile_cpuhash_nunit.o		\
+	$(NEOIP_BT_MISC_DIR)/piece_cpuhash/neoip_bt_piece_cpuhash.o			\
+	$(NEOIP_BT_MISC_DIR)/relay/neoip_bt_relay.o					\
+	$(NEOIP_BT_MISC_DIR)/relay/base/profile/neoip_bt_relay_profile.o		\
+	$(NEOIP_BT_MISC_DIR)/relay/base/wikidbg/neoip_bt_relay_wikidbg.o		\
+	$(NEOIP_BT_MISC_DIR)/tracker/base/peer/neoip_bt_tracker_peer.o			\
+	$(NEOIP_BT_MISC_DIR)/tracker/base/request/neoip_bt_tracker_request.o		\
+	$(NEOIP_BT_MISC_DIR)/tracker/base/reply/neoip_bt_tracker_reply.o		\
+	$(NEOIP_BT_MISC_DIR)/tracker/client/neoip_bt_tracker_client.o			\
+	$(NEOIP_BT_MISC_DIR)/tracker/client/base/profile/neoip_bt_tracker_client_profile.o	\
+	$(NEOIP_BT_MISC_DIR)/tracker/client/base/nunit/neoip_bt_tracker_client_nunit.o	\
+	$(NEOIP_BT_MISC_DIR)/tracker/server/neoip_bt_tracker_server.o			\
+	$(NEOIP_BT_MISC_DIR)/tracker/server/nunit/neoip_bt_tracker_server_nunit.o	\
+	$(NEOIP_BT_MISC_DIR)/lnk2mfile/neoip_bt_lnk2mfile.o				\
+	$(NEOIP_BT_MISC_DIR)/lnk2mfile/base/type/neoip_bt_lnk2mfile_type.o		\
+	$(NEOIP_BT_MISC_DIR)/lnk2mfile/base/profile/neoip_bt_lnk2mfile_profile.o	\
+	$(NEOIP_BT_MISC_DIR)/lnk2mfile/base/nunit/neoip_bt_lnk2mfile_nunit.o		\
+	$(NEOIP_BT_MISC_DIR)/mlink_file/neoip_mlink_file.o				\
+	$(NEOIP_BT_MISC_DIR)/mlink_file/helper/neoip_mlink_file_helper.o		\
+	$(NEOIP_BT_MISC_DIR)/mlink_file/base/nunit/neoip_mlink_nunit.o			\
+	$(NEOIP_BT_MISC_DIR)/mlink_file/base/subfile/neoip_mlink_subfile.o		\
+	$(NEOIP_BT_MISC_DIR)/mlink_file/base/subfile/arr/neoip_mlink_subfile_arr.o	\
+	$(NEOIP_BT_MISC_DIR)/mlink_file/base/url/neoip_mlink_url.o			\
+	$(NEOIP_BT_MISC_DIR)/mlink_file/base/url/arr/neoip_mlink_url_arr.o		\
+	$(NEOIP_BT_MISC_DIR)/mlink_file/base/hash/neoip_mlink_hash.o			\
+	$(NEOIP_BT_MISC_DIR)/mlink_file/base/hash/arr/neoip_mlink_hash_arr.o		\
+	$(NEOIP_BT_MISC_DIR)/base/nunit_gsuite/neoip_bt_misc_nunit_gsuite.o
+
+NEOIP_BT_CAST_DIR=neoip_bt_cast
+NEOIP_BT_CAST_INC=-I$(NEOIP_BT_CAST_DIR)
+NEOIP_BT_CAST_OBJS =									\
+	$(NEOIP_BT_CAST_DIR)/httpo/base/event/neoip_bt_httpo_event.o			\
+	$(NEOIP_BT_CAST_DIR)/httpo/listener/neoip_bt_httpo_listener.o			\
+	$(NEOIP_BT_CAST_DIR)/httpo/listener/wikidbg/neoip_bt_httpo_listener_wikidbg.o	\
+	$(NEOIP_BT_CAST_DIR)/httpo/resp/neoip_bt_httpo_resp.o			\
+	$(NEOIP_BT_CAST_DIR)/httpo/resp/wikidbg/neoip_bt_httpo_resp_wikidbg.o	\
+	$(NEOIP_BT_CAST_DIR)/httpo/full/neoip_bt_httpo_full.o			\
+	$(NEOIP_BT_CAST_DIR)/httpo/full/base/arg/neoip_bt_httpo_full_arg.o	\
+	$(NEOIP_BT_CAST_DIR)/httpo/full/base/wikidbg/neoip_bt_httpo_full_wikidbg.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/neoip_bt_httpi.o				\
+	$(NEOIP_BT_CAST_DIR)/httpi/base/event/neoip_bt_httpi_event.o		\
+	$(NEOIP_BT_CAST_DIR)/httpi/base/profile/neoip_bt_httpi_profile.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/base/nunit/neoip_bt_httpi_nunit.o		\
+	$(NEOIP_BT_CAST_DIR)/httpi/base/wikidbg/neoip_bt_httpi_wikidbg.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/mod/base/type/neoip_bt_httpi_mod_type.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/raw/neoip_bt_httpi_mod_raw.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/raw/profile/neoip_bt_httpi_mod_raw_profile.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/flv/neoip_bt_httpi_mod_flv.o	\
+	$(NEOIP_BT_CAST_DIR)/mdata/neoip_bt_cast_mdata.o			\
+	$(NEOIP_BT_CAST_DIR)/mdata/server/neoip_bt_cast_mdata_server.o		\
+	$(NEOIP_BT_CAST_DIR)/mdata/client/neoip_bt_cast_mdata_client.o		\
+	$(NEOIP_BT_CAST_DIR)/mdata/base/nunit/neoip_bt_cast_mdata_nunit.o	\
+	$(NEOIP_BT_CAST_DIR)/mdata/base/udata/neoip_bt_cast_udata.o		\
+	$(NEOIP_BT_CAST_DIR)/base/pidx/neoip_bt_cast_pidx.o			\
+	$(NEOIP_BT_CAST_DIR)/base/spos/neoip_bt_cast_spos.o			\
+	$(NEOIP_BT_CAST_DIR)/base/spos/arr/neoip_bt_cast_spos_arr.o		\
+	$(NEOIP_BT_CAST_DIR)/base/helper/neoip_bt_cast_helper.o			\
+	$(NEOIP_BT_CAST_DIR)/base/nunit_gsuite/neoip_bt_cast_nunit_gsuite.o
+
+NEOIP_FLV_DIR=neoip_flv
+NEOIP_FLV_INC=-I$(NEOIP_FLV_DIR)
+NEOIP_FLV_OBJS =							\
+	$(NEOIP_FLV_DIR)/base/basic/codecid/neoip_flv_codecid.o		\
+	$(NEOIP_FLV_DIR)/base/basic/frametype/neoip_flv_frametype.o	\
+	$(NEOIP_FLV_DIR)/base/basic/soundtype/neoip_flv_soundtype.o	\
+	$(NEOIP_FLV_DIR)/base/basic/soundsize/neoip_flv_soundsize.o	\
+	$(NEOIP_FLV_DIR)/base/basic/soundrate/neoip_flv_soundrate.o	\
+	$(NEOIP_FLV_DIR)/base/basic/soundformat/neoip_flv_soundformat.o	\
+	$(NEOIP_FLV_DIR)/base/basic/tagtype/neoip_flv_tagtype.o		\
+	$(NEOIP_FLV_DIR)/base/err/neoip_flv_err.o			\
+	$(NEOIP_FLV_DIR)/base/nunit_gsuite/neoip_flv_nunit_gsuite.o	\
+	$(NEOIP_FLV_DIR)/base/taghd/neoip_flv_taghd.o			\
+	$(NEOIP_FLV_DIR)/base/taghd/audio/neoip_flv_taghd_audio.o	\
+	$(NEOIP_FLV_DIR)/base/taghd/video/neoip_flv_taghd_video.o	\
+	$(NEOIP_FLV_DIR)/base/tophd/neoip_flv_tophd.o			\
+	$(NEOIP_FLV_DIR)/base/tophd/flag/neoip_flv_tophd_flag.o		\
+	$(NEOIP_FLV_DIR)/parse/base/event/neoip_flv_parse_event.o	\
+	$(NEOIP_FLV_DIR)/parse/base/helper/neoip_flv_parse_helper.o	\
+	$(NEOIP_FLV_DIR)/parse/base/profile/neoip_flv_parse_profile.o	\
+	$(NEOIP_FLV_DIR)/parse/base/state/neoip_flv_parse_state.o	\
+	$(NEOIP_FLV_DIR)/parse/base/nunit/neoip_flv_parse_nunit.o	\
+	$(NEOIP_FLV_DIR)/parse/base/wikidbg/neoip_flv_parse_wikidbg.o	\
+	$(NEOIP_FLV_DIR)/parse/neoip_flv_parse.o
+
+NEOIP_KAD_DIR=neoip_kad
+NEOIP_KAD_INC=-I$(NEOIP_KAD_DIR) 					\
+			-I$(NEOIP_KAD_DIR)/base				\
+			-I$(NEOIP_KAD_DIR)/base/err			\
+			-I$(NEOIP_KAD_DIR)/base/event			\
+			-I$(NEOIP_KAD_DIR)/base/addr			\
+			-I$(NEOIP_KAD_DIR)/base/addr/kad_addr		\
+			-I$(NEOIP_KAD_DIR)/base/addr/kad_caddr		\
+			-I$(NEOIP_KAD_DIR)/base/record			\
+			-I$(NEOIP_KAD_DIR)/base/record/kad_rec		\
+			-I$(NEOIP_KAD_DIR)/base/record/kad_recdups	\
+			-I$(NEOIP_KAD_DIR)/base/rpc_common		\
+			-I$(NEOIP_KAD_DIR)/base/rpc_profile		\
+			-I$(NEOIP_KAD_DIR)/base/pkttype			\
+			-I$(NEOIP_KAD_DIR)/base/profile			\
+			-I$(NEOIP_KAD_DIR)/base/stat			\
+			-I$(NEOIP_KAD_DIR)/listener			\
+			-I$(NEOIP_KAD_DIR)/listener/base/wikidbg	\
+			-I$(NEOIP_KAD_DIR)/peer				\
+			-I$(NEOIP_KAD_DIR)/peer/rpc_server		\
+			-I$(NEOIP_KAD_DIR)/peer/base/wikidbg		\
+			-I$(NEOIP_KAD_DIR)/service/db			\
+			-I$(NEOIP_KAD_DIR)/service/db/replicate		\
+			-I$(NEOIP_KAD_DIR)/service/db/replicate/wikidbg	\
+			-I$(NEOIP_KAD_DIR)/service/db/republish		\
+			-I$(NEOIP_KAD_DIR)/service/db/republish/wikidbg	\
+			-I$(NEOIP_KAD_DIR)/service/db/base/rec		\
+			-I$(NEOIP_KAD_DIR)/service/db/base/rec/wikidbg	\
+			-I$(NEOIP_KAD_DIR)/service/db/base/profile	\
+			-I$(NEOIP_KAD_DIR)/service/db/base/wikidbg	\
+			-I$(NEOIP_KAD_DIR)/service/cnx/clicnx		\
+			-I$(NEOIP_KAD_DIR)/service/cnx/clicnx/profile	\
+			-I$(NEOIP_KAD_DIR)/service/cnx/srvcnx		\
+			-I$(NEOIP_KAD_DIR)/service/cnx/srvcnx/cnx	\
+			-I$(NEOIP_KAD_DIR)/service/kbucket			\
+			-I$(NEOIP_KAD_DIR)/service/kbucket/kbucklist		\
+			-I$(NEOIP_KAD_DIR)/service/kbucket/kbucklist/wikidbg	\
+			-I$(NEOIP_KAD_DIR)/service/kbucket/kbucknode		\
+			-I$(NEOIP_KAD_DIR)/service/kbucket/kbucknode/wikidbg	\
+			-I$(NEOIP_KAD_DIR)/service/kbucket/base/profile		\
+			-I$(NEOIP_KAD_DIR)/service/kbucket/base/wikidbg		\
+			-I$(NEOIP_KAD_DIR)/service/bstrap			\
+			-I$(NEOIP_KAD_DIR)/service/bstrap/cand			\
+			-I$(NEOIP_KAD_DIR)/service/bstrap/base/src		\
+			-I$(NEOIP_KAD_DIR)/service/bstrap/base/src/profile	\
+			-I$(NEOIP_KAD_DIR)/service/bstrap/base/src/nunit	\
+			-I$(NEOIP_KAD_DIR)/service/bstrap/base/filef		\
+			-I$(NEOIP_KAD_DIR)/service/bstrap/base/profile		\
+			-I$(NEOIP_KAD_DIR)/service/bstrap/base/nunit		\
+			-I$(NEOIP_KAD_DIR)/client_rpc			\
+			-I$(NEOIP_KAD_DIR)/client_rpc/ping_rpc		\
+			-I$(NEOIP_KAD_DIR)/client_rpc/store_rpc		\
+			-I$(NEOIP_KAD_DIR)/client_rpc/findnode_rpc	\
+			-I$(NEOIP_KAD_DIR)/client_rpc/findsomeval_rpc	\
+			-I$(NEOIP_KAD_DIR)/client_rpc/findallval_rpc	\
+			-I$(NEOIP_KAD_DIR)/client_rpc/delete_rpc	\
+			-I$(NEOIP_KAD_DIR)/client_rpc/base/nunit	\
+			-I$(NEOIP_KAD_DIR)/cmd					\
+			-I$(NEOIP_KAD_DIR)/cmd/base/nsearch			\
+			-I$(NEOIP_KAD_DIR)/cmd/base/nsearch/lnode		\
+			-I$(NEOIP_KAD_DIR)/cmd/base/nsearch/llist		\
+			-I$(NEOIP_KAD_DIR)/cmd/base/nsearch/base/profile	\
+			-I$(NEOIP_KAD_DIR)/cmd/base/nsearch/base/wikidbg	\
+			-I$(NEOIP_KAD_DIR)/cmd/base/nunit		\
+			-I$(NEOIP_KAD_DIR)/cmd/closestnode		\
+			-I$(NEOIP_KAD_DIR)/cmd/store			\
+			-I$(NEOIP_KAD_DIR)/cmd/delete			\
+			-I$(NEOIP_KAD_DIR)/cmd/query			\
+			-I$(NEOIP_KAD_DIR)/cmd/query_some		\
+			-I$(NEOIP_KAD_DIR)/helper/kad_rec_src		\
+			-I$(NEOIP_KAD_DIR)/helper/kad_rec_src/nunit	\
+			-I$(NEOIP_KAD_DIR)/helper/kad_rec_src/nunit	\
+			-I$(NEOIP_KAD_DIR)/helper/kad_publish			\
+			-I$(NEOIP_KAD_DIR)/helper/kad_publish/base/nunit	\
+			-I$(NEOIP_KAD_DIR)/helper/kad_publish/base/wikidbg	\
+			-I$(NEOIP_KAD_DIR)/nunit_gsuite
+
+	
+NEOIP_KAD_OBJS =								\
+	$(NEOIP_KAD_DIR)/base/err/neoip_kad_err.o				\
+	$(NEOIP_KAD_DIR)/base/event/neoip_kad_event.o				\
+	$(NEOIP_KAD_DIR)/base/addr/kad_addr/neoip_kad_addr.o			\
+	$(NEOIP_KAD_DIR)/base/addr/kad_caddr/neoip_kad_caddr.o			\
+	$(NEOIP_KAD_DIR)/base/record/kad_rec/neoip_kad_rec.o			\
+	$(NEOIP_KAD_DIR)/base/record/kad_recdups/neoip_kad_recdups.o		\
+	$(NEOIP_KAD_DIR)/base/rpc_common/neoip_kad_rpc_common.o			\
+	$(NEOIP_KAD_DIR)/base/rpc_profile/neoip_kad_rpc_profile.o		\
+	$(NEOIP_KAD_DIR)/base/pkttype/neoip_kad_pkttype.o			\
+	$(NEOIP_KAD_DIR)/base/profile/neoip_kad_profile.o			\
+	$(NEOIP_KAD_DIR)/base/stat/neoip_kad_stat.o				\
+	$(NEOIP_KAD_DIR)/listener/neoip_kad_listener.o				\
+	$(NEOIP_KAD_DIR)/listener/base/wikidbg/neoip_kad_listener_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/peer/neoip_kad_peer.o					\
+	$(NEOIP_KAD_DIR)/peer/rpc_server/neoip_kad_peer_rpc_server.o		\
+	$(NEOIP_KAD_DIR)/peer/base/wikidbg/neoip_kad_peer_wikidbg.o		\
+	$(NEOIP_KAD_DIR)/service/db/neoip_kad_db.o				\
+	$(NEOIP_KAD_DIR)/service/db/replicate/neoip_kad_db_replicate.o			\
+	$(NEOIP_KAD_DIR)/service/db/replicate/wikidbg/neoip_kad_db_replicate_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/service/db/republish/neoip_kad_db_republish.o			\
+	$(NEOIP_KAD_DIR)/service/db/republish/wikidbg/neoip_kad_db_republish_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/service/db/base/rec/neoip_kad_db_rec.o			\
+	$(NEOIP_KAD_DIR)/service/db/base/rec/wikidbg/neoip_kad_db_rec_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/service/db/base/profile/neoip_kad_db_profile.o		\
+	$(NEOIP_KAD_DIR)/service/db/base/wikidbg/neoip_kad_db_wikidbg.o		\
+	$(NEOIP_KAD_DIR)/service/cnx/clicnx/neoip_kad_clicnx.o			\
+	$(NEOIP_KAD_DIR)/service/cnx/clicnx/base/profile/neoip_kad_clicnx_profile.o	\
+	$(NEOIP_KAD_DIR)/service/cnx/clicnx/base/wikidbg/neoip_kad_clicnx_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/service/cnx/srvcnx/neoip_kad_srvcnx.o			\
+	$(NEOIP_KAD_DIR)/service/cnx/srvcnx/cnx/neoip_kad_srvcnx_cnx.o		\
+	$(NEOIP_KAD_DIR)/service/kbucket/neoip_kad_kbucket.o					\
+	$(NEOIP_KAD_DIR)/service/kbucket/kbucknode/neoip_kad_kbucknode.o			\
+	$(NEOIP_KAD_DIR)/service/kbucket/kbucknode/wikidbg/neoip_kad_kbucknode_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/service/kbucket/kbucklist/neoip_kad_kbucklist.o			\
+	$(NEOIP_KAD_DIR)/service/kbucket/kbucklist/wikidbg/neoip_kad_kbucklist_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/service/kbucket/base/profile/neoip_kad_kbucket_profile.o		\
+	$(NEOIP_KAD_DIR)/service/kbucket/base/wikidbg/neoip_kad_kbucket_wikidbg.o		\
+	$(NEOIP_KAD_DIR)/service/bstrap/neoip_kad_bstrap.o				\
+	$(NEOIP_KAD_DIR)/service/bstrap/cand/neoip_kad_bstrap_cand.o			\
+	$(NEOIP_KAD_DIR)/service/bstrap/base/file/neoip_kad_bstrap_file.o		\
+	$(NEOIP_KAD_DIR)/service/bstrap/base/src/neoip_kad_bstrap_src.o			\
+	$(NEOIP_KAD_DIR)/service/bstrap/base/src/profile/neoip_kad_bstrap_src_profile.o	\
+	$(NEOIP_KAD_DIR)/service/bstrap/base/src/nunit/neoip_kad_bstrap_src_nunit.o	\
+	$(NEOIP_KAD_DIR)/service/bstrap/base/profile/neoip_kad_bstrap_profile.o		\
+	$(NEOIP_KAD_DIR)/service/bstrap/base/nunit/neoip_kad_bstrap_nunit.o		\
+	$(NEOIP_KAD_DIR)/client_rpc/base/client/neoip_kad_client_rpc.o			\
+	$(NEOIP_KAD_DIR)/client_rpc/base/client/wikidbg/neoip_kad_client_rpc_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/client_rpc/base/nunit/neoip_kad_client_rpc_nunit.o	\
+	$(NEOIP_KAD_DIR)/client_rpc/ping_rpc/neoip_kad_ping_rpc.o			\
+	$(NEOIP_KAD_DIR)/client_rpc/ping_rpc/wikidbg/neoip_kad_ping_rpc_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/client_rpc/store_rpc/neoip_kad_store_rpc.o			\
+	$(NEOIP_KAD_DIR)/client_rpc/store_rpc/wikidbg/neoip_kad_store_rpc_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/client_rpc/findnode_rpc/neoip_kad_findnode_rpc.o		\
+	$(NEOIP_KAD_DIR)/client_rpc/findnode_rpc/wikidbg/neoip_kad_findnode_rpc_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/client_rpc/findsomeval_rpc/neoip_kad_findsomeval_rpc.o			\
+	$(NEOIP_KAD_DIR)/client_rpc/findsomeval_rpc/wikidbg/neoip_kad_findsomeval_rpc_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/client_rpc/findallval_rpc/neoip_kad_findallval_rpc.o			\
+	$(NEOIP_KAD_DIR)/client_rpc/findallval_rpc/wikidbg/neoip_kad_findallval_rpc_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/client_rpc/delete_rpc/neoip_kad_delete_rpc.o				\
+	$(NEOIP_KAD_DIR)/client_rpc/delete_rpc/wikidbg/neoip_kad_delete_rpc_wikidbg.o		\
+	$(NEOIP_KAD_DIR)/cmd/base/nsearch/neoip_kad_nsearch.o					\
+	$(NEOIP_KAD_DIR)/cmd/base/nsearch/lnode/neoip_kad_nsearch_lnode.o			\
+	$(NEOIP_KAD_DIR)/cmd/base/nsearch/lnode/state/neoip_kad_nsearch_lnode_state.o		\
+	$(NEOIP_KAD_DIR)/cmd/base/nsearch/lnode/wikidbg/neoip_kad_nsearch_lnode_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/cmd/base/nsearch/llist/neoip_kad_nsearch_llist.o			\
+	$(NEOIP_KAD_DIR)/cmd/base/nsearch/llist/wikidbg/neoip_kad_nsearch_llist_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/cmd/base/nsearch/base/profile/neoip_kad_nsearch_profile.o		\
+	$(NEOIP_KAD_DIR)/cmd/base/nsearch/base/wikidbg/neoip_kad_nsearch_wikidbg.o		\
+	$(NEOIP_KAD_DIR)/cmd/base/nunit/neoip_kad_cmd_nunit.o				\
+	$(NEOIP_KAD_DIR)/cmd/closestnode/neoip_kad_closestnode.o			\
+	$(NEOIP_KAD_DIR)/cmd/closestnode/wikidbg/neoip_kad_closestnode_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/cmd/store/neoip_kad_store.o					\
+	$(NEOIP_KAD_DIR)/cmd/store/wikidbg/neoip_kad_store_wikidbg.o			\
+	$(NEOIP_KAD_DIR)/cmd/delete/neoip_kad_delete.o					\
+	$(NEOIP_KAD_DIR)/cmd/delete/wikidbg/neoip_kad_delete_wikidbg.o			\
+	$(NEOIP_KAD_DIR)/cmd/query/neoip_kad_query.o					\
+	$(NEOIP_KAD_DIR)/cmd/query/wikidbg/neoip_kad_query_wikidbg.o			\
+	$(NEOIP_KAD_DIR)/cmd/query_some/neoip_kad_query_some.o				\
+	$(NEOIP_KAD_DIR)/cmd/query_some/wikidbg/neoip_kad_query_some_wikidbg.o		\
+	$(NEOIP_KAD_DIR)/helper/kad_rec_src/neoip_kad_rec_src.o			\
+	$(NEOIP_KAD_DIR)/helper/kad_rec_src/nunit/neoip_kad_rec_src_nunit.o	\
+	$(NEOIP_KAD_DIR)/helper/kad_publish/neoip_kad_publish.o				\
+	$(NEOIP_KAD_DIR)/helper/kad_publish/base/nunit/neoip_kad_publish_nunit.o	\
+	$(NEOIP_KAD_DIR)/helper/kad_publish/base/wikidbg/neoip_kad_publish_wikidbg.o	\
+	$(NEOIP_KAD_DIR)/nunit_gsuite/neoip_kad_nunit_gsuite.o
+
+NEOIP_KAD_RPC_DIR=neoip_kad_rpc
+NEOIP_KAD_RPC_INC=-I$(NEOIP_KAD_RPC_DIR) 					\
+			-I$(NEOIP_KAD_RPC_DIR)/rpclistener			\
+			-I$(NEOIP_KAD_RPC_DIR)/rpcpeer				\
+			-I$(NEOIP_KAD_RPC_DIR)/cmd/rpcstore			\
+			-I$(NEOIP_KAD_RPC_DIR)/cmd/rpcquery			\
+			-I$(NEOIP_KAD_RPC_DIR)/base/rpclistener_id		\
+			-I$(NEOIP_KAD_RPC_DIR)/base/rpcpeer_id			\
+			-I$(NEOIP_KAD_RPC_DIR)/base/nunit			\
+			-I$(NEOIP_KAD_RPC_DIR)/base/nunit_gsuite		\
+			-I$(NEOIP_KAD_RPC_DIR)/base
+NEOIP_KAD_RPC_OBJS =								\
+	$(NEOIP_KAD_RPC_DIR)/base/rpclistener_id/neoip_kad_rpclistener_id.o	\
+	$(NEOIP_KAD_RPC_DIR)/base/rpcpeer_id/neoip_kad_rpcpeer_id.o		\
+	$(NEOIP_KAD_RPC_DIR)/base/nunit/neoip_kad_rpcresp_nunit.o		\
+	$(NEOIP_KAD_RPC_DIR)/base/nunit_gsuite/neoip_kad_rpc_nunit_gsuite.o	\
+	$(NEOIP_KAD_RPC_DIR)/rpclistener/neoip_kad_rpclistener.o		\
+	$(NEOIP_KAD_RPC_DIR)/rpcpeer/neoip_kad_rpcpeer.o			\
+	$(NEOIP_KAD_RPC_DIR)/cmd/rpcstore/neoip_kad_rpcstore.o			\
+	$(NEOIP_KAD_RPC_DIR)/cmd/rpcquery/neoip_kad_rpcquery.o			\
+	$(NEOIP_KAD_RPC_DIR)/neoip_kad_rpcresp.o
+
+
+NEOIP_XML_DIR=neoip_xml
+NEOIP_XML_INC=-I$(NEOIP_XML_DIR) 						\
+			-I$(NEOIP_XML_DIR)/base					\
+			-I$(NEOIP_XML_DIR)/base/nunit_gsuite			\
+			-I$(NEOIP_XML_DIR)/build				\
+			-I$(NEOIP_XML_DIR)/build/nunit				\
+			-I$(NEOIP_XML_DIR)/parse				\
+			-I$(NEOIP_XML_DIR)/parse/base/doc			\
+			-I$(NEOIP_XML_DIR)/parse/base/nunit
+NEOIP_XML_OBJS =								\
+	$(NEOIP_XML_DIR)/base/nunit_gsuite/neoip_xml_nunit_gsuite.o		\
+	$(NEOIP_XML_DIR)/build/neoip_xml_build.o				\
+	$(NEOIP_XML_DIR)/build/nunit/neoip_xml_build_nunit.o			\
+	$(NEOIP_XML_DIR)/parse/neoip_xml_parse.o				\
+	$(NEOIP_XML_DIR)/parse/base/doc/neoip_xml_parse_doc.o			\
+	$(NEOIP_XML_DIR)/parse/base/nunit/neoip_xml_parse_nunit.o
+
+NEOIP_XMLRPC_DIR=neoip_xmlrpc
+NEOIP_XMLRPC_INC=-I$(NEOIP_XMLRPC_DIR) 						\
+			-I$(NEOIP_XMLRPC_DIR)/build				\
+			-I$(NEOIP_XMLRPC_DIR)/build/nunit			\
+			-I$(NEOIP_XMLRPC_DIR)/parse				\
+			-I$(NEOIP_XMLRPC_DIR)/parse/nunit			\
+			-I$(NEOIP_XMLRPC_DIR)/base				\
+			-I$(NEOIP_XMLRPC_DIR)/base/consistency_nunit		\
+			-I$(NEOIP_XMLRPC_DIR)/base/exttype			\
+			-I$(NEOIP_XMLRPC_DIR)/base/nunit_gsuite
+NEOIP_XMLRPC_OBJS =								\
+	$(NEOIP_XMLRPC_DIR)/build/neoip_xmlrpc_build.o				\
+	$(NEOIP_XMLRPC_DIR)/build/nunit/neoip_xmlrpc_build_nunit.o		\
+	$(NEOIP_XMLRPC_DIR)/parse/neoip_xmlrpc_parse.o				\
+	$(NEOIP_XMLRPC_DIR)/parse/nunit/neoip_xmlrpc_parse_nunit.o		\
+	$(NEOIP_XMLRPC_DIR)/base/exttype/neoip_xmlrpc_exttype.o			\
+	$(NEOIP_XMLRPC_DIR)/base/consistency_nunit/neoip_xmlrpc_consistency_nunit.o	\
+	$(NEOIP_XMLRPC_DIR)/base/nunit_gsuite/neoip_xmlrpc_nunit_gsuite.o
+
+NEOIP_XMLRPC_NET_DIR=neoip_xmlrpc_net
+NEOIP_XMLRPC_NET_INC=-I$(NEOIP_XMLRPC_NET_DIR) 					\
+			-I$(NEOIP_XMLRPC_NET_DIR)/resp				\
+			-I$(NEOIP_XMLRPC_NET_DIR)/resp/nunit			\
+			-I$(NEOIP_XMLRPC_NET_DIR)/base/err			\
+			-I$(NEOIP_XMLRPC_NET_DIR)/base/nunit_gsuite
+NEOIP_XMLRPC_NET_OBJS =								\
+	$(NEOIP_XMLRPC_NET_DIR)/client/neoip_xmlrpc_client.o			\
+	$(NEOIP_XMLRPC_NET_DIR)/resp/neoip_xmlrpc_resp.o			\
+	$(NEOIP_XMLRPC_NET_DIR)/resp/nunit/neoip_xmlrpc_resp_nunit.o		\
+	$(NEOIP_XMLRPC_NET_DIR)/base/err/neoip_xmlrpc_err.o			\
+	$(NEOIP_XMLRPC_NET_DIR)/base/nunit_gsuite/neoip_xmlrpc_net_nunit_gsuite.o
+
+NEOIP_XMLRPC0_DIR=neoip_xmlrpc0
+NEOIP_XMLRPC0_INC=-I$(NEOIP_XMLRPC0_DIR) 					\
+			-I$(NEOIP_XMLRPC0_DIR)/parse			\
+			-I$(NEOIP_XMLRPC0_DIR)/build			\
+			-I$(NEOIP_XMLRPC0_DIR)/exttype			\
+			-I$(NEOIP_XMLRPC0_DIR)/utest
+NEOIP_XMLRPC0_OBJS =							\
+	$(NEOIP_XMLRPC0_DIR)/parse/neoip_xmlrpc0_parse.o		\
+	$(NEOIP_XMLRPC0_DIR)/build/neoip_xmlrpc0_build.o		\
+	$(NEOIP_XMLRPC0_DIR)/exttype/neoip_xmlrpc0_exttype.o		\
+	$(NEOIP_XMLRPC0_DIR)/utest/neoip_xmlrpc0_utest.o
+
+NEOIP_LIBSESS_DIR=neoip_libsess
+NEOIP_LIBSESS_INC=-I$(NEOIP_LIBSESS_DIR)					\
+		-I$(NEOIP_LIBSESS_DIR)/lib_apps/				\
+		-I$(NEOIP_LIBSESS_DIR)/lib_apps/base/profile			\
+		-I$(NEOIP_LIBSESS_DIR)/lib_apps/base/helper			\
+		-I$(NEOIP_LIBSESS_DIR)/session/					\
+		-I$(NEOIP_LIBSESS_DIR)/session/lib_httpd			\
+		-I$(NEOIP_LIBSESS_DIR)/session/lib_httpd/wikidbg		\
+		-I$(NEOIP_LIBSESS_DIR)/session/exit				\
+		-I$(NEOIP_LIBSESS_DIR)/session/base/profile			\
+		-I$(NEOIP_LIBSESS_DIR)/session/base/init			\
+		-I$(NEOIP_LIBSESS_DIR)/helper/asyncexe				\
+		-I$(NEOIP_LIBSESS_DIR)/helper/asyncexe/base/profile		\
+		-I$(NEOIP_LIBSESS_DIR)/helper/asyncexe/base/wikidbg		\
+		-I$(NEOIP_LIBSESS_DIR)/helper/asyncexe/base/nunit		\
+		-I$(NEOIP_LIBSESS_DIR)/base/nunit_gsuite/			\
+		-I$(NEOIP_LIBSESS_DIR)/base/err					\
+		-I$(NEOIP_LIBSESS_DIR)/base/clineopt				\
+		-I$(NEOIP_LIBSESS_DIR)/base/clineopt/base/helper		\
+		-I$(NEOIP_LIBSESS_DIR)/base/clineopt/base/err			\
+		-I$(NEOIP_LIBSESS_DIR)/base/clineopt/base/mode			\
+		-I$(NEOIP_LIBSESS_DIR)/base/clineopt/base/nunit
+NEOIP_LIBSESS_OBJS =									\
+	$(NEOIP_LIBSESS_DIR)/lib_apps/neoip_lib_apps.o					\
+	$(NEOIP_LIBSESS_DIR)/lib_apps/base/profile/neoip_lib_apps_profile.o		\
+	$(NEOIP_LIBSESS_DIR)/lib_apps/base/helper/neoip_lib_apps_helper.o		\
+	$(NEOIP_LIBSESS_DIR)/session/neoip_lib_session.o				\
+	$(NEOIP_LIBSESS_DIR)/session/base/profile/neoip_lib_session_profile.o		\
+	$(NEOIP_LIBSESS_DIR)/session/base/init/neoip_lib_session_init.o			\
+	$(NEOIP_LIBSESS_DIR)/session/exit/neoip_lib_session_exit.o			\
+	$(NEOIP_LIBSESS_DIR)/session/lib_httpd/neoip_lib_httpd.o			\
+	$(NEOIP_LIBSESS_DIR)/session/lib_httpd/wikidbg/neoip_lib_httpd_wikidbg.o	\
+	$(NEOIP_LIBSESS_DIR)/helper/asyncexe/neoip_asyncexe.o				\
+	$(NEOIP_LIBSESS_DIR)/helper/asyncexe/base/profile/neoip_asyncexe_profile.o	\
+	$(NEOIP_LIBSESS_DIR)/helper/asyncexe/base/wikidbg/neoip_asyncexe_wikidbg.o	\
+	$(NEOIP_LIBSESS_DIR)/helper/asyncexe/base/nunit/neoip_asyncexe_nunit.o		\
+	$(NEOIP_LIBSESS_DIR)/base/nunit_gsuite/neoip_libsess_nunit_gsuite.o		\
+	$(NEOIP_LIBSESS_DIR)/base/err/neoip_libsess_err.o				\
+	$(NEOIP_LIBSESS_DIR)/base/clineopt/neoip_clineopt.o				\
+	$(NEOIP_LIBSESS_DIR)/base/clineopt/base/helper/neoip_clineopt_helper.o		\
+	$(NEOIP_LIBSESS_DIR)/base/clineopt/base/err/neoip_clineopt_err.o		\
+	$(NEOIP_LIBSESS_DIR)/base/clineopt/base/mode/neoip_clineopt_mode.o		\
+	$(NEOIP_LIBSESS_DIR)/base/clineopt/base/nunit/neoip_clineopt_nunit.o
+
+# the libnss in this directory has its own makefile
+NEOIP_DNSGRAB_DIR=neoip_dnsgrab
+NEOIP_DNSGRAB_INC=-I$(NEOIP_DNSGRAB_DIR) 					\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/				\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/cnx			\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/cnx/wikidbg		\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/register			\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/helper		\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/helper/dns_helper	\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/helper/dnsname	\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/helper/dnsname/nunit\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/request		\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/arg			\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/err			\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/wikidbg		\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/nunit		\
+			-I$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/nunit_gsuite
+NEOIP_DNSGRAB_OBJS =								\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/neoip_dnsgrab.o				\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/cnx/neoip_dnsgrab_cnx.o			\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/cnx/wikidbg/neoip_dnsgrab_cnx_wikidbg.o	\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/register/neoip_dnsgrab_register.o		\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/helper/dns_helper/neoip_dns_helper.o	\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/helper/dnsname/neoip_dnsname.o		\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/helper/dnsname/nunit/neoip_dnsname_nunit.o	\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/request/neoip_dnsgrab_request.o	\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/arg/neoip_dnsgrab_arg.o		\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/err/neoip_dnsgrab_err.o		\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/wikidbg/neoip_dnsgrab_wikidbg.o	\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/nunit/neoip_dnsgrab_nunit.o		\
+	$(NEOIP_DNSGRAB_DIR)/dnsgrab/base/nunit_gsuite/neoip_dnsgrab_nunit_gsuite.o
+
+
+NEOIP_INET_DIR=neoip_inet
+NEOIP_INET_INC=-I$(NEOIP_INET_DIR) 					\
+			-I$(NEOIP_INET_DIR)/nslan			\
+			-I$(NEOIP_INET_DIR)/nslan/base			\
+			-I$(NEOIP_INET_DIR)/nslan/base/pkttype		\
+			-I$(NEOIP_INET_DIR)/nslan/base/rec		\
+			-I$(NEOIP_INET_DIR)/nslan/base/event		\
+			-I$(NEOIP_INET_DIR)/nslan/listener		\
+			-I$(NEOIP_INET_DIR)/nslan/listener/wikidbg	\
+			-I$(NEOIP_INET_DIR)/nslan/peer			\
+			-I$(NEOIP_INET_DIR)/nslan/peer/wikidbg		\
+			-I$(NEOIP_INET_DIR)/nslan/publish		\
+			-I$(NEOIP_INET_DIR)/nslan/publish/wikidbg	\
+			-I$(NEOIP_INET_DIR)/nslan/query			\
+			-I$(NEOIP_INET_DIR)/nslan/query/wikidbg		\
+			-I$(NEOIP_INET_DIR)/nslan/helper		\
+			-I$(NEOIP_INET_DIR)/nslan/helper/rec_src	\
+			-I$(NEOIP_INET_DIR)/nslan/helper/rec_src/base/nunit	\
+			-I$(NEOIP_INET_DIR)/nslan/helper/rec_src/base/wikidbg	\
+			-I$(NEOIP_INET_DIR)/nslan/base/nunit		\
+			-I$(NEOIP_INET_DIR)/helper/host2ip/			\
+			-I$(NEOIP_INET_DIR)/helper/host2ip/nunit		\
+			-I$(NEOIP_INET_DIR)/helper/host2ip/impl/sync		\
+			-I$(NEOIP_INET_DIR)/helper/host2ip/impl/fork		\
+			-I$(NEOIP_INET_DIR)/helper/host2ip/impl/agai		\
+			-I$(NEOIP_INET_DIR)/nudp			\
+			-I$(NEOIP_INET_DIR)/nudp/utest			\
+			-I$(NEOIP_INET_DIR)/nudp/wikidbg		\
+			-I$(NEOIP_INET_DIR)/udp				\
+			-I$(NEOIP_INET_DIR)/udp/resp			\
+			-I$(NEOIP_INET_DIR)/udp/full			\
+			-I$(NEOIP_INET_DIR)/udp/full/wikidbg		\
+			-I$(NEOIP_INET_DIR)/udp/itor			\
+			-I$(NEOIP_INET_DIR)/udp/base/event			\
+			-I$(NEOIP_INET_DIR)/udp/base/layer			\
+			-I$(NEOIP_INET_DIR)/udp/base/layer/init			\
+			-I$(NEOIP_INET_DIR)/udp/base/layer/http			\
+			-I$(NEOIP_INET_DIR)/udp/base/helper/udp_vresp		\
+			-I$(NEOIP_INET_DIR)/udp/base/helper/udp_vresp/cnx	\
+			-I$(NEOIP_INET_DIR)/udp/base/helper/udp_vresp/wikidbg	\
+			-I$(NEOIP_INET_DIR)/udp/base/helper/udp_vresp/utest	\
+			-I$(NEOIP_INET_DIR)/udp/base/helper/udp_client		\
+			-I$(NEOIP_INET_DIR)/udp/base/helper/udp_client/base/nunit	\
+			-I$(NEOIP_INET_DIR)/udp/base/helper/udp_client/base/wikidbg	\
+			-I$(NEOIP_INET_DIR)/tcp					\
+			-I$(NEOIP_INET_DIR)/tcp/resp				\
+			-I$(NEOIP_INET_DIR)/tcp/resp/arg			\
+			-I$(NEOIP_INET_DIR)/tcp/itor				\
+			-I$(NEOIP_INET_DIR)/tcp/itor/arg			\
+			-I$(NEOIP_INET_DIR)/tcp/full				\
+			-I$(NEOIP_INET_DIR)/tcp/full/profile			\
+			-I$(NEOIP_INET_DIR)/tcp/base/event			\
+			-I$(NEOIP_INET_DIR)/tcp/base/helper			\
+			-I$(NEOIP_INET_DIR)/tcp/base/helper/client		\
+			-I$(NEOIP_INET_DIR)/tcp/base/helper/client/nunit	\
+			-I$(NEOIP_INET_DIR)/tcp/base/helper/service/chargen/base/nunit	\
+			-I$(NEOIP_INET_DIR)/tcp/base/helper/service/chargen/client	\
+			-I$(NEOIP_INET_DIR)/tcp/base/helper/service/chargen/server	\
+			-I$(NEOIP_INET_DIR)/tcp/base/helper/service/chargen/server/cnx	\
+			-I$(NEOIP_INET_DIR)/address			\
+			-I$(NEOIP_INET_DIR)/address/ip_addr		\
+			-I$(NEOIP_INET_DIR)/address/ip_addr/nunit	\
+			-I$(NEOIP_INET_DIR)/address/ip_netaddr		\
+			-I$(NEOIP_INET_DIR)/address/ip_netaddr/nunit	\
+			-I$(NEOIP_INET_DIR)/address/ipport_addr		\
+			-I$(NEOIP_INET_DIR)/address/ipport_addr/base/nunit		\
+			-I$(NEOIP_INET_DIR)/address/ipport_addr/base/helper		\
+			-I$(NEOIP_INET_DIR)/address/ipport_addr/base/strlist_src	\
+			-I$(NEOIP_INET_DIR)/address/ipport_addr/base/strlist_src/nunit	\
+			-I$(NEOIP_INET_DIR)/address/ipport_aview			\
+			-I$(NEOIP_INET_DIR)/address/ipport_aview/base/helper		\
+			-I$(NEOIP_INET_DIR)/address/ipport_aview/base/nunit		\
+			-I$(NEOIP_INET_DIR)/nunit_gsuite
+
+NEOIP_INET_OBJS =							\
+	$(NEOIP_INET_DIR)/nslan/base/pkttype/neoip_nslan_pkttype.o	\
+	$(NEOIP_INET_DIR)/nslan/base/event/neoip_nslan_event.o		\
+	$(NEOIP_INET_DIR)/nslan/base/rec/neoip_nslan_rec.o		\
+	$(NEOIP_INET_DIR)/nslan/listener/neoip_nslan_listener.o				\
+	$(NEOIP_INET_DIR)/nslan/listener/wikidbg/neoip_nslan_listener_wikidbg.o		\
+	$(NEOIP_INET_DIR)/nslan/peer/neoip_nslan_peer.o					\
+	$(NEOIP_INET_DIR)/nslan/peer/wikidbg/neoip_nslan_peer_wikidbg.o			\
+	$(NEOIP_INET_DIR)/nslan/publish/neoip_nslan_publish.o				\
+	$(NEOIP_INET_DIR)/nslan/publish/wikidbg/neoip_nslan_publish_wikidbg.o		\
+	$(NEOIP_INET_DIR)/nslan/query/neoip_nslan_query.o				\
+	$(NEOIP_INET_DIR)/nslan/query/wikidbg/neoip_nslan_query_wikidbg.o		\
+	$(NEOIP_INET_DIR)/nslan/helper/rec_src/neoip_nslan_rec_src.o			\
+	$(NEOIP_INET_DIR)/nslan/helper/rec_src/base/nunit/neoip_nslan_rec_src_nunit.o		\
+	$(NEOIP_INET_DIR)/nslan/helper/rec_src/base/wikidbg/neoip_nslan_rec_src_wikidbg.o	\
+	$(NEOIP_INET_DIR)/nslan/base/nunit/neoip_nslan_nunit.o			\
+	$(NEOIP_INET_DIR)/helper/host2ip/nunit/neoip_host2ip_nunit.o		\
+	$(NEOIP_INET_DIR)/helper/host2ip/impl/sync/neoip_host2ip_sync.o		\
+	$(NEOIP_INET_DIR)/helper/host2ip/impl/fork/neoip_host2ip_fork.o		\
+	$(NEOIP_INET_DIR)/helper/host2ip/impl/agai/neoip_host2ip_agai.o		\
+	$(NEOIP_INET_DIR)/helper/ipcountry/neoip_ipcountry.o			\
+	$(NEOIP_INET_DIR)/helper/ipcountry/nunit/neoip_ipcountry_nunit.o	\
+	$(NEOIP_INET_DIR)/neoip_inet_err.o					\
+	$(NEOIP_INET_DIR)/tcp/resp/neoip_tcp_resp.o				\
+	$(NEOIP_INET_DIR)/tcp/resp/arg/neoip_tcp_resp_arg.o			\
+	$(NEOIP_INET_DIR)/tcp/itor/neoip_tcp_itor.o				\
+	$(NEOIP_INET_DIR)/tcp/itor/arg/neoip_tcp_itor_arg.o			\
+	$(NEOIP_INET_DIR)/tcp/itor/profile/neoip_tcp_itor_profile.o		\
+	$(NEOIP_INET_DIR)/tcp/full/neoip_tcp_full.o				\
+	$(NEOIP_INET_DIR)/tcp/full/profile/neoip_tcp_full_profile.o		\
+	$(NEOIP_INET_DIR)/tcp/base/event/neoip_tcp_event.o			\
+	$(NEOIP_INET_DIR)/tcp/base/profile/neoip_tcp_profile.o			\
+	$(NEOIP_INET_DIR)/tcp/base/helper/client/neoip_tcp_client.o		\
+	$(NEOIP_INET_DIR)/tcp/base/helper/client/nunit/neoip_tcp_client_nunit.o			\
+	$(NEOIP_INET_DIR)/tcp/base/helper/service/chargen/base/nunit/neoip_tcp_chargen_nunit.o	\
+	$(NEOIP_INET_DIR)/tcp/base/helper/service/chargen/client/neoip_tcp_chargen_client.o		\
+	$(NEOIP_INET_DIR)/tcp/base/helper/service/chargen/server/neoip_tcp_chargen_server.o		\
+	$(NEOIP_INET_DIR)/tcp/base/helper/service/chargen/server/cnx/neoip_tcp_chargen_server_cnx.o	\
+	$(NEOIP_INET_DIR)/nudp/neoip_nudp.o					\
+	$(NEOIP_INET_DIR)/nudp/utest/neoip_nudp_utest.o				\
+	$(NEOIP_INET_DIR)/nudp/wikidbg/neoip_nudp_wikidbg.o			\
+	$(NEOIP_INET_DIR)/udp/resp/neoip_udp_resp.o				\
+	$(NEOIP_INET_DIR)/udp/resp/wikidbg/neoip_udp_resp_wikidbg.o		\
+	$(NEOIP_INET_DIR)/udp/full/neoip_udp_full.o				\
+	$(NEOIP_INET_DIR)/udp/full/wikidbg/neoip_udp_full_wikidbg.o		\
+	$(NEOIP_INET_DIR)/udp/itor/neoip_udp_itor.o				\
+	$(NEOIP_INET_DIR)/udp/base/event/neoip_udp_event.o				\
+	$(NEOIP_INET_DIR)/udp/base/layer/neoip_udp_layer.o				\
+	$(NEOIP_INET_DIR)/udp/base/layer/http/neoip_udp_layer_http.o			\
+	$(NEOIP_INET_DIR)/udp/base/layer/init/neoip_udp_layer_init.o			\
+	$(NEOIP_INET_DIR)/udp/base/helper/udp_vresp/neoip_udp_vresp.o			\
+	$(NEOIP_INET_DIR)/udp/base/helper/udp_vresp/cnx/neoip_udp_vresp_cnx.o		\
+	$(NEOIP_INET_DIR)/udp/base/helper/udp_vresp/wikidbg/neoip_udp_vresp_wikidbg.o	\
+	$(NEOIP_INET_DIR)/udp/base/helper/udp_vresp/utest/neoip_udp_vresp_utest.o	\
+	$(NEOIP_INET_DIR)/udp/base/helper/udp_client/neoip_udp_client.o			\
+	$(NEOIP_INET_DIR)/udp/base/helper/udp_client/base/nunit/neoip_udp_client_nunit.o	\
+	$(NEOIP_INET_DIR)/udp/base/helper/udp_client/base/wikidbg/neoip_udp_client_wikidbg.o	\
+	$(NEOIP_INET_DIR)/address/ip_addr/neoip_ip_addr.o			\
+	$(NEOIP_INET_DIR)/address/ip_addr/nunit/neoip_ip_addr_nunit.o		\
+	$(NEOIP_INET_DIR)/address/ipport_addr/neoip_ipport_addr.o		\
+	$(NEOIP_INET_DIR)/address/ipport_addr/base/nunit/neoip_ipport_addr_nunit.o			\
+	$(NEOIP_INET_DIR)/address/ipport_addr/base/helper/neoip_ipport_addr_helper.o			\
+	$(NEOIP_INET_DIR)/address/ipport_addr/base/strlist_src/neoip_ipport_strlist_src.o		\
+	$(NEOIP_INET_DIR)/address/ipport_addr/base/strlist_src/nunit/neoip_ipport_strlist_src_nunit.o	\
+	$(NEOIP_INET_DIR)/address/ipport_aview/neoip_ipport_aview.o			\
+	$(NEOIP_INET_DIR)/address/ipport_aview/base/helper/neoip_ipport_aview_helper.o	\
+	$(NEOIP_INET_DIR)/address/ipport_aview/base/nunit/neoip_ipport_aview_nunit.o	\
+	$(NEOIP_INET_DIR)/address/ip_netaddr/neoip_ip_netaddr.o			\
+	$(NEOIP_INET_DIR)/address/ip_netaddr/nunit/neoip_ip_netaddr_nunit.o	\
+	$(NEOIP_INET_DIR)/nunit_gsuite/neoip_inet_nunit_gsuite.o
+
+NEOIP_UPNP_DIR=neoip_upnp
+NEOIP_UPNP_INC=-I$(NEOIP_UPNP_DIR) 						\
+			-I$(NEOIP_UPNP_DIR)/base/err				\
+			-I$(NEOIP_UPNP_DIR)/base/sockfam			\
+			-I$(NEOIP_UPNP_DIR)/base/nunit_gsuite			\
+			-I$(NEOIP_UPNP_DIR)/disc				\
+			-I$(NEOIP_UPNP_DIR)/disc/base/res			\
+			-I$(NEOIP_UPNP_DIR)/disc/base/res/wikidbg		\
+			-I$(NEOIP_UPNP_DIR)/disc/base/profile			\
+			-I$(NEOIP_UPNP_DIR)/disc/base/wikidbg			\
+			-I$(NEOIP_UPNP_DIR)/call/base/call/profile		\
+			-I$(NEOIP_UPNP_DIR)/call/base/call/wikidbg		\
+			-I$(NEOIP_UPNP_DIR)/call/base/portdesc			\
+			-I$(NEOIP_UPNP_DIR)/call/call_addport			\
+			-I$(NEOIP_UPNP_DIR)/call/call_delport			\
+			-I$(NEOIP_UPNP_DIR)/call/call_getport			\
+			-I$(NEOIP_UPNP_DIR)/call/call_scanport			\
+			-I$(NEOIP_UPNP_DIR)/call/call_extipaddr			\
+			-I$(NEOIP_UPNP_DIR)/call/call_statusinfo		\
+			-I$(NEOIP_UPNP_DIR)/watch/				\
+			-I$(NEOIP_UPNP_DIR)/watch/base/event			\
+			-I$(NEOIP_UPNP_DIR)/watch/base/profile			\
+			-I$(NEOIP_UPNP_DIR)/watch/base/wikidbg			\
+			-I$(NEOIP_UPNP_DIR)/watch/base/nunit			\
+			-I$(NEOIP_UPNP_DIR)/helper/bindport			\
+			-I$(NEOIP_UPNP_DIR)/helper/bindport/wikidbg		\
+			-I$(NEOIP_UPNP_DIR)/helper/getportendian_test
+NEOIP_UPNP_OBJS =								\
+	$(NEOIP_UPNP_DIR)/base/err/neoip_upnp_err.o				\
+	$(NEOIP_UPNP_DIR)/base/sockfam/neoip_upnp_sockfam.o			\
+	$(NEOIP_UPNP_DIR)/base/nunit_gsuite/neoip_upnp_nunit_gsuite.o		\
+	$(NEOIP_UPNP_DIR)/disc/neoip_upnp_disc.o				\
+	$(NEOIP_UPNP_DIR)/disc/base/res/neoip_upnp_disc_res.o			\
+	$(NEOIP_UPNP_DIR)/disc/base/res/wikidbg/neoip_upnp_disc_res_wikidbg.o	\
+	$(NEOIP_UPNP_DIR)/disc/base/profile/neoip_upnp_disc_profile.o		\
+	$(NEOIP_UPNP_DIR)/disc/base/wikidbg/neoip_upnp_disc_wikidbg.o		\
+	$(NEOIP_UPNP_DIR)/call/base/call/neoip_upnp_call.o			\
+	$(NEOIP_UPNP_DIR)/call/base/call/profile/neoip_upnp_call_profile.o	\
+	$(NEOIP_UPNP_DIR)/call/base/call/wikidbg/neoip_upnp_call_wikidbg.o	\
+	$(NEOIP_UPNP_DIR)/call/base/portdesc/neoip_upnp_portdesc.o		\
+	$(NEOIP_UPNP_DIR)/call/call_addport/neoip_upnp_call_addport.o		\
+	$(NEOIP_UPNP_DIR)/call/call_delport/neoip_upnp_call_delport.o		\
+	$(NEOIP_UPNP_DIR)/call/call_getport/neoip_upnp_call_getport.o		\
+	$(NEOIP_UPNP_DIR)/call/call_scanport/neoip_upnp_call_scanport.o		\
+	$(NEOIP_UPNP_DIR)/call/call_extipaddr/neoip_upnp_call_extipaddr.o	\
+	$(NEOIP_UPNP_DIR)/call/call_statusinfo/neoip_upnp_call_statusinfo.o	\
+	$(NEOIP_UPNP_DIR)/watch/neoip_upnp_watch.o				\
+	$(NEOIP_UPNP_DIR)/watch/base/event/neoip_upnp_watch_event.o		\
+	$(NEOIP_UPNP_DIR)/watch/base/profile/neoip_upnp_watch_profile.o		\
+	$(NEOIP_UPNP_DIR)/watch/base/wikidbg/neoip_upnp_watch_wikidbg.o		\
+	$(NEOIP_UPNP_DIR)/watch/base/nunit/neoip_upnp_watch_nunit.o		\
+	$(NEOIP_UPNP_DIR)/watch/service/bindport/neoip_upnp_bindport.o				\
+	$(NEOIP_UPNP_DIR)/watch/service/bindport/base/profile/neoip_upnp_bindport_profile.o	\
+	$(NEOIP_UPNP_DIR)/watch/service/bindport/base/wikidbg/neoip_upnp_bindport_wikidbg.o	\
+	$(NEOIP_UPNP_DIR)/watch/service/portcleaner/neoip_upnp_portcleaner.o				\
+	$(NEOIP_UPNP_DIR)/watch/service/portcleaner/base/item/neoip_upnp_portcleaner_item.o		\
+	$(NEOIP_UPNP_DIR)/watch/service/portcleaner/base/item/wikidbg/neoip_upnp_portcleaner_item_wikidbg.o	\
+	$(NEOIP_UPNP_DIR)/watch/service/portcleaner/base/profile/neoip_upnp_portcleaner_profile.o	\
+	$(NEOIP_UPNP_DIR)/watch/service/portcleaner/base/wikidbg/neoip_upnp_portcleaner_wikidbg.o	\
+	$(NEOIP_UPNP_DIR)/helper/scanallport/neoip_upnp_scanallport.o					\
+	$(NEOIP_UPNP_DIR)/helper/getportendian_test/neoip_upnp_getportendian_test.o			\
+	$(NEOIP_UPNP_DIR)/helper/getportendian_test/base/profile/neoip_upnp_getportendian_test_profile.o
+
+NEOIP_NDIAG_DIR=neoip_ndiag
+NEOIP_NDIAG_INC=	-I$(NEOIP_NDIAG_DIR)/_base/err			\
+			-I$(NEOIP_NDIAG_DIR)/watch/base/profile		\
+			-I$(NEOIP_NDIAG_DIR)/watch/base/wikidbg		\
+			-I$(NEOIP_NDIAG_DIR)/watch/base/init		\
+			-I$(NEOIP_NDIAG_DIR)/watch
+NEOIP_NDIAG_OBJS =									\
+	$(NEOIP_NDIAG_DIR)/_base/err/neoip_ndiag_err.o					\
+	$(NEOIP_NDIAG_DIR)/_base/nunit_gsuite/neoip_ndiag_nunit_gsuite.o		\
+	$(NEOIP_NDIAG_DIR)/_base/cacheport/neoip_ndiag_cacheport.o			\
+	$(NEOIP_NDIAG_DIR)/_base/cacheport/base/item/neoip_ndiag_cacheport_item.o	\
+	$(NEOIP_NDIAG_DIR)/_base/cacheport/base/helper/neoip_ndiag_cacheport_helper.o	\
+	$(NEOIP_NDIAG_DIR)/_base/cacheport/base/nunit/neoip_ndiag_cacheport_nunit.o	\
+	$(NEOIP_NDIAG_DIR)/_base/cacheport/base/wikidbg/neoip_ndiag_cacheport_wikidbg.o	\
+	$(NEOIP_NDIAG_DIR)/aview/base/nunit/neoip_ndiag_aview_nunit.o		\
+	$(NEOIP_NDIAG_DIR)/aview/base/wikidbg/neoip_ndiag_aview_wikidbg.o	\
+	$(NEOIP_NDIAG_DIR)/aview/neoip_ndiag_aview.o				\
+	$(NEOIP_NDIAG_DIR)/watch/base/profile/neoip_ndiag_watch_profile.o	\
+	$(NEOIP_NDIAG_DIR)/watch/base/wikidbg/neoip_ndiag_watch_wikidbg.o	\
+	$(NEOIP_NDIAG_DIR)/watch/base/init/neoip_ndiag_watch_init.o		\
+	$(NEOIP_NDIAG_DIR)/watch/neoip_ndiag_watch.o
+
+
+NEOIP_NTUDP_DIR=neoip_ntudp
+NEOIP_NTUDP_INC=-I$(NEOIP_NTUDP_DIR)						\
+			-I$(NEOIP_NTUDP_DIR)/base				\
+			-I$(NEOIP_NTUDP_DIR)/base/cnxtype			\
+			-I$(NEOIP_NTUDP_DIR)/base/err				\
+			-I$(NEOIP_NTUDP_DIR)/base/addr				\
+			-I$(NEOIP_NTUDP_DIR)/base/addr/nunit			\
+			-I$(NEOIP_NTUDP_DIR)/base/profile			\
+			-I$(NEOIP_NTUDP_DIR)/base/rdvpt				\
+			-I$(NEOIP_NTUDP_DIR)/base/rdvpt/nunit			\
+			-I$(NEOIP_NTUDP_DIR)/base/tunl_pkttype			\
+			-I$(NEOIP_NTUDP_DIR)/base/sock_pkttype			\
+			-I$(NEOIP_NTUDP_DIR)/base/sock_errcode			\
+			-I$(NEOIP_NTUDP_DIR)/service/				\
+			-I$(NEOIP_NTUDP_DIR)/service/aview_pool			\
+			-I$(NEOIP_NTUDP_DIR)/service/aview_pool/base/wikidbg	\
+			-I$(NEOIP_NTUDP_DIR)/service/aview_pool/base/nunit	\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver_pool		\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver_pool/base/profile	\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver_pool/base/wikidbg	\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver_pool/base/nunit	\
+			-I$(NEOIP_NTUDP_DIR)/service/dircnx_server		\
+			-I$(NEOIP_NTUDP_DIR)/service/dircnx_server/cnx		\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver			\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver/extcnx		\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver/tunnel		\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver/tunnel/wikidbg	\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver/reverse		\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver/base/rec		\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver/base/profile	\
+			-I$(NEOIP_NTUDP_DIR)/service/pserver/base/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/service/relpeer			\
+			-I$(NEOIP_NTUDP_DIR)/service/relpeer/tunnel		\
+			-I$(NEOIP_NTUDP_DIR)/service/relpeer/tunnel/base/profile\
+			-I$(NEOIP_NTUDP_DIR)/service/relpeer/tunnel/base/wikidbg	\
+			-I$(NEOIP_NTUDP_DIR)/service/relpeer/base/profile	\
+			-I$(NEOIP_NTUDP_DIR)/service/relpeer/base/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/npos				\
+			-I$(NEOIP_NTUDP_DIR)/npos/base				\
+			-I$(NEOIP_NTUDP_DIR)/npos/base/event			\
+			-I$(NEOIP_NTUDP_DIR)/npos/base/pkttype			\
+			-I$(NEOIP_NTUDP_DIR)/npos/base/res			\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli				\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli/inetreach			\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli/inetreach/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli/natlback			\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli/natlback/cnx		\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli/natlback/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli/saddrecho			\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli/saddrecho/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli/base/profile		\
+			-I$(NEOIP_NTUDP_DIR)/npos/cli/base/nunit		\
+			-I$(NEOIP_NTUDP_DIR)/npos/server			\
+			-I$(NEOIP_NTUDP_DIR)/npos/server/cnx			\
+			-I$(NEOIP_NTUDP_DIR)/npos/eval				\
+			-I$(NEOIP_NTUDP_DIR)/npos/eval/base/count_db		\
+			-I$(NEOIP_NTUDP_DIR)/npos/eval/base/nunit		\
+			-I$(NEOIP_NTUDP_DIR)/npos/eval/base/profile		\
+			-I$(NEOIP_NTUDP_DIR)/npos/eval/base/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/npos/watch				\
+			-I$(NEOIP_NTUDP_DIR)/npos/watch/base/profile		\
+			-I$(NEOIP_NTUDP_DIR)/npos/watch/base/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/peer				\
+			-I$(NEOIP_NTUDP_DIR)/peer/base/rec			\
+			-I$(NEOIP_NTUDP_DIR)/peer/base/profile			\
+			-I$(NEOIP_NTUDP_DIR)/peer/base/wikidbg			\
+			-I$(NEOIP_NTUDP_DIR)/socket				\
+			-I$(NEOIP_NTUDP_DIR)/socket/event			\
+			-I$(NEOIP_NTUDP_DIR)/socket/resp			\
+			-I$(NEOIP_NTUDP_DIR)/socket/resp/direct			\
+			-I$(NEOIP_NTUDP_DIR)/socket/resp/estarelay		\
+			-I$(NEOIP_NTUDP_DIR)/socket/resp/reverse		\
+			-I$(NEOIP_NTUDP_DIR)/socket/resp/base/profile		\
+			-I$(NEOIP_NTUDP_DIR)/socket/resp/base/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/socket/itor			\
+			-I$(NEOIP_NTUDP_DIR)/socket/itor/direct			\
+			-I$(NEOIP_NTUDP_DIR)/socket/itor/estarelay		\
+			-I$(NEOIP_NTUDP_DIR)/socket/itor/estarelay/2peer	\
+			-I$(NEOIP_NTUDP_DIR)/socket/itor/estarelay/2pserver	\
+			-I$(NEOIP_NTUDP_DIR)/socket/itor/reverse		\
+			-I$(NEOIP_NTUDP_DIR)/socket/itor/base/profile		\
+			-I$(NEOIP_NTUDP_DIR)/socket/itor/base/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/socket/full			\
+			-I$(NEOIP_NTUDP_DIR)/socket/full/wikidbg		\
+			-I$(NEOIP_NTUDP_DIR)/socket/nunit			\
+			-I$(NEOIP_NTUDP_DIR)/socket/nunit/base/client_close	\
+			-I$(NEOIP_NTUDP_DIR)/socket/nunit/base/server_close	\
+			-I$(NEOIP_NTUDP_DIR)/socket/nunit/direct		\
+			-I$(NEOIP_NTUDP_DIR)/socket/nunit/estarelay		\
+			-I$(NEOIP_NTUDP_DIR)/socket/nunit/reverse		\
+			-I$(NEOIP_NTUDP_DIR)/socket/nunit/error			\
+			-I$(NEOIP_NTUDP_DIR)/socket/helper			\
+			-I$(NEOIP_NTUDP_DIR)/socket/helper/itor_retry		\
+			-I$(NEOIP_NTUDP_DIR)/socket/helper/itor_retry/nunit	\
+			-I$(NEOIP_NTUDP_DIR)/socket/helper/client		\
+			-I$(NEOIP_NTUDP_DIR)/socket/helper/client/nunit		\
+			-I$(NEOIP_NTUDP_DIR)/base/nunit_gsuite			\
+			-I$(NEOIP_NTUDP_DIR)/base/nunit_gsuite/helper
+
+
+NEOIP_NTUDP_OBJS=								\
+	$(NEOIP_NTUDP_DIR)/base/err/neoip_ntudp_err.o				\
+	$(NEOIP_NTUDP_DIR)/base/cnxtype/neoip_ntudp_cnxtype.o			\
+	$(NEOIP_NTUDP_DIR)/base/addr/neoip_ntudp_addr.o				\
+	$(NEOIP_NTUDP_DIR)/base/addr/nunit/neoip_ntudp_addr_nunit.o		\
+	$(NEOIP_NTUDP_DIR)/base/profile/neoip_ntudp_profile.o			\
+	$(NEOIP_NTUDP_DIR)/base/rdvpt/neoip_ntudp_rdvpt.o			\
+	$(NEOIP_NTUDP_DIR)/base/rdvpt/nunit/neoip_ntudp_rdvpt_nunit.o		\
+	$(NEOIP_NTUDP_DIR)/base/tunl_pkttype/neoip_ntudp_tunl_pkttype.o		\
+	$(NEOIP_NTUDP_DIR)/base/sock_pkttype/neoip_ntudp_sock_pkttype.o		\
+	$(NEOIP_NTUDP_DIR)/base/sock_errcode/neoip_ntudp_sock_errcode.o		\
+	$(NEOIP_NTUDP_DIR)/service/aview_pool/neoip_ntudp_aview_pool.o				\
+	$(NEOIP_NTUDP_DIR)/service/aview_pool/base/wikidbg/neoip_ntudp_aview_pool_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/service/aview_pool/base/nunit/neoip_ntudp_aview_pool_nunit.o		\
+	$(NEOIP_NTUDP_DIR)/service/pserver_pool/neoip_ntudp_pserver_pool.o			\
+	$(NEOIP_NTUDP_DIR)/service/pserver_pool/base/profile/neoip_ntudp_pserver_pool_profile.o	\
+	$(NEOIP_NTUDP_DIR)/service/pserver_pool/base/wikidbg/neoip_ntudp_pserver_pool_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/service/pserver_pool/base/nunit/neoip_ntudp_pserver_pool_nunit.o	\
+	$(NEOIP_NTUDP_DIR)/service/dircnx_server/neoip_ntudp_dircnx_server.o			\
+	$(NEOIP_NTUDP_DIR)/service/dircnx_server/cnx/neoip_ntudp_dircnx_server_cnx.o		\
+	$(NEOIP_NTUDP_DIR)/service/pserver/neoip_ntudp_pserver.o				\
+	$(NEOIP_NTUDP_DIR)/service/pserver/extcnx/neoip_ntudp_pserver_extcnx.o			\
+	$(NEOIP_NTUDP_DIR)/service/pserver/tunnel/neoip_ntudp_pserver_tunnel.o			\
+	$(NEOIP_NTUDP_DIR)/service/pserver/tunnel/wikidbg/neoip_ntudp_pserver_tunnel_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/service/pserver/reverse/neoip_ntudp_pserver_reverse.o		\
+	$(NEOIP_NTUDP_DIR)/service/pserver/base/rec/neoip_ntudp_pserver_rec.o			\
+	$(NEOIP_NTUDP_DIR)/service/pserver/base/profile/neoip_ntudp_pserver_profile.o		\
+	$(NEOIP_NTUDP_DIR)/service/pserver/base/wikidbg/neoip_ntudp_pserver_wikidbg.o		\
+	$(NEOIP_NTUDP_DIR)/service/relpeer/neoip_ntudp_relpeer.o				\
+	$(NEOIP_NTUDP_DIR)/service/relpeer/tunnel/neoip_ntudp_relpeer_tunnel.o			\
+	$(NEOIP_NTUDP_DIR)/service/relpeer/tunnel/base/profile/neoip_ntudp_relpeer_tunnel_profile.o	\
+	$(NEOIP_NTUDP_DIR)/service/relpeer/tunnel/base/wikidbg/neoip_ntudp_relpeer_tunnel_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/service/relpeer/base/profile/neoip_ntudp_relpeer_profile.o		\
+	$(NEOIP_NTUDP_DIR)/service/relpeer/base/wikidbg/neoip_ntudp_relpeer_wikidbg.o		\
+	$(NEOIP_NTUDP_DIR)/npos/base/event/neoip_ntudp_npos_event.o			\
+	$(NEOIP_NTUDP_DIR)/npos/base/pkttype/neoip_ntudp_npos_pkttype.o			\
+	$(NEOIP_NTUDP_DIR)/npos/base/res/neoip_ntudp_npos_res.o				\
+	$(NEOIP_NTUDP_DIR)/npos/base/res/wikidbg/neoip_ntudp_npos_res_wikidbg.o		\
+	$(NEOIP_NTUDP_DIR)/npos/cli/inetreach/neoip_ntudp_npos_inetreach.o			\
+	$(NEOIP_NTUDP_DIR)/npos/cli/inetreach/wikidbg/neoip_ntudp_npos_inetreach_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/npos/cli/natlback/neoip_ntudp_npos_natlback.o			\
+	$(NEOIP_NTUDP_DIR)/npos/cli/natlback/cnx/neoip_ntudp_npos_natlback_cnx.o		\
+	$(NEOIP_NTUDP_DIR)/npos/cli/natlback/wikidbg/neoip_ntudp_npos_natlback_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/npos/cli/saddrecho/neoip_ntudp_npos_saddrecho.o			\
+	$(NEOIP_NTUDP_DIR)/npos/cli/saddrecho/wikidbg/neoip_ntudp_npos_saddrecho_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/npos/cli/base/profile/neoip_ntudp_npos_cli_profile.o		\
+	$(NEOIP_NTUDP_DIR)/npos/cli/base/nunit/neoip_ntudp_npos_cli_nunit.o		\
+	$(NEOIP_NTUDP_DIR)/npos/server/neoip_ntudp_npos_server.o			\
+	$(NEOIP_NTUDP_DIR)/npos/server/cnx/neoip_ntudp_npos_server_cnx.o		\
+	$(NEOIP_NTUDP_DIR)/npos/server/wikidbg/neoip_ntudp_npos_server_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/npos/eval/neoip_ntudp_npos_eval.o				\
+	$(NEOIP_NTUDP_DIR)/npos/eval/base/count_db/neoip_ntudp_npos_eval_count_db.o	\
+	$(NEOIP_NTUDP_DIR)/npos/eval/base/profile/neoip_ntudp_npos_eval_profile.o	\
+	$(NEOIP_NTUDP_DIR)/npos/eval/base/wikidbg/neoip_ntudp_npos_eval_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/npos/eval/base/nunit/neoip_ntudp_npos_eval_nunit.o		\
+	$(NEOIP_NTUDP_DIR)/npos/watch/neoip_ntudp_npos_watch.o				\
+	$(NEOIP_NTUDP_DIR)/npos/watch/base/profile/neoip_ntudp_npos_watch_profile.o	\
+	$(NEOIP_NTUDP_DIR)/npos/watch/base/wikidbg/neoip_ntudp_npos_watch_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/peer/neoip_ntudp_peer.o				\
+	$(NEOIP_NTUDP_DIR)/peer/base/rec/neoip_ntudp_peer_rec.o			\
+	$(NEOIP_NTUDP_DIR)/peer/base/profile/neoip_ntudp_peer_profile.o		\
+	$(NEOIP_NTUDP_DIR)/peer/base/wikidbg/neoip_ntudp_peer_wikidbg.o		\
+	$(NEOIP_NTUDP_DIR)/socket/resp/neoip_ntudp_resp.o			\
+	$(NEOIP_NTUDP_DIR)/socket/resp/direct/neoip_ntudp_resp_direct.o		\
+	$(NEOIP_NTUDP_DIR)/socket/resp/estarelay/neoip_ntudp_resp_estarelay.o	\
+	$(NEOIP_NTUDP_DIR)/socket/resp/reverse/neoip_ntudp_resp_reverse.o	\
+	$(NEOIP_NTUDP_DIR)/socket/resp/base/profile/neoip_ntudp_resp_profile.o	\
+	$(NEOIP_NTUDP_DIR)/socket/resp/base/wikidbg/neoip_ntudp_resp_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/socket/itor/neoip_ntudp_itor.o			\
+	$(NEOIP_NTUDP_DIR)/socket/itor/direct/neoip_ntudp_itor_direct.o		\
+	$(NEOIP_NTUDP_DIR)/socket/itor/estarelay/neoip_ntudp_itor_estarelay.o	\
+	$(NEOIP_NTUDP_DIR)/socket/itor/estarelay/2peer/neoip_ntudp_itor_estarelay_2peer.o	\
+	$(NEOIP_NTUDP_DIR)/socket/itor/estarelay/2pserver/neoip_ntudp_itor_estarelay_2pserver.o	\
+	$(NEOIP_NTUDP_DIR)/socket/itor/reverse/neoip_ntudp_itor_reverse.o	\
+	$(NEOIP_NTUDP_DIR)/socket/itor/base/profile/neoip_ntudp_itor_profile.o	\
+	$(NEOIP_NTUDP_DIR)/socket/itor/base/wikidbg/neoip_ntudp_itor_wikidbg.o	\
+	$(NEOIP_NTUDP_DIR)/socket/full/neoip_ntudp_full.o			\
+	$(NEOIP_NTUDP_DIR)/socket/full/wikidbg/neoip_ntudp_full_wikidbg.o		\
+	$(NEOIP_NTUDP_DIR)/socket/event/neoip_ntudp_event.o			\
+	$(NEOIP_NTUDP_DIR)/socket/nunit/base/client_close/neoip_ntudp_socket_nunit_client_close.o	\
+	$(NEOIP_NTUDP_DIR)/socket/nunit/base/server_close/neoip_ntudp_socket_nunit_server_close.o	\
+	$(NEOIP_NTUDP_DIR)/socket/nunit/direct/neoip_ntudp_socket_direct_nunit.o		\
+	$(NEOIP_NTUDP_DIR)/socket/nunit/estarelay/neoip_ntudp_socket_estarelay_nunit.o		\
+	$(NEOIP_NTUDP_DIR)/socket/nunit/reverse/neoip_ntudp_socket_reverse_nunit.o		\
+	$(NEOIP_NTUDP_DIR)/socket/nunit/error/neoip_ntudp_socket_error_nunit.o			\
+	$(NEOIP_NTUDP_DIR)/socket/helper/itor_retry/neoip_ntudp_itor_retry.o			\
+	$(NEOIP_NTUDP_DIR)/socket/helper/itor_retry/nunit/neoip_ntudp_itor_retry_nunit.o	\
+	$(NEOIP_NTUDP_DIR)/socket/helper/client/neoip_ntudp_client.o				\
+	$(NEOIP_NTUDP_DIR)/socket/helper/client/nunit/neoip_ntudp_client_nunit.o		\
+	$(NEOIP_NTUDP_DIR)/base/nunit_gsuite/neoip_ntudp_nunit_gsuite.o				\
+	$(NEOIP_NTUDP_DIR)/base/nunit_gsuite/helper/neoip_ntudp_nunit_helper.o
+
+NEOIP_NETIF_DIR=neoip_netif
+NEOIP_NETIF_INC=-I$(NEOIP_NETIF_DIR) 					\
+			-I$(NEOIP_NETIF_DIR)/util			\
+			-I$(NEOIP_NETIF_DIR)/util/nunit			\
+			-I$(NEOIP_NETIF_DIR)/ippkt_util			\
+			-I$(NEOIP_NETIF_DIR)/addr			\
+			-I$(NEOIP_NETIF_DIR)/addr/nunit			\
+			-I$(NEOIP_NETIF_DIR)/addr/watch			\
+			-I$(NEOIP_NETIF_DIR)/addr/watch/nunit		\
+			-I$(NEOIP_NETIF_DIR)/stat			\
+			-I$(NEOIP_NETIF_DIR)/stat/nunit			\
+			-I$(NEOIP_NETIF_DIR)/stat/helper		\
+			-I$(NEOIP_NETIF_DIR)/stat/watch			\
+			-I$(NEOIP_NETIF_DIR)/stat/watch/nunit		\
+			-I$(NEOIP_NETIF_DIR)/vdev			\
+			-I$(NEOIP_NETIF_DIR)/vdev/base/nunit		\
+			-I$(NEOIP_NETIF_DIR)/vdev/base/wikidbg		\
+			-I$(NEOIP_NETIF_DIR)/base			\
+			-I$(NEOIP_NETIF_DIR)/base/err			\
+			-I$(NEOIP_NETIF_DIR)/base/nunit_gsuite
+NEOIP_NETIF_OBJS =							\
+	$(NEOIP_NETIF_DIR)/util/neoip_netif_util.o			\
+	$(NEOIP_NETIF_DIR)/util/nunit/neoip_netif_util_nunit.o		\
+	$(NEOIP_NETIF_DIR)/ippkt_util/neoip_ippkt_util.o		\
+	$(NEOIP_NETIF_DIR)/vdev/neoip_netif_vdev.o			\
+	$(NEOIP_NETIF_DIR)/vdev/base/wikidbg/neoip_netif_vdev_wikidbg.o	\
+	$(NEOIP_NETIF_DIR)/vdev/base/nunit/neoip_netif_vdev_nunit.o	\
+	$(NEOIP_NETIF_DIR)/addr/neoip_netif_addr.o				\
+	$(NEOIP_NETIF_DIR)/addr/nunit/neoip_netif_addr_nunit.o			\
+	$(NEOIP_NETIF_DIR)/addr/watch/neoip_netif_addr_watch.o			\
+	$(NEOIP_NETIF_DIR)/addr/watch/nunit/neoip_netif_addr_watch_nunit.o	\
+	$(NEOIP_NETIF_DIR)/stat/neoip_netif_stat.o				\
+	$(NEOIP_NETIF_DIR)/stat/nunit/neoip_netif_stat_nunit.o			\
+	$(NEOIP_NETIF_DIR)/stat/helper/neoip_netif_stat_helper.o		\
+	$(NEOIP_NETIF_DIR)/stat/watch/neoip_netif_stat_watch.o			\
+	$(NEOIP_NETIF_DIR)/stat/watch/nunit/neoip_netif_stat_watch_nunit.o	\
+	$(NEOIP_NETIF_DIR)/base/err/neoip_netif_err.o				\
+	$(NEOIP_NETIF_DIR)/base/nunit_gsuite/neoip_netif_nunit_gsuite.o
+
+NEOIP_NUNIT_DIR=neoip_nunit
+NEOIP_NUNIT_INC=-I$(NEOIP_NUNIT_DIR) 					\
+			-I$(NEOIP_NUNIT_DIR)/base			\
+			-I$(NEOIP_NUNIT_DIR)/base/err			\
+			-I$(NEOIP_NUNIT_DIR)/base/res			\
+			-I$(NEOIP_NUNIT_DIR)/base/path			\
+			-I$(NEOIP_NUNIT_DIR)/base/event			\
+			-I$(NEOIP_NUNIT_DIR)/testclass			\
+			-I$(NEOIP_NUNIT_DIR)/suite			\
+			-I$(NEOIP_NUNIT_DIR)/runner			\
+			-I$(NEOIP_NUNIT_DIR)/helper/gsuite		\
+			-I$(NEOIP_NUNIT_DIR)/utest
+NEOIP_NUNIT_OBJS =							\
+	$(NEOIP_NUNIT_DIR)/base/err/neoip_nunit_err.o			\
+	$(NEOIP_NUNIT_DIR)/base/res/neoip_nunit_res.o			\
+	$(NEOIP_NUNIT_DIR)/base/path/neoip_nunit_path.o			\
+	$(NEOIP_NUNIT_DIR)/base/event/neoip_nunit_event.o		\
+	$(NEOIP_NUNIT_DIR)/suite/neoip_nunit_suite.o			\
+	$(NEOIP_NUNIT_DIR)/runner/neoip_nunit_runner.o			\
+	$(NEOIP_NUNIT_DIR)/helper/gsuite/neoip_nunit_gsuite.o		\
+	$(NEOIP_NUNIT_DIR)/utest/neoip_nunit_utest.o
+
+
+NEOIP_CRYPTO_DIR=neoip_crypto
+NEOIP_CRYPTO_INC=-I$(NEOIP_CRYPTO_DIR) 						\
+			-I$(NEOIP_CRYPTO_DIR)/random_pool			\
+			-I$(NEOIP_CRYPTO_DIR)/skey/pkcs5_derivkey		\
+			-I$(NEOIP_CRYPTO_DIR)/skey/pkcs5_derivkey/utest		\
+			-I$(NEOIP_CRYPTO_DIR)/skey/auth				\
+			-I$(NEOIP_CRYPTO_DIR)/skey/auth/type			\
+			-I$(NEOIP_CRYPTO_DIR)/skey/auth/nunit			\
+			-I$(NEOIP_CRYPTO_DIR)/skey/ciph				\
+			-I$(NEOIP_CRYPTO_DIR)/skey/ciph/type			\
+			-I$(NEOIP_CRYPTO_DIR)/skey/ciph/nunit			\
+			-I$(NEOIP_CRYPTO_DIR)/x509/base/nunit			\
+			-I$(NEOIP_CRYPTO_DIR)/x509				\
+			-I$(NEOIP_CRYPTO_DIR)/x509/cert				\
+			-I$(NEOIP_CRYPTO_DIR)/x509/privkey			\
+			-I$(NEOIP_CRYPTO_DIR)/x509/request			\
+			-I$(NEOIP_CRYPTO_DIR)/dh				\
+			-I$(NEOIP_CRYPTO_DIR)/dh/param				\
+			-I$(NEOIP_CRYPTO_DIR)/dh/pubkey				\
+			-I$(NEOIP_CRYPTO_DIR)/dh/privkey			\
+			-I$(NEOIP_CRYPTO_DIR)/dh/shsecret			\
+			-I$(NEOIP_CRYPTO_DIR)/dh/nunit				\
+			-I$(NEOIP_CRYPTO_DIR)/dh/utest				\
+			-I$(NEOIP_CRYPTO_DIR)/base/err				\
+			-I$(NEOIP_CRYPTO_DIR)/base/nunit_gsuite
+			
+NEOIP_CRYPTO_OBJS =								\
+	$(NEOIP_CRYPTO_DIR)/random_pool/neoip_random_pool.o			\
+	$(NEOIP_CRYPTO_DIR)/skey/pkcs5_derivkey/neoip_skey_pkcs5_derivkey.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/pkcs5_derivkey/utest/neoip_skey_pkcs5_derivkey_utest.o	\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/neoip_skey_auth.o				\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/type/neoip_skey_auth_algo.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/type/neoip_skey_auth_mode.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/type/neoip_skey_auth_type.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/auth/nunit/neoip_skey_auth_nunit.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/type/neoip_skey_ciph_algo.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/type/neoip_skey_ciph_mode.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/type/neoip_skey_ciph_type.o		\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/neoip_skey_ciph.o				\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/neoip_skey_ciph_iv.o			\
+	$(NEOIP_CRYPTO_DIR)/skey/ciph/nunit/neoip_skey_ciph_nunit.o		\
+	$(NEOIP_CRYPTO_DIR)/x509/base/nunit/neoip_x509_nunit.o			\
+	$(NEOIP_CRYPTO_DIR)/x509/privkey/neoip_x509_privkey.o			\
+	$(NEOIP_CRYPTO_DIR)/x509/privkey/nunit/neoip_x509_privkey_nunit.o	\
+	$(NEOIP_CRYPTO_DIR)/x509/cert/neoip_x509_cert.o				\
+	$(NEOIP_CRYPTO_DIR)/x509/cert/nunit/neoip_x509_cert_nunit.o		\
+	$(NEOIP_CRYPTO_DIR)/x509/request/neoip_x509_request.o			\
+	$(NEOIP_CRYPTO_DIR)/x509/request/nunit/neoip_x509_request_nunit.o	\
+	$(NEOIP_CRYPTO_DIR)/dh/param/neoip_dh_param.o				\
+	$(NEOIP_CRYPTO_DIR)/dh/pubkey/neoip_dh_pubkey.o				\
+	$(NEOIP_CRYPTO_DIR)/dh/privkey/neoip_dh_privkey.o			\
+	$(NEOIP_CRYPTO_DIR)/dh/shsecret/neoip_dh_shsecret.o			\
+	$(NEOIP_CRYPTO_DIR)/dh/nunit/neoip_dh_nunit.o				\
+	$(NEOIP_CRYPTO_DIR)/base/err/neoip_crypto_err.o				\
+	$(NEOIP_CRYPTO_DIR)/base/layer/neoip_crypto_layer_init.o		\
+	$(NEOIP_CRYPTO_DIR)/base/nunit_gsuite/neoip_crypto_nunit_gsuite.o
+
+NEOIP_COMPRESS_DIR=neoip_compress
+NEOIP_COMPRESS_INC=-I$(NEOIP_COMPRESS_DIR) 				\
+			-I$(NEOIP_COMPRESS_DIR)/algo/null		\
+			-I$(NEOIP_COMPRESS_DIR)/algo/bzip		\
+			-I$(NEOIP_COMPRESS_DIR)/algo/deflate		\
+			-I$(NEOIP_COMPRESS_DIR)/algo/gzip		\
+			-I$(NEOIP_COMPRESS_DIR)/algo/zlib		\
+			-I$(NEOIP_COMPRESS_DIR)/type			\
+			-I$(NEOIP_COMPRESS_DIR)/layer			\
+			-I$(NEOIP_COMPRESS_DIR)/nunit			\
+			-I$(NEOIP_COMPRESS_DIR)/nunit/gsuite		\
+			-I$(NEOIP_COMPRESS_DIR)/utest
+NEOIP_COMPRESS_OBJS =								\
+	$(NEOIP_COMPRESS_DIR)/algo/null/neoip_compress_null.o			\
+	$(NEOIP_COMPRESS_DIR)/algo/bzip/neoip_compress_bzip.o			\
+	$(NEOIP_COMPRESS_DIR)/algo/deflate/neoip_compress_deflate.o		\
+	$(NEOIP_COMPRESS_DIR)/algo/gzip/neoip_compress_gzip.o			\
+	$(NEOIP_COMPRESS_DIR)/algo/zlib/neoip_compress_zlib.o			\
+	$(NEOIP_COMPRESS_DIR)/type/neoip_compress_type.o			\
+	$(NEOIP_COMPRESS_DIR)/layer/neoip_compress_layer.o			\
+	$(NEOIP_COMPRESS_DIR)/layer/neoip_compress_layer_init.o			\
+	$(NEOIP_COMPRESS_DIR)/neoip_compress.o					\
+	$(NEOIP_COMPRESS_DIR)/nunit/neoip_compress_nunit.o			\
+	$(NEOIP_COMPRESS_DIR)/nunit/gsuite/neoip_compress_nunit_gsuite.o	\
+	$(NEOIP_COMPRESS_DIR)/utest/neoip_compress_utest.o
+
+
+NEOIP_BASE_DIR=neoip_base
+NEOIP_BASE_INC=-I$(NEOIP_BASE_DIR) 				\
+		-I$(NEOIP_BASE_DIR)/base_except			\
+		-I$(NEOIP_BASE_DIR)/debug			\
+		-I$(NEOIP_BASE_DIR)/debug/log			\
+		-I$(NEOIP_BASE_DIR)/debug/log/layer		\
+		-I$(NEOIP_BASE_DIR)/debug/log/level		\
+		-I$(NEOIP_BASE_DIR)/debug/tokeep_check		\
+		-I$(NEOIP_BASE_DIR)/debug/tokeep_check/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools			\
+		-I$(NEOIP_BASE_DIR)/tools/argpack		\
+		-I$(NEOIP_BASE_DIR)/tools/argpack/utest		\
+		-I$(NEOIP_BASE_DIR)/tools/base64		\
+		-I$(NEOIP_BASE_DIR)/tools/base64/utest		\
+		-I$(NEOIP_BASE_DIR)/tools/event_hook		\
+		-I$(NEOIP_BASE_DIR)/tools/event_hook/utest	\
+		-I$(NEOIP_BASE_DIR)/tools/event_hook/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/dvar			\
+		-I$(NEOIP_BASE_DIR)/tools/dvar/dvar_t		\
+		-I$(NEOIP_BASE_DIR)/tools/dvar/subtype		\
+		-I$(NEOIP_BASE_DIR)/tools/dvar/subtype/int	\
+		-I$(NEOIP_BASE_DIR)/tools/dvar/subtype/str	\
+		-I$(NEOIP_BASE_DIR)/tools/dvar/subtype/arr	\
+		-I$(NEOIP_BASE_DIR)/tools/dvar/subtype/map	\
+		-I$(NEOIP_BASE_DIR)/tools/dvar/base		\
+		-I$(NEOIP_BASE_DIR)/tools/dvar/base/type	\
+		-I$(NEOIP_BASE_DIR)/tools/dvar/base/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/ptr			\
+		-I$(NEOIP_BASE_DIR)/tools/ptr/nunit		\
+		-I$(NEOIP_BASE_DIR)/tools/profile		\
+		-I$(NEOIP_BASE_DIR)/tools/profile/nunit		\
+		-I$(NEOIP_BASE_DIR)/tools/profile/nunit/example	\
+		-I$(NEOIP_BASE_DIR)/tools/string		\
+		-I$(NEOIP_BASE_DIR)/tools/string/nunit		\
+		-I$(NEOIP_BASE_DIR)/tools/errtype		\
+		-I$(NEOIP_BASE_DIR)/tools/errtype/nunit		\
+		-I$(NEOIP_BASE_DIR)/tools/interval		\
+		-I$(NEOIP_BASE_DIR)/tools/interval/base		\
+		-I$(NEOIP_BASE_DIR)/tools/interval/base/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/item_arr		\
+		-I$(NEOIP_BASE_DIR)/tools/item_arr/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/bitflag		\
+		-I$(NEOIP_BASE_DIR)/tools/bitflag/nunit		\
+		-I$(NEOIP_BASE_DIR)/tools/bitfield		\
+		-I$(NEOIP_BASE_DIR)/tools/bitfield/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/bitfield/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/strtype		\
+		-I$(NEOIP_BASE_DIR)/tools/strtype/nunit		\
+		-I$(NEOIP_BASE_DIR)/tools/strvar_db/base/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/strvar_db/base/item	\
+		-I$(NEOIP_BASE_DIR)/tools/strvar_db/base/helper	\
+		-I$(NEOIP_BASE_DIR)/tools/strvar_db		\
+		-I$(NEOIP_BASE_DIR)/tools/pkttype		\
+		-I$(NEOIP_BASE_DIR)/tools/pkttype/profile	\
+		-I$(NEOIP_BASE_DIR)/tools/pkttype/nunit		\
+		-I$(NEOIP_BASE_DIR)/tools/version		\
+		-I$(NEOIP_BASE_DIR)/tools/version/utest		\
+		-I$(NEOIP_BASE_DIR)/tools/slotpool		\
+		-I$(NEOIP_BASE_DIR)/tools/slotpool/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/slotpool/utest	\
+		-I$(NEOIP_BASE_DIR)/tools/object_slotid		\
+		-I$(NEOIP_BASE_DIR)/tools/object_slotid/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/expireset		\
+		-I$(NEOIP_BASE_DIR)/tools/expireset/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/expireset2		\
+		-I$(NEOIP_BASE_DIR)/tools/expireset2/base/nunit	\
+		-I$(NEOIP_BASE_DIR)/tools/property		\
+		-I$(NEOIP_BASE_DIR)/tools/property/utest	\
+		-I$(NEOIP_BASE_DIR)/cpp				\
+		-I$(NEOIP_BASE_DIR)/cpp/obj_factory		\
+		-I$(NEOIP_BASE_DIR)/cpp/obj_factory/utest	\
+		-I$(NEOIP_BASE_DIR)/cpp/demangle		\
+		-I$(NEOIP_BASE_DIR)/cpp/demangle/utest		\
+		-I$(NEOIP_BASE_DIR)/cpp/stack			\
+		-I$(NEOIP_BASE_DIR)/cpp/stack/location		\
+		-I$(NEOIP_BASE_DIR)/cpp/stack/backtrace		\
+		-I$(NEOIP_BASE_DIR)/cpp/stack/utest		\
+		-I$(NEOIP_BASE_DIR)/memory			\
+		-I$(NEOIP_BASE_DIR)/memory/bytearray		\
+		-I$(NEOIP_BASE_DIR)/memory/serial		\
+		-I$(NEOIP_BASE_DIR)/memory/serial/base/stat	\
+		-I$(NEOIP_BASE_DIR)/memory/serial/base/nunit	\
+		-I$(NEOIP_BASE_DIR)/memory/datum		\
+		-I$(NEOIP_BASE_DIR)/memory/datum/base/flag	\
+		-I$(NEOIP_BASE_DIR)/memory/datum/base/nunit	\
+		-I$(NEOIP_BASE_DIR)/memory/nipmem/alloc		\
+		-I$(NEOIP_BASE_DIR)/memory/nipmem/nunit		\
+		-I$(NEOIP_BASE_DIR)/memory/nipmem/tracker	\
+		-I$(NEOIP_BASE_DIR)/memory/nipmem/tracker/http	\
+		-I$(NEOIP_BASE_DIR)/nunit_gsuite		\
+		-I$(NEOIP_BASE_DIR)/time/zerotimer		\
+		-I$(NEOIP_BASE_DIR)/time/delay			\
+		-I$(NEOIP_BASE_DIR)/time/delay/nunit		\
+		-I$(NEOIP_BASE_DIR)/time/delay0			\
+		-I$(NEOIP_BASE_DIR)/time/delay2			\
+		-I$(NEOIP_BASE_DIR)/time/delay2/nunit		\
+		-I$(NEOIP_BASE_DIR)/time/delaygen			\
+		-I$(NEOIP_BASE_DIR)/time/delaygen/base/regular		\
+		-I$(NEOIP_BASE_DIR)/time/delaygen/base/regular/arg	\
+		-I$(NEOIP_BASE_DIR)/time/delaygen/base/expboff		\
+		-I$(NEOIP_BASE_DIR)/time/delaygen/base/expboff/arg	\
+		-I$(NEOIP_BASE_DIR)/time/delaygen/delaygen		\
+		-I$(NEOIP_BASE_DIR)/time/delaygen/delaygen/arg		\
+		-I$(NEOIP_BASE_DIR)/time/delaygen/nunit			\
+		-I$(NEOIP_BASE_DIR)/time/date				\
+		-I$(NEOIP_BASE_DIR)/time/date/base/nunit		\
+		-I$(NEOIP_BASE_DIR)/time/date/base/helper		\
+		-I$(NEOIP_BASE_DIR)/time/timer_policy			\
+		-I$(NEOIP_BASE_DIR)/time/timer_policy/expbackoff	\
+		-I$(NEOIP_BASE_DIR)/time/timer_policy/probing		\
+		-I$(NEOIP_BASE_DIR)/time/timer_policy/utest		\
+		-I$(NEOIP_BASE_DIR)/time
+
+NEOIP_BASE_OBJS =								\
+	$(NEOIP_BASE_DIR)/tools/argpack/utest/neoip_argpack_utest.o		\
+	$(NEOIP_BASE_DIR)/tools/base64/utest/neoip_base64_utest.o		\
+	$(NEOIP_BASE_DIR)/tools/base64/neoip_base64.o				\
+	$(NEOIP_BASE_DIR)/tools/event_hook/neoip_event_hook.o			\
+	$(NEOIP_BASE_DIR)/tools/event_hook/reg/neoip_event_hook_reg.o		\
+	$(NEOIP_BASE_DIR)/tools/event_hook/utest/neoip_event_hook_utest.o	\
+	$(NEOIP_BASE_DIR)/tools/event_hook/nunit/neoip_event_hook_nunit.o	\
+	$(NEOIP_BASE_DIR)/tools/dvar/dvar_t/neoip_dvar_t.o			\
+	$(NEOIP_BASE_DIR)/tools/dvar/subtype/int/neoip_dvar_int.o		\
+	$(NEOIP_BASE_DIR)/tools/dvar/subtype/str/neoip_dvar_str.o		\
+	$(NEOIP_BASE_DIR)/tools/dvar/subtype/arr/neoip_dvar_arr.o		\
+	$(NEOIP_BASE_DIR)/tools/dvar/subtype/map/neoip_dvar_map.o		\
+	$(NEOIP_BASE_DIR)/tools/dvar/base/type/neoip_dvar_type.o		\
+	$(NEOIP_BASE_DIR)/tools/dvar/base/nunit/neoip_dvar_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/ptr/nunit/neoip_ptr_nunit.o			\
+	$(NEOIP_BASE_DIR)/tools/profile/nunit/neoip_profile_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/profile/nunit/example/neoip_profile_nunit_example.o	\
+	$(NEOIP_BASE_DIR)/tools/strtype/nunit/neoip_strtype_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/strvar_db/base/item/neoip_strvar_item.o		\
+	$(NEOIP_BASE_DIR)/tools/strvar_db/base/helper/neoip_strvar_helper.o	\
+	$(NEOIP_BASE_DIR)/tools/strvar_db/base/nunit/neoip_strvar_db_nunit.o	\
+	$(NEOIP_BASE_DIR)/tools/strvar_db/neoip_strvar_db.o			\
+	$(NEOIP_BASE_DIR)/tools/pkttype/profile/neoip_pkttype_profile.o		\
+	$(NEOIP_BASE_DIR)/tools/pkttype/nunit/neoip_pkttype_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/errtype/nunit/neoip_errtype_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/interval/base/nunit/neoip_interval_nunit.o	\
+	$(NEOIP_BASE_DIR)/tools/item_arr/nunit/neoip_item_arr_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/mlist/nunit/neoip_mlist_nunit.o			\
+	$(NEOIP_BASE_DIR)/tools/bitflag/nunit/neoip_bitflag_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/bitfield/neoip_bitfield.o			\
+	$(NEOIP_BASE_DIR)/tools/bitfield/rawserial/neoip_bitfield_rawserial.o	\
+	$(NEOIP_BASE_DIR)/tools/bitfield/base/nunit/neoip_bitfield_nunit.o	\
+	$(NEOIP_BASE_DIR)/tools/bitfield/base/wikidbg/neoip_bitfield_wikidbg.o	\
+	$(NEOIP_BASE_DIR)/tools/bitcount/neoip_bitcount.o			\
+	$(NEOIP_BASE_DIR)/tools/bitcount/base/nunit/neoip_bitcount_nunit.o	\
+	$(NEOIP_BASE_DIR)/tools/bitcount/base/wikidbg/neoip_bitcount_wikidbg.o	\
+	$(NEOIP_BASE_DIR)/tools/string/neoip_string.o				\
+	$(NEOIP_BASE_DIR)/tools/string/nunit/neoip_string_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/version/neoip_version.o				\
+	$(NEOIP_BASE_DIR)/tools/version/utest/neoip_version_utest.o		\
+	$(NEOIP_BASE_DIR)/tools/slotpool/neoip_slotpool.o			\
+	$(NEOIP_BASE_DIR)/tools/slotpool/nunit/neoip_slotpool_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/slotpool/utest/neoip_slotpool_utest.o		\
+	$(NEOIP_BASE_DIR)/tools/object_slotid/neoip_object_slotid.o		\
+	$(NEOIP_BASE_DIR)/tools/object_slotid/nunit/neoip_object_slotid_nunit.o	\
+	$(NEOIP_BASE_DIR)/tools/expireset/nunit/neoip_expireset_nunit.o		\
+	$(NEOIP_BASE_DIR)/tools/expireset2/base/nunit/neoip_expireset2_nunit.o	\
+	$(NEOIP_BASE_DIR)/tools/property/neoip_property.o			\
+	$(NEOIP_BASE_DIR)/tools/property/utest/neoip_property_utest.o		\
+	$(NEOIP_BASE_DIR)/cpp/demangle/neoip_cpp_demangle.o			\
+	$(NEOIP_BASE_DIR)/cpp/demangle/utest/neoip_cpp_demangle_utest.o		\
+	$(NEOIP_BASE_DIR)/cpp/stack/location/neoip_cpp_location.o		\
+	$(NEOIP_BASE_DIR)/cpp/stack/backtrace/neoip_cpp_backtrace.o		\
+	$(NEOIP_BASE_DIR)/cpp/stack/utest/neoip_cpp_stack_utest.o		\
+	$(NEOIP_BASE_DIR)/cpp/obj_factory/utest/neoip_obj_factory_utest.o	\
+	$(NEOIP_BASE_DIR)/time/zerotimer/neoip_zerotimer.o			\
+	$(NEOIP_BASE_DIR)/time/delay/neoip_delay.o				\
+	$(NEOIP_BASE_DIR)/time/delay/nunit/neoip_delay_nunit.o			\
+	$(NEOIP_BASE_DIR)/time/delaygen/base/regular/neoip_delaygen_regular.o		\
+	$(NEOIP_BASE_DIR)/time/delaygen/base/regular/arg/neoip_delaygen_regular_arg.o	\
+	$(NEOIP_BASE_DIR)/time/delaygen/base/expboff/neoip_delaygen_expboff.o		\
+	$(NEOIP_BASE_DIR)/time/delaygen/base/expboff/arg/neoip_delaygen_expboff_arg.o	\
+	$(NEOIP_BASE_DIR)/time/delaygen/delaygen/neoip_delaygen.o			\
+	$(NEOIP_BASE_DIR)/time/delaygen/delaygen/arg/neoip_delaygen_arg.o		\
+	$(NEOIP_BASE_DIR)/time/delaygen/nunit/neoip_delaygen_nunit.o			\
+	$(NEOIP_BASE_DIR)/time/date/neoip_date.o				\
+	$(NEOIP_BASE_DIR)/time/date/base/nunit/neoip_date_nunit.o		\
+	$(NEOIP_BASE_DIR)/time/date/base/helper/neoip_date_helper.o		\
+	$(NEOIP_BASE_DIR)/time/timer_policy/expbackoff/neoip_timer_expboff.o	\
+	$(NEOIP_BASE_DIR)/time/timer_policy/probing/neoip_timer_probing.o	\
+	$(NEOIP_BASE_DIR)/time/timer_policy/utest/neoip_timer_policy_utest.o	\
+	$(NEOIP_BASE_DIR)/debug/log/layer/neoip_log_layer.o			\
+	$(NEOIP_BASE_DIR)/debug/log/level/neoip_log_level.o			\
+	$(NEOIP_BASE_DIR)/debug/tokeep_check/neoip_tokeep_check.o		\
+	$(NEOIP_BASE_DIR)/debug/tokeep_check/nunit/neoip_tokeep_check_nunit.o	\
+	$(NEOIP_BASE_DIR)/memory/bytearray/neoip_bytearray.o			\
+	$(NEOIP_BASE_DIR)/memory/serial/neoip_serial.o				\
+	$(NEOIP_BASE_DIR)/memory/serial/base/stat/neoip_serial_stat.o		\
+	$(NEOIP_BASE_DIR)/memory/serial/base/nunit/neoip_serial_nunit.o		\
+	$(NEOIP_BASE_DIR)/memory/datum/neoip_datum.o				\
+	$(NEOIP_BASE_DIR)/memory/datum/base/flag/neoip_datum_flag.o		\
+	$(NEOIP_BASE_DIR)/memory/datum/base/nunit/neoip_datum_nunit.o		\
+	$(NEOIP_BASE_DIR)/memory/nipmem/alloc/neoip_nipmem_alloc.o			\
+	$(NEOIP_BASE_DIR)/memory/nipmem/tracker/neoip_nipmem_tracker.o			\
+	$(NEOIP_BASE_DIR)/memory/nipmem/tracker/http/neoip_nipmem_tracker_http.o	\
+	$(NEOIP_BASE_DIR)/memory/nipmem/nunit/neoip_nipmem_nunit.o			\
+	$(NEOIP_BASE_DIR)/nunit_gsuite/neoip_base_nunit_gsuite.o
+
+NEOIP_ELOOP_DIR=neoip_eloop
+NEOIP_ELOOP_INC=-I$(NEOIP_ELOOP_DIR) 					\
+			-I$(NEOIP_ELOOP_DIR)/base			\
+			-I$(NEOIP_ELOOP_DIR)/base/nunit_gsuite		\
+			-I$(NEOIP_ELOOP_DIR)/eloop			\
+			-I$(NEOIP_ELOOP_DIR)/eloop/glib			\
+			-I$(NEOIP_ELOOP_DIR)/eloop/levt			\
+			-I$(NEOIP_ELOOP_DIR)/fdwatch			\
+			-I$(NEOIP_ELOOP_DIR)/fdwatch/base		\
+			-I$(NEOIP_ELOOP_DIR)/fdwatch/base/cond		\
+			-I$(NEOIP_ELOOP_DIR)/fdwatch/glib		\
+			-I$(NEOIP_ELOOP_DIR)/fdwatch/levt		\
+			-I$(NEOIP_ELOOP_DIR)/timeout			\
+			-I$(NEOIP_ELOOP_DIR)/timeout/base		\
+			-I$(NEOIP_ELOOP_DIR)/timeout/base/nunit		\
+			-I$(NEOIP_ELOOP_DIR)/timeout/base/wikidbg	\
+			-I$(NEOIP_ELOOP_DIR)/timeout/glib		\
+			-I$(NEOIP_ELOOP_DIR)/timeout/levt		\
+			-I$(NEOIP_ELOOP_DIR)/glib_only/agethostbyname/		\
+			-I$(NEOIP_ELOOP_DIR)/glib_only/agethostbyname/hostent	\
+			-I$(NEOIP_ELOOP_DIR)/glib_only/agethostbyname/nunit	\
+			-I$(NEOIP_ELOOP_DIR)/glib_only/asyncop			\
+			-I$(NEOIP_ELOOP_DIR)/glib_only/asyncop/utest		\
+			-I$(NEOIP_ELOOP_DIR)/glib_only/idleop			\
+			-I$(NEOIP_ELOOP_DIR)/glib_only/idleop/nunit
+NEOIP_ELOOP_OBJS =								\
+	$(NEOIP_ELOOP_DIR)/base/nunit_gsuite/neoip_eloop_nunit_gsuite.o		\
+	$(NEOIP_ELOOP_DIR)/eloop/glib/neoip_eloop_glib.o			\
+	$(NEOIP_ELOOP_DIR)/eloop/levt/neoip_eloop_levt.o			\
+	$(NEOIP_ELOOP_DIR)/fdwatch/base/cond/neoip_fdwatch_cond.o		\
+	$(NEOIP_ELOOP_DIR)/fdwatch/glib/neoip_fdwatch_glib.o			\
+	$(NEOIP_ELOOP_DIR)/fdwatch/levt/neoip_fdwatch_levt.o			\
+	$(NEOIP_ELOOP_DIR)/timeout/base/nunit/neoip_timeout_nunit.o		\
+	$(NEOIP_ELOOP_DIR)/timeout/base/wikidbg/neoip_timeout_wikidbg.o		\
+	$(NEOIP_ELOOP_DIR)/timeout/glib/neoip_timeout_glib.o			\
+	$(NEOIP_ELOOP_DIR)/timeout/levt/neoip_timeout_levt.o			\
+	$(NEOIP_ELOOP_DIR)/glib_only/agethostbyname/neoip_agethostbyname.o		\
+	$(NEOIP_ELOOP_DIR)/glib_only/agethostbyname/hostent/neoip_hostent.o		\
+	$(NEOIP_ELOOP_DIR)/glib_only/agethostbyname/nunit/neoip_agethostbyname_nunit.o	\
+	$(NEOIP_ELOOP_DIR)/glib_only/asyncop/neoip_asyncop.o				\
+	$(NEOIP_ELOOP_DIR)/glib_only/asyncop/utest/neoip_asyncop_utest.o		\
+	$(NEOIP_ELOOP_DIR)/glib_only/idleop/neoip_idleop.o				\
+	$(NEOIP_ELOOP_DIR)/glib_only/idleop/nunit/neoip_idleop_nunit.o
+
+
+NEOIP_FILE_DIR=neoip_file
+NEOIP_FILE_INC=-I$(NEOIP_FILE_DIR) 				\
+		-I$(NEOIP_FILE_DIR)/base/err			\
+		-I$(NEOIP_FILE_DIR)/base/mode			\
+		-I$(NEOIP_FILE_DIR)/base/mode/nunit		\
+		-I$(NEOIP_FILE_DIR)/base/perm			\
+		-I$(NEOIP_FILE_DIR)/base/perm/nunit		\
+		-I$(NEOIP_FILE_DIR)/base/nunit_gsuite		\
+		-I$(NEOIP_FILE_DIR)/base/path			\
+		-I$(NEOIP_FILE_DIR)/base/path/nunit		\
+		-I$(NEOIP_FILE_DIR)/base/range			\
+		-I$(NEOIP_FILE_DIR)/base/range/nunit		\
+		-I$(NEOIP_FILE_DIR)/base/size			\
+		-I$(NEOIP_FILE_DIR)/base/size/nunit		\
+		-I$(NEOIP_FILE_DIR)/file_aio			\
+		-I$(NEOIP_FILE_DIR)/file_aio/awrite		\
+		-I$(NEOIP_FILE_DIR)/file_aio/aread		\
+		-I$(NEOIP_FILE_DIR)/file_aio/base/profile	\
+		-I$(NEOIP_FILE_DIR)/file_aio/base/nunit		\
+		-I$(NEOIP_FILE_DIR)/file_sio			\
+		-I$(NEOIP_FILE_DIR)/file_sio/nunit		\
+		-I$(NEOIP_FILE_DIR)/dir				\
+		-I$(NEOIP_FILE_DIR)/dir/nunit			\
+		-I$(NEOIP_FILE_DIR)/utils			\
+		-I$(NEOIP_FILE_DIR)/utils/nunit			\
+		-I$(NEOIP_FILE_DIR)/stat			\
+		-I$(NEOIP_FILE_DIR)/obsolete/read		\
+		-I$(NEOIP_FILE_DIR)/obsolete/write		\
+		-I$(NEOIP_FILE_DIR)/utest
+NEOIP_FILE_OBJS =								\
+	$(NEOIP_FILE_DIR)/base/err/neoip_file_err.o				\
+	$(NEOIP_FILE_DIR)/base/mode/neoip_file_mode.o				\
+	$(NEOIP_FILE_DIR)/base/mode/nunit/neoip_file_mode_nunit.o		\
+	$(NEOIP_FILE_DIR)/base/perm/neoip_file_perm.o				\
+	$(NEOIP_FILE_DIR)/base/perm/nunit/neoip_file_perm_nunit.o		\
+	$(NEOIP_FILE_DIR)/base/range/nunit/neoip_file_range_nunit.o		\
+	$(NEOIP_FILE_DIR)/base/range/neoip_file_range.o				\
+	$(NEOIP_FILE_DIR)/base/size/neoip_file_size.o				\
+	$(NEOIP_FILE_DIR)/base/size/nunit/neoip_file_size_nunit.o		\
+	$(NEOIP_FILE_DIR)/base/path/neoip_file_path.o				\
+	$(NEOIP_FILE_DIR)/base/path/nunit/neoip_file_path_nunit.o		\
+	$(NEOIP_FILE_DIR)/base/nunit_gsuite/neoip_file_nunit_gsuite.o		\
+	$(NEOIP_FILE_DIR)/file_aio/neoip_file_aio.o				\
+	$(NEOIP_FILE_DIR)/file_aio/aread/neoip_file_aread.o			\
+	$(NEOIP_FILE_DIR)/file_aio/awrite/neoip_file_awrite.o			\
+	$(NEOIP_FILE_DIR)/file_aio/base/profile/neoip_file_aio_profile.o	\
+	$(NEOIP_FILE_DIR)/file_aio/base/nunit/neoip_file_aio_nunit.o		\
+	$(NEOIP_FILE_DIR)/file_sio/neoip_file_sio.o				\
+	$(NEOIP_FILE_DIR)/file_sio/nunit/neoip_file_sio_nunit.o			\
+	$(NEOIP_FILE_DIR)/utils/neoip_file_utils.o				\
+	$(NEOIP_FILE_DIR)/utils/nunit/neoip_file_utils_nunit.o			\
+	$(NEOIP_FILE_DIR)/stat/neoip_file_stat.o				\
+	$(NEOIP_FILE_DIR)/dir/neoip_file_dir.o					\
+	$(NEOIP_FILE_DIR)/dir/nunit/neoip_file_dir_nunit.o			\
+	$(NEOIP_FILE_DIR)/obsolete/read/neoip_file_read.o			\
+	$(NEOIP_FILE_DIR)/obsolete/write/neoip_file_write.o
+
+
+NEOIP_HTTP_DIR=neoip_http
+NEOIP_HTTP_INC=-I$(NEOIP_HTTP_DIR) 				\
+		-I$(NEOIP_HTTP_DIR)/base			\
+		-I$(NEOIP_HTTP_DIR)/base/err			\
+		-I$(NEOIP_HTTP_DIR)/base/rephd			\
+		-I$(NEOIP_HTTP_DIR)/base/rephd/nunit		\
+		-I$(NEOIP_HTTP_DIR)/base/reqhd			\
+		-I$(NEOIP_HTTP_DIR)/base/reqhd/nunit		\
+		-I$(NEOIP_HTTP_DIR)/base/method			\
+		-I$(NEOIP_HTTP_DIR)/base/version		\
+		-I$(NEOIP_HTTP_DIR)/base/nunit_gsuite		\
+		-I$(NEOIP_HTTP_DIR)/base/uri			\
+		-I$(NEOIP_HTTP_DIR)/base/uri/nunit		\
+		-I$(NEOIP_HTTP_DIR)/listener			\
+		-I$(NEOIP_HTTP_DIR)/listener/resp/mode		\
+		-I$(NEOIP_HTTP_DIR)/listener/resp		\
+		-I$(NEOIP_HTTP_DIR)/listener/cnx		\
+		-I$(NEOIP_HTTP_DIR)/listener/base/nunit		\
+		-I$(NEOIP_HTTP_DIR)/listener/base/profile	\
+		-I$(NEOIP_HTTP_DIR)/client/base			\
+		-I$(NEOIP_HTTP_DIR)/client/base/profile		\
+		-I$(NEOIP_HTTP_DIR)/client/base/wikidbg		\
+		-I$(NEOIP_HTTP_DIR)/client/base/nunit		\
+		-I$(NEOIP_HTTP_DIR)/client/pool/base/stat	\
+		-I$(NEOIP_HTTP_DIR)/client/pool/base/stat/helper\
+		-I$(NEOIP_HTTP_DIR)/client/pool/base/profile	\
+		-I$(NEOIP_HTTP_DIR)/client/pool/base/wikidbg	\
+		-I$(NEOIP_HTTP_DIR)/client/pool/cnx		\
+		-I$(NEOIP_HTTP_DIR)/client/pool/cnx/wikidbg	\
+		-I$(NEOIP_HTTP_DIR)/client/pool			\
+		-I$(NEOIP_HTTP_DIR)/client			\
+		-I$(NEOIP_HTTP_DIR)/helper/nested_uri/nunit	\
+		-I$(NEOIP_HTTP_DIR)/helper/nested_uri		\
+		-I$(NEOIP_HTTP_DIR)/helper/sclient/base/nunit	\
+		-I$(NEOIP_HTTP_DIR)/helper/sclient/base/profile	\
+		-I$(NEOIP_HTTP_DIR)/helper/sclient/base/res	\
+		-I$(NEOIP_HTTP_DIR)/helper/sclient/base/wikidbg	\
+		-I$(NEOIP_HTTP_DIR)/helper/sclient
+
+NEOIP_HTTP_OBJS =								\
+	$(NEOIP_HTTP_DIR)/base/err/neoip_http_err.o				\
+	$(NEOIP_HTTP_DIR)/base/method/neoip_http_method.o			\
+	$(NEOIP_HTTP_DIR)/base/version/neoip_http_version.o			\
+	$(NEOIP_HTTP_DIR)/base/rephd/neoip_http_rephd.o				\
+	$(NEOIP_HTTP_DIR)/base/rephd/nunit/neoip_http_rephd_nunit.o		\
+	$(NEOIP_HTTP_DIR)/base/reqhd/neoip_http_reqhd.o				\
+	$(NEOIP_HTTP_DIR)/base/reqhd/nunit/neoip_http_reqhd_nunit.o		\
+	$(NEOIP_HTTP_DIR)/base/nunit_gsuite/neoip_http_nunit_gsuite.o		\
+	$(NEOIP_HTTP_DIR)/base/uri/neoip_http_uri.o				\
+	$(NEOIP_HTTP_DIR)/base/uri/nunit/neoip_http_uri_nunit.o			\
+	$(NEOIP_HTTP_DIR)/listener/base/nunit/neoip_http_listener_nunit.o	\
+	$(NEOIP_HTTP_DIR)/listener/base/profile/neoip_http_listener_profile.o	\
+	$(NEOIP_HTTP_DIR)/listener/cnx/neoip_http_listener_cnx.o		\
+	$(NEOIP_HTTP_DIR)/listener/resp/mode/neoip_http_resp_mode.o		\
+	$(NEOIP_HTTP_DIR)/listener/resp/neoip_http_resp.o			\
+	$(NEOIP_HTTP_DIR)/listener/neoip_http_listener.o			\
+	$(NEOIP_HTTP_DIR)/client/base/profile/neoip_http_client_profile.o	\
+	$(NEOIP_HTTP_DIR)/client/base/nunit/neoip_http_client_nunit.o		\
+	$(NEOIP_HTTP_DIR)/client/base/wikidbg/neoip_http_client_wikidbg.o	\
+	$(NEOIP_HTTP_DIR)/client/pool/base/stat/neoip_http_client_pool_stat.o			\
+	$(NEOIP_HTTP_DIR)/client/pool/base/stat/helper/neoip_http_client_pool_stat_helper.o	\
+	$(NEOIP_HTTP_DIR)/client/pool/base/profile/neoip_http_client_pool_profile.o		\
+	$(NEOIP_HTTP_DIR)/client/pool/base/wikidbg/neoip_http_client_pool_wikidbg.o		\
+	$(NEOIP_HTTP_DIR)/client/pool/cnx/wikidbg/neoip_http_client_pool_cnx_wikidbg.o		\
+	$(NEOIP_HTTP_DIR)/client/pool/cnx/neoip_http_client_pool_cnx.o				\
+	$(NEOIP_HTTP_DIR)/client/pool/neoip_http_client_pool.o					\
+	$(NEOIP_HTTP_DIR)/client/neoip_http_client.o					\
+	$(NEOIP_HTTP_DIR)/helper/nested_uri/nunit/neoip_http_nested_uri_nunit.o		\
+	$(NEOIP_HTTP_DIR)/helper/nested_uri/neoip_http_nested_uri.o			\
+	$(NEOIP_HTTP_DIR)/helper/sclient/base/nunit/neoip_http_sclient_nunit.o		\
+	$(NEOIP_HTTP_DIR)/helper/sclient/base/profile/neoip_http_sclient_profile.o	\
+	$(NEOIP_HTTP_DIR)/helper/sclient/base/res/neoip_http_sclient_res.o		\
+	$(NEOIP_HTTP_DIR)/helper/sclient/base/wikidbg/neoip_http_sclient_wikidbg.o	\
+	$(NEOIP_HTTP_DIR)/helper/sclient/neoip_http_sclient.o
+	
+NEOIP_HTTPD_DIR=neoip_httpd
+NEOIP_HTTPD_INC=-I$(NEOIP_HTTPD_DIR) 				\
+		-I$(NEOIP_HTTPD_DIR)/base			\
+		-I$(NEOIP_HTTPD_DIR)/base/err			\
+		-I$(NEOIP_HTTPD_DIR)/handler/			\
+		-I$(NEOIP_HTTPD_DIR)/request/			\
+		-I$(NEOIP_HTTPD_DIR)/cnx/			\
+		-I$(NEOIP_HTTPD_DIR)/helper			\
+		-I$(NEOIP_HTTPD_DIR)/helper/httpd_auth		\
+		-I$(NEOIP_HTTPD_DIR)/helper/wikidbg/base	\
+		-I$(NEOIP_HTTPD_DIR)/helper/wikidbg/http	\
+		-I$(NEOIP_HTTPD_DIR)/helper/wikidbg/keyword_db	\
+		-I$(NEOIP_HTTPD_DIR)/helper/wikidbg/global_db	\
+		-I$(NEOIP_HTTPD_DIR)/helper/wikidbg/obj		\
+		-I$(NEOIP_HTTPD_DIR)/helper/wikidbg/obj/static_page	\
+		-I$(NEOIP_HTTPD_DIR)/utest/
+NEOIP_HTTPD_OBJS =										\
+	$(NEOIP_HTTPD_DIR)/helper/httpd_auth/neoip_httpd_auth.o					\
+	$(NEOIP_HTTPD_DIR)/helper/wikidbg/global_db/neoip_wikidbg_global_db.o			\
+	$(NEOIP_HTTPD_DIR)/helper/wikidbg/keyword_db/neoip_wikidbg_keyword_db.o			\
+	$(NEOIP_HTTPD_DIR)/helper/wikidbg/http/neoip_wikidbg_http.o				\
+	$(NEOIP_HTTPD_DIR)/helper/wikidbg/obj/static_page/neoip_wikidbg_obj_static_page.o	\
+	$(NEOIP_HTTPD_DIR)/base/err/neoip_httpd_err.o			\
+	$(NEOIP_HTTPD_DIR)/utest/neoip_httpd_utest.o			\
+	$(NEOIP_HTTPD_DIR)/handler/neoip_httpd_handler.o		\
+	$(NEOIP_HTTPD_DIR)/request/neoip_httpd_request.o		\
+	$(NEOIP_HTTPD_DIR)/cnx/neoip_httpd_cnx.o			\
+	$(NEOIP_HTTPD_DIR)/neoip_httpd.o
+
+NEOIP_PROTO_NUNIT_DIR=neoip_proto/nunit_gsuite
+NEOIP_PROTO_NUNIT_INC=-I$(NEOIP_PROTO_NUNIT_DIR)
+NEOIP_PROTO_NUNIT_OBJS =						\
+	$(NEOIP_PROTO_NUNIT_DIR)/neoip_proto_nunit_gsuite.o
+	
+NEOIP_PKTCOMP_DIR=neoip_proto/pktcomp
+NEOIP_PKTCOMP_INC=-I$(NEOIP_PKTCOMP_DIR) 				\
+			-I$(NEOIP_PKTCOMP_DIR)/base			\
+			-I$(NEOIP_PKTCOMP_DIR)/base/pkttype		\
+			-I$(NEOIP_PKTCOMP_DIR)/base/err			\
+			-I$(NEOIP_PKTCOMP_DIR)/base/profile		\
+			-I$(NEOIP_PKTCOMP_DIR)/utest
+NEOIP_PKTCOMP_OBJS =							\
+	$(NEOIP_PKTCOMP_DIR)/neoip_pktcomp.o				\
+	$(NEOIP_PKTCOMP_DIR)/base/err/neoip_pktcomp_err.o		\
+	$(NEOIP_PKTCOMP_DIR)/base/pkttype/neoip_pktcomp_pkttype.o	\
+	$(NEOIP_PKTCOMP_DIR)/base/profile/neoip_pktcomp_profile.o	\
+	$(NEOIP_PKTCOMP_DIR)/utest/neoip_pktcomp_utest.o
+
+NEOIP_RDGRAM_DIR=neoip_proto/rdgram
+NEOIP_RDGRAM_INC=-I$(NEOIP_RDGRAM_DIR)					\
+			-I$(NEOIP_RDGRAM_DIR)/base			\
+			-I$(NEOIP_RDGRAM_DIR)/base/err			\
+			-I$(NEOIP_RDGRAM_DIR)/base/event		\
+			-I$(NEOIP_RDGRAM_DIR)/base/pkttype		\
+			-I$(NEOIP_RDGRAM_DIR)/utest
+NEOIP_RDGRAM_OBJS =							\
+	$(NEOIP_RDGRAM_DIR)/utest/neoip_rdgram_utest.o			\
+	$(NEOIP_RDGRAM_DIR)/base/event/neoip_rdgram_event.o		\
+	$(NEOIP_RDGRAM_DIR)/base/err/neoip_rdgram_err.o			\
+	$(NEOIP_RDGRAM_DIR)/base/pkttype/neoip_rdgram_pkttype.o		\
+	$(NEOIP_RDGRAM_DIR)/neoip_rdgram.o
+
+NEOIP_ORDGRAM_DIR=neoip_proto/ordgram
+NEOIP_ORDGRAM_INC=-I$(NEOIP_ORDGRAM_DIR)				\
+			-I$(NEOIP_ORDGRAM_DIR)/base/event		\
+			-I$(NEOIP_ORDGRAM_DIR)/base
+NEOIP_ORDGRAM_OBJS =							\
+	$(NEOIP_ORDGRAM_DIR)/base/event/neoip_ordgram_event.o		\
+	$(NEOIP_ORDGRAM_DIR)/neoip_ordgram.o
+
+NEOIP_REACHPEER_DIR=neoip_proto/reachpeer
+NEOIP_REACHPEER_INC=-I$(NEOIP_REACHPEER_DIR)			\
+			-I$(NEOIP_REACHPEER_DIR)/base		\
+			-I$(NEOIP_REACHPEER_DIR)/base/err	\
+			-I$(NEOIP_REACHPEER_DIR)/base/event	\
+			-I$(NEOIP_REACHPEER_DIR)/base/pkttype	\
+			-I$(NEOIP_REACHPEER_DIR)/base/profile	\
+			-I$(NEOIP_REACHPEER_DIR)/utest
+NEOIP_REACHPEER_OBJS =							\
+	$(NEOIP_REACHPEER_DIR)/base/err/neoip_reachpeer_err.o		\
+	$(NEOIP_REACHPEER_DIR)/base/event/neoip_reachpeer_event.o	\
+	$(NEOIP_REACHPEER_DIR)/base/pkttype/neoip_reachpeer_pkttype.o	\
+	$(NEOIP_REACHPEER_DIR)/base/profile/neoip_reachpeer_profile.o	\
+	$(NEOIP_REACHPEER_DIR)/utest/neoip_reachpeer_utest.o		\
+	$(NEOIP_REACHPEER_DIR)/neoip_reachpeer.o
+
+NEOIP_PKTFRAG_DIR=neoip_proto/pktfrag
+NEOIP_PKTFRAG_INC=-I$(NEOIP_PKTFRAG_DIR)				\
+			-I$(NEOIP_PKTFRAG_DIR)/base			\
+			-I$(NEOIP_PKTFRAG_DIR)/base/err			\
+			-I$(NEOIP_PKTFRAG_DIR)/base/pkttype		\
+			-I$(NEOIP_PKTFRAG_DIR)/base/profile		\
+			-I$(NEOIP_PKTFRAG_DIR)/base/nunit		\
+			-I$(NEOIP_PKTFRAG_DIR)/fraglist			\
+			-I$(NEOIP_PKTFRAG_DIR)/pending_dgram
+NEOIP_PKTFRAG_OBJS =								\
+	$(NEOIP_PKTFRAG_DIR)/base/err/neoip_pktfrag_err.o			\
+	$(NEOIP_PKTFRAG_DIR)/base/pkttype/neoip_pktfrag_pkttype.o		\
+	$(NEOIP_PKTFRAG_DIR)/base/profile/neoip_pktfrag_profile.o		\
+	$(NEOIP_PKTFRAG_DIR)/base/nunit/neoip_pktfrag_nunit.o			\
+	$(NEOIP_PKTFRAG_DIR)/fraglist/neoip_pktfrag_fraglist.o			\
+	$(NEOIP_PKTFRAG_DIR)/pending_dgram/neoip_pktfrag_pending_dgram.o	\
+	$(NEOIP_PKTFRAG_DIR)/neoip_pktfrag.o
+
+NEOIP_SIMUWAN_DIR=neoip_proto/simuwan
+NEOIP_SIMUWAN_INC=-I$(NEOIP_SIMUWAN_DIR)				\
+			-I$(NEOIP_SIMUWAN_DIR)/base			\
+			-I$(NEOIP_SIMUWAN_DIR)/base/err			\
+			-I$(NEOIP_SIMUWAN_DIR)/base/event		\
+			-I$(NEOIP_SIMUWAN_DIR)/base/profile
+NEOIP_SIMUWAN_OBJS =							\
+	$(NEOIP_SIMUWAN_DIR)/base/err/neoip_simuwan_err.o		\
+	$(NEOIP_SIMUWAN_DIR)/base/event/neoip_simuwan_event.o		\
+	$(NEOIP_SIMUWAN_DIR)/base/profile/neoip_simuwan_profile.o	\
+	$(NEOIP_SIMUWAN_DIR)/neoip_simuwan.o
+
+
+NEOIP_SCNX_DIR=neoip_proto/scnx
+NEOIP_SCNX_INC=-I$(NEOIP_SCNX_DIR)					\
+			-I$(NEOIP_SCNX_DIR)/base/			\
+			-I$(NEOIP_SCNX_DIR)/base/err			\
+			-I$(NEOIP_SCNX_DIR)/base/err/utest		\
+			-I$(NEOIP_SCNX_DIR)/base/event			\
+			-I$(NEOIP_SCNX_DIR)/base/event/utest		\
+			-I$(NEOIP_SCNX_DIR)/base/pkttype		\
+			-I$(NEOIP_SCNX_DIR)/base/pkttype/utest		\
+			-I$(NEOIP_SCNX_DIR)/base/profile		\
+			-I$(NEOIP_SCNX_DIR)/resp/			\
+			-I$(NEOIP_SCNX_DIR)/itor/			\
+			-I$(NEOIP_SCNX_DIR)/full/			\
+			-I$(NEOIP_SCNX_DIR)/full/recv			\
+			-I$(NEOIP_SCNX_DIR)/full/rkey			\
+			-I$(NEOIP_SCNX_DIR)/full/xmit			\
+			-I$(NEOIP_SCNX_DIR)/	
+NEOIP_SCNX_OBJS =							\
+	$(NEOIP_SCNX_DIR)/resp/neoip_scnx_resp.o			\
+	$(NEOIP_SCNX_DIR)/itor/neoip_scnx_itor.o			\
+	$(NEOIP_SCNX_DIR)/full/recv/neoip_scnx_full_recv.o		\
+	$(NEOIP_SCNX_DIR)/full/rkey/neoip_scnx_full_rkey.o		\
+	$(NEOIP_SCNX_DIR)/full/xmit/neoip_scnx_full_xmit.o		\
+	$(NEOIP_SCNX_DIR)/full/neoip_scnx_full.o			\
+	$(NEOIP_SCNX_DIR)/base/err/neoip_scnx_err.o			\
+	$(NEOIP_SCNX_DIR)/base/event/neoip_scnx_event.o			\
+	$(NEOIP_SCNX_DIR)/base/pkttype/neoip_scnx_pkttype.o		\
+	$(NEOIP_SCNX_DIR)/base/profile/neoip_scnx_profile.o
+	
+NEOIP_NLAY_DIR=neoip_nlay
+NEOIP_NLAY_INC=-I$(NEOIP_NLAY_DIR)					\
+			-I$(NEOIP_NLAY_DIR)/resp/			\
+			-I$(NEOIP_NLAY_DIR)/itor/			\
+			-I$(NEOIP_NLAY_DIR)/full/			\
+			-I$(NEOIP_NLAY_DIR)/nego/			\
+			-I$(NEOIP_NLAY_DIR)/nego/base			\
+			-I$(NEOIP_NLAY_DIR)/nego/base/pkttype		\
+			-I$(NEOIP_NLAY_DIR)/base/			\
+			-I$(NEOIP_NLAY_DIR)/base/err/			\
+			-I$(NEOIP_NLAY_DIR)/base/event/			\
+			-I$(NEOIP_NLAY_DIR)/base/profile/		\
+			-I$(NEOIP_NLAY_DIR)/base/regpkt/		\
+			-I$(NEOIP_NLAY_DIR)/base/type/			\
+			-I$(NEOIP_NLAY_DIR)/utest/
+NEOIP_NLAY_OBJS =							\
+	$(NEOIP_NLAY_DIR)/resp/neoip_nlay_resp.o			\
+	$(NEOIP_NLAY_DIR)/itor/neoip_nlay_itor.o			\
+	$(NEOIP_NLAY_DIR)/full/neoip_nlay_full.o			\
+	$(NEOIP_NLAY_DIR)/full/neoip_nlay_full_reliability.o		\
+	$(NEOIP_NLAY_DIR)/full/neoip_nlay_full_mtu.o			\
+	$(NEOIP_NLAY_DIR)/full/neoip_nlay_full_stack.o			\
+	$(NEOIP_NLAY_DIR)/nego/neoip_nlay_nego.o			\
+	$(NEOIP_NLAY_DIR)/nego/base/pkttype/neoip_nlay_nego_pkttype.o	\
+	$(NEOIP_NLAY_DIR)/base/err/neoip_nlay_err.o			\
+	$(NEOIP_NLAY_DIR)/base/event/neoip_nlay_event.o			\
+	$(NEOIP_NLAY_DIR)/base/profile/neoip_nlay_profile.o		\
+	$(NEOIP_NLAY_DIR)/base/regpkt/neoip_nlay_regpkt.o		\
+	$(NEOIP_NLAY_DIR)/base/type/neoip_nlay_type.o			\
+	$(NEOIP_NLAY_DIR)/utest/neoip_nlay_utest.o
+
+NEOIP_NLAY_BRICK_DIR=neoip_nlay_brick
+NEOIP_NLAY_BRICK_INC=-I$(NEOIP_NLAY_BRICK_DIR)				\
+			-I$(NEOIP_NLAY_BRICK_DIR)/bstream2dgram/	\
+			-I$(NEOIP_NLAY_BRICK_DIR)/closure/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/closure/pkttype	\
+			-I$(NEOIP_NLAY_BRICK_DIR)/closure/profile	\
+			-I$(NEOIP_NLAY_BRICK_DIR)/dataize/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/idletimeout/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/idletimeout/profile	\
+			-I$(NEOIP_NLAY_BRICK_DIR)/ordgram/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/pktfrag/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/pktcomp/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/pktcomp/nego		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/rate_limit/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/rate_limit/profile	\
+			-I$(NEOIP_NLAY_BRICK_DIR)/rdgram/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/reachpeer/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/scnx_full/		\
+			-I$(NEOIP_NLAY_BRICK_DIR)/simuwan/
+NEOIP_NLAY_BRICK_OBJS =							\
+	$(NEOIP_NLAY_BRICK_DIR)/bstream2dgram/neoip_nlay_bstream2dgram.o\
+	$(NEOIP_NLAY_BRICK_DIR)/closure/neoip_nlay_closure.o		\
+	$(NEOIP_NLAY_BRICK_DIR)/closure/profile/neoip_nlay_closure_profile.o		\
+	$(NEOIP_NLAY_BRICK_DIR)/closure/pkttype/neoip_nlay_closure_pkttype.o		\
+	$(NEOIP_NLAY_BRICK_DIR)/dataize/neoip_nlay_dataize.o				\
+	$(NEOIP_NLAY_BRICK_DIR)/idletimeout/neoip_nlay_idletimeout.o			\
+	$(NEOIP_NLAY_BRICK_DIR)/idletimeout/profile/neoip_nlay_idletimeout_profile.o	\
+	$(NEOIP_NLAY_BRICK_DIR)/ordgram/neoip_nlay_ordgram.o				\
+	$(NEOIP_NLAY_BRICK_DIR)/pktcomp/neoip_nlay_pktcomp.o				\
+	$(NEOIP_NLAY_BRICK_DIR)/pktcomp/nego/neoip_nlay_pktcomp_nego.o			\
+	$(NEOIP_NLAY_BRICK_DIR)/pktfrag/neoip_nlay_pktfrag.o				\
+	$(NEOIP_NLAY_BRICK_DIR)/rate_limit/neoip_nlay_rate_limit.o			\
+	$(NEOIP_NLAY_BRICK_DIR)/rate_limit/profile/neoip_nlay_rate_limit_profile.o	\
+	$(NEOIP_NLAY_BRICK_DIR)/rdgram/neoip_nlay_rdgram.o		\
+	$(NEOIP_NLAY_BRICK_DIR)/reachpeer/neoip_nlay_reachpeer.o	\
+	$(NEOIP_NLAY_BRICK_DIR)/scnx_full/neoip_nlay_scnx_full.o	\
+	$(NEOIP_NLAY_BRICK_DIR)/simuwan/neoip_nlay_simuwan.o
+
+
+NEOIP_NETUTILS_DIR=neoip_netutils
+NEOIP_NETUTILS_INC=-I$(NEOIP_NETUTILS_DIR)				\
+			-I$(NEOIP_NETUTILS_DIR)/acl/			\
+			-I$(NEOIP_NETUTILS_DIR)/acl/acl_dstring		\
+			-I$(NEOIP_NETUTILS_DIR)/acl/utest		\
+			-I$(NEOIP_NETUTILS_DIR)/slidwin/		\
+			-I$(NEOIP_NETUTILS_DIR)/slidwin/utest		\
+			-I$(NEOIP_NETUTILS_DIR)/obsolete/rat0_estim/		\
+			-I$(NEOIP_NETUTILS_DIR)/obsolete/rat0_estim/utest	\
+			-I$(NEOIP_NETUTILS_DIR)/obsolete/rat0_limit/		\
+			-I$(NEOIP_NETUTILS_DIR)/obsolete/rat0_limit/utest	\
+			-I$(NEOIP_NETUTILS_DIR)/rate_estim		\
+			-I$(NEOIP_NETUTILS_DIR)/rate_estim/base/arg	\
+			-I$(NEOIP_NETUTILS_DIR)/rate_estim/base/nunit	\
+			-I$(NEOIP_NETUTILS_DIR)/rate_sched/		\
+			-I$(NEOIP_NETUTILS_DIR)/rate_sched/limit	\
+			-I$(NEOIP_NETUTILS_DIR)/rate_sched/limit/base/profile	\
+			-I$(NEOIP_NETUTILS_DIR)/rate_sched/limit/base/arg	\
+			-I$(NEOIP_NETUTILS_DIR)/rate_sched/base/prec		\
+			-I$(NEOIP_NETUTILS_DIR)/rate_sched/base/err		\
+			-I$(NEOIP_NETUTILS_DIR)/rate_sched/base/profile		\
+			-I$(NEOIP_NETUTILS_DIR)/rate_sched/base/nunit		\
+			-I$(NEOIP_NETUTILS_DIR)/rate_sched/base/nunit/item	\
+			-I$(NEOIP_NETUTILS_DIR)/cookie/			\
+			-I$(NEOIP_NETUTILS_DIR)/bfilter/		\
+			-I$(NEOIP_NETUTILS_DIR)/bfilter/param		\
+			-I$(NEOIP_NETUTILS_DIR)/bfilter/nunit		\
+			-I$(NEOIP_NETUTILS_DIR)/bencode/		\
+			-I$(NEOIP_NETUTILS_DIR)/bencode/nunit		\
+			-I$(NEOIP_NETUTILS_DIR)/gen_id/			\
+			-I$(NEOIP_NETUTILS_DIR)/gen_id/nunit		\
+			-I$(NEOIP_NETUTILS_DIR)/mimediag/		\
+			-I$(NEOIP_NETUTILS_DIR)/mimediag/nunit		\
+			-I$(NEOIP_NETUTILS_DIR)/pkt/			\
+			-I$(NEOIP_NETUTILS_DIR)/negorange/		\
+			-I$(NEOIP_NETUTILS_DIR)/negorange/utest		\
+			-I$(NEOIP_NETUTILS_DIR)/cnxstat/		\
+			-I$(NEOIP_NETUTILS_DIR)/cnxstat/utest		\
+			-I$(NEOIP_NETUTILS_DIR)/wai/			\
+			-I$(NEOIP_NETUTILS_DIR)/wai/utest		\
+			-I$(NEOIP_NETUTILS_DIR)/nunit_gsuite
+
+NEOIP_NETUTILS_OBJS =								\
+	$(NEOIP_NETUTILS_DIR)/acl/utest/neoip_acl_utest.o			\
+	$(NEOIP_NETUTILS_DIR)/acl/neoip_acl_action.o				\
+	$(NEOIP_NETUTILS_DIR)/acl/acl_dstring/neoip_acl_dstring.o		\
+	$(NEOIP_NETUTILS_DIR)/cookie/neoip_cookie.o				\
+	$(NEOIP_NETUTILS_DIR)/bfilter/neoip_bfilter.o				\
+	$(NEOIP_NETUTILS_DIR)/bfilter/param/neoip_bfilter_param.o		\
+	$(NEOIP_NETUTILS_DIR)/bfilter/nunit/neoip_bfilter_nunit.o		\
+	$(NEOIP_NETUTILS_DIR)/bencode/neoip_bencode.o				\
+	$(NEOIP_NETUTILS_DIR)/bencode/nunit/neoip_bencode_nunit.o		\
+	$(NEOIP_NETUTILS_DIR)/gen_id/nunit/neoip_gen_id_nunit.o			\
+	$(NEOIP_NETUTILS_DIR)/mimediag/neoip_mimediag.o				\
+	$(NEOIP_NETUTILS_DIR)/mimediag/nunit/neoip_mimediag_nunit.o		\
+	$(NEOIP_NETUTILS_DIR)/slidwin/utest/neoip_slidwin_utest.o		\
+	$(NEOIP_NETUTILS_DIR)/obsolete/rat0_estim/utest/neoip_rat0_estim_utest.o	\
+	$(NEOIP_NETUTILS_DIR)/obsolete/rat0_limit/utest/neoip_rat0_limit_utest.o	\
+	$(NEOIP_NETUTILS_DIR)/rate_estim/base/arg/neoip_rate_estim_arg.o		\
+	$(NEOIP_NETUTILS_DIR)/rate_estim/base/nunit/neoip_rate_estim_nunit.o		\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/neoip_rate_sched.o				\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/limit/neoip_rate_limit.o			\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/limit/base/profile/neoip_rate_limit_profile.o	\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/limit/base/arg/neoip_rate_limit_arg.o		\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/limit/base/wikidbg/neoip_rate_limit_wikidbg.o	\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/base/prec/neoip_rate_prec.o			\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/base/err/neoip_rate_err.o			\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/base/wikidbg/neoip_rate_sched_wikidbg.o	\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/base/nunit/neoip_rate_sched_nunit.o		\
+	$(NEOIP_NETUTILS_DIR)/rate_sched/base/nunit/item/neoip_rate_sched_nunit_item.o	\
+	$(NEOIP_NETUTILS_DIR)/cnxstat/neoip_cnxstat.o				\
+	$(NEOIP_NETUTILS_DIR)/cnxstat/utest/neoip_cnxstat_utest.o		\
+	$(NEOIP_NETUTILS_DIR)/negorange/utest/neoip_negorange_utest.o		\
+	$(NEOIP_NETUTILS_DIR)/wai/utest/neoip_wai_utest.o			\
+	$(NEOIP_NETUTILS_DIR)/nunit_gsuite/neoip_netutils_nunit_gsuite.o
+	
+NEOIP_SOCKET_GLUE_DIR=neoip_socket/glue
+NEOIP_SOCKET_GLUE_INC=-I$(NEOIP_SOCKET_GLUE_DIR)				\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/address			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/address/addr		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/address/addr/nunit	\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/address/peerid		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/address/peerid/nunit	\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/address/portid		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/address/portid/nunit	\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/type			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/event			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/err			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/domain			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/profile			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/base/profile/linger		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/resp				\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/resp/arg			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/itor				\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/itor/arg			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/full				\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/full/profile			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/layer			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/layer/init			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/service		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/service/chargen/base/nunit	\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/service/chargen/client	\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/service/chargen/server	\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/service/chargen/server/cnx	\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/service/echo/base/nunit	\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/service/echo/client		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/service/echo/server		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/service/echo/server/cnx	\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/client			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/helper/client/nunit			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper			\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/domain		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/ntlay		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/ntudp		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/tcp		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/udp		\
+			-I$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite
+
+NEOIP_SOCKET_GLUE_OBJS=									\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/address/addr/neoip_socket_addr.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/address/addr/nunit/neoip_socket_addr_nunit.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/address/peerid/neoip_socket_peerid.o		\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/address/peerid/nunit/neoip_socket_peerid_nunit.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/address/portid/neoip_socket_portid.o		\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/address/portid/nunit/neoip_socket_portid_nunit.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/type/neoip_socket_type.o				\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/event/neoip_socket_event.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/err/neoip_socket_err.o				\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/domain/neoip_socket_domain.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/profile/neoip_socket_profile.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/base/profile/linger/neoip_socket_linger_profile.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/resp/neoip_socket_resp.o				\
+	$(NEOIP_SOCKET_GLUE_DIR)/resp/arg/neoip_socket_resp_arg.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/itor/neoip_socket_itor.o				\
+	$(NEOIP_SOCKET_GLUE_DIR)/itor/arg/neoip_socket_itor_arg.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/full/neoip_socket_full.o				\
+	$(NEOIP_SOCKET_GLUE_DIR)/full/profile/neoip_socket_full_profile.o		\
+	$(NEOIP_SOCKET_GLUE_DIR)/layer/neoip_socket_layer.o				\
+	$(NEOIP_SOCKET_GLUE_DIR)/layer/init/neoip_socket_layer_init.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/service/chargen/base/nunit/neoip_socket_chargen_nunit.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/service/chargen/client/neoip_socket_chargen_client.o		\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/service/chargen/server/neoip_socket_chargen_server.o		\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/service/chargen/server/cnx/neoip_socket_chargen_server_cnx.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/service/echo/base/nunit/neoip_socket_echo_nunit.o		\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/service/echo/client/neoip_socket_echo_client.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/service/echo/server/neoip_socket_echo_server.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/service/echo/server/cnx/neoip_socket_echo_server_cnx.o		\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/client/neoip_socket_client.o			\
+	$(NEOIP_SOCKET_GLUE_DIR)/helper/client/nunit/neoip_socket_client_nunit.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/domain/neoip_socket_nunit_domain.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/ntlay/neoip_socket_nunit_ntlay.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/ntudp/neoip_socket_nunit_ntudp.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/tcp/neoip_socket_nunit_tcp.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/helper/udp/neoip_socket_nunit_udp.o	\
+	$(NEOIP_SOCKET_GLUE_DIR)/nunit_gsuite/neoip_socket_nunit_gsuite.o
+	
+
+NEOIP_SOCKET_UDP_DIR=neoip_socket/udp
+NEOIP_SOCKET_UDP_INC=-I$(NEOIP_SOCKET_UDP_DIR)				\
+			-I$(NEOIP_SOCKET_UDP_DIR)/layer			\
+			-I$(NEOIP_SOCKET_UDP_DIR)/layer/init		\
+			-I$(NEOIP_SOCKET_UDP_DIR)/profile		\
+			-I$(NEOIP_SOCKET_UDP_DIR)/address		\
+			-I$(NEOIP_SOCKET_UDP_DIR)/address/peerid	\
+			-I$(NEOIP_SOCKET_UDP_DIR)/address/portid	\
+			-I$(NEOIP_SOCKET_UDP_DIR)/resp			\
+			-I$(NEOIP_SOCKET_UDP_DIR)/resp/cnx		\
+			-I$(NEOIP_SOCKET_UDP_DIR)/itor			\
+			-I$(NEOIP_SOCKET_UDP_DIR)/full			\
+			-I$(NEOIP_SOCKET_UDP_DIR)/full/close
+NEOIP_SOCKET_UDP_OBJS=								\
+	$(NEOIP_SOCKET_UDP_DIR)/layer/neoip_socket_layer_udp.o			\
+	$(NEOIP_SOCKET_UDP_DIR)/layer/init/neoip_socket_layer_udp_init.o	\
+	$(NEOIP_SOCKET_UDP_DIR)/helper/neoip_socket_helper_udp.o		\
+	$(NEOIP_SOCKET_UDP_DIR)/profile/neoip_socket_profile_udp.o		\
+	$(NEOIP_SOCKET_UDP_DIR)/address/peerid/neoip_socket_peerid_udp.o	\
+	$(NEOIP_SOCKET_UDP_DIR)/address/portid/neoip_socket_portid_udp.o	\
+	$(NEOIP_SOCKET_UDP_DIR)/resp/neoip_socket_resp_udp.o			\
+	$(NEOIP_SOCKET_UDP_DIR)/resp/cnx/neoip_socket_resp_udp_cnx.o		\
+	$(NEOIP_SOCKET_UDP_DIR)/itor/neoip_socket_itor_udp.o			\
+	$(NEOIP_SOCKET_UDP_DIR)/full/neoip_socket_full_udp.o			\
+	$(NEOIP_SOCKET_UDP_DIR)/full/close/neoip_socket_full_close_udp.o	
+
+NEOIP_SOCKET_NTLAY_DIR=neoip_socket/ntlay
+NEOIP_SOCKET_NTLAY_INC=-I$(NEOIP_SOCKET_NTLAY_DIR)				\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/layer			\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/layer/init			\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/profile			\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/address			\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/address/peerid		\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/address/portid		\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/resp			\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/resp/cnx			\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/itor			\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/full			\
+			-I$(NEOIP_SOCKET_NTLAY_DIR)/full/close
+NEOIP_SOCKET_NTLAY_OBJS=							\
+	$(NEOIP_SOCKET_NTLAY_DIR)/layer/neoip_socket_layer_ntlay.o		\
+	$(NEOIP_SOCKET_NTLAY_DIR)/layer/init/neoip_socket_layer_ntlay_init.o	\
+	$(NEOIP_SOCKET_NTLAY_DIR)/helper/neoip_socket_helper_ntlay.o		\
+	$(NEOIP_SOCKET_NTLAY_DIR)/profile/neoip_socket_profile_ntlay.o		\
+	$(NEOIP_SOCKET_NTLAY_DIR)/address/peerid/neoip_socket_peerid_ntlay.o	\
+	$(NEOIP_SOCKET_NTLAY_DIR)/address/portid/neoip_socket_portid_ntlay.o	\
+	$(NEOIP_SOCKET_NTLAY_DIR)/resp/neoip_socket_resp_ntlay.o		\
+	$(NEOIP_SOCKET_NTLAY_DIR)/resp/cnx/neoip_socket_resp_ntlay_cnx.o	\
+	$(NEOIP_SOCKET_NTLAY_DIR)/itor/neoip_socket_itor_ntlay.o		\
+	$(NEOIP_SOCKET_NTLAY_DIR)/full/neoip_socket_full_ntlay.o		\
+	$(NEOIP_SOCKET_NTLAY_DIR)/full/close/neoip_socket_full_close_ntlay.o
+
+NEOIP_SOCKET_NTUDP_DIR=neoip_socket/ntudp
+NEOIP_SOCKET_NTUDP_INC=-I$(NEOIP_SOCKET_NTUDP_DIR)				\
+			-I$(NEOIP_SOCKET_NTUDP_DIR)/profile			\
+			-I$(NEOIP_SOCKET_NTUDP_DIR)/address			\
+			-I$(NEOIP_SOCKET_NTUDP_DIR)/address/peerid		\
+			-I$(NEOIP_SOCKET_NTUDP_DIR)/address/portid		\
+			-I$(NEOIP_SOCKET_NTUDP_DIR)/profile			\
+			-I$(NEOIP_SOCKET_NTUDP_DIR)/resp			\
+			-I$(NEOIP_SOCKET_NTUDP_DIR)/itor			\
+			-I$(NEOIP_SOCKET_NTUDP_DIR)/full
+NEOIP_SOCKET_NTUDP_OBJS=							\
+	$(NEOIP_SOCKET_NTUDP_DIR)/helper/neoip_socket_helper_ntudp.o		\
+	$(NEOIP_SOCKET_NTUDP_DIR)/profile/neoip_socket_profile_ntudp.o		\
+	$(NEOIP_SOCKET_NTUDP_DIR)/address/peerid/neoip_socket_peerid_ntudp.o	\
+	$(NEOIP_SOCKET_NTUDP_DIR)/address/portid/neoip_socket_portid_ntudp.o	\
+	$(NEOIP_SOCKET_NTUDP_DIR)/resp/neoip_socket_resp_ntudp.o		\
+	$(NEOIP_SOCKET_NTUDP_DIR)/itor/neoip_socket_itor_ntudp.o		\
+	$(NEOIP_SOCKET_NTUDP_DIR)/full/neoip_socket_full_ntudp.o
+
+NEOIP_SOCKET_TCP_DIR=neoip_socket/tcp
+NEOIP_SOCKET_TCP_INC=-I$(NEOIP_SOCKET_TCP_DIR)					\
+			-I$(NEOIP_SOCKET_TCP_DIR)/helper			\
+			-I$(NEOIP_SOCKET_TCP_DIR)/profile			\
+			-I$(NEOIP_SOCKET_TCP_DIR)/address			\
+			-I$(NEOIP_SOCKET_TCP_DIR)/address/peerid		\
+			-I$(NEOIP_SOCKET_TCP_DIR)/address/portid		\
+			-I$(NEOIP_SOCKET_TCP_DIR)/profile			\
+			-I$(NEOIP_SOCKET_TCP_DIR)/resp				\
+			-I$(NEOIP_SOCKET_TCP_DIR)/itor				\
+			-I$(NEOIP_SOCKET_TCP_DIR)/full
+NEOIP_SOCKET_TCP_OBJS=								\
+	$(NEOIP_SOCKET_TCP_DIR)/helper/neoip_socket_helper_tcp.o		\
+	$(NEOIP_SOCKET_TCP_DIR)/profile/neoip_socket_profile_tcp.o		\
+	$(NEOIP_SOCKET_TCP_DIR)/address/peerid/neoip_socket_peerid_tcp.o	\
+	$(NEOIP_SOCKET_TCP_DIR)/address/portid/neoip_socket_portid_tcp.o	\
+	$(NEOIP_SOCKET_TCP_DIR)/resp/neoip_socket_resp_tcp.o			\
+	$(NEOIP_SOCKET_TCP_DIR)/itor/neoip_socket_itor_tcp.o			\
+	$(NEOIP_SOCKET_TCP_DIR)/full/neoip_socket_full_tcp.o
+
+NEOIP_NS_DIR=neoip_ns
+NEOIP_NS_INC=-I$(NEOIP_NS_DIR) 			\
+		-I$(NEOIP_NS_DIR)/ns_db		\
+		-I$(NEOIP_NS_DIR)/ns_client	\
+		-I$(NEOIP_NS_DIR)/ns_server	\
+		-I$(NEOIP_NS_DIR)/ns_realm	\
+		-I$(NEOIP_NS_DIR)/ns_record	\
+		-I$(NEOIP_NS_DIR)/ns_tools
+NEOIP_NS_OBJS =							\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db.o			\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_udate.o		\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_odate.o		\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_fsave.o		\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_fload.o		\
+	$(NEOIP_NS_DIR)/ns_db/neoip_ns_db_get.o			\
+	$(NEOIP_NS_DIR)/ns_client/neoip_ns_client.o		\
+	$(NEOIP_NS_DIR)/ns_client/neoip_ns_client_getting.o	\
+	$(NEOIP_NS_DIR)/ns_client/neoip_ns_client_putting.o	\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_server.o		\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_flood_server.o	\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_flood_getting.o	\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_flood_putting.o	\
+	$(NEOIP_NS_DIR)/ns_server/neoip_ns_flood_negcache.o	\
+	$(NEOIP_NS_DIR)/ns_realm/neoip_ns_realm.o		\
+	$(NEOIP_NS_DIR)/ns_realm/neoip_ns_realm_get.o		\
+	$(NEOIP_NS_DIR)/ns_realm/neoip_ns_realm_put.o		\
+	$(NEOIP_NS_DIR)/ns_record/neoip_ns_uid_db.o		\
+	$(NEOIP_NS_DIR)/ns_record/neoip_ns_record.o		\
+	$(NEOIP_NS_DIR)/ns_record/neoip_ns_ksearch.o		\
+	$(NEOIP_NS_DIR)/neoip_ns_packet.o			\
+	$(NEOIP_NS_DIR)/neoip_ns_layer.o			\
+	$(NEOIP_NS_DIR)/ns_tools/neoip_ns_realm_get_w_peer.o	\
+	$(NEOIP_NS_DIR)/neoip_ns_utest.o
+
+	
+NEOIP_TOOLS_DIR=old_neoip_tools_cpp
+NEOIP_TOOLS_INC=-I$(NEOIP_TOOLS_DIR)
+NEOIP_TOOLS_OBJS =					\
+	$(NEOIP_TOOLS_DIR)/neoip_id.o			\
+	$(NEOIP_TOOLS_DIR)/neoip_datum_old.o		\
+	$(NEOIP_TOOLS_DIR)/testcpp.o			\
+	$(NEOIP_TOOLS_DIR)/testc.o
+
+NEOIP_UTILS_DIR=old_neoip_utils
+NEOIP_UTILS_INC=-I$(NEOIP_UTILS_DIR)
+NEOIP_UTILS_OBJS =					\
+	$(NEOIP_UTILS_DIR)/slidwin.o			\
+	$(NEOIP_UTILS_DIR)/bitfield.o			\
+	$(NEOIP_UTILS_DIR)/intval.o			\
+	$(NEOIP_UTILS_DIR)/bdelta.o			\
+	$(NEOIP_UTILS_DIR)/rollsum.o			\
+	$(NEOIP_UTILS_DIR)/bfilter.o			\
+	$(NEOIP_UTILS_DIR)/hook_list.o
+
+NEOIP_FT_DIR=old_neoip_ft
+NEOIP_FT_INC=-I$(NEOIP_FT_DIR)
+NEOIP_FT_OBJS =				\
+	$(NEOIP_FT_DIR)/ft_fsum.o	\
+	$(NEOIP_FT_DIR)/ft_blk_io.o	\
+	$(NEOIP_FT_DIR)/ft_share.o	\
+	$(NEOIP_FT_DIR)/ft_blk.o	\
+	$(NEOIP_FT_DIR)/ft_finfo.o	\
+	$(NEOIP_FT_DIR)/ft_ui.o
+
+OLD_NEOIPLIB_C_DIR=old_neoiplib_c
+OLD_NEOIPLIB_C_INC=-I$(OLD_NEOIPLIB_C_DIR)
+OLD_NEOIPLIB_C_OBJS=					\
+	$(OLD_NEOIPLIB_C_DIR)/util.o			\
+	$(OLD_NEOIPLIB_C_DIR)/rate_estim.o 		\
+	$(OLD_NEOIPLIB_C_DIR)/rate_limit.o 		\
+	$(OLD_NEOIPLIB_C_DIR)/ndir.o  			\
+	$(OLD_NEOIPLIB_C_DIR)/logmsg.o 			\
+	$(OLD_NEOIPLIB_C_DIR)/nipmem.o			\
+	$(OLD_NEOIPLIB_C_DIR)/rand.o \
+	$(OLD_NEOIPLIB_C_DIR)/usercfg.o \
+	$(OLD_NEOIPLIB_C_DIR)/prop.o \
+	$(OLD_NEOIPLIB_C_DIR)/prop_util.o \
+	$(OLD_NEOIPLIB_C_DIR)/prop_db.o \
+	$(OLD_NEOIPLIB_C_DIR)/unbound_inpkt.o \
+	$(OLD_NEOIPLIB_C_DIR)/relay_cli.o \
+	$(OLD_NEOIPLIB_C_DIR)/relay_srv.o \
+	$(OLD_NEOIPLIB_C_DIR)/relay_status.o \
+	$(OLD_NEOIPLIB_C_DIR)/responder.o \
+	$(OLD_NEOIPLIB_C_DIR)/initiator.o \
+	$(OLD_NEOIPLIB_C_DIR)/auth.o \
+	$(OLD_NEOIPLIB_C_DIR)/asymkey.o \
+	$(OLD_NEOIPLIB_C_DIR)/dh_xchg.o \
+	$(OLD_NEOIPLIB_C_DIR)/nsock_ra.o \
+	$(OLD_NEOIPLIB_C_DIR)/mac.o \
+	$(OLD_NEOIPLIB_C_DIR)/enc.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkcs5.o \
+	$(OLD_NEOIPLIB_C_DIR)/comp.o \
+	$(OLD_NEOIPLIB_C_DIR)/comp_zlib.o \
+	$(OLD_NEOIPLIB_C_DIR)/stunnel.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_out.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_in.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_reach.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_rtt.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_samenat.o \
+	$(OLD_NEOIPLIB_C_DIR)/skey.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_secu.o \
+	$(OLD_NEOIPLIB_C_DIR)/stun_httpd.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_scramb.o \
+	$(OLD_NEOIPLIB_C_DIR)/nsock_err.o \
+	$(OLD_NEOIPLIB_C_DIR)/relipkt.o \
+	$(OLD_NEOIPLIB_C_DIR)/rdgram.o \
+	$(OLD_NEOIPLIB_C_DIR)/rdgram_utest.o \
+	$(OLD_NEOIPLIB_C_DIR)/rdgram_bufxmit.o \
+	$(OLD_NEOIPLIB_C_DIR)/rstream.o \
+	$(OLD_NEOIPLIB_C_DIR)/rstream_utest.o \
+	$(OLD_NEOIPLIB_C_DIR)/optnego_reg.o \
+	$(OLD_NEOIPLIB_C_DIR)/optnego_payl.o \
+	$(OLD_NEOIPLIB_C_DIR)/optnego_encmac.o \
+	$(OLD_NEOIPLIB_C_DIR)/nipid.o \
+	$(OLD_NEOIPLIB_C_DIR)/netif.o \
+	$(OLD_NEOIPLIB_C_DIR)/payl.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_gram.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_err.o \
+	$(OLD_NEOIPLIB_C_DIR)/cookie.o \
+	$(OLD_NEOIPLIB_C_DIR)/ip_addr.o \
+	$(OLD_NEOIPLIB_C_DIR)/rdvpt.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_addr.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_relay_client.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_udpv4.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_tcpv4.o \
+	$(OLD_NEOIPLIB_C_DIR)/otsp_tcpv4_cnx.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_keepalive.o \
+	$(OLD_NEOIPLIB_C_DIR)/pkt_rxmit.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_db.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_util.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_realm.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_nunit.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_publish.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_query.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_negcache.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_clicnx.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_server.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_result.o \
+	$(OLD_NEOIPLIB_C_DIR)/ns_rec_gram.o \
+	$(OLD_NEOIPLIB_C_DIR)/httpd.o \
+	$(OLD_NEOIPLIB_C_DIR)/pubaddr_server.o \
+	$(OLD_NEOIPLIB_C_DIR)/pubaddr_pool.o \
+	$(OLD_NEOIPLIB_C_DIR)/pubaddr_disc.o \
+	$(OLD_NEOIPLIB_C_DIR)/reg_client.o \
+	$(OLD_NEOIPLIB_C_DIR)/reg_server.o \
+	$(OLD_NEOIPLIB_C_DIR)/natdiag_sym.o \
+	$(OLD_NEOIPLIB_C_DIR)/natdiag_loop.o \
+	$(OLD_NEOIPLIB_C_DIR)/netdiag.o \
+	$(OLD_NEOIPLIB_C_DIR)/netdiag_upd.o \
+	$(OLD_NEOIPLIB_C_DIR)/inetreach_client.o \
+	$(OLD_NEOIPLIB_C_DIR)/inetreach_server.o \
+	$(OLD_NEOIPLIB_C_DIR)/libmain.o \
+	$(OLD_NEOIPLIB_C_DIR)/afile_io.o \
+	$(OLD_NEOIPLIB_C_DIR)/ncoord.o \
+	$(OLD_NEOIPLIB_C_DIR)/ncoord2.o \
+	$(OLD_NEOIPLIB_C_DIR)/watchdog.o \
+	$(OLD_NEOIPLIB_C_DIR)/emergency_exit.o \
+	$(NEOIP_UTILS_OBJS) \
+	$(NEOIP_FT_OBJS)
+
+
+APP_ROUTER_SRC_DIR=apps/obsolete/old_neoip_router
+APP_ROUTER_OBJS = 					\
+	$(APP_ROUTER_SRC_DIR)/main.o 			\
+	$(APP_ROUTER_SRC_DIR)/main_router.o 		\
+	$(APP_ROUTER_SRC_DIR)/rawip.o 			\
+	$(APP_ROUTER_SRC_DIR)/vdev.o			\
+	$(APP_ROUTER_SRC_DIR)/onet.o 			\
+	$(APP_ROUTER_SRC_DIR)/dst_iaddr_negcache.o	\
+	$(APP_ROUTER_SRC_DIR)/dns_grabber.o			\
+	$(APP_ROUTER_SRC_DIR)/nodeid_iaddr.o 		\
+	$(APP_ROUTER_SRC_DIR)/iaddr_log_server.o	\
+	$(APP_ROUTER_SRC_DIR)/iaddr_log_client.o	\
+	libneoip.a					\
+	libneoip_ns.a					\
+	libneoip_socket.a				\
+	libneoip_tools_cpp.a				\
+	$(NEOIP_BASE_OBJS)			\
+	$(NEOIP_CRYPTO_NONE_OBJS)			\
+	$(NEOIP_NETUTILS_OBJS)			\
+	$(NEOIP_INET_OBJS)			\
+	$(NEOIP_SOCKET2_OBJS)			\
+
+APP_NETCAT_DIR=apps/obsolete/neoip_netcat
+APP_NETCAT_INC=-I$(APP_NETCAT_DIR)		\
+		-I$(APP_NETCAT_DIR)/nc2
+APP_NETCAT_LINK= -lneoip_kad				\
+		-lneoip_scnx				\
+		-lneoip_rdgram				\
+		-lneoip_ordgram				\
+		-lneoip_pktcomp				\
+		-lneoip_pktfrag				\
+		-lneoip_reachpeer			\
+		-lneoip_simuwan				\
+		-lneoip_nlay				\
+		-lneoip_socket_udp -lneoip_socket	\
+		-lneoip_omni				\
+		-lneoip_netutils			\
+		-lneoip_inet				\
+		-lneoip_crypto -lneoip_compress 	\
+		-lneoip_xmlrpc				\
+		-lneoip_base
+APP_NETCAT_DEPS	= $(APP_NETCAT_OBJS)			\
+			libneoip_kad.a			\
+			libneoip_scnx.a			\
+			libneoip_rdgram.a		\
+			libneoip_ordgram.a		\
+			libneoip_pktcomp.a		\
+			libneoip_pktfrag.a		\
+			libneoip_reachpeer.a		\
+			libneoip_simuwan.a		\
+			libneoip_nlay.a			\
+			libneoip_socket.a		\
+			libneoip_socket_udp.a		\
+			libneoip_omni.a			\
+			libneoip_netutils.a		\
+			libneoip_inet.a			\
+			libneoip_crypto.a		\
+			libneoip_compress.a		\
+			libneoip_xmlrpc.a		\
+			libneoip_base.a
+APP_NETCAT_OBJS = 					\
+	$(APP_NETCAT_DIR)/nc2/nc2_server.o		\
+	$(APP_NETCAT_DIR)/nc2/nc2_client.o		\
+	$(APP_NETCAT_DIR)/main.o
+
+APP_ALL_LIB=		neoip_base		neoip_eloop		neoip_nunit		\
+			neoip_netutils		neoip_inet					\
+			neoip_upnp		neoip_ndiag					\
+			neoip_dnsgrab		neoip_kad		neoip_kad_rpc		\
+			neoip_xml		neoip_xmlrpc					\
+			neoip_xmlrpc_net							\
+			neoip_crypto		neoip_compress					\
+			neoip_rdgram		neoip_ordgram		neoip_pktcomp		\
+			neoip_pktfrag		neoip_reachpeer		neoip_simuwan		\
+			neoip_nlay		neoip_scnx		neoip_proto_nunit	\
+			neoip_socket_glue	neoip_socket_udp	neoip_socket_ntudp	\
+			neoip_socket_ntlay	neoip_socket_tcp				\
+			neoip_file		neoip_httpd					\
+			neoip_libsess		neoip_http					\
+			neoip_ntudp		neoip_netif					\
+			neoip_router								\
+			neoip_bt_core		neoip_bt_plugin					\
+			neoip_bt_ez		neoip_bt_misc		neoip_bt_cast		\
+			neoip_flv
+
+######################## Build the kad_daemon ##################################
+APP_KAD_DAEMON_DIR=apps/neoip_kad_daemon
+APP_KAD_DAEMON_INC=-I$(APP_KAD_DAEMON_DIR)					\
+			-I$(APP_KAD_DAEMON_DIR)/apps
+APP_KAD_DAEMON_OBJS= 								\
+	$(APP_KAD_DAEMON_DIR)/apps/neoip_kad_daemon_apps.o			\
+	$(APP_KAD_DAEMON_DIR)/neoip_kad_daemon_main.o
+APP_KAD_DAEMON_LIB=	$(APP_ALL_LIB)
+APP_KAD_DAEMON_LINK= $(addprefix -l, $(APP_KAD_DAEMON_LIB))
+APP_KAD_DAEMON_DEPS_DYNA= $(APP_KAD_DAEMON_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_KAD_DAEMON_LIB)))
+APP_KAD_DAEMON_DEPS_STAT= $(APP_KAD_DAEMON_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_KAD_DAEMON_LIB)))
+
+######################## Build the neoip_buddy #################################
+APP_BUDDY_DIR=apps/obsolete/neoip_buddy
+APP_BUDDY_INC=-I$(APP_BUDDY_DIR)					\
+			-I$(APP_BUDDY_DIR)/http_fdir			\
+			-I$(APP_BUDDY_DIR)/http_fdir/uri_var		\
+			-I$(APP_BUDDY_DIR)/thumb_factory/utest		\
+			-I$(APP_BUDDY_DIR)/thumb_factory		\
+			-I$(APP_BUDDY_DIR)/mimediag2/utest		\
+			-I$(APP_BUDDY_DIR)/mimediag2			\
+			-I$(APP_BUDDY_DIR)/asyncexe/			\
+			-I$(APP_BUDDY_DIR)/asyncexe/utest		\
+			-I$(APP_BUDDY_DIR)/neoip_buddy			\
+			-I$(APP_BUDDY_DIR)/neoip_buddy/bud_http_search	\
+			-I$(APP_BUDDY_DIR)/neoip_buddy/bud_lshare	\
+			-I$(APP_BUDDY_DIR)/url_redir
+APP_BUDDY_OBJS = 								\
+	$(APP_BUDDY_DIR)/thumb_factory/neoip_thumb_factory.o			\
+	$(APP_BUDDY_DIR)/thumb_factory/utest/neoip_thumb_factory_utest.o	\
+	$(APP_BUDDY_DIR)/mimediag2/neoip_mimediag2.o				\
+	$(APP_BUDDY_DIR)/mimediag2/utest/neoip_mimediag2_utest.o			\
+	$(APP_BUDDY_DIR)/http_fdir/neoip_http_fdir.o				\
+	$(APP_BUDDY_DIR)/http_fdir/uri_var/neoip_http_fdir_uri_var.o		\
+	$(APP_BUDDY_DIR)/url_redir/neoip_url_redir.o				\
+	$(APP_BUDDY_DIR)/asyncexe/neoip_asyncexe.o				\
+	$(APP_BUDDY_DIR)/asyncexe/utest/neoip_asyncexe_utest.o			\
+	$(APP_BUDDY_DIR)/neoip_buddy/neoip_bud_main.o				\
+	$(APP_BUDDY_DIR)/neoip_buddy/bud_http_search/neoip_bud_http_search.o	\
+	$(APP_BUDDY_DIR)/neoip_buddy/bud_lshare/neoip_bud_lshare.o		\
+	$(APP_BUDDY_DIR)/main.o
+			
+APP_BUDDY_LIB=		$(APP_ALL_LIB)
+APP_BUDDY_LINK= $(addprefix -l, $(APP_BUDDY_LIB))
+APP_BUDDY_DEPS_DYNA= $(APP_BUDDY_OBJS)	$(addprefix lib, $(addsuffix .so, $(APP_BUDDY_LIB)))
+APP_BUDDY_DEPS_STAT= $(APP_BUDDY_OBJS)	$(addprefix lib, $(addsuffix .a , $(APP_BUDDY_LIB)))
+
+
+######################## Build the neoip_nunitapps  ############################
+APP_UNITTEST_DIR=apps/neoip_nunitapps
+APP_UNITTEST_INC=								\
+	-I$(APP_UNITTEST_DIR)/runner						\
+	-I$(APP_UNITTEST_DIR)						
+APP_UNITTEST_OBJS= 								\
+	$(APP_UNITTEST_DIR)/runner/neoip_nunitapps_runner.o			\
+	$(APP_UNITTEST_DIR)/neoip_nunitapps_main.o
+APP_UNITTEST_LIB=	$(APP_ALL_LIB)
+APP_UNITTEST_LINK= $(addprefix -l, $(APP_UNITTEST_LIB))
+APP_UNITTEST_DEPS_DYNA= $(APP_UNITTEST_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_UNITTEST_LIB)))
+APP_UNITTEST_DEPS_STAT= $(APP_UNITTEST_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_UNITTEST_LIB)))
+
+######################## Build the neoip_get  ###############################
+APP_GET_DIR=apps/neoip_get
+APP_GET_INC=								\
+	-I$(APP_GET_DIR)						\
+	-I$(APP_GET_DIR)/apps						\
+	-I$(APP_GET_DIR)/apps/base/profile
+APP_GET_OBJS= 									\
+	$(APP_GET_DIR)/neoip_get_main.o						\
+	$(APP_GET_DIR)/apps/neoip_get_apps.o					\
+	$(APP_GET_DIR)/apps/base/profile/neoip_get_profile.o
+APP_GET_LIB=	$(APP_ALL_LIB)
+APP_GET_LINK= $(addprefix -l, $(APP_GET_LIB))
+APP_GET_DEPS_DYNA= $(APP_GET_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_GET_LIB)))
+APP_GET_DEPS_STAT= $(APP_GET_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_GET_LIB)))
+
+######################## Build the neoip_btcli  ###############################
+APP_BTCLI_DIR=apps/neoip_btcli
+APP_BTCLI_INC=								\
+	-I$(APP_BTCLI_DIR)/apps						\
+	-I$(APP_BTCLI_DIR)/apps/swarm					\
+	-I$(APP_BTCLI_DIR)/apps/base/					\
+	-I$(APP_BTCLI_DIR)/apps/base/profile				\
+	-I$(APP_BTCLI_DIR)
+APP_BTCLI_OBJS= 								\
+	$(APP_BTCLI_DIR)/apps/neoip_btcli_apps.o				\
+	$(APP_BTCLI_DIR)/apps/swarm/neoip_btcli_swarm.o				\
+	$(APP_BTCLI_DIR)/apps/base/profile/neoip_btcli_profile.o		\
+	$(APP_BTCLI_DIR)/apps/base/ezswarmid/neoip_btcli_ezswarmid.o		\
+	$(APP_BTCLI_DIR)/apps/base/ezswarmid/arr/neoip_btcli_ezswarmid_arr.o	\
+	$(APP_BTCLI_DIR)/apps/base/ezswarm_info/neoip_btcli_ezswarm_info.o	\
+	$(APP_BTCLI_DIR)/apps/base/ezsession_info/neoip_btcli_ezsession_info.o	\
+	$(APP_BTCLI_DIR)/apps/rpc/neoip_btcli_resp.o				\
+	$(APP_BTCLI_DIR)/neoip_btcli_main.o
+APP_BTCLI_LIB=	$(APP_ALL_LIB)
+APP_BTCLI_LINK= $(addprefix -l, $(APP_BTCLI_LIB))
+APP_BTCLI_DEPS_DYNA= $(APP_BTCLI_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_BTCLI_LIB)))
+APP_BTCLI_DEPS_STAT= $(APP_BTCLI_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_BTCLI_LIB)))
+
+
+######################## Build the neoip_oload  ###############################
+APP_OLOAD_DIR=apps/neoip_oload
+APP_OLOAD_INC=									\
+	-I$(APP_OLOAD_DIR)							\
+	-I$(APP_OLOAD_DIR)/oload
+APP_OLOAD_OBJS= 								\
+	$(APP_OLOAD_DIR)/neoip_oload_main.o					\
+	$(APP_OLOAD_DIR)/apps/itor/neoip_oload_itor.o				\
+	$(APP_OLOAD_DIR)/apps/itor/wikidbg/neoip_oload_itor_wikidbg.o		\
+	$(APP_OLOAD_DIR)/apps/swarm/neoip_oload_swarm.o				\
+	$(APP_OLOAD_DIR)/apps/swarm/base/profile/neoip_oload_swarm_profile.o	\
+	$(APP_OLOAD_DIR)/apps/swarm/base/wikidbg/neoip_oload_swarm_wikidbg.o	\
+	$(APP_OLOAD_DIR)/apps/service/mod/impl/raw/neoip_oload_mod_raw.o	\
+	$(APP_OLOAD_DIR)/apps/service/mod/impl/flv/neoip_oload_mod_flv.o	\
+	$(APP_OLOAD_DIR)/apps/service/mod/base/type/neoip_oload_mod_type.o	\
+	$(APP_OLOAD_DIR)/apps/service/webdetect/neoip_oload_webdetect.o		\
+	$(APP_OLOAD_DIR)/apps/service/webdetect/cnx/neoip_oload_webdetect_cnx.o	\
+	$(APP_OLOAD_DIR)/apps/base/helper/neoip_oload_helper.o			\
+	$(APP_OLOAD_DIR)/apps/base/wikidbg/neoip_oload_apps_wikidbg.o		\
+	$(APP_OLOAD_DIR)/apps/neoip_oload_apps.o
+	
+APP_OLOAD_LIB=	$(APP_ALL_LIB)
+APP_OLOAD_LINK= $(addprefix -l, $(APP_OLOAD_LIB))
+APP_OLOAD_DEPS_DYNA= $(APP_OLOAD_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_OLOAD_LIB)))
+APP_OLOAD_DEPS_STAT= $(APP_OLOAD_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_OLOAD_LIB)))
+
+
+######################## Build the neoip_btrelay  ###############################
+APP_BTRELAY_DIR=apps/neoip_btrelay
+APP_BTRELAY_INC=								\
+	-I$(APP_BTRELAY_DIR)							\
+	-I$(APP_BTRELAY_DIR)/btrelay
+APP_BTRELAY_OBJS= 								\
+	$(APP_BTRELAY_DIR)/neoip_btrelay_main.o					\
+	$(APP_BTRELAY_DIR)/apps/itor/neoip_btrelay_itor.o			\
+	$(APP_BTRELAY_DIR)/apps/itor/wikidbg/neoip_btrelay_itor_wikidbg.o	\
+	$(APP_BTRELAY_DIR)/apps/swarm/neoip_btrelay_swarm.o			\
+	$(APP_BTRELAY_DIR)/apps/swarm/wikidbg/neoip_btrelay_swarm_wikidbg.o	\
+	$(APP_BTRELAY_DIR)/apps/base/profile/neoip_btrelay_apps_profile.o	\
+	$(APP_BTRELAY_DIR)/apps/base/wikidbg/neoip_btrelay_apps_wikidbg.o	\
+	$(APP_BTRELAY_DIR)/apps/neoip_btrelay_apps.o
+	
+APP_BTRELAY_LIB=	$(APP_ALL_LIB)
+APP_BTRELAY_LINK= $(addprefix -l, $(APP_BTRELAY_LIB))
+APP_BTRELAY_DEPS_DYNA= $(APP_BTRELAY_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_BTRELAY_LIB)))
+APP_BTRELAY_DEPS_STAT= $(APP_BTRELAY_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_BTRELAY_LIB)))
+
+######################## Build the neoip_casti  ###############################
+APP_CASTI_DIR=apps/neoip_casti
+APP_CASTI_INC=									\
+	-I$(APP_CASTI_DIR)							\
+	-I$(APP_CASTI_DIR)/casti
+APP_CASTI_OBJS= 								\
+	$(APP_CASTI_DIR)/apps/neoip_casti_apps.o				\
+	$(APP_CASTI_DIR)/apps/base/wikidbg/neoip_casti_apps_wikidbg.o		\
+	$(APP_CASTI_DIR)/apps/base/profile/neoip_casti_apps_profile.o		\
+	$(APP_CASTI_DIR)/apps/swarm/neoip_casti_swarm.o				\
+	$(APP_CASTI_DIR)/apps/swarm/spos/neoip_casti_swarm_spos.o			\
+	$(APP_CASTI_DIR)/apps/swarm/spos/wikidbg/neoip_casti_swarm_spos_wikidbg.o	\
+	$(APP_CASTI_DIR)/apps/swarm/httpi/neoip_casti_swarm_httpi.o				\
+	$(APP_CASTI_DIR)/apps/swarm/httpi/base/profile/neoip_casti_swarm_httpi_profile.o	\
+	$(APP_CASTI_DIR)/apps/swarm/httpi/base/wikidbg/neoip_casti_swarm_httpi_wikidbg.o	\
+	$(APP_CASTI_DIR)/apps/swarm/udata/neoip_casti_swarm_udata.o				\
+	$(APP_CASTI_DIR)/apps/swarm/udata/base/profile/neoip_casti_swarm_udata_profile.o	\
+	$(APP_CASTI_DIR)/apps/swarm/udata/base/wikidbg/neoip_casti_swarm_udata_wikidbg.o	\
+	$(APP_CASTI_DIR)/apps/swarm/base/profile/neoip_casti_swarm_profile.o			\
+	$(APP_CASTI_DIR)/apps/swarm/base/wikidbg/neoip_casti_swarm_wikidbg.o			\
+	$(APP_CASTI_DIR)/neoip_casti_main.o
+	
+APP_CASTI_LIB=	$(APP_ALL_LIB)
+APP_CASTI_LINK= $(addprefix -l, $(APP_CASTI_LIB))
+APP_CASTI_DEPS_DYNA= $(APP_CASTI_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_CASTI_LIB)))
+APP_CASTI_DEPS_STAT= $(APP_CASTI_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_CASTI_LIB)))
+
+######################## Build the neoip_casto  ###############################
+APP_CASTO_DIR=apps/neoip_casto
+APP_CASTO_INC=									\
+	-I$(APP_CASTO_DIR)							\
+	-I$(APP_CASTO_DIR)/casto
+APP_CASTO_OBJS= 								\
+	$(APP_CASTO_DIR)/neoip_casto_main.o					\
+	$(APP_CASTO_DIR)/apps/base/wikidbg/neoip_casto_apps_wikidbg.o		\
+	$(APP_CASTO_DIR)/apps/base/helper/neoip_casto_helper.o			\
+	$(APP_CASTO_DIR)/apps/itor/neoip_casto_itor.o				\
+	$(APP_CASTO_DIR)/apps/itor/wikidbg/neoip_casto_itor_wikidbg.o		\
+	$(APP_CASTO_DIR)/apps/webdetect/neoip_casto_webdetect.o			\
+	$(APP_CASTO_DIR)/apps/webdetect/cnx/neoip_casto_webdetect_cnx.o		\
+	$(APP_CASTO_DIR)/apps/swarm/neoip_casto_swarm.o					\
+	$(APP_CASTO_DIR)/apps/swarm/udata/neoip_casto_swarm_udata.o			\
+	$(APP_CASTO_DIR)/apps/swarm/udata/wikidbg/neoip_casto_swarm_udata_wikidbg.o	\
+	$(APP_CASTO_DIR)/apps/swarm/httpo/neoip_casto_swarm_httpo.o			\
+	$(APP_CASTO_DIR)/apps/swarm/httpo/wikidbg/neoip_casto_swarm_httpo_wikidbg.o	\
+	$(APP_CASTO_DIR)/apps/swarm/base/wikidbg/neoip_casto_swarm_wikidbg.o		\
+	$(APP_CASTO_DIR)/apps/neoip_casto_apps.o
+	
+APP_CASTO_LIB=	$(APP_ALL_LIB)
+APP_CASTO_LINK= $(addprefix -l, $(APP_CASTO_LIB))
+APP_CASTO_DEPS_DYNA= $(APP_CASTO_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_CASTO_LIB)))
+APP_CASTO_DEPS_STAT= $(APP_CASTO_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_CASTO_LIB)))
+
+
+######################## Build the neoip_router  ###############################
+APP_ROUTER_DIR=apps/neoip_router
+APP_ROUTER_INC=								\
+	-I$(APP_ROUTER_DIR)/apps					\
+	-I$(APP_ROUTER_DIR)/apps/helper					\
+	-I$(APP_ROUTER_DIR)						
+APP_ROUTER_OBJS= 							\
+	$(APP_ROUTER_DIR)/apps/neoip_router_apps.o			\
+	$(APP_ROUTER_DIR)/apps/helper/neoip_router_apps_helper.o	\
+	$(APP_ROUTER_DIR)/neoip_router_main.o
+APP_ROUTER_LIB=	$(APP_ALL_LIB)
+APP_ROUTER_LINK= $(addprefix -l, $(APP_ROUTER_LIB))
+APP_ROUTER_DEPS_DYNA= $(APP_ROUTER_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_ROUTER_LIB)))
+APP_ROUTER_DEPS_STAT= $(APP_ROUTER_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_ROUTER_LIB)))
+
+
+######################## Build the neoip_bstrapntudp	########################
+APP_BSTRAPNTUDP_DIR=apps/neoip_bstrapntudp
+APP_BSTRAPNTUDP_INC=							\
+	-I$(APP_BSTRAPNTUDP_DIR)/apps					\
+	-I$(APP_BSTRAPNTUDP_DIR)						
+APP_BSTRAPNTUDP_OBJS= 							\
+	$(APP_BSTRAPNTUDP_DIR)/apps/neoip_bstrapntudp_apps.o		\
+	$(APP_BSTRAPNTUDP_DIR)/neoip_bstrapntudp_main.o
+APP_BSTRAPNTUDP_LIB=	$(APP_ALL_LIB)
+APP_BSTRAPNTUDP_LINK= $(addprefix -l, $(APP_BSTRAPNTUDP_LIB))
+APP_BSTRAPNTUDP_DEPS_DYNA= $(APP_BSTRAPNTUDP_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_BSTRAPNTUDP_LIB)))
+APP_BSTRAPNTUDP_DEPS_STAT= $(APP_BSTRAPNTUDP_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_BSTRAPNTUDP_LIB)))
+
+######################## Build the neoip_upnp  ###############################
+APP_UPNP_DIR=apps/neoip_upnp
+APP_UPNP_INC=									\
+	-I$(APP_UPNP_DIR)							\
+	-I$(APP_UPNP_DIR)/upnp
+APP_UPNP_OBJS= 									\
+	$(APP_UPNP_DIR)/neoip_upnp_main.o					\
+	$(APP_UPNP_DIR)/apps/neoip_upnp_apps.o	
+APP_UPNP_LIB=	$(APP_ALL_LIB)
+APP_UPNP_LINK= $(addprefix -l, $(APP_UPNP_LIB))
+APP_UPNP_DEPS_DYNA= $(APP_UPNP_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_UPNP_LIB)))
+APP_UPNP_DEPS_STAT= $(APP_UPNP_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_UPNP_LIB)))
+
+# jme- some experiment to automatize the makefile a lot more that the current full-manual version
+#base_dir	:= neoip_bt/swarm/utmsg
+#base_dir	:= neoip_nunit
+#list_cpp	:= $(shell find $(base_dir) -type f -name "*.cpp")
+#list_cpp_nunit	:= $(shell find $(base_dir) -type f -name "*nunit.cpp" -or -name "*nunit_gsuite.cpp")
+#list_cpp_wikidbg:= $(shell find $(base_dir) -type f -name "*wikidbg.cpp")
+#list_cpp_core	:= $(filter-out $(list_cpp_nunit) $(list_cpp_wikidbg), $(list_cpp))
+#list_obj	:= $(list_cpp:.cpp=.o)
+#alldd:
+#	@echo list_cpp=$(list_cpp)
+#	@echo list_cpp_nunit=$(list_cpp_nunit)
+#	@echo list_cpp_wikidbg=$(list_cpp_wikidbg)
+#	@echo list_cpp_core=$(list_cpp_core)
+
+MAIN_OPT=
+#PROF_OPT+= -pg
+#LINK_OPT=-frepo
+DBG_OPT= -Wall
+NEOIP_ALL_INC=		$(APP_NETCAT_INC)  $(APP_KAD_DAEMON_INC) $(APP_BUDDY_INC)		\
+			$(APP_UNITTEST_INC) $(APP_GET_INC) $(APP_BTCLI_INC)			\
+			$(APP_OLOAD_INC) $(APP_CASTI_INC) $(APP_CASTO_INC) $(APP_ROUTER_INC)	\
+			$(NEOIP_CORE_INC) $(NEOIP_BASE_INC) 	$(NEOIP_ELOOP_INC)		\
+			$(NEOIP_FILE_INC)							\
+			$(NEOIP_HTTPD_INC) $(NEOIP_HTTP_INC)					\
+			$(NEOIP_SOCKET_GLUE_INC) $(NEOIP_SOCKET_UDP_INC)			\
+			$(NEOIP_SOCKET_NTUDP_INC) $(NEOIP_SOCKET_NTLAY_INC)			\
+			$(NEOIP_SOCKET_TCP_INC)							\
+			$(NEOIP_INET_INC) $(NEOIP_UPNP)	$(NEOIP_NDIAG) $(NEOIP_NTUDP_INC)	\
+			$(NEOIP_NETIF_INC) $(NEOIP_NUNIT_INC)					\
+			$(NEOIP_CRYPTO_INC)							\
+			$(NEOIP_NETUTILS_INC)							\
+			$(NEOIP_COMPRESS_INC)			 				\
+			$(NEOIP_NLAY_INC) $(NEOIP_NLAY_BRICK_INC)				\
+			$(NEOIP_SCNX_INC) $(NEOIP_RDGRAM_INC) $(NEOIP_ORDGRAM_INC)		\
+			$(NEOIP_PKTFRAG_INC)							\
+			$(NEOIP_REACHPEER_INC) $(NEOIP_SIMUWAN_INC) $(NEOIP_PKTCOMP_INC)	\
+			$(NEOIP_PROTO_NUNIT_INC)						\
+			$(NEOIP_KAD_INC) $(NEOIP_KAD_INC) $(NEOIP_XML_INC)			\
+			$(NEOIP_XMLRPC_INC) $(NEOIP_XMLRPC_NET_INC)				\
+			$(NEOIP_DNSGRAB_INC)							\
+			$(NEOIP_LIBSESS_INC)	$(NEOIP_ROUTER_INC)				\
+			$(NEOIP_BT_CORE_INC)	$(NEOIP_BT_EZ_INC)				\
+			$(NEOIP_BT_CAST_INC)	$(NEOIP_BT_MISC_INC)	$(NEOIP_BT_PLUGIN)
+
+INCLUDEOPT	 =   -I.
+
+# Add the -I for all the .hpp of this project
+#INCLUDEOPT+= $(NEOIP_ALL_INC)
+INCLUDEOPT+= -I ../.include
+
+
+LINKLIB 	+= -lm
+# for eloop_t on glib -- TODO there are likely other thing remaining depending on glib remove them
+LINKLIB 	+= `pkg-config --libs glib-2.0 gthread-2.0`
+INCLUDEOPT	+= `pkg-config --cflags glib-2.0 gthread-2.0`
+# for eloop_t on libevent
+LINKLIB 	+= -levent
+INCLUDEOPT	+= -Ilibevent
+# for libneoip_crypto based on gnutls
+LINKLIB 	+= -lgnutls -lgcrypt -lgpg-error -ltasn1
+# for xmlrpc_t
+LINKLIB 	+= `xml2-config --libs`
+INCLUDEOPT	+= `xml2-config --cflags`
+# for libneoip_compress
+LINKLIB		+= -lz -lbz2
+# for agetaddrinfo_t - IIF there is the -DUSE_HOST2IP_FORK
+LINKLIB		+= -lanl
+# for dns_helper_t::idna_to_ascii - used to support internationnal hostname in neoip-router
+LINKLIB		+= -lidn
+
+DEBUG_BUILD=1
+#ifeq ($(DEBUG_BUILD),1)
+#	LINKLIB += -lefence
+#endif
+
+ifeq ($(DEBUG_BUILD),1)
+	DBG_OPT += -g
+# supposed to be the same as -g but much faster to link statically
+# - testing show otherwise
+#	DBG_OPT += -gstabs+
+	DBG_OPT += -Werror
+	DBG_OPT += -fpic
+#	DBG_OPT += -fPIC
+	DBG_OPT += -D_FILE_OFFSET_BITS=64
+#	DBG_OPT += -O0
+	DBG_OPT += -O3
+#	DBG_OPT += -march=pentium4
+#	DBG_OPT += -fomit-frame-pointer
+#	DBG_OPT += -fvisibility-inlines-hidden
+	DBG_OPT += -fno-strict-aliasing
+#	DBG_OPT += -DUSE_ELOOP_GLIB
+	DBG_OPT += -DUSE_ELOOP_LEVT
+#	DBG_OPT += -DUSE_HOST2IP_SYNC
+	DBG_OPT += -DUSE_HOST2IP_FORK
+#	DBG_OPT += -DUSE_HOST2IP_AGAI
+	DBG_OPT += -DNO_DBG_TRACE=1
+#	DBG_OPT += -DNO_DBG_ASSERT=1
+	DBG_OPT += -DNO_TOKEEP_CHECK_DECLARE=1
+	DBG_OPT += -DNO_TOKEEP_CHECK_USAGE=1
+	DBG_OPT += -DNO_NIPMEM_SMASHING=1
+	DBG_OPT += -DNO_NIPMEM_TRACKING=1
+# jme- to make the template instance unique at link-time. i dont really get what it is or how to use it tho
+#      would make the code smaller. i tried and it created compilation error at link time
+#	DBG_OPT += -frepo
+# jme- for stuff i dont really get about precompiled header (not important as they are not compatible with distcc)
+#	DBG_OPT += -fpch-preprocess
+else
+	DBG_OPT += -O3 -DNEOIP_NODEBUG_COMPIL=1 -DNO_DBG_TRACE=1
+#-DNO_TRACE_AT_ALL
+endif
+
+COMMON_CFLAGS= $(MAIN_OPT) $(INCLUDEOPT) $(PROF_OPT) $(DBG_OPT)
+
+# set to compile with GCC
+CC=gcc
+CFLAGS=$(COMMON_CFLAGS)
+CXXFLAGS=$(COMMON_CFLAGS)
+
+#ALL_EXE += neoip-nunitapps
+#ALL_EXE += neoip-router
+#ALL_EXE += neoip-bstrapntudp
+ALL_EXE += neoip-get
+#ALL_EXE += neoip-btcli
+
+all: $(ALL_EXE)
+
+libneoip_base.a: $(NEOIP_BASE_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_base.so: $(NEOIP_BASE_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_eloop.a: $(NEOIP_ELOOP_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_eloop.so: $(NEOIP_ELOOP_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_file.a: $(NEOIP_FILE_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_file.so: $(NEOIP_FILE_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_http.a: $(NEOIP_HTTP_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_http.so: $(NEOIP_HTTP_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_httpd.a: $(NEOIP_HTTPD_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_httpd.so: $(NEOIP_HTTPD_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_inet.a: $(NEOIP_INET_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_inet.so: $(NEOIP_INET_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+	
+libneoip_upnp.a: $(NEOIP_UPNP_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_upnp.so: $(NEOIP_UPNP_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+	
+libneoip_ndiag.a: $(NEOIP_NDIAG_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_ndiag.so: $(NEOIP_NDIAG_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+	
+libneoip_ntudp.a: $(NEOIP_NTUDP_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_ntudp.so: $(NEOIP_NTUDP_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_netif.a: $(NEOIP_NETIF_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_netif.so: $(NEOIP_NETIF_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+	
+libneoip_nunit.a: $(NEOIP_NUNIT_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_nunit.so: $(NEOIP_NUNIT_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_crypto.a: $(NEOIP_CRYPTO_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_crypto.so: $(NEOIP_CRYPTO_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_compress.a: $(NEOIP_COMPRESS_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_compress.so: $(NEOIP_COMPRESS_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_router.a: $(NEOIP_ROUTER_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_router.so: $(NEOIP_ROUTER_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_bt_core.a: $(NEOIP_BT_CORE_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_bt_core.so: $(NEOIP_BT_CORE_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_bt_plugin.a: $(NEOIP_BT_PLUGIN_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_bt_plugin.so: $(NEOIP_BT_PLUGIN_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_bt_ez.a: $(NEOIP_BT_EZ_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_bt_ez.so: $(NEOIP_BT_EZ_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_bt_misc.a: $(NEOIP_BT_MISC_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_bt_misc.so: $(NEOIP_BT_MISC_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_bt_cast.a: $(NEOIP_BT_CAST_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_bt_cast.so: $(NEOIP_BT_CAST_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_flv.a: $(NEOIP_FLV_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_flv.so: $(NEOIP_FLV_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_kad.a: $(NEOIP_KAD_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_kad.so: $(NEOIP_KAD_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_kad_rpc.a: $(NEOIP_KAD_RPC_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_kad_rpc.so: $(NEOIP_KAD_RPC_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_xml.a: $(NEOIP_XML_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_xml.so: $(NEOIP_XML_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_xmlrpc0.a: $(NEOIP_XMLRPC0_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_xmlrpc0.so: $(NEOIP_XMLRPC0_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_xmlrpc.a: $(NEOIP_XMLRPC_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_xmlrpc.so: $(NEOIP_XMLRPC_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_xmlrpc_net.a: $(NEOIP_XMLRPC_NET_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_xmlrpc_net.so: $(NEOIP_XMLRPC_NET_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_libsess.a: $(NEOIP_LIBSESS_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_libsess.so: $(NEOIP_LIBSESS_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_dnsgrab.a: $(NEOIP_DNSGRAB_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_dnsgrab.so: $(NEOIP_DNSGRAB_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_socket_glue.a: $(NEOIP_SOCKET_GLUE_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_socket_glue.so: $(NEOIP_SOCKET_GLUE_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_socket_udp.a: $(NEOIP_SOCKET_UDP_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_socket_udp.so: $(NEOIP_SOCKET_UDP_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_socket_ntlay.a: $(NEOIP_SOCKET_NTLAY_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_socket_ntlay.so: $(NEOIP_SOCKET_NTLAY_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_socket_ntudp.a: $(NEOIP_SOCKET_NTUDP_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_socket_ntudp.so: $(NEOIP_SOCKET_NTUDP_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_socket_tcp.a: $(NEOIP_SOCKET_TCP_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_socket_tcp.so: $(NEOIP_SOCKET_TCP_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_proto_nunit.a: $(NEOIP_PROTO_NUNIT_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_proto_nunit.so: $(NEOIP_PROTO_NUNIT_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_pktcomp.a: $(NEOIP_PKTCOMP_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_pktcomp.so: $(NEOIP_PKTCOMP_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_scnx.a: $(NEOIP_SCNX_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_scnx.so: $(NEOIP_SCNX_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_rdgram.a: $(NEOIP_RDGRAM_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_rdgram.so: $(NEOIP_RDGRAM_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_ordgram.a: $(NEOIP_ORDGRAM_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_ordgram.so: $(NEOIP_ORDGRAM_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_pktfrag.a: $(NEOIP_PKTFRAG_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_pktfrag.so: $(NEOIP_PKTFRAG_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_reachpeer.a: $(NEOIP_REACHPEER_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_reachpeer.so: $(NEOIP_REACHPEER_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_simuwan.a: $(NEOIP_SIMUWAN_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_simuwan.so: $(NEOIP_SIMUWAN_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_nlay.a: $(NEOIP_NLAY_OBJS) $(NEOIP_NLAY_BRICK_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_nlay.so: $(NEOIP_NLAY_OBJS) $(NEOIP_NLAY_BRICK_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_netutils.a: $(NEOIP_NETUTILS_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_netutils.so: $(NEOIP_NETUTILS_OBJS)
+	gcc -shared -o $@ -Wl,-soname,$@ $^
+
+libneoip_ns.a: $(NEOIP_NS_OBJS)
+	$(AR) rcs $@ $^
+
+libneoip_tools_cpp.a: $(NEOIP_TOOLS_OBJS)
+	$(AR) rcs $@ $^
+
+
+
+neoip-netcat: $(APP_NETCAT_DEPS)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_NETCAT_OBJS) -Wl,--start-group $(APP_NETCAT_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-kad_daemon: $(APP_KAD_DAEMON_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_KAD_DAEMON_OBJS) $(APP_KAD_DAEMON_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-kad_daemon-bin-static: $(APP_KAD_DAEMON_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_KAD_DAEMON_OBJS) $(APP_KAD_DAEMON_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-buddy: $(APP_BUDDY_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BUDDY_OBJS) $(APP_BUDDY_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-buddy-bin-static: $(APP_BUDDY_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BUDDY_OBJS) $(APP_BUDDY_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-nunitapps: $(APP_UNITTEST_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_UNITTEST_OBJS) $(APP_UNITTEST_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-nunitapps-bin-static: $(APP_UNITTEST_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_UNITTEST_OBJS) $(APP_UNITTEST_LINK) $(LINKLIB) -Wl,--end-group 
+
+neoip-get: $(APP_GET_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_GET_OBJS) $(APP_GET_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-get-bin-static: $(APP_GET_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_GET_OBJS) $(APP_GET_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-btcli: $(APP_BTCLI_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BTCLI_OBJS) $(APP_BTCLI_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-btcli-bin-static: $(APP_BTCLI_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BTCLI_OBJS) $(APP_BTCLI_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-oload: $(APP_OLOAD_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_OLOAD_OBJS) $(APP_OLOAD_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-oload-bin-static: $(APP_OLOAD_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_OLOAD_OBJS) $(APP_OLOAD_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-btrelay: $(APP_BTRELAY_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BTRELAY_OBJS) $(APP_BTRELAY_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-btrelay-bin-static: $(APP_BTRELAY_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BTRELAY_OBJS) $(APP_BTRELAY_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-casti: $(APP_CASTI_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_CASTI_OBJS) $(APP_CASTI_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-casti-bin-static: $(APP_CASTI_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_CASTI_OBJS) $(APP_CASTI_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-casto: $(APP_CASTO_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_CASTO_OBJS) $(APP_CASTO_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-casto-bin-static: $(APP_CASTO_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_CASTO_OBJS) $(APP_CASTO_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-router: $(APP_ROUTER_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_ROUTER_OBJS) $(APP_ROUTER_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-router-bin-static: $(APP_ROUTER_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_ROUTER_OBJS) $(APP_ROUTER_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-bstrapntudp: $(APP_BSTRAPNTUDP_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BSTRAPNTUDP_OBJS) $(APP_BSTRAPNTUDP_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-bstrapntudp-bin-static: $(APP_BSTRAPNTUDP_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BSTRAPNTUDP_OBJS) $(APP_BSTRAPNTUDP_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-upnp: $(APP_UPNP_DEPS_DYNA)
+	g++ $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_UPNP_OBJS) $(APP_UPNP_LINK) -Wl,--end-group $(LINKLIB)
+
+neoip-upnp-bin-static: $(APP_UPNP_DEPS_STAT)
+	g++ $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_UPNP_OBJS) $(APP_UPNP_LINK) -Wl,--end-group $(LINKLIB)
+
+
+INSTALL_CONFIG_DIR=/etc
+INSTALL_BIN_DIR=/usr/bin
+INSTALL_PRIVATE_BIN_DIR=/usr/lib
+
+BUDDY_INSTALL_CONFIG_DIR=$(INSTALL_CONFIG_DIR)/neoip_buddy
+BUDDY_INSTALL_BIN_DIR=$(INSTALL_BIN_DIR)
+BUDDY_INSTALL_PRIVATE_BIN_DIR=$(INSTALL_PRIVATE_BIN_DIR)/neoip_buddy
+
+buddy_install: neoip_buddy-bin-static
+	strip			neoip_buddy-bin-static
+	install -d -m 755	$(BUDDY_INSTALL_PRIVATE_BIN_DIR)
+	install -m 755		neoip_buddy-bin-static			$(BUDDY_INSTALL_PRIVATE_BIN_DIR)/neoip_buddy-bin
+	install -m 755		buddy_conf/neoip_buddy_launcher.sh	$(BUDDY_INSTALL_PRIVATE_BIN_DIR)
+	ln -fs $(BUDDY_INSTALL_PRIVATE_BIN_DIR)/neoip_buddy_launcher.sh $(BUDDY_INSTALL_BIN_DIR)/neoip_buddy_gui
+	ln -fs $(BUDDY_INSTALL_PRIVATE_BIN_DIR)/neoip_buddy_launcher.sh $(BUDDY_INSTALL_BIN_DIR)/neoip_buddy_tui
+	install -m 644		buddy_conf/neoip_buddy.desktop		/usr/share/applications
+	install -m 644 		buddy_conf/neoip_buddy.png		/usr/share/pixmaps
+	install -d -m 755						$(BUDDY_INSTALL_CONFIG_DIR)
+	install -m 644 		conf_netcat1/neoip_http.ico		$(BUDDY_INSTALL_CONFIG_DIR)
+	install -m 644		conf_netcat1/neoip*.conf		$(BUDDY_INSTALL_CONFIG_DIR)
+	install -d -m 755						$(BUDDY_INSTALL_CONFIG_DIR)/buddy_lshare
+	install -d -m 755						$(BUDDY_INSTALL_CONFIG_DIR)/http_fdir_files
+	install -m 644 		conf_netcat1/http_fdir_files/*		$(BUDDY_INSTALL_CONFIG_DIR)/http_fdir_files
+
+buddy_uninstall:
+	rm $(BUDDY_INSTALL_PRIVATE_BIN_DIR)/neoip_buddy-bin
+	rm $(BUDDY_INSTALL_PRIVATE_BIN_DIR)/neoip_buddy_launcher.sh
+	rm $(BUDDY_INSTALL_BIN_DIR)/neoip_buddy_gui
+	rm $(BUDDY_INSTALL_BIN_DIR)/neoip_buddy_tui
+	rm /usr/share/applications/neoip_buddy.desktop
+	rm /usr/share/pixmaps/neoip_buddy.png
+	
+	
+INSTALL_ROUTER_CONFIG_DIR=/etc/neoip_router
+INSTALL_ROUTER_BIN_DIR=/usr/bin
+INSTALL_ROUTER_PRIVATE_BIN_DIR=/usr/lib/neoip_router
+
+install_router: neoip_router-bin
+	install -d -m 755 $(INSTALL_ROUTER_PRIVATE_BIN_DIR)
+	install -d -m 755 $(INSTALL_ROUTER_CONFIG_DIR)
+	install -d -m 755 $(INSTALL_ROUTER_CONFIG_DIR)/netdiag
+	strip neoip_router-bin
+	install -m 755 neoip_router-bin $(INSTALL_ROUTER_PRIVATE_BIN_DIR)
+	install -m 755 cfg_file/neoip_auto_register.sh $(INSTALL_ROUTER_BIN_DIR)/neoip_router
+	install -m 755 cfg_file/neoip_router_configurator.sh $(INSTALL_ROUTER_PRIVATE_BIN_DIR)
+	ln -fs $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router_configurator.sh $(INSTALL_ROUTER_BIN_DIR)/neoip_router_gui
+	ln -fs $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router_configurator.sh $(INSTALL_ROUTER_BIN_DIR)/neoip_router_tui
+	install -m 755 cfg_file/neoip_router.init /etc/init.d/neoip_router
+	install -m 644 cfg_file/neoip_router.desktop /usr/share/applications
+	install -m 644 cfg_file/neoip_router.png /usr/share/pixmaps
+	install -m 644 cfg_file/neoip_lib.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_lib_default.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_router.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip_router_default.ini $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/root_ca_cert.pem $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 cfg_file/neoip.ico $(INSTALL_ROUTER_CONFIG_DIR)
+	install -m 644 neoip_router.8 /usr/man/man8
+
+uninstall_router:
+	rm $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router-bin
+	rm $(INSTALL_ROUTER_BIN_DIR)/neoip_router
+	rm $(INSTALL_ROUTER_PRIVATE_BIN_DIR)/neoip_router_configurator.sh
+	rm $(INSTALL_ROUTER_BIN_DIR)/neoip_router_gui
+	rm $(INSTALL_ROUTER_BIN_DIR)/neoip_router_tui
+	rm /etc/init.d/neoip_router
+	rm /usr/share/applications/neoip_router.desktop
+	rm /usr/share/pixmaps/neoip_router.png
+	rm /usr/man/man8/neoip_router.8
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip.ico
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_lib.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_lib_default.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_router.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/neoip_router_default.ini
+	rm $(INSTALL_ROUTER_CONFIG_DIR)/root_ca_cert.pem
+
+##############################################
+#  beyond this points only mangement target. #
+##############################################
+clean :
+	@echo Begin to clean
+	$(RM) $(ALL_EXE)
+	find -type f -and -name "core" -or -name "*.[oa]" -or -name "*.so" -or -name "*.rpo" | xargs rm 
+	@echo Clean is completed
+
+mrproper : clean
+	@echo Begin to mrproper
+	$(RM) -r .depend .protect/
+	@echo Mrproper is completed
+
+strip :
+	@echo Begin to strip $(ALL_EXE)
+	$(STRIP) $(ALL_EXE)
+	@echo $(ALL_EXE) have been striped
+
+backup: mrproper cleanlog
+	@echo Backup to backup
+	(cd .. && tar cf - $(PROJECT) | gzip -9 >$(PROJECT).tgz)
+	sync
+	@echo Backup is completed
+
+#######################################
+# to precompile the .hpp (unclear it is of any use with distcc)
+######
+%.gch: %.hpp
+	$(CXX)  $(COMMON_CFLAGS) -x c++ -c $< -o $@	
+LIST_HPP = $(shell find apps/ neoip*/ -name "*.hpp")
+precompile_header: $(patsubst %.hpp, %.gch, $(LIST_HPP))
+
+#######################################
+# to create the .include directory
+# - it link all the .hpp of the src/ directory in a single directory
+# - this avoid having a lot of -I in the command line.
+#   - i did the 'lots of -I' before and actually reached the 32kbyte limit
+# - this directory is ONLY for the building and NOT anything else.
+######
+includedir:
+	cd ../.include && rm -f ../.include/*.hpp && for i in `find ../src -name "*.hpp"`; do ln -s $$i .; done
+
+#######################################
+# to make a fast dependancies computation (may be inaccurate in special cases tho :)
+######
+dep:
+	./mkfiles.pl && ./mkdep.pl
+
+# to include 
+ifeq (make.dep,$(wildcard make.dep))
+include make.dep
+endif
+
+#######################################
+# to make a slow dependancies computation (slow but surely accurate)
+######
+# only GCC. 
+depend slowdep:
+	@echo Start to build depedances in .depend
+	for i in `find apps neoip*/ -name "*.c-removemetohaveCcode" -or -name "*.cpp"`; do echo Building dependencies for $$i >/dev/tty; echo -n `dirname $$i`/;$(CPP) -M $(CFLAGS) $$i;done >.tmpdepend
+	mv -f .tmpdepend .depend
+	@echo Dependances completed
+
+#only GCC and good make
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif
+
+
+
+DEPDIR=.depdir
+# automatically generate dependencies based on all .cpp files:
+$(DEPDIR)%.d: %.o
+	echo from $< to $@
+
+#	$(CXX) -MM $(CFLAGS) $< \
+#		| sed 's/$*.o/$(OBJDIR:/=\/)$*.o/g' \
+#		| sed 's/$*.o/& $(subst /,\/,$@)/g' > $@
+
+# DO NOT DELETE

@@ -1,0 +1,49 @@
+note about a name service but refactored:
+-----------------------------------------
+Main policy:
+- to be object oriented
+- to be able to implement different type of name service on the same arch
+  - super peer + flood
+  - various dht
+  
+Description of the ns realm arch:
+- it has a parent ns realm
+- it has a access control
+  - who is able to do what operation on this ns realm
+  - who is able to be server
+- it can support multiple servers and each node may become servers based on ns realm specific policies
+========================================================
+- NS realm: it is a given name service realm
+- NS record: it is here to describe what is a record
+  - everybody should use this to manipulate record
+- NS db: it store the records on the local peer
+- NS put: it publish records in the ns realm
+- NS get: it retrieve records from the ns realm
+- ns_clicnx: maintain a client connection toward a server
+  - if connected, stand still
+  - if unconnected, try to connect periodically with a short period
+- ns_srvcnx: maintain all the clients connection and X connection towards other server
+  - try to connect other servers with which period
+  - just answer and maintains the client connections
+=========================================================
+Access Control:
+---------------
+- ns_cred: the credential of a peer
+  - list of operation which are allowed/denied inside the ns_realm
+  - it is authenticated
+- the authentication is done by a list of accepted authority
+  - sort of nsock_ra.c
+  - accauth.c list of access authority
+- the access controls is hierarchical
+  - a child ns realm doesnt have more rigth than a parent ns realm
+  - all files shared inside a ns realm must not be accessible by people denied by this ns realm
+  - all connections based on a ns realm should not allow more than the ns realm
+=========================================================
+Planning:
+---------
+- do ns realm basics
+- do ns record
+- do ns db basics
+  - fill it with fake record of ns mother's server
+- do the cnx cli and server
+  - do a http option to allow to change the role. will help debuging

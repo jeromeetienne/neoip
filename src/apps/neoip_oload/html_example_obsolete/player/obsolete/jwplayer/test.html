@@ -1,0 +1,99 @@
+<html debug=true>
+<head>
+<script type="text/javascript" src="../../../base/javascript/swfobject.js"></script>
+<script src="../../../base/firebug/firebug.js"></script>
+</head>
+<body>
+
+
+<h3>jw flash Player</h3>
+This is a flash player with a NOT opensource license. but it is cheap. just testing for now.
+<p id="player"><a href="http://www.macromedia.com/go/getflashplayer">Get the Flash Player</a> to see this player.</p>
+
+<script type="text/javascript">
+	// This is a javascript handler for the player and is always needed.
+	function thisMovie(movieName) {
+	    if(navigator.appName.indexOf("Microsoft") != -1) {
+			return window[movieName];
+		} else {
+			return document[movieName];
+		}
+	};
+	function sendEvent(typ,prm)	{ thisMovie("mpl").sendEvent(typ,prm);	}
+	function loadFile(obj)		{ thisMovie("mpl").loadFile(obj);	}
+	function addItem(obj,idx)	{ thisMovie("mpl").addItem(obj,idx);	}
+	function removeItem(idx)	{ thisMovie("mpl").removeItem(idx);	}
+	function loadPlayer_js() {
+		var so = new SWFObject('flvplayer.swf','mpl','320','260','7');
+		so.addParam("allowfullscreen"	,"true"		);
+		so.addVariable("javascriptid"	,"mpl"		);
+		so.addVariable("enablejs"	,"true"		);
+		so.addVariable("file"		, ''		);
+		so.addVariable("streamscript"	, 'lighttpd'	); 
+		so.addVariable("autostart"	,"false"	);
+		so.write('player');
+	};
+	//loadPlayer_js();
+
+	function loadPlayer_raw() {
+		var so = new SWFObject('flvplayer.swf','mpl','320','260','7');
+		so.addVariable("javascriptid"	, "mpl"		);
+		so.addVariable("enablejs"	, "true"	);
+		so.addVariable("file"		, 'http://127.0.0.1:4550/flv/http%3a//192.168.1.3/~jerome/output.flv');
+		//so.addVariable("file"		, ''		);
+		//so.addVariable("streamscript"	, 'lighttpd'	); 
+		so.addVariable("autostart"	, "false"	);
+		so.write('player');
+	};
+	//loadPlayer_raw();
+
+	function build_player(width, height) {
+		var so = new SWFObject('flvplayer.swf','mpl',width, height, '7');
+//		so.addVariable("file"		, 'http://127.0.0.1:4550/flv/*httpo_maxrate*100k/http://blip.tv/file/get/Prpoint-HowToCopeWithStressRememberDREAM669.flv');
+//		so.addVariable("file"		, 'http://127.0.0.1:4550/flv/*httpo_maxrate*100k/http://blip.tv/file/get/Prpoint-HowToCopeWithStressRememberDREAM669.flv');
+		so.addVariable("file"		, 'http://127.0.0.1:4550/flv/http%3a//192.168.1.3/~jerome/output.flv');
+		so.addVariable("streamscript"	, 'lighttpd'); 
+		so.addVariable("autostart"	, "true");
+		so.write('player');
+	};
+	build_player(320, 260);
+
+	//addItem({file: 'http://127.0.0.1:4550/flv/http%3a//192.168.1.3/~jerome/output.flv', start: 10}, 0);
+	//sendEvent('playpause');
+	
+</script>
+
+
+<script>
+	function play() {
+		console.info("enter play");
+//		sendEvent('stop');
+//		addItem({file:'http://127.0.0.1:4550/flv/http%3a//192.168.1.3/~jerome/output.flv', start: 10})
+//		var	obj	= {};
+//		obj.file	= "http://192.168.1.3/~jerome/golfers.flv";
+//		addItem(obj, 0)
+//		addItem(obj, 0)
+//		addItem({file:'http://vp.video.google.com/videodownload?version=0&secureurl=uAAAAJw81hw0GCsDxGdux3htIcIrp4J6jZyt-drhlDR53-XjkJzAwzS2iAM6dP9mxy4uppKqgP-6YrPnprNKVkLFjNem0tOOuDT0LW61lYL1kQsPUwkFxafMnYPXq-S-DOve2C3SRVpYVZD1nKzcTm-C74u_X9xQI4tepITUVvnKVKiuhzVNfxf3slQwK6RixvMIcRYq4N8JsUUOICMz_DIXH40_oABFaeMusYLBOWFbmPjK6lMPj2O3WVEQy_ajMPUChA&sigh=XvuUwE7IMIAJZs2_a_lBLESb2X8&begin=0&len=3295105&docid=-4216011961522818645'})
+//		addItem({file:'http://127.0.0.1:4550/flv/*httpo_maxrate*200k/http%3a/192.168.1.2/~jerome/vid_mdata.flv'})
+		sendEvent('playitem',1)
+		sendEvent('playitem',0)
+		console.info("leave play");
+	}
+	function stop() {
+		sendEvent('stop');
+		removeItem(1);
+	}
+</script>
+<input type=button value="Start" onClick='play()'>
+<input type=button value="Stop" onClick='stop()'>
+<h2>SEND EVENTS</h2>
+<ul>
+	<li><a href="javascript:addItem({file:'http:/192.168.1.3/~jerome/output.flv'})">load a movie at the end of the playlist</a>.</li>
+	<li><a href="javascript:sendEvent('playitem', 0)">Play first item</a>.</li>
+	<li></li>
+	<li><a href="javascript:sendEvent('playpause')">Toggle the pause state</a>.</li>
+	<li><a href="javascript:sendEvent('stop')">Stop loading and playing</a>.</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
+\textclass article
+\begin_preamble
+\date{ }
+\end_preamble
+\language english
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize default
+\spacing single 
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\use_natbib 0
+\use_numerical_citations 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 2
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+Metalink extension in .torrent
+\layout Author
+
+Jerome Etienne
+\layout Abstract
+
+This text presents a extension in .torrent file format in order to include
+ a metalink file.
+ Thus the bittorrent client supporting this extension will be able to take
+ advantages of the metalink fileformat (TODO put some here), such as the
+ multi protocol download.
+ Morover, the resulting .torrent will remains compatible with all existing
+ bittorrent clients, ensuring a smooth transition.
+\layout Section
+
+Extension Description
+\layout Itemize
+
+A bencoded string in the root dictionnary, with a key 
+\begin_inset Quotes eld
+\end_inset 
+
+metalink
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\layout Itemize
+
+this string contains a metalink file with the unmodified format
+\begin_deeper 
+\layout Itemize
+
+NOTE: if it possible to add a torrent inside a metalink file, in this case
+ it is allowed but not recommended as it would be uselessly redundant.
+\end_deeper 
+\layout Section
+
+About the transition
+\layout Itemize
+
+It should not be in the info dictionary as it would modify the infohash
+ which acts as identifier for a swarm.
+ Changing it would cause all the peers of the unmodified the .torrent not
+ to find the one from the modified one, uselessly reducing the cooperation
+ between peers.
+\layout Itemize
+
+metalink provides some administratives informations which are nice for indexing
+ purpose or for informations purposes
+\layout Itemize
+
+especially it may provides links external to the bittorrent swarm to get
+ the informations.
+\layout Section
+
+Convertion
+\layout Standard
+
+This section describes the methods to convert a file from one format to
+ another, and the limitations of those convertions.
+ Here one assume to have only the metafile without the data themselves or
+ any human interventions.
+\layout Subsection
+
+From metalink to torrent
+\layout Itemize
+
+In fact with this, it is possible to merge the metalink and the torrent
+ format.
+\layout Itemize
+
+If the original metalink file contains a torrent, it is trivial
+\layout Itemize
+
+if the original metalink file doesnt contains a torrent, it is possible
+ but require to use the 'no piecehash' extension.
+ which is not backward compatible with client which doesnt support it.
+\layout Subsection
+
+From torrent to metalink
+\layout Itemize
+
+it is possible to provide some basic field of a metalink file from a torrent
+ and include the torrent in it
+\layout Itemize
+
+NOTE: that metalink are only for single file, hence it wont work for multi
+ file torrent
+\layout Itemize
+
+is it ? i mean to check what are the minimal metalink
+\layout Itemize
+
+for example the hash of the whole file is not included in the .torrent
+\the_end

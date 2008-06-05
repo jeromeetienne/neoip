@@ -1,0 +1,60 @@
+/*! \page neoip-router NeoIP-Router
+
+\ref neoip-router is a application which acts as a IP router. It (i) restore end2end, provide 
+(ii) security, (iii) mobility and will provide multicast and anycast.
+
+\section router-just-works It just works.
+- answer the dns query so most applications will work on top of it unmodified
+- as soon as it is installed, it is possible to connect other \ref neoip-router
+- For most users, the only configuration step is to register their hostname
+
+\section end2end Restoring end2end
+This means that any computer can connect any other computer, except it it is explicitly forbidden to 
+for administrative purpose (typically firewall).
+
+\section secury Security
+- nothing to configure, all connections are secured
+
+\section Mobility
+- no need for reconfiguration if the computer is moving inside the network
+- even for a computer with WiFi moving from one relay to the other, so changing its IP address
+
+\section Notes
+- the traffic may be compressed 
+
+\section Future features
+- Anycast: not yet implemented, but can be done trivially thru the \ref network-coord which provide the distance
+    between peers
+- Multicast: not yet implemented, but can be done trivially thru group in \ref neoip-ns
+- address allocation 
+  - on installation: When a \ref neoip-router is installed, a IP address is allocated for it for 
+    a lifetime.
+    - Due to IPv4 address shortage, it is clearly unsuitable for IPv4 as outter protocol
+    - It may works for IPv6 and thus allows any \ref neoip-router to be able to route IPv6
+  - on launch: When a \ref neoip-router is launched, a given IP address is leased for it for a given
+    period. If the lease isnt renewed, the ip address may be leased to another \ref neoip-router
+    - very much like with DHCP. 
+    - doesn't change the classic assumptions made on IP address, so very transparent
+  - on connection: When a \ref neoip-router connects another, they negociates the IP addresses of both 
+    end of the tunnel they just established.
+    - to reduce the span of a network address
+      - as IPv4 network address space is sparse, it is a good thing
+        - TODO do the math to see how many computers
+      - prevent to use an IP address as a peer identifier, only the hostname can be used
+        - some protocols have trouble with that
+    - require to establish the tunnel before a dns request is answered
+- Using FEC when the packet loss is above a given rate
+
+\section relation-ipv6 Relationship with IPv6
+- IPv6 is a nice protocol but suffers from 2 main disadvantages in practice:
+  - no native support for an overwhelming part of the internet
+  - very few applications supports it
+- In practice, to make those change happen would take a long time and until then, to use IPv6 is quite harsh.
+  - \ref neoip-router aims to provides features of IPv6 in IPv4 and make them easy to use or even transparent.
+    \ref neoip-router takes advantages of its overlay network architecture to provide those features without
+    requiring to change each router of the internet to obtain ubquitous IPv6 native support and without
+    requiring to change the applications to have IPv6 support.
+- NeoIP router may help the deployement of IPv6: if IPv6 support is added in \ref neoip-router, applications
+  could use IPv6 before the internet has native support for it.
+
+*/

@@ -1,0 +1,18 @@
+/*!\page ns-realm NS Realm
+
+\ref ns-realm is the main component of \neoip-ns. 
+
+\ref ns-realm has a basename and a fullname
+- the basename is the name of this realm
+- the fullname is the basename appended to the fullname of the parent \ref ns-realm
+
+
+\section ns-realm-hierachie Ns Realm Hieararchie
+- a given \ref ns-realm always has a parent \ref ns-realm. Thus a \ref ns-realm may
+  be dynamically stacked up to allow tunability in performance and security.
+
+\section Notes
+- special role of the \ref ns-realm-mother and its relation ship with \ref ns-bootstrapping
+- provide the file directory analogies to help people understand
+
+*/

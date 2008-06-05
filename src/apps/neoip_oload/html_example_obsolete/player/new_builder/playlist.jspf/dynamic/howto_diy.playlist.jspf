@@ -1,0 +1,135 @@
+{
+  "playlist": {
+    "title": "Howto DIY",
+    "date": "Wed Dec 19 17:40:13 UTC 2007",
+    "track": [
+      {
+        "title": "BLIP day 3 - III",
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 1874.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "mod": "flv",
+            "static_filelen": 4775407
+          }
+        },
+        "meta": {
+
+        },
+        "duration": 37171,
+        "location": "http:\/\/s8.video.blip.tv\/1180001675370\/Make-BLIPDay3III620.flv"
+      },
+      {
+        "title": "BLIP day 3 - II",
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 2086.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "mod": "flv",
+            "static_filelen": 6202461
+          }
+        },
+        "meta": {
+
+        },
+        "duration": 63424,
+        "location": "http:\/\/s6.video.blip.tv\/0730001675255\/Make-BLIPDay3II319.flv"
+      },
+      {
+        "title": "BLIP day 3 - I",
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 2122.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "mod": "flv",
+            "static_filelen": 5195251
+          }
+        },
+        "meta": {
+
+        },
+        "duration": 44825,
+        "location": "http:\/\/s8.video.blip.tv\/1150001675113\/Make-BLIPDay3I865.flv"
+      },
+      {
+        "extension": {
+          "flv_mdata_info": {
+            "type": "external",
+            "extmdata_uri": "http:\/\/jmehost1\/~jerome\/neoip_html\/player\/playlist.jspf\/flv_mdata_xml\/75620abea12495a8d804b672ce0842c2.flv_mdata.xml",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "mod": "flv",
+            "static_filelen": 33252662
+          }
+        },
+        "title": "Make a Spud Gun - Make Podcast: Weekend Projects",
+        "meta": {
+
+        },
+        "duration": 515600,
+        "location": "http:\/\/s7.video.blip.tv\/1140000118031\/Make-MakeASpudGunMakePodcastWeekendProjects781.flv"
+      },
+      {
+        "extension": {
+          "flv_mdata_info": {
+            "type": "external",
+            "extmdata_uri": "http:\/\/jmehost1\/~jerome\/neoip_html\/player\/playlist.jspf\/flv_mdata_xml\/d0e11e6dc311a2dbc2bfd86ac64a0432.flv_mdata.xml",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "mod": "flv",
+            "static_filelen": 24535407
+          }
+        },
+        "title": "Make a Programmable LED Pumpkin!",
+        "meta": {
+
+        },
+        "duration": 330163,
+        "location": "http:\/\/s9.video.blip.tv\/1310000114579\/Make-MakeAProgrammableLEDPumpkin441.flv"
+      },
+      {
+        "extension": {
+          "flv_mdata_info": {
+            "type": "external",
+            "extmdata_uri": "http:\/\/jmehost1\/~jerome\/neoip_html\/player\/playlist.jspf\/flv_mdata_xml\/9abd65b3fea9cb3ac37bf1c31d04c208.flv_mdata.xml",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "mod": "flv",
+            "static_filelen": 6359927
+          }
+        },
+        "title": "Hazard Factory's Fireball Maker",
+        "meta": {
+
+        },
+        "duration": 88275,
+        "location": "http:\/\/s8.video.blip.tv\/1230000112305\/Make-HazardFactorysFireballMaker550.flv"
+      }
+    ],
+    "meta": {
+      "trackidx_beg": 3,
+      "instance_nonce": "xt8cSfKKvP",
+      "reload_delay": 10000,
+      "may_loop": false
+    },
+    "identifier": "howto_diy"
+  }
+}

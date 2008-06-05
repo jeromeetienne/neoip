@@ -1,0 +1,53 @@
+{
+  "base_date": "Sun Oct 14 22:01:29 UTC 2007",
+  "item_arr": [
+    {
+      "meta": {
+        "admin": {
+          "name": "Andrew Mwenda takes a new look at Africa"
+        },
+        "oload": {
+          "mod": "flv"
+        }
+      },
+      "duration": 1144.97,
+      "address": "http:\/\/blip.tv\/file\/get\/Tedtalks-AndrewMwendaTakesANewLookAtAfrica574.flv"
+    },
+    {
+      "meta": {
+        "admin": {
+          "name": "Erin McKean redefines the dictionary"
+        },
+        "oload": {
+          "mod": "flv"
+        }
+      },
+      "duration": 1067.88,
+      "address": "http:\/\/blip.tv\/file\/get\/Tedtalks-ErinMcKeanRedefiningTheDictionary935.flv"
+    },
+    {
+      "meta": {
+        "admin": {
+          "name": "Jeff Skoll makes movies that make change"
+        },
+        "oload": {
+          "mod": "flv"
+        }
+      },
+      "duration": 1051.09,
+      "address": "http:\/\/blip.tv\/file\/get\/Tedtalks-JeffSkollMakesMoviesThatMakeChange911.flv"
+    },
+    {
+      "meta": {
+        "admin": {
+          "name": "Dean Kamen previews a new prosthetic arm"
+        },
+        "oload": {
+          "mod": "flv"
+        }
+      },
+      "duration": 426.447,
+      "address": "http:\/\/blip.tv\/file\/get\/Tedtalks-DeanKamenPreviewsANewProstheticArm998.flv"
+    }
+  ]
+}

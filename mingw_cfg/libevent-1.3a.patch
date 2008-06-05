@@ -1,0 +1,13 @@
+diff -ruN libevent-1.3a/sample/event-test.c libevent-1.3a.modif/sample/event-test.c
+--- libevent-1.3a/sample/event-test.c	2007-02-18 20:33:57.000000000 +0100
++++ libevent-1.3a.modif/sample/event-test.c	2007-06-25 13:53:27.000000000 +0200
+@@ -17,7 +17,8 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <errno.h>
+-
++// jme- added
++#include "config.h"
+ #include <event.h>
+ 
+ void

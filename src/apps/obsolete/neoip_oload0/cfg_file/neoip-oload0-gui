@@ -1,0 +1,3 @@
+#!/bin/sh
+# tools to launch the neoip-oload gui
+/etc/neoip/neoip-ui-launcher.sh gui `pidof neoip-oload`

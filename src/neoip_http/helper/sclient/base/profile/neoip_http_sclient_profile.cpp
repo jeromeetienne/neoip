@@ -1,0 +1,49 @@
+/*! \file
+    \brief Definition of the \ref http_sclient_profile_t
+
+*/
+
+
+/* system include */
+/* local include */
+#include "neoip_http_sclient_profile.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+// definition of \ref http_sclient_profile_t constant
+const size_t	http_sclient_profile_t::REPLY_MAXLEN		= 0;
+const size_t	http_sclient_profile_t::DFL_MSGLEN_PREALLOC	= 64*1024;
+const size_t	http_sclient_profile_t::PROGRESS_CHUNK_LEN	= 0;
+// end of constants definition
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                              ctor/dtor
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+http_sclient_profile_t::http_sclient_profile_t()	throw()
+{
+	reply_maxlen		(REPLY_MAXLEN);
+	dfl_msglen_prealloc	(DFL_MSGLEN_PREALLOC);
+	progress_chunk_len	(PROGRESS_CHUNK_LEN);
+}
+
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+//                     check function
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+
+/** \brief Check the validity of the profile
+ */
+http_err_t	http_sclient_profile_t::check()	const throw()
+{
+	// return no error
+	return http_err_t::OK;
+}
+
+NEOIP_NAMESPACE_END
+

@@ -1,0 +1,5 @@
+little experiment to get mingw to produce dll 
+from interdependant dll.
+- it works but i dunno how applicable it is to neoip
+- the interdependance of shared lib is not well done in neoip
+  - maybe it should be cleaned up

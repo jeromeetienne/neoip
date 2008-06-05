@@ -1,0 +1,97 @@
+.\" -*- nroff -*-
+.TH NEOIP-OLOAD 8 "Dec 2006" "neoip-casto(1)" "neoip-casto's Manual"
+.SH NAME
+neoip-casto - tools to read from the neoip cast system
+.SH SYNOPSIS
+.B neoip-casto
+[--config_dir dirname] [--help] [--version]
+.SH DESCRIPTION
+neoip-casto is a deamon which allow to read stream from the neoip cast 
+system. It is closely related to neoip-casti, which is the tool to write
+in the neoip cast system. 
+
+casto stands for neoip cast output. casti stands for neoip cast input.
+
+
+Typical usage for debugging: specifying a specific conficuration directory and nodaemon
+neoip-casto -c myconfigdirectory -d
+
+then launch a reader (e.g. a video player) toward the url
+http://localhost:4000/http:/jmehost2:8080/blabla.mpg.
+
+neoip-casto is listening on localhost:4000 and will forward the 
+stream http://jmehost2:8080/blabla.mpg thru it
+
+Additionnaly the blabal.mpg allows the reader an easier diasgnostic based 
+on the file extension to know the type of stream format forwarded.
+
+WARNING: internally neoip-casto has a hardcoded url http://jmehost1:9080/cast_mdata
+which is used to get the bt_cast_mdata_t via xmlrpc. this is typically neoip-casti 
+while doing test which is answering to this
+
+.SH About swarm access
+neoip-casto is able to handle multiple swarm at the same time.
+each swarm is uniquely identify by the couple mdata_srv_uri and cast_name.
+Each swarm is accessed by connecting an http server within neoip-casto.
+The format of this url is webdetect_uri/cast_name. It may optionnaly specify
+the mdata_srv_uri as a url variable. if the mdata_srv_uri variable is not explicitly
+specified, it is taken from the neoip_casto.conf file.
+
+Example: the url to access the cast_name 'superstream.flv' on a webdetect uri
+http://localhost:4560 is http://localhost:4560/superstream.flv. If the mdata_srv_uri
+is http://example.org/mdata_srv, the full url is 
+http://localhost:4560/superstream.flv?mdata_srv_uri=http://example.org/mdata_srv
+
+.TP
+.I "httpo_maxrate size"
+Determine the maximum rate at which the data will be delivered. It is mainly
+itended for prefetching with a rate of 0k because receiving a stream slower that
+it is sent will rapidely caused desynchronisation, and receiving faster
+is impossible.
+
+.SH OPTIONS
+.TP
+.I "-d, --nodaemon"
+Dont 'daemonize' the application. aka leave it in the foreground. This
+is usefull to debugging and doing diagnostic
+.TP
+.I "-h, --help"
+display the inlined help
+.TP
+.I "-h, --help"
+display the inlined help
+.TP
+.I "-v, --version"
+display the version string
+
+.SH EXAMPLES
+To launch a http stream on jmehost2. it launchs vlc to endlessly stream ntv002.mpg
+on port 8080. ntv002.mpg is a MPEGv1 in a mpegps container
+  vlc -vvv ntv002.mpg --sout-keep --loop --sout '#standard{access=http,mux=ps,dst=:8080}' 
+
+To launch it from yavipin/src directory and read the http://jmehost2:8080 http stream
+  ./neoip-casti -c config_dir_debug1 -d  http://jmehost2:8080
+
+To launch a neoip-casto on jmehost1
+  ./m neoip-casto && ./neoip-casto -c config_dir_debug2 -d
+
+To read the video 
+  mplayer http://localhost:4000/http/jmehost2:8080/blabla.mpg
+
+
+.SH FILES
+\fI/etc/neoip\fR
+default configuration directory
+
+.SH LICENSE
+The license is proprietary and this programm should be used for testing purpose only
+
+.SH AUTHOR
+.B neoip-casto
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP's homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.
+Note that the metalink support is experimental.

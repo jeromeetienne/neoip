@@ -1,0 +1,236 @@
+/*! \file
+    \brief Implementation of \ref router_name_t
+    
+\ref Brief description
+router_name_t handles the dns hostname stuff. They may be idn but the idn 
+to ascii translation is handled externally aka it MUST be done before constructing
+a router_name_t.
+
+\par Examples
+- *.exampledomain.com is a router_name_t is_domain_only
+- myhost.* is a router_name_t is_host_only
+- myhost.exampledomain.com is a router_name_t::is_fully_qualified
+
+\ref host/domain functions
+- is_host_only() is true if the first label is '*', false otherwise
+- is_domain_only() is true if the last label is '*', false otherwise
+- host() will return the hostname part of the router_name_t
+- domain() will return the domainname part of the router_name_t
+
+\par host/domain name and labels
+- the hostname may contains multiple labels
+- the domainname may contains multiple labels
+- NOTE: when parsing a router_name_t from a raw string, the domain name is
+  assumed to be the last item.
+
+*/
+
+/* system include */
+/* local include */
+#include "neoip_router_name.hpp"
+#include "neoip_dns_helper.hpp"
+#include "neoip_string.hpp"
+#include "neoip_log.hpp"
+#include "neoip_nipmem_alloc.hpp"
+
+
+NEOIP_NAMESPACE_BEGIN;
+
+// definition of \ref nunit_path_t constant
+const char *	router_name_t::SEPARATOR	= ".";
+const char *	router_name_t::GLOB_STR		= "*";
+// end of constants definition
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			ctor/dtor
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor from std::string
+ */
+router_name_t::router_name_t(const std::string &str)		throw()
+{
+	std::vector<std::string>	words = string_t::split(str, SEPARATOR);
+	// log to debug
+	KLOG_DBG("enter str=" << str);
+	// if there are no label, return a null object now
+	if( words.size() == 0 )	return;
+	// if first label AND last label are equal to GLOB_STR, it is illegal, return a null object now
+	if( words[0] == GLOB_STR && words[words.size()-1] == GLOB_STR )	return;
+	// if any 'middle' label contain GLOB_STR, it is illegal, return a null object now
+	for(size_t i = 1;i < words.size()-1; i++ ){
+		// if this label doesnt contain GLOB_STR, goto the next
+		if( words[i] != GLOB_STR )	continue;
+		// else return a null object now
+		return;
+	}
+	// if any label which is not GLOB_STR is invalide, return a null object now
+	for(size_t i = 0;i < words.size()-0; i++ ){
+		// if this label is a GLOB_STR, goto the next
+		if( words[i] == GLOB_STR )			continue;
+		// if this label is valid, goto the next
+		if( dns_helper_t::label_is_valid(words[i]) )	continue;
+		// else return a null object now
+		return;
+	}
+
+	// NOTE: here it is considered a valid router_name_t
+	
+	// copy the words into the label_db
+	// - thu this router_name_t wont be is_null()
+	for(size_t i = 0;i < words.size(); i++ )	label_db.append(words[i]);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			query function
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Return true if the router_name_t is a domain only
+ * 
+ * - aka if the last label is a '*'
+ */
+bool	router_name_t::is_domain_only()			const throw()
+{
+	// if the object is null, it is not a domain_only
+	if( is_null() )	return false;
+	// sanity check - label_db MUST NOT be empty 
+	DBG_ASSERT( !label_db.empty() );
+	// if the first label IS NOT a GLOB_STR, it is not a domain_only
+	if( label_db[0] != GLOB_STR )	return false;
+	// if all previous tests passed, it is a domain_only
+	return true;
+}
+
+/** \brief Return true if the router_name_t is a host only
+ * 
+ * - aka if the first label is a '*'
+ */
+bool	router_name_t::is_host_only()			const throw()
+{
+	// if the object is null, it is not a host_only
+	if( is_null() )	return false;
+	// sanity check - label_db MUST NOT be empty 
+	DBG_ASSERT( !label_db.empty() );
+	// if the last label IS NOT a GLOB_STR, it is not a host_only
+	if( label_db[label_db.size()-1] != GLOB_STR )	return false;
+	// if all previous tests passed, it is_host_only
+	return true;
+}
+
+/** \brief Return true if the router_name_t is fully_qualified
+ * 
+ * - aka if NOT null and NOT host_only and NOT domain_only
+ */
+bool	router_name_t::is_fully_qualified()			const throw()
+{
+	// if the router_name_t is null, it is not fully_qualified
+	if( is_null() )		return false;	
+	// if the router_name_t is_host_only, it is not fully_qualified
+	if( is_host_only() )	return false;
+	// if the router_name_t is_domain_only, it is not fully_qualified
+	if( is_domain_only() )	return false;
+	// if all previous tests passed, it is_fully_qualified
+	return true;
+}
+
+/** \brief Return true if this router_name_t contains the other router_name_t
+ * 
+ * - WARNING: this router_name_t MUST be is_domain_only_t and the other MUST be
+ *   is_fully_qualified()
+ */
+bool	router_name_t::match(const router_name_t &other)		const throw()
+{
+	// sanity check - this router_name_t MUST be a is_domain_only() or is_host_only()
+	DBG_ASSERT( is_domain_only() || is_host_only() );
+	// sanity check - the other router_name_t MUST be a is_fully_qualified()
+	DBG_ASSERT( other.is_fully_qualified() );
+	// return a string_t::glob_match
+	// - it is ok because GLOB_STR == "*" which is the same for string_t::glob_match	
+	return string_t::glob_match(to_string(), other.to_string());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			update function
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief add a domain to a host_only router_name_t
+ * 
+ * - WARNING: this router_name_t MUST be host_only and the other MUST be domain_only
+ */
+router_name_t &	router_name_t::add_domain(const router_name_t &other)	throw()
+{
+	// sanity check - this router_name_t MUST be a is_host_only()
+	DBG_ASSERT( is_host_only() );
+	// sanity check - the other router_name_t MUST be a is_domain_only()
+	DBG_ASSERT( other.is_domain_only() );
+
+	// sanity check - the last label MUST be GLOB_STR
+	DBG_ASSERT( label_db[label_db.size()-1] == GLOB_STR );
+	// remove the last label
+	label_db.remove(label_db.size()-1);
+	
+	// sanity check - the first label of other MUST be GLOB_STR
+	DBG_ASSERT( other.label_db[0] == GLOB_STR );
+	// append the whole other.label_db except the first 
+	for(size_t i = 1; i < other.label_db.size(); i++)	label_db.append(other.label_db[i]); 
+	
+	// return the object itself
+	return *this;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                     main compare function
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief main compare functions
+ */
+int router_name_t::compare(const router_name_t &other)	const throw()
+{
+	// handle the case where at least one is null
+	if(  is_null() && !other.is_null() )	return -1;
+	if( !is_null() &&  other.is_null() )	return +1;
+	if(  is_null() &&  other.is_null() )	return  0;
+	// NOTE: here both are NOT null
+
+	// compare the label_db
+	if( label_db < other.label_db )		return -1;
+	if( label_db > other.label_db )		return +1;
+	// NOTE: here both label_db are equal
+
+	// here both are considered equal
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+//                     to_string() function
+//////////////////////////////////////////////////////////////////////////////	
+//////////////////////////////////////////////////////////////////////////////	
+
+/** \brief Convert the object into a string
+ */
+std::string	router_name_t::to_string()	const throw()
+{
+	std::ostringstream 	oss;
+	// build the string
+	for( size_t i = 0; i < label_db.size(); i++ ){
+		// add the inter label SEPARATOR
+		if( i != 0 )	oss << SEPARATOR;
+		// display the lbale itself
+		oss << label_db[i];
+	}
+	// return the just built string
+	return oss.str();
+}
+
+NEOIP_NAMESPACE_END
+
+
+

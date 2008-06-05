@@ -1,0 +1,77 @@
+/*! \page neoip-kad-delrec NeoIP Kademlia Record Deletion
+
+
+This pages describe how to put a DELETE feature in kademlia. It isn't explained
+in the paper but it is straight forward to add one.
+
+It is based on the fact that kademlia makes its best to store a record in
+the k closest nodes to its KeyID (NOTE: it doesn't guaranty that nodes 
+which are NOT in the k closest don't store the record). 
+So the point is to send a DELETE RPC to each of them.
+
+NOTE: this procedure is not guaranteed to remove all records
+
+\section neoip-kad-delrpc-procedure Deletion Procedure
+It is based on the node search algorithm, similarly to the publishing and retrieval procedure.
+The procedure is simply (i) to perform a node search using the DELETE RPC and 
+(ii) to stop when "the initiator has queried and gotten responses from the k 
+closest nodes it has seen".
+
+The DELETE RPC request contains the KeyID and the RecID of the record to delete.
+The receiver of this rpc replies the usual "the k nodes it knows about closest to the" KeyID
+and delete the record matching the RecID.
+
+\section neoip-kad-delrec-guaranty Guaranty of Deletion
+The guaranty of deletion means that after the deletion, it is garanteed that 
+no nodes store this records. Due to the distributed aspect of dht, its isn't
+trivial to obtain.
+
+In fact, it can't be fully garanteed due to the dynamic aspect of nodes joining/leaving. 
+So if the nodes are stable when the deletion happens, this procedure will guaranty the deletion.
+But it will NOT if they are going up and down. It is due to the fact that the nodes
+may have a different view of the k closest nodes during unstable periods.
+
+Nevertheless the record will no more be stored by the k closest nodes of its KeyID,
+So it won't be where the kademlia algorithm expects to find it. So record 
+retrieval may find it if and only if it hits one of the node which still have it
+along the way to those k closest nodes.
+
+\subsection neoip-kad-delrpc-newnode Relation with new nodes closer to the KeyID
+According to kademlia algorithm, when a new node B is observed by a node A and
+that node B is closer to some records stored by node A, node A MUST send a STORE
+of those records to node B and node A must keep its local copies.
+
+The issue is node A may not be in the k closest but it will still store a copy.
+So the \ref neoip-kad-delrpc-procedure won't remove it. It is up to Node A to find
+out if it is in the k closest nodes of this KeyID. and if so, keep the copy, else
+delete it.
+
+\par How Node A may find out that it is no more in the k closest
+It could do a node search of the record KeyID to determine the k closest node
+of this record and see if it is amoung them. Nevertheless the cost will be quite
+high i.e. each time a new node arrives, the k nodes around its node id will have
+to do a node search for all their stored records.
+- BAD solution: Node A could wrongly assume that if k/2 nodes are between its local nodeid and
+  the KeyID, it isnt in the k closest. It would be based on the fact that
+  nodeid are random, so evenly distributed in the key space. But it would not be
+  guaranteed at all and it may even break the other assumption if it delete the
+  record while being in k closest.
+
+
+\subsection neoip-kad-delrpc-caching Relation with Caching
+The caching population may duplicate the records on many nodes which are
+not in the k closest nodes of the KeyID. There is no way afterward to find out
+which node has cached which record.
+
+So the caching seems to imply that the DELETE procedure does NOT garantee that all 
+records to be removed. So caching may be disabled to decrease the likely hood of 
+stale records after deletion.
+
+*/
+
+
+
+
+
+
+

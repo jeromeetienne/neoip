@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script src="http://jmehost1/~jerome/oload/base/firebug/firebug.js"></script> 
+<script src="http://jmehost1/~jerome/oload/base/javascript/swfobject.js"></script> 
+</head>
+<body onload="onload_cb()">
+
+<div id="neoip_player_container_id">Place to put player container</div>
+
+<script>
+	function thisMovie(movieName){
+		var isIE	= navigator.appName.indexOf("Microsoft") != -1;
+		return (isIE) ? window[movieName] : document[movieName];
+	}
+
+	function playlist_populate(){
+		var player	= thisMovie("plugin_html_id");
+		var track_arg;
+if( 0 ){
+		// put this track
+		track_arg	= { content_url	: 'http://jmehost2/~jerome/output.flv?bla=bli&slota=sloti',
+					};
+		//player.track_add(track_arg, player.track_count());	
+		// put this track
+		track_arg	= { content_url	: 'http://cache.googlevideo.com/get_video?video_id=45WY57lS708',
+				 //   start_time	: 10,
+					};
+		player.track_add(track_arg, player.track_count());
+		// put this track
+		track_arg	= {	content_url	: "http://74.125.13.21/get_video?video_id=7uYoodBeqDI"
+					};
+		player.track_add(track_arg, player.track_count());	
+		// put this track
+		track_arg	= { content_url	: "http://74.125.13.21/get_video?video_id=7uYoodBeqDI",
+					start_time	: 26,
+					rangereq_type 	: 'flv',
+					rangereq_flv_var: 'start',
+					};
+}
+if(0){
+		//player.track_add(track_arg, player.track_count());	
+		// put this track
+		track_arg	= {	content_url	: "http://localhost:4550/*httpo_full_id*slota/http://jmehost2/~jerome/flash/elephantsdream_420_v4.flv"
+					};
+		player.track_add(track_arg, player.track_count());
+}
+if(0){	
+		// put this track
+//		track_arg	= { content_url	: "http://blip.tv/file/get/BreakaLegTV-BreakALegEpisode2Part1174.flv"
+//		track_arg	= { content_url : 'http://jmehost2/~jerome/golfers.flv',
+		track_arg	= { content_url	: 'http://jmehost2/~jerome/output.flv',
+					};
+		player.track_add(track_arg, player.track_count());
+}
+if(0){
+		// put this track
+		track_arg	= {	content_url	: 'http://localhost:4550/flv/http://jmehost2/~jerome/output.flv',
+					start_time	: 26,
+					rangereq_type 	: 'flv',
+					rangereq_flv_var: 'pos'
+					};
+		player.track_add(track_arg, player.track_count());
+}
+if(0){
+		// TODO this one is not displayed on screen....
+		// put this track
+		track_arg	= {	content_url	: 'http://localhost:4550/flv/*httpo_maxrate*100k/http://blip.tv/file/get/Demnow-DemocracyNowMondayJuly232007335.flv',
+					start_time	: 50,
+					rangereq_type 	: 'flv',
+					rangereq_flv_var: 'pos'
+					};
+		player.track_add(track_arg, player.track_count());
+}
+if(0){
+		// put this track
+		track_arg	= {	content_url	: "http://localhost:4560/superstream.flv"
+					};
+		player.track_add(track_arg, player.track_count());
+}
+if(0){
+		// put this track
+		track_arg	= {	content_url	: "http://server185a.files.youporn.com/video/04/87/flv/48763_German_Couple_7.flv"
+					};
+		player.track_add(track_arg, player.track_count());
+		// put this track
+		track_arg	= {	content_url	: "http://server187a.files.youporn.com/video/02/16/flv/21639_Carly_Parker_5.flv"
+					};
+		player.track_add(track_arg, player.track_count());
+		// put this track
+		track_arg	= {	content_url	: "http://server234.files.youporn.com/video/03/48/flv/34863_Susana.flv"
+					};
+}
+if(0){
+		//player.track_add(track_arg, player.track_count());
+		// put this track
+		track_arg	= {	content_url	: "http://jmehost2/~jerome/ntv002.mp4"
+					};
+		//player.track_add(track_arg, player.track_count());
+		// put this track
+		track_arg	= {	content_url	: "http://blip.tv/file/get/BreakaLegTV-BreakALegEpisode2Part1174.flv"
+					};
+		//player.track_add(track_arg, player.track_count());
+}
+if(1){
+		// put this track
+//		track_arg	= {	content_url	: "http://jmehost2/~jerome/output.flv"
+//		track_arg	= {	content_url	: "http://jmehost2/~jerome/flash/elephantsdream_420_v4.flv"
+		track_arg	= {
+				"content_url"	: "http://localhost:4550/flv/*httpo_full_id*slota/*httpo_maxrate*250k/http://jmehost2/~jerome/flash/elephantsdream_420_v4.flv",
+				"net_ratelim"	: {	"key"	: "slota",
+							"uri"	: "http://localhost:4550"
+						}
+							
+					};
+		player.track_add(track_arg, player.track_count());
+}
+		//player.set_sound_vol(0);
+	}
+var track_arg_output_flv_direct	= {
+		"content_url"	: 'http://jmehost2/~jerome/output.flv'
+	};
+var track_arg_output_flv_oload_start_time	= {
+		"content_url"	: 'http://localhost:4550/flv/http://jmehost2/~jerome/output.flv',
+		"start_time"	: 26,
+		"rangereq_type"	: 'flv',
+		"rangereq_flv_var": 'pos'
+	};
+var track_arg_breakaleg_direct	= {
+		"content_url"	: 'http://blip.tv/file/get/BreakaLegTV-BreakALegEpisode2Part1174.flv'
+	};
+var track_arg_breakaleg_oload	= {
+		"content_url"	: 'http://localhost:4550/flv/http://blip.tv/file/get/BreakaLegTV-BreakALegEpisode2Part1174.flv',
+		"rangereq_type"	: 'flv',
+		"rangereq_flv_var": 'pos'
+	};
+
+var measure_start; 
+	
+</script>
+
+
+<input type=button value="output.flv direct"		onClick='do_measure(track_arg_output_flv_direct)'>
+<input type=button value="output.flv oload+start_time"	onClick='do_measure(track_arg_output_flv_oload_start_time)'>
+<input type=button value="breakaleg direct"		onClick='do_measure(track_arg_breakaleg_direct)'>
+<input type=button value="breakaleg oload"		onClick='do_measure(track_arg_breakaleg_oload)'>
+<br>
+<input type=button value="reset"			onClick='measure_reset()'>
+
+<script>
+	function onload_cb() {
+		console.info("start building flash");
+		var	so	= new SWFObject("neoip_asplayer.swf", 'plugin_html_id'
+					, "320", "240", "9", "#000000", true);
+		// put the parameter to the flash plugin itself
+		so.addParam("allowScriptAccess"	, "always");
+		so.addParam("scale"		, "noscale");
+		var allowfullscreen	= true;
+		so.addParam("allowfullscreen"	, allowfullscreen ? "true" : "false");
+		// mirror addParam "allowfullscreen" because unable to get addParam from as
+		so.addVariable("allowfullscreen", allowfullscreen ? "true" : "false");  
+		// put the variable for the flash program
+		so.addVariable("jscallback_str"	, "neoip_flash_player_cb");
+		so.addVariable("jscallback_key"	, "slota_jscallbackkey");
+		// write the result in the html
+	      	so.write('neoip_player_container_id');
+	      	console.info("flash built");
+	}
+	function measure_reset(track_arg){
+		var player	= thisMovie("plugin_html_id");
+		// playing_stop if needed
+		player.playing_stop();
+	}
+	function do_measure(track_arg){
+		var player	= thisMovie("plugin_html_id");
+		// playing_stop if needed
+		player.playing_stop();
+		// remove all track 
+		while( player.track_count() > 0 )	player.track_del(0);
+		// add this track_arg as track
+		player.track_add(track_arg, player.track_count());
+		// store the present date to know when the playing started
+		measure_start	= new Date(); 
+		// start playing
+		player.playing_start();
+		
+	}
+	function neoip_flash_player_cb(cb_key, event_type, arg){
+		var measure_now		= new Date();
+		var started_since	= measure_now - measure_start;
+		// log to debug
+		//console.info("event_type=" + event_type);console.dir(arg);
+	
+		if( event_type == "state_change" && arg['new_state'] == "playing" )
+			console.info("************* start to playing in " + started_since/1000 + "-sec");
+	
+		// TODO here detect THE event which saying it is started
+		// - dump the result in the webpage itself. 
+		// - plus some info on the thing which has been measured
+
+
+		//console.info("Playing started " + started_since/1000 + "-sec ago.");
+	}
+</script>
+</body>
+</html>

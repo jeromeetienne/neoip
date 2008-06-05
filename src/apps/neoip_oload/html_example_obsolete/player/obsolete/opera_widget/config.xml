@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<widget>
+	<widgetname>Hello World!</widgetname>
+	<description>
+		This is the very first widget written!
+	</description>
+
+	<width>573</width>
+	<height>500</height>
+
+	<author>
+		<name>Jerome Etienne</name>
+		<link>http://acme-widget.example.com</link>
+
+		<organization>NeoIP, inc.</organization>
+	</author>
+	<id>
+		<host>example.com</host>
+		<name>HelloWorld</name>
+
+		<revised>2006-01</revised>
+	</id>
+</widget>

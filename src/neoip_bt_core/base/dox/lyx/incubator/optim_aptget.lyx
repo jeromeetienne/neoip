@@ -1,0 +1,118 @@
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
+\textclass article
+\begin_preamble
+\date{ }
+\end_preamble
+\language english
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize default
+\spacing single 
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\use_natbib 0
+\use_numerical_citations 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 2
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+Optimized apt-get
+\layout Author
+
+Jerome Etienne
+\layout Abstract
+
+This text presents several possible optimizations on apt-get systems in
+ order to reduce the network load on the server and increase the network
+ speed for the client
+\layout Section
+
+Basic description
+\layout Itemize
+
+apt-get system is based on a http protocol, so the apt-get programm may
+ be intercepted by changing the /etc/apt/sources.list to point to a proxy.
+\layout Itemize
+
+apt-get is using a local cache of the previously download packages
+\layout Section
+
+Usage of bittorrent
+\layout Itemize
+
+optimization is using the bittorrent in order to download from multiple
+ sources
+\layout Itemize
+
+possibility to include a list of http server (aka mirror) which already
+ contains the files
+\begin_deeper 
+\layout Itemize
+
+those http server are already known as apt-get mirror
+\end_deeper 
+\layout Itemize
+
+TODO how the other bt peer having the files are made aware that they should
+ seed a file they already have
+\layout Section
+
+Usage of versioning
+\layout Itemize
+
+the packages goes by increasing version.
+\layout Itemize
+
+it is likely that the difference between 2 versions is smaller than the
+ whole new version
+\layout Itemize
+
+TODO make some statistic about the size of the difference
+\begin_deeper 
+\layout Itemize
+
+rsync stuff
+\layout Itemize
+
+zsync stuff (he mades a lot of work on this)
+\end_deeper 
+\layout Itemize
+
+TODO does it requires the server to already include the .zsync ?
+\begin_deeper 
+\layout Itemize
+
+this would requires modification of the current servers and thus reduces
+ the adoptions
+\layout Itemize
+
+maybe those .zsync could be stored elsewhere...
+ like simply on another http server
+\layout Itemize
+
+this would allows the a much easier deployment
+\end_deeper 
+\layout Section
+
+NOTES
+\layout Itemize
+
+this would be done as a bt_oload plugin
+\layout Itemize
+
+client with low bandwidth would install it because of the bw gain due to
+ delta transfert
+\the_end

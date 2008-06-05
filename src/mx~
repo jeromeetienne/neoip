@@ -1,0 +1,11 @@
+# ! /bin/sh
+
+# ask the shell to exit at the first command which fails
+set -e
+
+# copy the command line parameter into more readable variable
+EXE_NAME=$1
+CONFIG_DIR=$2
+
+# make the program
+./m $EXE_NAME && exec ./x $EXE_NAME $CONFIG_DIR

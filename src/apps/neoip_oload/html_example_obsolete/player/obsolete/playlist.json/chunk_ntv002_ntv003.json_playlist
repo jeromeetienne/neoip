@@ -1,0 +1,11 @@
+{
+	"base_date"	: "Fri, 17 Aug 2007 20:07:25 GMT",
+	"item_arr"	: [
+			{	"address"	: "http://192.168.1.3/~jerome/ntv002.mp4",
+			       	"duration"	: 40,
+			},
+			{	"address"	: "http://192.168.1.3/~jerome/ntv003.mp4",
+			       	"duration"	: 40,
+			},
+		]
+}

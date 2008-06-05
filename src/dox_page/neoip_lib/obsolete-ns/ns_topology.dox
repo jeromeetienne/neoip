@@ -1,0 +1,59 @@
+/*! \page ns-topology Ns Topology
+
+\ref neoip-ns maintains a distributed database of \ref ns-record(s). 
+
+TODO this page is shit, but the arch of the system is real good
+
+\section ns-topology-cmp Topology Comparison
+
+\subsection ns-topology-star Star Topology
+The most known network architecture to handle database is known as the client/server model.
+So each client connects the server, sends it request. The server queries its local database
+and has to answer the requests from all clients.
+- \b PRO: it is fast. as the database is local to the server, to query/modify it is very efficient.
+- \b CON: it is unscalable. The central server needs to handle all the clients. If there are too 
+  many clients, the server is no more fast enougth and need to be replaced
+- \b CON: it is a single point of faillure: If the server becomes unrechable, all the clients
+  are prevented from accessing the database.
+- \b CON: it is expensive: The adminisatration, computer, bandwidth of this server costs money.
+  The more clients are served, the more expensive it is.
+
+\subsection ns-topology-fullmesh Full Mesh Topology
+Some p2p networks have chosen a full mesh topology i.e. all peers are to be considered servers.
+TODO to goes on
+- \b PRO: scalable
+- \b PRO: more reliable
+- \b PRO: cheap
+
+
+
+\section ns-server-cloud Ns Server Cloud
+The topology between \ref neoip-peer in \ref neoip-ns is based on what i call a \ref ns-server-cloud.
+
+Amoung all the \ref neoip-peer(s) of a given \ref ns-realm, some are \ref ns-server and others are
+\ref ns-client(s). In short :
+- The \ref ns-server(s) are connected together in way depending of the \ref ns-arch
+- A \ref ns-client is connected to a single \ref ns-server which handle all the \ref ns-client
+  request (for \ref ns-get and \ref ns-put).
+
+As any \ref neoip-peer can switch between \ref ns-server and \ref ns-client at any time, it is 
+possible to dynamically tune the size of the \ref ns-server-cloud.
+
+\subsection ns-server-cloud-flexibility Flexibility
+- \ref ns-topology-star is possible, the caller just have to limit the number of server to one
+- \ref ns-topology-fullmesh is possible, the caller just have to set up all \ref neoip-peer are server
+
+\subsection ns-server-definition Definition
+- the \ref ns-server-cloud is all the \ref ns-server of a \ref ns-realm
+- Its size is dynamically tunable
+- \ref ns-arch determines how those \ref ns-server(s) act together to maintain the database
+
+\section TODO
+- advantage for performance
+  - the more servers there are, the worst the performance gonna be
+  - due to \ref churn-rate
+  - each operations requires to contacts more servers, so more time is needed
+- ultimatly a unique central server powerfull enougth to handle all requests is the most efficient topology
+  - \b CON: this cause a lot of money
+
+*/

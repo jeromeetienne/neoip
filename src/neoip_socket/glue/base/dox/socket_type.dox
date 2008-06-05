@@ -1,0 +1,47 @@
+/*! \page neoip-socket-type NeoIP Socket Type
+
+\ref neoip-socket-type defined the type of \ref neoip-socket.
+
+- all \ref neoip-socket-domain will support all \ref neoip-socket-type
+
+\section neoip-socket-type-list  NeoIP Socket Type List
+- DGRAM is a \ref neoip-socket-type-dgram
+- RDM is a \ref neoip-socket-type-rdm
+- SEQPACKET is a \ref neoip-socket-type-seqpacket
+- STREAM is a \ref neoip-socket-type-stream
+
+\subsection neoip-socket-type-dgram NeoIP Socket Type DGRAM
+- \ref neoip-socket-type-dgram is a Unordered Unreliable Datagram 
+  connection, abreviated DGRAM.
+
+\subsection neoip-socket-type-rdm NeoIP Socket Type RDM
+- \ref neoip-socket-type-rdm is a Unordered Reliable Datagram
+  connection.
+- it is called rdgram layer
+
+\subsection neoip-socket-type-seqpacket NeoIP Socket Type SEQPACKET
+- \ref neoip-socket-type-seqpacket is a Ordered Reliable Datagram
+  connection.
+- it is called ordgram and is coded on top of rdgram layer but add a ordered layer
+
+\subsection neoip-socket-type-stream NeoIP Socket Type STREAM
+- \ref neoip-socket-type-stream is a Ordered Reliable Byte-oriented
+  connection.
+- It is is coded on top ordgram but add a byte layering on top
+
+
+\section neoip-socket-type-vs-otsp-type Relationship between NeoIP Socket Type and the Outter Transport Type
+- the Outter Transport socket can have 2 types
+  - DGRAM (e.g. UDP/IP) and STREAM (e.g. TCP/IP)
+- The \ref neoip-socket on top of this outter transport must support all \ref neoip-socket-type.
+  Here is the table explaining the relationship between the two
+  
+
+<table>
+<tr> <td>otsp native type\ socket wished</td>
+			<td>DGRAM</td>		<td>RDM</td>		<td>SEQPACKET</td>		<td>STREAM</td>		</tr>
+<tr> <td>DGRAM</td>	<td>nothing</td>	<td>rdgram</td>		<td>ordgram</td>		<td>bstream</td>	</tr>
+<tr> <td>STREAM</td>	<td>pktisation</td>	<td>pktisation</td>	<td>pktisation</td>		<td>nothing</td>	</tr>
+</table>
+
+*/

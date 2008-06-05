@@ -1,0 +1,13 @@
+{
+	base_date	: "Fri, 17 Aug 2007 20:07:25 GMT",
+	item_arr	: [
+			{	address		: "http://74.125.13.21/get_video?video_id=7uYoodBeqDI%26origin=lax-v279.lax.youtube.com%26neoip_http_metavar_mod_type=flv%26neoip_http_metavar_mod_flv_varname=start",
+				duration	: 43.21,
+				meta : {
+			       		oload:	{
+						mod: "flv",
+			       		},
+			       	},
+			},
+		]
+}

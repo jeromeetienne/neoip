@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head><title>NeoIP casto playing page</title></head>
+<script src="../base/firebug/firebug.js"></script> 
+<script src="../base/javascript/neoip_xdomrpc_t.js"></script>
+<script src="../base/javascript/neoip_apps_detect_t.js"></script> 
+<script src="../base/javascript/swfobject.js"></script>
+<body onload="start_probing()">
+<center><h1>NeoIP casto Playing page</h1></center>
+
+<p id="player"><a href="http://www.macromedia.com/go/getflashplayer">Get the Flash Player</a> to see this player.</p>
+
+<input type=button value="Start playing"
+	onClick="javascript:build_player(build_casto_url(),'160', '140')">
+
+
+
+<h3>neoip-casto parameters</h3>
+<input type=button value="Save Parameter" onClick='casto_param_to_cookie()'>
+<input type=button value="Load Parameter" onClick='casto_param_from_cookie()'>
+<table>
+	<tr><td>cast_name</td><td>: <input type="text" id="cast_name"		/></td></tr>
+	<tr><td>mdata_srv_uri</td><td>: <input type="text" id="mdata_srv_uri"	/></td></tr>
+</table>
+
+<h3>Debug Actions</h3>
+<input type=button value="Read superstream.flv Hardcoded from neoip-casto"
+	onClick="javascript:build_player('http://localhost:4560/superstream.flv','320', '260')">
+<input type=button value="Read directly from vlc"
+	onClick="javascript:build_player('http://localhost:8080/stream.flv','320', '260')">
+
+
+<script>
+	function build_casto_url()
+	{
+		// get parameter from the fields
+		var	cast_name	= document.getElementById('cast_name').value;
+		var	mdata_srv_uri	= document.getElementById('mdata_srv_uri').value;
+		// sanity check - all mandatory fields MUST be present
+		if( !cast_name )	throw "cast_name is undefined";
+		// build the casto_url		
+		var	casto_url	= neoip.outter_uri('casto');
+		casto_url	+= "/" + cast_name;
+		if( mdata_srv_uri ) casto_url += "?mdata_server_uri=" + escape(mdata_srv_uri);
+		// return the result
+		return	casto_url
+	}
+	function build_player(file_url, width, height) {
+		var so = new SWFObject('../neoip_oload/flash/flvplayer.swf','mpl',width, height, '7');
+		so.addVariable("file", file_url);
+		so.addVariable("autostart","true");
+		so.write('player');
+	};
+</script>
+<h1>Current status</h1>
+<ul>
+	<li>neoip-casto  <span id="neoip_casto_probe_result">is currently being probbed.</span></li>
+</ul>
+
+<h3>Issue</h3>
+<ul>
+	<li>jw flash player doesnt like to have variable in the uri... close to the issue
+		of cast identification. and how to get a fix url for a given cast.</li>
+	<li>What about the mdata_srv parameter ? it points to the wikidbg of neoip-casto...
+		having infrastructure stuff on wikidbg http is BAD BAD BAD</li>
+	<li>Some issue with the cpu load when i record+play thru firefox... may
+		simply be my overheating cpu kicking in... dunno. have to test on
+		jmehost2 which doesnt have this cpu overheating problem</li>
+</ul>
+
+<script>
+function casto_param_init()
+{
+	casto_param['cast_name']	= null;
+	casto_param['mdata_srv_uri']	= null;
+}
+
+// copy all the casto_param to the html field
+function casto_param_to_field()
+{
+	for( key in casto_param ){
+		document.getElementById(key).value	= casto_param[key];
+	}
+}
+
+// copy all the html_field to the casto_param
+function casto_param_from_field()
+{
+	for( key in casto_param ){
+		casto_param[key] = document.getElementById(key).value;
+	}
+}
+
+// Store all the casto_param in cookie 
+function casto_param_to_cookie()
+{
+	// get the casto_param from the html fields
+	casto_param_from_field();
+
+	// set the expiration date
+	var	expire_date	= new Date()
+	expire_date.setDate(expire_date.getDate() + 30*24*60*60)
+	
+	// add all the casto_param into cookies
+	for( key in casto_param ){
+		var str  = ' ' + key + '=' + escape(casto_param[key]) + '; ';
+		str	+= "expires=" + expire_date.toGMTString() + ';';
+		document.cookie	= str;
+	}
+}
+
+// fetch the casto_param from cookie 
+function casto_param_from_cookie()
+{
+	// add all the casto_param into cookies
+	for( key in casto_param ){
+		// try to find this key
+		var c_start	= document.cookie.indexOf(key + "=")
+		// if not found, goto the next
+		if( c_start == -1 )	continue;
+		// skip the test of the key + '='
+		c_start	= c_start + key.length + 1;
+		// try to find the end of the value
+		var c_end	= document.cookie.indexOf(";", c_start);
+		// if not found, assume it is up to the end of the cookie
+		if( c_end==-1 )	c_end	= document.cookie.length;
+		// now actually set the casto_param with the value from the cookie
+		casto_param[key]	= unescape(document.cookie.substring(c_start,c_end));
+	}
+
+	// set the casto_param to the html fields
+	casto_param_to_field();
+}
+
+// declare the casto_param and initialize it
+var casto_param	= new Array();
+casto_param_init();
+
+// on load, read the casto_param_from_cookie
+casto_param_from_cookie();
+</script>
+
+<script>
+function start_probing()
+{
+	// start probing neoip-apps
+	var	casto_detect	= new neoip.apps_detect_t("casto", 4560, 4569
+					, neoip.apps_detect_cb_t(apps_detect_cb));						
+}
+
+/** \brief Callback for all the neoip.apps_detect_t of this page
+ */
+function apps_detect_cb(apps_detect, userptr, result_str)
+{
+	var	suffix_name	= apps_detect.suffix_name();
+	// log the result
+	console.info("enter suffix_name=" + apps_detect.suffix_name() + " result_str=" + result_str);
+
+	// delete the apps_detect
+	apps_detect.destructor();
+
+	// build the string to display
+	var	str;
+	if( neoip.apps_present(suffix_name) ){
+		str	 = " <font color='green'>HAS been found</font> -";
+		str	+= " version " + neoip.apps_version(suffix_name);
+		str	+= " with outter_uri of " + neoip.outter_uri(suffix_name);
+	}else{
+		str	 = "<font color='red'>HAS NOT</font> been found";
+		str	+= " running on your computer.";
+	}
+	// display the current str
+	var	elem_id	= "neoip_" + suffix_name + "_probe_result";
+	document.getElementById(elem_id).innerHTML= str;
+}
+</script>
+
+</body>
+</html>

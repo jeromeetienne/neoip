@@ -1,0 +1,187 @@
+******************************************
+* TO DO
+******************************************
+- tranform the crypto/compression stuff into a library, thus
+  other VPON could use it
+  o the name of the library is yavcrypt. yavc_* 
+  o think about the fact to send outof band packet specific to the 
+    local protocol
+  o some packets must be sent asynchronously (e.g. proof of liveness,
+    rekey etc...) 
+    + different possibilities, probe or timer
+    + timer is important
+  o API: packet processing
+    + yavc_in_get_pkt_lenght(yav_ctx_t *ctx, char *pkt, int len )
+    + yavc_out_get_pkt_lenght(yav_ctx_t *ctx, char *pkt, int len )
+    + yavc_in_do_pkt( yav_ctx_t *ctx, char *pkt_in, int len_in, char *pkt_out,
+                                                 int len_out )
+    + yavc_out_do_pkt( yav_ctx_t *ctx, char *pkt_out, int len_out, char *pkt_in,
+                                                 int len_in )
+  o API: connection establishement
+    + should be iterated until a given return code is returned
+    + the context is allocated by the caller
+    + a connection has a initiator and a responder
+    + the context will have a internal state to check if it is 
+      properly used, yavc_clear_ctx, then 
+    + yavc_clear_ctx( yavc_ctx_t *ctx )
+    + yavc_init_ctx( yavc_ctx_t *ctx, char *option )
+      could be called several time, yavc_clear_ctx should be called first
+    + yavc_cnx_itor
+- make all the delay configurable at run time
+- enable the sec_pmtu and test it with uml
+  o carefull with what you set in the probe
+  o the safest is ipid+updcsum, it is 32bit
+  o enable a random source port binding, it would add 15 bits on most
+    computer. where to put this ? it is aim to protect the pmtu
+    but it is at the socket time. maybe a spmtu option and
+    the socket layer to ask spmtu layer while binding.
+  o --spmtu=ip_id,udp_csum,ip_tos,ip_off,udp_port,default
+- give an option for the pmtu blackhole, clear DF but send icmp
+  o is it possible with the yavipin model where it is done by the 
+    kernel ?
+- does the forward secrecy for g^x
+  o handle multiple g^x for smooth transition:
+    what happen for the initiator seing responder's g^x changing between
+    seding cnx_id_resp and recving itor_auth ? likely a faillure.
+  o document the relation between skey_renewal and dh_priv_renewal
+- in the docs:
+  o rename itor/resp by server/client
+  o rename src/dst ip by local/remote
+- port it to 2.2 which doesnt support /dev/tun. simply does vdev for
+  ethertap. code it under 2.4 (still support ethertap) and test it under 2.2
+  o code of ethertap done, need to test it on 2.2
+- write a script to use SuSe-compartment to do a chroot+cap+setuid
+  o see on debian in the libcap2-bin package. execcap/getpcap
+- write a script to run dhcp over yavipin, it would help a lot the 
+  mobile user case.
+- it may be interesting to have the responder 'initiates' a cnx, if the 
+  initiator reduce its retry frequency to save bandwith. it would reduce
+  the needed delay for the establishement
+- if mlock fails, report it and exit
+- about the packet compression
+  o clean the compression code (move it to a separate file)
+  o read the ipcomp rfcs
+  o may be a waste of CPU to try to compress each packet
+- forward directly etherpacket. stop to handle directly IPv4. use the
+  kernel for it and handle the interface. 
+  o DONE change the interface MTU according to the stun pmtu.
+  o DONE set the interface to down when the stun is down
+  o remove any icmp reply to the safe side
+  o if the vpn is done over lo, no ICMP is generated when the packet sent
+    is larger than lo's MTU. but sendto() return -1/message too long 
+    freitag advices to handle it with async error reporting.
+    man socket, IP_RECVERR
+- if the decryption produces very invalid packet, the receiver 
+  cores dumps, this implys a bad sanity check
+- authentication:
+  o signature and certificate
+  o phil will do it for nebola. wait and get his code
+  o ssl stuff. http://www.mozilla.org/projects/security/
+  o openssl stuff, see ssl-ca contrib
+- stun encryption/auth in module.
+  o use the same as usr_ipsec. same for vdev
+- proper configuration (file and command line)
+- puzzle during the establishement
+- about ipsec incopatiblity with NAT, draft-aboba-nat-ipsec-04.txt
+
+******************************************
+* network address
+******************************************
+- IS THIS JUST A LAME VERSION OF DHCP ?
+  o why not running DHCP on the tunnel ?
+  o keep yavipin at the link layer level ?
+- the responder establish the cnx, and get a /dev/(tun|tap), allocate the
+  route for it.
+- allow dynamic address and dynamic device allocation
+- the responder provides the network address he handle
+- each peer may be a router (with a safe side) xor a host
+  o a peer acting as a router has to export at least one netaddr
+  o a initiator acting as a host may request a dynamic address to 
+- In the typical case of mobile client, the initiator provide only
+  its own address. which may be dynamically allocated by the responder.
+- the responder notifies the initiator of the resp's safe side netaddr
+- the initiator does the same but the responder may accept or
+  not depending on its local configuration 
+- each peer notifies the other of its netaddr
+  o if there is no netaddr, the netaddr is NULL.
+  o if the initiator wants the provider to allocate him an dynamic address,
+    it uses a dedicated address type. (WORK: how the responder gives
+    him the address ?). the responder MUST not ask for a dynamic address.
+  o In anycase, the payload MUST be present (to ease the packet 
+    construction and parsing).
+- both sides have a configured netaddr it accepts from the peers (subsets
+  are accepted too). for ipv4, /0 will equal to no check
+- responder always provides a netaddr to the initiator
+- initiator may provides a netaddr to the responder. it doesnt if and 
+  only if it ask for a dynamic address.
+- itor ---- netaddr request ----> resp
+  itor <--- netaddr reply ------- resp
+  o netaddr request (type/16) + (netaddr/32,netmask/32)
+  o netaddr reply   (type/16) + (netaddr/32,netmask/32) + dyn_addr
+  o if request type == dyn_ipv4, reply dyn_addr contains the answer
+    else dyn_addr is always NULL
+  o if request/reply type == netaddr_ipv4, the payload is netaddr/32, 
+    netmask/32
+- each peer may be a router (with a safe side) xor a host
+  o if it is a host, the ipv4 netaddr will have a 255.255.255.255 netmask
+- for that it need to get the address from the initiator.
+- is it usefull to get the network info from the responder too ? dont 
+  think so
+- if the device is specified, dont allocate one dynamically
+
+******************************************
+* DONE
+******************************************
+- dynamic device allocation with scripts launched at the begining and 
+  at the end of a tunnel
+- short term key rekeying.
+- ported to linux2.4.12 (use of binded raw socket instead of /dev/tap)
+- authentication
+  o shared secret key
+- when the initiator stunnel is interrupted, retry until it is 
+  established again
+- configuration: check cmdline parameters
+- add pop from the initiator in init_auth packet
+  o maybe rename init_auth by itor_auth and resp_auth
+- better validity check for bogus packet in incoming packet (resp,itor,stun)
+- itor relaunched when the connectivity is lost during establishement
+- reply xmit for not established tunnel
+- skey renewal goes mad after a while.
+  o was a simple bug in packet parsing
+- add a packet to notify the other that a peer shutdowns
+  o may be lost but speed up unreach detection if things are going well
+- shutdown on sigint must be done on glib event to avoid race condition
+- there is bug in the stun closing. glib complains about a 
+  tag <= 0 in g_source_remove. try to luanch and stop many time
+  one peer.
+  o FIXED. was a race condition when processing shutdown packets
+- DONE add a cmdline option to deamonize it at the begining. 
+  o if not deamonize print log on the screen.
+  o started but not yet complete
+- packaging 
+  o DONE compilation + installation
+  o DONE remove the secure pmtu disc as it isnt tested
+  o DONE timer tuning
+  o DONE add admin trace and goes syslog.
+  o DONE udpate the man page
+  o DONE remove the dbg trace
+- DONE deamonize() in main is stupid. daemon() is a standard function which does
+  the same or more
+- DONE rename cert in auth in the whole source
+- DONE bad error report if script doesnt exist
+- DONE if the MTU of the outgoing interface is smaller than the packet,
+  it doesnt receive any icmp, just a len=-1 and Message too long
+  while writting. handle this case in the mtu discovery
+- DONE support -c alg, lzo, zlib, bz2
+  o --enc="aes-cbc" etc...
+  o --hash="balbla"
+  o what about dynamic download
+- DONE fix the ip addr/port binding
+  o a itor should only provide only the destionation address
+  o a resp doesnt have to provide any of it. addr may be null. 
+    and port a default
+  o handle the ip addr/port in the config
+  o if the source ip addr is unspecified, bind it yourself
+  o if the destination port is unspecified, take a default one
+  o if the source port is unspecified bind the first available
+

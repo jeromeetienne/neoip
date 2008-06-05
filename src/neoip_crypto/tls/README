@@ -1,0 +1,11 @@
+this tls layer is a wrapper on top of gnutls
+- it act as a filter. aka no network connection is done by this layer
+- it is halfback because it is not tunable
+  - it is because i currently dont understand what are the option for tls
+- it has been a bit tested
+  - successfull: establish a client connection toward a https server (see nunit2)
+  - successfull: in memory connection toward a cert tls_resp_t. 
+  - successfull: establish an anonymous connection toward a anonymous tls server
+    - see  ex-serv-anon in gnutls example
+  - successfull: establish anonymous connection between tls_itor_t and tls_resp_t
+    in memory only (see nunit)

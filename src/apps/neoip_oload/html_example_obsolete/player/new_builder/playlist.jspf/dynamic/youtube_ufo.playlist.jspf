@@ -1,0 +1,59 @@
+{
+  "playlist": {
+    "title": "youtube UFO",
+    "date": "Wed Dec 19 17:40:13 UTC 2007",
+    "track": [
+      {
+        "title": "Joe Satriani - Surfing with the Alien",
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 1744.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "neoip_metavar_http_mod_flv_varname": "start",
+            "mod": "flv",
+            "neoip_metavar_http_mod_type": "flv",
+            "static_filelen": 13067314
+          }
+        },
+        "meta": {
+          "location_rangereq_byuri_varname": "start"
+        },
+        "duration": 315011,
+        "location": "http:\/\/lax-v158.lax.youtube.com\/get_video?video_id=MjNAeELQ_Z8"
+      },
+      {
+        "title": "Alien Ant Farm - Glow",
+        "extension": {
+          "flv_mdata_info": {
+            "intmdata_len": 9396.0,
+            "type": "internal",
+            "kframe_index_present": true
+          },
+          "oload": {
+            "announce_uri": "http:\/\/jmeserv.podzone.net:50001\/announce",
+            "neoip_metavar_http_mod_flv_varname": "start",
+            "mod": "flv",
+            "neoip_metavar_http_mod_type": "flv",
+            "static_filelen": 8675986
+          }
+        },
+        "meta": {
+          "location_rangereq_byuri_varname": "start"
+        },
+        "duration": 211148,
+        "location": "http:\/\/lax-v189.lax.youtube.com\/get_video?video_id=u_-Wy2B0Xl4"
+      }
+    ],
+    "meta": {
+      "trackidx_beg": 4,
+      "instance_nonce": "VjBryFu35K",
+      "reload_delay": 10000,
+      "may_loop": false
+    },
+    "identifier": "youtube_ufo"
+  }
+}

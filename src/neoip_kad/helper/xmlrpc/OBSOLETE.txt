@@ -1,0 +1,9 @@
+NOTE:
+- this layer has been obsoleted during the refactorisation of the kad layer
+  to remove the slot_id_t
+- the new kad api make xmlrpc different
+  - the work to restore it likely implies to handle a slot_id_t. to import
+    the handler in the client
+- i decided to drop kad_xmlrpc for now
+  - PRO: this xmlrpc stuff is not high priority
+  - CON: it keep xmlrpc in the running loop

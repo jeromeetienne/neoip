@@ -1,0 +1,53 @@
+/*! \page neoip-kad-recdups NeoIP Kademlia Duplicate records
+
+
+This page describes the status of kademlia about the duplicate record matter.
+
+TODO add a section about the need of RecID to identify record while republishing
+- if duplicate record are allowed, record ID is required
+- if not, the KeyID is enought to uniquely identify the record
+
+\section neoip-kad-recdups-nosupport Original Kademlia doesnt support duplicate records
+Kademlia, as describe in the paper, doesn't support the duplicate records. 
+It is seen in the algorithm used to "find a (key, value) pair" which is:
+-# perform a node lookup procedure using FINDVALUE rpc.
+-# stop as soon as one value is found.
+
+\par Relation with caching
+Kademlia allows caching to spread the load due to popular records. The procedure
+is (i) when looking for a value (ii) republish the found value to the last 
+node which didn't have it. A consequence of this procedure is to replicate
+a given record on many nodes thus a FINDVALUE will find it sooner without having
+to ask to the 'normal' storer (aka the original 'k' ones).
+
+In relation with the duplicate records issue, this implies that cachine increase
+the chance not to get all the records because the 'stop as soon as one value is
+found' will occurs sooner.
+
+\section neoip-kad-recdups-get Possible solution
+- If a given key is supposed to support multiple data for a single key, no need
+  to cache it. as anyway the procedure goes up to the end
+- Change the get procedure to 
+  -# do a FINDVALUE which return the value if available *AND* return the n closest
+     nodes to the key.
+     - the original FINDVALUE return one *OR* the other.
+  -# perform a node lookup using this FINDVALUE until it has queried and 
+     received responsed from all the 'k' closest nodes it has seen.
+  -# any value returns by FINDVALUE is a answer to the get
+- this procedure ensures that a FINDVALUE is sent and replies from the 'k' closest
+  nodes to the key.
+  - as the publishing procedure is: send a STORE to the 'k' closest nodes to the 
+    keys, a FINDVALUE is sent to the same nodes (modulo that different nodes may
+    have a different view of those 'k' nodes)
+- this procedure doesn't garantee to provide all the data due to the different
+  view of those 'k' nodes. But the whole kademlia algorithm makes it best 
+  to ensure each nodes has the same vision of it even if it isn't garanteed.
+
+*/
+
+
+
+
+
+
+

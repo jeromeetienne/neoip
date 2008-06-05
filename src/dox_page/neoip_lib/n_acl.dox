@@ -1,0 +1,68 @@
+/*! \page n-acl NeoIP Access Control List
+
+\section Concepts
+An acl is a way to control the access of a given \ref n-key to a 
+given resources. i think \ref n-key is outdatedd by \ref n-key
+
+- see \ref n-key
+
+\subsection n-acl_apps Some application:
+ - a user bob want to download a local file hello.txt, is he allowed to
+   - here the identity is bob, the rescource is "download hello.txt" 
+ - a user alice want to query the index of a ns_realm_t "office file", is he allowed to
+   - here the identity is alice and the resource is 'query the index of ns_realm office_file"
+
+\section Notes
+- TODO what if no \ref n-acl_rule matches ?
+  - provide a catch-all \ref n-acl_rule which perform a given \ref n-acl_action.
+
+\section n-acl_rule ACL rule
+an ACL is a \b ordered list of \ref n-acl_rule
+  -# \ref n-acl_action which determine the action to be taken if the \ref n-acl_operation 
+     and the \ref n-acl_identity matchs
+  -# \ref n-acl_operation is a opaque blob provided by the caller of \ref n-acl to determine
+     the operation specific to its application
+     - see \ref ns-acl
+  -# \ref n-acl_identity which determine who is concerned by this \ref n-acl_rule
+
+\section n-acl_operation ACL operation
+\ref n-acl_operation is a opaque blob provided by the caller of \ref n-acl to determine
+the operation specific to its application
+ - see \ref ns-acl
+
+\section n-acl_identity ACL identity
+- TODO determine the identity, its format
+- should i put the way the identity is authenticated here ?
+  - allow \ref neoip-ft-upload by anybody who got this password
+  - allow \ref neoip-ft-download by anybody who got this other password
+
+\section n-acl_action ACL actions
+- ALLOW: If the \ref n-acl_rule matches, the \ref n-acl_operation is allowed 
+- DENY: If the \ref n-acl_rule matches, the \ref n-acl_operation is denied
+- ASK: If the \ref n-acl_rule matches, the permission to perform the \ref n-acl_operation is 
+  asked (typically to the user)
+  - TODO explain what is it
+  - typically to allow the ssh/buddy list kind of authentication
+
+=========================================================================
+=========================================================================
+
+\section n-acl-example ACL example
+-# The client sends a server a request which contains the requested operation, along 
+   with the \ref n-cred for this operation.
+-# The server receives the requests
+   -# it test if the received \ref n-cred is signed by a \ref n-key-owner trusted by the server
+   -# if no, deny the request
+   -# if yes, test if the requested operation is valid according to the \ref n-acl of the received \ref n-cred
+   -# if no, deny the request
+   -# if yes, test if the requested operation is valid according to the \ref n-acl of the server
+   -# if no, deny the request
+   -# if yes, allow the request
+
+\section slkdfjalsdfkj try to modularize this stuff and finding proper name
+- private_key: ability to authenticate data, via password or public key
+- List of trusted \ref n-key-owner
+  - seems like a list of public key
+- ACL: list of operation associated with action 
+
+*/

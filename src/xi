@@ -1,0 +1,2 @@
+./yavipind -i -p passwd_file.txt -s 192.168.1.2:9000 -d 192.168.0.254:9001 -f -b ./script_up_itor 
+

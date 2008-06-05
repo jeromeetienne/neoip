@@ -1,0 +1,13 @@
+{	"playlist_title": "youporn",
+	"playlist_id"	: "youporn_random",
+	"trackgen_info"	: [
+		{	"cmd"	: "concat",
+			"arg"	: {	"space"	: "youporn",
+					"desc"	: {	"dummy"	: "slota"	}
+				}
+		},
+		{	"cmd"	: "select_random_contiguous",
+			"arg"	: { "nb_contiguous"	: 3	}
+		}
+		]
+}

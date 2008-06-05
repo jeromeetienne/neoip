@@ -1,0 +1,74 @@
+CURRENT STATE:
+- the current way the piece state are maintained now is bad
+  - it is scattered all other the places
+  - it is unclean
+  - thus it is producing bugs
+    - i already got one in the neoip-oload seeking
+    - it is due to a bt_swarm_sched_piece_t deletion, the piece is put into
+      unselectable when bt_swarm_sched_piece_t is ctor but never never
+      put back in isselectable when the bt_swarm_sched_piece_t is dtor before 
+      completion.
+    - i fixed the bug but it is ultra poor coding, so unmaintainable
+- so there is a clear need for refactoring.
+--------------------------------------------------------------------------------
+- the main issue with the current way is that it breaks the 'unicity rule'
+- in order to restore the unicity rule compliance, data and their processing
+  MUST be centralized and not scattered.
+--------------------------------------------------------------------------------
+STATE DESCRIPTION
+remote state
+- piecefreq	= how many times each piece is available remotly
+  - should it count the local availability too ?
+  - bitcount_t of bt_mfile.nb_piece()
+- piecewish	= how many times each piece is wished for download
+  - remotly ? locally too ? both ?
+  - bitcount_t of bt_mfile.nb_piece()
+  - TODO a given piece for a given remote peer, can it be in piecewish and pievefreq
+    at the same time ? i dont think so
+
+local state
+- pieceavail	= for each piece, is it locally available or not
+  - bitfield_t of bt_mfile.nb_piece()
+- piecedling	= for each piece, is it currently downloading or not
+  - bitfield_t of bt_mfile.nb_piece()
+  - pieceavail and piecedling are mutually exclusive
+  - aka a given piece MUST NOT be in both at the same time
+- pieceprec	= the local precedence for each piece
+--------------------------------------------------------------------------------
+Centralisation of the states in bt_pselect_vapi_t
+- bt_pselect_vapi_t needs to access them all 
+- bt_pselect_vapi_t needs to know when and how each of those states
+  - in order to update bt_pselect_vapi_t internal states
+    - typically the precomputed structures to make select_new_dling_piece
+  - this is an important factor for this solution
+  - if the states are not stored in bt_pselect_vapi_t, how it gonna be
+    aware of the modification of the states
+  - if bt_pselect_vapi_t store the states, it can provide 'gateway' function
+    which gonna modify the states and potentially update its precomputed structure
+
+================================================================================
+SCHEDULE:
+- it is clear that it has to be refactored
+- BUT how to organize this ?
+- POSSIBLE SOLUTION:
+  - write a bt_ppelect_t which gonna be the new implementation of the 2 bt_pselect_t
+  - write extensive nunit for it
+  - write a bt_ppelect_core_t which maintains the core data 
+    - and bt_ppelect_fixed/slide_t which does the specific on top, inheriting from core
+    - the core is the one implementing the vapi
+  - then.... well look at porting it to the bt_swarm_t
+================================================================================
+- the bt_pselect_vapi_t is constructed internally to bt_swarm_t 
+  - why is there this special case ?
+  - why it isnt like bt_io_vapi_t ? aka constructed outside to the bt_swarm_t 
+    and passed to it
+  - to become external ctor would remove the need for bt_pselect_policy_t
+  - unify this... ok but which policy to adopt
+  - right now i see a clear advantage toward the 'external ctor'
+- do i still need the pignored ?
+  - in fact this is a poor name for 'unselectable'
+  - pignored bit are the one which are either in pieceavail or in piecedling
+- bt_pselect_slide_t DO NOT take into account the rarity....
+  - how will that influence the neoip-oload and neoip-casto ?
+  - i dont see that as a good thing
+

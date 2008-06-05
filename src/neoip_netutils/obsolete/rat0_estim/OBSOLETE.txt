@@ -1,0 +1,4 @@
+this is a old obsolete poorly coded version, use the rate_estim_t which is 
+more clean
+- it doesnt use the slidwin_t object and use its own slidwin_t implementation
+- it is faster

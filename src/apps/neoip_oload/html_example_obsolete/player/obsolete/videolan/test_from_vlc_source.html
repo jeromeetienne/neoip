@@ -1,0 +1,158 @@
+<HTML>
+<TITLE>VLC Mozilla plugin test page</TITLE>
+<BODY>
+<TABLE>
+<TR><TD colspan="2">
+MRL:
+<INPUT size="90" id="targetTextField" value="">
+<INPUT type=submit value="Go" onClick="doGo(document.getElementById('targetTextField').value);">
+</TD></TR>
+<TR><TD colspan="2">
+<EMBED  type="application/x-vlc-plugin" pluginspage="http://www.videolan.org/" version="VideoLAN.VLCPlugin.2"
+        width="320"
+        height="240"
+        id="vlc">
+</EMBED>
+</TD></TR>
+<TR><TD>
+<INPUT type=button id="PlayOrPause" value=" Play " onClick='doPlayOrPause()'>
+<INPUT type=button value="Stop" onClick='document.getElementById("vlc").playlist.stop();'>
+&nbsp;
+<INPUT type=button value=" << " onClick='doPlaySlower();'>
+<INPUT type=button value=" >> " onClick='doPlayFaster();'>
+&nbsp;
+<INPUT type=button value="Version" onClick='alert(document.getElementById("vlc"));'>
+<SPAN style="text-align:center">Volume:</SPAN>
+<INPUT type=button value=" - " onClick='updateVolume(-10)'>
+<SPAN id="volumeTextField" style="text-align: center">--</SPAN>
+<INPUT type=button value=" + " onClick='updateVolume(+10)'>
+<INPUT type=button value="Mute" onClick='document.getElementById("vlc").audio.toggleMute();'>
+</TD><TD width="15%">
+<DIV id="info" style="text-align:center">-:--:--/-:--:--</DIV>
+</TD></TR>
+</TABLE>
+<SCRIPT LANGUAGE="Javascript">
+<!--
+var timerId = 0;
+
+function updateVolume(deltaVol)
+{
+    var vlc = document.getElementById("vlc");
+    vlc.audio.volume += deltaVol;
+    document.getElementById("volumeTextField").innerHTML = vlc.audio.volume+"%";
+};
+function formatTime(timeVal)
+{
+    var timeHour = timeVal;
+    var timeSec = timeHour % 60;
+    if( timeSec < 10 )
+    	timeSec = '0'+timeSec;
+    timeHour = (timeHour - timeSec)/60;
+    var timeMin = timeHour % 60;
+    if( timeMin < 10 )
+    	timeMin = '0'+timeMin;
+    timeHour = (timeHour - timeMin)/60;
+    if( timeHour > 0 )
+    	return timeHour+":"+timeMin+":"+timeSec;
+    else
+    	return timeMin+":"+timeSec;
+};
+function onPlay()
+{
+    document.getElementById("PlayOrPause").value = "Pause";
+};
+function onPause()
+{
+    document.getElementById("PlayOrPause").value = " Play ";
+};
+function onStop()
+{
+    document.getElementById("info").innerHTML = "-:--:--/-:--:--";
+    document.getElementById("PlayOrPause").value = " Play ";
+};
+var liveFeedText = new Array("Live", "((Live))", "(( Live ))", "((  Live  ))");
+var liveFeedRoll = 0;
+
+function doUpdate()
+{
+    var vlc = document.getElementById("vlc");
+    if( vlc.playlist.isPlaying )
+    {
+        if( vlc.input.length > 0 )
+        {
+            // seekable stream
+            document.getElementById("info").innerHTML = formatTime(vlc.input.time/1000)+"/"+formatTime(vlc.input.length/1000);
+            document.getElementById("PlayOrPause").Enabled = true;
+        }
+        else {
+            liveFeedRoll = liveFeedRoll & 3;
+            document.getElementById("info").innerText = liveFeedText[liveFeedRoll++];
+        }
+        timerId = setTimeout("doUpdate()", 1000);
+    }
+    else
+    {
+        onStop();
+        timerId = 0;
+    }
+};
+function doGo(targetURL)
+{
+	var opt = new Array();
+	opt.push(":vout-filter=deinterlace");
+	opt.push(":deinterlace-mode=linear");
+	opt.push(":start-time=60");
+	document.getElementById("vlc").playlist.add(targetURL, null, opt);
+};
+function doPlayOrPause()
+{
+    var vlc = document.getElementById("vlc");
+    if( vlc.playlist.isPlaying )
+    {
+        vlc.playlist.pause();
+    }
+    else
+    {
+        vlc.playlist.play();
+    }
+};
+function doPlaySlower()
+{
+    var vlc = document.getElementById("vlc");
+    vlc.input.rate = vlc.input.rate / 2;
+};
+function doPlayFaster()
+{
+    var vlc = document.getElementById("vlc");
+    vlc.input.rate = vlc.input.rate * 2;
+};
+function vlcPlayEvent()
+{
+    if( ! timerId )
+    {
+        timerId = setTimeout("doUpdate()", 1000);
+    }
+    onPlay();
+};
+function vlcPauseEvent()
+{
+    if( timerId )
+    {
+        clearTimeout(timerId)
+        timerId = 0;
+    }
+    onPause();
+};
+function vlcStopEvent()
+{
+    if( timerId )
+    {
+        clearTimeout(timerId)
+        timerId = 0;
+    }
+    onStop();
+};
+//-->
+</SCRIPT>
+</BODY>
+</HTML>

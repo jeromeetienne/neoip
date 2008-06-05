@@ -1,0 +1,35 @@
+/*! \page neoip-kad-testing NeoIP Kademlia Testing
+
+I looked for a way to test the implementation of kademlia for a long time.
+First i created a suitable environement aka known and reproductible
+- i launch a given number of nodes on a LAN
+  - each of thoses nodes as a unique index, e.g. 0 to 300
+  - the first 16-bit of the kademlia nodeid are this unique index
+    - TODO what about the rest.... having no random make it dangerous 
+      - if a node goes powercycle rapidely, the others wont find out it
+        disapears, so the node wont have the proper data when it is 
+        supposed to.
+      - maybe with 16-bit of index + 16-bit of 0 + random ?
+  - thus relaunching several times a node it will always be in the same position
+    in the DHT ring.
+    - so always the same neighbors
+    - so always receives the same records
+- i implemented a way to query the state of a given node:
+  - each node has a http server included which allow to browser its internal state
+  - it is possible to send commands to any other those nodes via shell
+    - some weird command sent via http url
+      - wget -t 1 -O - -o /dev/null "http://127.0.0.1:9080/neoip_lib/kad_server?realm_name=bonjour&cmd=getone&key_name=thisone"
+    - later i will implement xml-rpc
+      - thus the testing could be done in python/php etc...
+      - reusable as a feature later
+    - the commands are all the basic commands like insert/remove/getone/getall
+      and all the core rpc ping/store/findnode/findoneval/findallval/delete
+
+*/
+
+
+
+
+
+
+

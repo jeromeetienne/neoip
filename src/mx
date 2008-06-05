@@ -1,0 +1,10 @@
+# ! /bin/sh
+
+# ask the shell to exit at the first command which fails
+set -e
+
+# copy the command line parameter into more readable variable
+EXE_NAME=$1
+
+# make the program
+./m $EXE_NAME && exec ./x $*

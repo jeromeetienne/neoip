@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=NeoIP Kademlia Daemon
+Comment=Share Files
+Exec=neoip_kad_daemon_gui
+Icon=neoip_kad_daemon.png
+Terminal=false
+Type=Application
+Encoding=UTF-8
+Categories=Network;Application;

@@ -1,0 +1,6 @@
+#!/bin/sh
+# this script uploads the doc/html directory to the sourceforge homepage
+cd ..
+cp src/ChangeLog doc/html
+scp doc/html/* jme@yavipin.sourceforge.net:/home/groups/y/ya/yavipin/htdocs
+

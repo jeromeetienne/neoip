@@ -1,0 +1,203 @@
+# gnutls4win Makefile --- build GnuTLS Windows installer using MinGW and NSIS
+#
+# Copyright (C) 2006, 2007 Free Software Foundation
+#
+# Written by Simon Josefsson
+#
+# This file is part of GNUTLS.
+#
+# GNUTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# GNUTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301, USA
+
+CFGFLAGS= --host=i586-mingw32msvc --build=i686-pc-linux-gnu \
+	--prefix=$(PWD)/inst \
+	--with-gpg-error-prefix=$(PWD)/inst	\
+	--with-libgcrypt-prefix=$(PWD)/inst	\
+	--with-libtasn1-prefix=$(PWD)/inst	\
+	--with-libopencdk-prefix=$(PWD)/inst
+
+LIBGPGERROR_VERSION=1.5
+LIBGPGERROR_SO_VERSION=0
+
+LIBGCRYPT_VERSION=1.3.0
+LIBGCRYPT_SO_VERSION=11
+
+LIBTASN1_VERSION=0.3.9
+LIBTASN1_SO_VERSION=3
+
+OPENCDK_VERSION=0.5.13
+OPENCDK_SO_VERSION=8
+
+GNUTLS_VERSION=1.6.3
+GNUTLS_SO_VERSION=13
+
+all: gnutls-$(GNUTLS_VERSION).exe gnutls-$(GNUTLS_VERSION).exe.sig
+
+clean:
+	rm -rf src build inst
+
+# Libgpg-error
+
+src/libgpg-error-$(LIBGPGERROR_VERSION)/configure: dist/libgpg-error-$(LIBGPGERROR_VERSION).tar.bz2
+	-mkdir src
+	cd src && tar xfj ../dist/libgpg-error-$(LIBGPGERROR_VERSION).tar.bz2
+	touch src/libgpg-error-$(LIBGPGERROR_VERSION)/configure
+
+build/libgpg-error-$(LIBGPGERROR_VERSION)/Makefile: src/libgpg-error-$(LIBGPGERROR_VERSION)/configure
+	rm -rf build/libgpg-error-$(LIBGPGERROR_VERSION)
+	mkdir -p build/libgpg-error-$(LIBGPGERROR_VERSION) && \
+	cd build/libgpg-error-$(LIBGPGERROR_VERSION) && \
+	../../src/libgpg-error-$(LIBGPGERROR_VERSION)/configure $(CFGFLAGS)
+
+inst/bin/libgpg-error-$(LIBGPGERROR_SO_VERSION).dll: build/libgpg-error-$(LIBGPGERROR_VERSION)/Makefile
+	make -C build/libgpg-error-$(LIBGPGERROR_VERSION) install
+
+# make -C build/libgpg-error-$(LIBGPGERROR_VERSION) install check 
+
+libgpg-error: inst/bin/libgpg-error-$(LIBGPGERROR_SO_VERSION).dll
+	touch libgpg-error
+
+clean-libgpg-error:
+	-make -C build/libgpg-error-$(LIBGPGERROR_VERSION) uninstall
+	rm -rf src/libgpg-error-$(LIBGPGERROR_VERSION)
+	rm -rf build/libgpg-error-$(LIBGPGERROR_VERSION)
+
+# Libgcrypt
+
+src/libgcrypt-$(LIBGCRYPT_VERSION)/configure: dist/libgcrypt-$(LIBGCRYPT_VERSION).tar.bz2
+	-mkdir src
+	cd src && tar xfj ../dist/libgcrypt-$(LIBGCRYPT_VERSION).tar.bz2
+	echo "int main (void) { return 77; }" > src/libgcrypt-$(LIBGCRYPT_VERSION)/tests/random.c
+	touch src/libgcrypt-$(LIBGCRYPT_VERSION)/configure
+
+build/libgcrypt-$(LIBGCRYPT_VERSION)/Makefile: src/libgcrypt-$(LIBGCRYPT_VERSION)/configure
+	rm -rf build/libgcrypt-$(LIBGCRYPT_VERSION)
+	mkdir -p build/libgcrypt-$(LIBGCRYPT_VERSION) && \
+	cd build/libgcrypt-$(LIBGCRYPT_VERSION) && \
+	../../src/libgcrypt-$(LIBGCRYPT_VERSION)/configure $(CFGFLAGS) --disable-asm LDFLAGS="-no-undefined"
+	perl -pi -e 's/.run .LTCC/cc/' build/libgcrypt-$(LIBGCRYPT_VERSION)/libtool
+
+inst/bin/libgcrypt-$(LIBGCRYPT_SO_VERSION).dll: build/libgcrypt-$(LIBGCRYPT_VERSION)/Makefile
+	make -C build/libgcrypt-$(LIBGCRYPT_VERSION) install
+
+libgcrypt: inst/bin/libgcrypt-$(LIBGCRYPT_SO_VERSION).dll
+	touch libgcrypt
+
+clean-libgcrypt:
+	-make -C build/libgcrypt-$(LIBGCRYPT_VERSION) uninstall
+	rm -rf src/libgcrypt-$(LIBGCRYPT_VERSION)
+	rm -rf build/libgcrypt-$(LIBGCRYPT_VERSION)
+
+# Libtasn1
+
+src/libtasn1-$(LIBTASN1_VERSION)/configure: dist/libtasn1-$(LIBTASN1_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/libtasn1-$(LIBTASN1_VERSION).tar.gz
+	touch src/libtasn1-$(LIBTASN1_VERSION)/configure
+
+build/libtasn1-$(LIBTASN1_VERSION)/Makefile: src/libtasn1-$(LIBTASN1_VERSION)/configure
+	rm -rf build/libtasn1-$(LIBTASN1_VERSION)
+	mkdir -p build/libtasn1-$(LIBTASN1_VERSION) && \
+	cd build/libtasn1-$(LIBTASN1_VERSION) && \
+	../../src/libtasn1-$(LIBTASN1_VERSION)/configure $(CFGFLAGS)
+	perl -pi -e 's/.run .LTCC/cc/' build/libtasn1-$(LIBTASN1_VERSION)/libtool
+
+inst/bin/libtasn1-$(LIBTASN1_SO_VERSION).dll: build/libtasn1-$(LIBTASN1_VERSION)/Makefile
+	make -C build/libtasn1-$(LIBTASN1_VERSION) install
+
+libtasn1: inst/bin/libtasn1-$(LIBTASN1_SO_VERSION).dll
+	touch libtasn1
+
+clean-libtasn1:
+	-make -C build/libtasn1-$(LIBTASN1_VERSION) uninstall
+	rm -rf src/libtasn1-$(LIBTASN1_VERSION)
+	rm -rf build/libtasn1-$(LIBTASN1_VERSION)
+
+# Opencdk
+
+src/opencdk-$(OPENCDK_VERSION)/configure: dist/opencdk-$(OPENCDK_VERSION).tar.gz
+	-mkdir src
+	cd src && tar xfz ../dist/opencdk-$(OPENCDK_VERSION).tar.gz
+	touch src/opencdk-$(OPENCDK_VERSION)/configure
+
+build/opencdk-$(OPENCDK_VERSION)/Makefile: src/opencdk-$(OPENCDK_VERSION)/configure
+	rm -rf build/opencdk-$(OPENCDK_VERSION)
+	mkdir -p build/opencdk-$(OPENCDK_VERSION) && \
+	cd build/opencdk-$(OPENCDK_VERSION) && \
+	../../src/opencdk-$(OPENCDK_VERSION)/configure $(CFGFLAGS)
+	perl -pi -e 's/.run .LTCC/cc/' build/opencdk-$(OPENCDK_VERSION)/libtool
+
+inst/bin/libopencdk-$(OPENCDK_SO_VERSION).dll: build/opencdk-$(OPENCDK_VERSION)/Makefile
+	make -C build/opencdk-$(OPENCDK_VERSION) install
+
+opencdk: inst/bin/libopencdk-$(OPENCDK_SO_VERSION).dll
+	touch opencdk
+
+clean-opencdk:
+	-make -C build/opencdk-$(OPENCDK_VERSION) uninstall
+	rm -rf src/opencdk-$(OPENCDK_VERSION)
+	rm -rf build/opencdk-$(OPENCDK_VERSION)
+
+# GnuTLS
+
+src/gnutls-$(GNUTLS_VERSION)/configure: dist/gnutls-$(GNUTLS_VERSION).tar.bz2
+	-mkdir src
+	cd src && tar xfj ../dist/gnutls-$(GNUTLS_VERSION).tar.bz2
+	touch src/gnutls-$(GNUTLS_VERSION)/configure
+
+build/gnutls-$(GNUTLS_VERSION)/Makefile: src/gnutls-$(GNUTLS_VERSION)/configure
+	rm -rf build/gnutls-$(GNUTLS_VERSION)
+	mkdir -p build/gnutls-$(GNUTLS_VERSION) && \
+	cd build/gnutls-$(GNUTLS_VERSION) && \
+	../../src/gnutls-$(GNUTLS_VERSION)/configure $(CFGFLAGS) --disable-cxx
+	perl -pi -e 's/.run .LTCC/cc/' build/gnutls-$(GNUTLS_VERSION)/libtool
+
+inst/bin/libgnutls-$(GNUTLS_SO_VERSION).dll: build/gnutls-$(GNUTLS_VERSION)/Makefile
+	make -C build/gnutls-$(GNUTLS_VERSION) install
+
+gnutls: inst/bin/libgnutls-$(GNUTLS_SO_VERSION).dll
+	touch gnutls
+
+clean-gnutls:
+	-make -C build/gnutls-$(GNUTLS_VERSION) uninstall
+	rm -rf src/gnutls-$(GNUTLS_VERSION)
+	rm -rf build/gnutls-$(GNUTLS_VERSION)
+
+# Installer
+
+gnutls-$(GNUTLS_VERSION).exe: libgpg-error libgcrypt libtasn1 opencdk gnutls gnutls.nsi
+	makensis \
+		-DLIBTASN1_VERSION=$(LIBTASN1_VERSION) \
+		-DLIBTASN1_SO_VERSION=$(LIBTASN1_SO_VERSION) \
+		-DOPENCDK_VERSION=$(OPENCDK_VERSION) \
+		-DOPENCDK_SO_VERSION=$(OPENCDK_SO_VERSION) \
+		-DLIBGPGERROR_VERSION=$(LIBGPGERROR_VERSION) \
+		-DLIBGPGERROR_SO_VERSION=$(LIBGPGERROR_SO_VERSION) \
+		-DLIBGCRYPT_VERSION=$(LIBGCRYPT_VERSION) \
+		-DLIBGCRYPT_SO_VERSION=$(LIBGCRYPT_SO_VERSION) \
+		-DGNUTLS_VERSION=$(GNUTLS_VERSION) \
+		-DGNUTLS_SO_VERSION=$(GNUTLS_SO_VERSION) \
+		gnutls.nsi
+	chmod +x gnutls-$(GNUTLS_VERSION).exe
+
+gnutls-$(GNUTLS_VERSION).exe.sig: gnutls-$(GNUTLS_VERSION).exe
+	rm -f gnutls-$(GNUTLS_VERSION).exe.sig
+	gpg -b gnutls-$(GNUTLS_VERSION).exe
+
+# Cruft
+
+README.html: README Makefile
+	-asciidoc --attribute icons --attribute iconsdir=../graphics --attribute imagesdir=../graphics README
+	cvs commit -m Auto-update. README.html

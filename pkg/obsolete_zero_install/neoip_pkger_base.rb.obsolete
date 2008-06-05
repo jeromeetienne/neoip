@@ -1,0 +1,483 @@
+#! /usr/bin/ruby
+# this tools is made to help the automatization of building packages
+# under win32_nsisinstall and linux_zeroinstall.
+# - TODO to doc more
+# - TODO to put logging to provide info - important in case of faillure
+# - currently there is the basic to support nsis too
+#   - but clearly not complete
+# - TODO the .desktop/.init.d are hardcoded in each apps pkg_extrsc
+#   - but all the .desktop are the same.... should i get a template ?
+# - TODO all the 0install stuff is now obsoleted by the epm stuff
+#   - remove it all when the epm stuff is known to work
+# - TODO parse the description from the neoip_oload_info.hpp
+# - TODO sort out this canon_apps mess
+#   - some stuff got '-' other got '_' why is that ?
+#   - executable got '-' by tradition
+#   - why do i need a '_' ?
+#     - seems like an error from the past... try with canon_name with '-'
+#     - remove canon_name and use only apps_name 
+
+
+require "fileutils"
+
+# TODO some sanity check on the current directory
+# yaviping/pkg_nsisinstall
+
+# determine all the possible pkg_type
+pkg_type_supported = ['nsis_install', 'zero_install', 'epm_install']
+
+################################################################################
+# Build a standalone directory for the application 
+################################################################################
+def mainsrc_dir()
+	return "../src";
+end
+
+def get_build_target(pkg_type)
+	if pkg_type == "zero_install"
+		return "linux";
+	elsif pkg_type == "epm_install"
+		return "linux"
+	elsif pkg_type == "nsis_install"
+		return "win32";
+	end
+	throw "should never happen"
+end
+
+# TODO here there is an nameing issue
+# - build dir is the directory in which the executable are compile
+# - but this script use build_dir for the directory which package file at put
+#   - find a better name of the pkg_tmpdir
+# - TODO unify all this
+#   - possible solution:
+#   - SRC_DIR = the path with the source in it
+#   - BUILD_DIR = the path with the execuratble
+#   - PKGTMP_DIR= the path where the package is built
+def get_exec_dir(pkg_type)
+	return "../build_#{get_build_target(pkg_type)}";
+end
+
+def cfgdir_sample()
+	return "#{mainsrc_dir}/config_dir_sample";
+end
+
+def get_build_dir(apps_name)
+	return "#{apps_name}.build_dir";
+end
+
+def get_apps_suffix(apps_name)
+	# sanity check - check if the apps_name starts with "neoip-"
+	throw "invalid apps_name #{apps_name}" unless apps_name[0..5] == "neoip-"
+	# return the apps_name without the preffix
+	return apps_name[6.. -1]
+end
+
+def get_canon_name(apps_name)
+	return apps_name.gsub(/-/,'_')
+end
+
+def get_apps_type(apps_name)
+	canon_name	= get_canon_name(apps_name)
+	apps_type	= `grep -e '^#define.*APPS_TYPE' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info.hpp | cut -d'"' -f 2 | head -c -1`
+	return	apps_type
+end
+
+# it is taken from the #{apps_name}_info.hpp in the src and from the #{apps_name}_main.o
+# compile time
+def get_apps_version(pkg_type, apps_name)
+	canon_name	= get_canon_name(apps_name)
+	apps_version	= `grep -e '^#define.*APPS_VERSION' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info.hpp | cut -d'"' -f 2 | head -c -1`
+	apps_compiletime= File.stat("#{get_exec_dir(pkg_type)}/apps/#{canon_name}/#{canon_name}_main.o").mtime
+	return apps_version + "-" + apps_compiletime.strftime("%Y%m%d%H%M")
+end
+
+def get_apps_summary(apps_name)
+	canon_name	= get_canon_name(apps_name)
+	apps_summary	= `grep -e '^#define.*APPS_SUMMARY' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info.hpp | cut -d'"' -f 2 | head -c -1`
+	return apps_summary
+end
+
+def get_apps_description(apps_name)
+	# TODO need to parse the suitable _info.hpp
+	return "mega long description of #{apps_name}"
+end
+
+################################################################################
+# Build a standalone directory for the application 
+# - TODO split this function into one per pkg_type, to comply to the regularity rule
+#   - make the common part in a apps_mkdir_common
+################################################################################
+def apps_mkdir(pkg_type, apps_name)
+	# log the event
+	puts "mkdir #{apps_name} for #{pkg_type}"
+
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	canon_name	= get_canon_name(apps_name)
+	exec_dir	= get_exec_dir(pkg_type)
+	build_target	= get_build_target(pkg_type)
+	# make the apps_basedir
+	FileUtils.mkdir "#{build_dir}"
+
+	# make the config_dir_sample 
+	FileUtils.mkdir "#{build_dir}/config_dir_sample"
+
+	# copy all basename of in the config_dir_sample
+	dir	= Dir.open("#{cfgdir_sample}");
+	dir.each do |basename|
+		# if this basename is a directory, skip it
+		next unless not File.stat("#{cfgdir_sample}/#{basename}").directory?
+		# do a symlink of the basename
+		FileUtils.cp_r "#{cfgdir_sample}/#{basename}", "#{build_dir}/config_dir_sample"
+	end
+
+	# copy the config directory specific to this apps
+	apps_suffix	= get_apps_suffix(apps_name)
+	if FileTest.exist?("#{cfgdir_sample}/#{apps_suffix}")
+		FileUtils.cp_r "#{cfgdir_sample}/#{apps_suffix}", "#{build_dir}/config_dir_sample"	
+	end
+
+	# copy the executable and strip it
+	if build_target == "linux"
+		FileUtils.cp "#{exec_dir}/#{apps_name}-bin-static", "#{build_dir}"
+		# TODO disable stripping for now
+		#system("strip #{build_dir}/#{apps_name}-bin-static")
+		FileUtils.ln_s("config_dir_sample/neoip_apps_ctrl.sh", "#{build_dir}/#{apps_name}")
+		# copy the extrsc directory if it exist
+		if FileTest.exist?("#{mainsrc_dir}/apps/#{canon_name}/pkg_extrsc")
+			FileUtils.cp_r("#{mainsrc_dir}/apps/#{canon_name}/pkg_extrsc", "#{build_dir}")	
+		end
+	elsif build_target == "win32"
+		FileUtils.cp "#{exec_dir}/#{apps_name}-bin-static.exe", "#{build_dir}"
+		system("i586-mingw32msvc-strip #{build_dir}/#{apps_name}-bin-static.exe")
+		# NOTE: for whatever reason im unable to link those lib statically
+		FileUtils.ln_s("/home/samba_share/libglib-2.0-0.dll"	, "#{build_dir}")
+		FileUtils.ln_s("/home/samba_share/libiconv-2.dll"	, "#{build_dir}")
+		FileUtils.ln_s("/home/samba_share/libintl-3.dll"	, "#{build_dir}")	
+	end
+end
+
+
+
+################################################################################
+# Remove a standalone directory for the application 
+################################################################################
+def apps_rmdir(pkg_type, apps_name)
+	# log the event
+	puts "rmdir #{apps_name} for #{pkg_type}"
+
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+
+	# remove all the remaining directory
+	# - NOTE: play funky with the path to reduce the risk to do rm_rf on wrong dir
+	FileUtils.rm_rf "../../yavipin/pkg/#{build_dir}"
+end
+
+################################################################################
+# Build the package - assume the standalone directory is already built
+################################################################################
+def apps_mkpkg(pkg_type, apps_name)
+	# log the event
+	puts "mkpkg #{apps_name} for #{pkg_type}"
+	# forward to pkg_type-specific function
+	send("apps_mkpkg_#{pkg_type}", apps_name)
+end
+
+def apps_rmpkg(pkg_type, apps_name)
+	# log the event
+	puts "rmpkg #{apps_name} for #{pkg_type}"
+	# forward to pkg_type-specific function
+	send("apps_rmpkg_#{pkg_type}", apps_name)
+end
+
+################################################################################
+# mkpkg/rmpkg for zero_install - assume the standalone directory is already built
+################################################################################
+
+# mkpkg for zero_install
+def apps_mkpkg_zero_install(apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	# get the data specific to this apps_name
+	apps_version	= get_apps_version('zero_install', apps_name)
+	apps_summary	= get_apps_summary(apps_name)
+	apps_description= get_apps_description(apps_name)
+
+	if true
+		# build the .tgz for the standalone dir
+		archive_name	= "#{build_dir}.tgz"
+		system("tar czf #{archive_name} #{build_dir}/")
+		archive_mime	= "application/x-compressed-tar"
+	else
+		# NOTE: this one is much smaller. 0.7 for a .tgz at 1
+		# - issue on edgy. no 'unlzma' tool. only a lzma
+		#   - may be worked around by doing a script where "unlzma -d"
+		#     become a "exec lzma d -si -so"
+		# build the .tgz for the standalone dir
+		archive_name	= "#{build_dir}.tar.lzma"
+		system("tar c #{build_dir} | lzma > #{archive_name}")
+		archive_mime	= "application/x-lzma-compressed-tar"
+	end
+
+	# get the archive size
+	archive_size	= File.size("#{archive_name}")
+
+	# get the manifest from the build_dir
+	apps_manifest	= `0store manifest #{build_dir}/ sha1new | tail -1`
+	apps_manifest.gsub!(/\n/, '')
+
+	# read the template
+	intf_file	= File.open("template_zero_install.xml").read
+	intf_file.gsub!(/@APPS_NAME@/		, "#{apps_name}");
+	intf_file.gsub!(/@APPS_SUMMARY@/	, "#{apps_summary}");
+	intf_file.gsub!(/@APPS_VERSION@/	, "#{apps_version}");
+	intf_file.gsub!(/@APPS_MANIFEST@/	, "#{apps_manifest}");
+	intf_file.gsub!(/@APPS_DESCRIPTION@/	, "#{apps_description}");
+	intf_file.gsub!(/@APPS_BUILD_DIR@/	, "#{build_dir}");
+	intf_file.gsub!(/@ARCHIVE_SIZE@/	, "#{archive_size}");
+	intf_file.gsub!(/@ARCHIVE_MIME@/	, "#{archive_mime}");
+	intf_file.gsub!(/@ARCHIVE_NAME@/	, "#{archive_name}");
+	# write the result to the .xml file
+	File.open("#{apps_name}.xml", "w") { |fOut| fOut << intf_file }
+	
+	# sign the resulting file
+	# - NOTE: assume that the gpg key has no passphrase and thus dont prompt the user
+	#   - good as it is fully automatic
+	#   - bad as it is quite insecure :)
+	system("0publish -x #{apps_name}.xml")
+
+	# 0publish remove the read permission for other. but we need it to serve it via http
+	system("chmod a+r #{apps_name}.xml")
+end
+
+# mkpkg for zero_install
+def apps_rmpkg_zero_install(apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+
+	# remove the .tgz
+	FileUtils.rm_f "#{build_dir}.tgz"
+	# remove the zero_install interface file
+	FileUtils.rm_f "#{apps_name}.xml"
+end
+
+################################################################################
+# mkpkg/rmpkg for epm_install - assume the standalone directory is already built
+################################################################################
+
+# mkpkg for epm_install
+def apps_mkpkg_epm_install(apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	# get the data specific to this apps_name
+	apps_version	= get_apps_version('epm_install', apps_name)
+	apps_summary	= get_apps_summary(apps_name)
+	apps_description= get_apps_description(apps_name)
+	apps_type	= get_apps_type(apps_name)
+	
+	# get external rescources
+	all_manpage	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.[0-9]$/.match(x) }
+	all_desktop	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.desktop$/.match(x) }
+	all_initd	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.init.d$/.match(x) }
+
+# TODO
+# - handle the libnss for neoip-router
+#   - a separate package ?
+#   - yep i have done a distinct libnss_neoip package
+#     - need a kluge to make neoip-router to require it ?
+# - handle the preinst/postinst script for installer
+#   - in preinst in case of _BOOT and already installed (aka neoip-oload-ctrl present), stop them
+#   - should i start after install ? hmm not sure
+
+	# write the result to the .epm_list file
+	File.open("#{apps_name}.epm_list", "w") { |fOut|
+		fOut.puts("%product #{apps_name} - #{apps_summary}")
+		fOut.puts("%copyright 2007")
+		fOut.puts("%vendor NeoIP")
+		fOut.puts("%version #{apps_version}")
+		fOut.puts("%readme \"Read http://off.net/~jme\" ")
+		fOut.puts("%license \"http://donotusethissoft.ever\"")
+		
+		
+		
+		fOut.puts("")
+		fOut.puts(`mkepmlist -u root -g root --prefix /etc/#{apps_name} #{build_dir}/config_dir_sample`)
+		
+		# if appt_type == *_BOOT
+		# - make the binary exec in ${apps_name}-bin
+		# - add a ctrl scrip in ${apps_name}-ctrl
+		# else (aka if apps_type == *_TEMP)
+		# - make the binary exec in #{apps_name}
+		if apps_type =~ /.*_BOOT/
+			fOut.puts("f 755 root root /usr/bin/#{apps_name}-bin #{build_dir}/#{apps_name}-bin-static")
+			fOut.puts("f 755 root root /usr/bin/#{apps_name}-ctrl #{build_dir}/config_dir_sample/neoip_apps_ctrl2.sh")
+		else
+			fOut.puts("f 755 root root /usr/bin/#{apps_name} #{build_dir}/#{apps_name}-bin-static")
+		end
+		
+		# add all the manpage
+		all_manpage.each { |src_file|
+			dst_dirname	= "/usr/local/man/man#{src_file[-1..-1]}"
+			fOut.puts("f 755 root root #{dst_dirname}/#{src_file} #{build_dir}/pkg_extrsc/#{src_file}")
+		}
+
+		# add all the desktop
+		all_desktop.each { |src_file|
+			dst_dirname	= "/usr/share/autostart"
+			fOut.puts("f 644 root root #{dst_dirname}/#{src_file} #{build_dir}/pkg_extrsc/#{src_file}")
+		}
+
+		# add all the initd
+		all_initd.each { |src_file|
+			dst_file	= "/etc/init.d/#{src_file.gsub(/(.*)\.init.d$/, '\1')}"
+			fOut.puts("f 644 root root #{dst_file} #{build_dir}/pkg_extrsc/#{src_file}")
+		}
+	}
+		
+	# build the package itself
+	puts ("Doing 'sudo epm' to build the epm_package. if it asks for a password, give sudo password.")
+	system("sudo epm -n --output-dir . -f deb #{apps_name} #{apps_name}.epm_list")
+
+	# epm put '-' between name/version, and version/arch
+	# just rename it the usual debian way
+	system("mv #{apps_name}-#{apps_version}.deb #{apps_name}_#{apps_version}_i386.deb")
+	
+	# remove the configuration file
+	#FileUtils.rm_f "#{apps_name}.epm_list"
+end
+
+# mkpkg for epm_install
+def apps_rmpkg_epm_install(apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	# get the data specific to this apps_name
+	apps_version	= get_apps_version('epm_install', apps_name)
+	
+	# remove the package
+	FileUtils.rm_f "#{apps_name}_#{apps_version}_i386.deb"
+end
+
+################################################################################
+# mkpkg/rmpkg for nsis_install - assume the standalone directory is already built
+################################################################################
+
+# mkpkg for nsis_install
+def apps_mkpkg_nsis_install(apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	# get the data specific to this apps_name
+	apps_version	= get_apps_version('nsis_install', apps_name)
+	
+	# read the template
+	# - TODO i should improve the template to get more flexible
+	#   - especially the version which is completly hidden
+	#   - neoip-oload-0.0.1.exe ?
+	intf_file	= File.open("template_nsis_install.nsi").read
+	intf_file.gsub!(/@APPS_NAME@/		, "#{apps_name}");
+	intf_file.gsub!(/@APPS_VERSION@/	, "#{apps_version}");
+	# write the result to the .xml file
+	File.open("#{apps_name}.nsi", "w") { |fOut| fOut << intf_file }
+
+	# make the package itself now
+	system("makensis #{apps_name}.nsi")
+end
+
+# mkpkg for nsis_install
+def apps_rmpkg_nsis_install(apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	# get the data specific to this apps_name
+	apps_version	= get_apps_version('nsis_install', apps_name)
+	
+	# remove the installer .exe
+	FileUtils.rm_f "#{apps_name}-#{apps_version}.exe"
+	# remove the nsis configuration file
+	FileUtils.rm_f "#{apps_name}.nsi"
+end
+
+################################################################################
+# upload the package - assume the package has been built
+################################################################################
+
+def apps_upload(pkg_type, apps_name)
+	# log the event
+	puts "upload #{apps_name} for #{pkg_type}"
+	# forward to pkg_type-specific function
+	send("apps_upload_#{pkg_type}", apps_name)
+end
+
+# upload for zero_install
+def apps_upload_zero_install(apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	# upload to jmehost2
+	system("scp #{apps_name}.xml #{build_dir}.tgz jmehost2:public_html/0install")
+end
+
+# upload for nsis_install
+def apps_upload_nsis_install(apps_name)
+	# upload to jmehost2
+	system("scp #{apps_name}-installer.exe jmehost2:public_html/0install")
+end
+
+################################################################################
+################################################################################
+# Program itself
+################################################################################
+################################################################################
+
+# if the number of argument is not 3, display an inline help and return an error
+if ARGV.length < 3
+        puts "ERROR: Invalid number of parameters"
+	puts "Usage: builder_op.rb pkg_type apps_name build_op [build_op]+"
+	exit 1
+end
+
+
+# get the parameter from the command line
+pkg_type	= ARGV[0]
+apps_name	= ARGV[1]
+
+
+puts "**************** #{get_apps_type(apps_name)}"
+puts "**************** #{get_apps_summary(apps_name)}"
+puts "**************** #{get_apps_version(pkg_type, apps_name)}"
+
+# sanity check on the parameter pkg_type
+if pkg_type_supported.include?(pkg_type) == false
+        puts "ERROR: pkg_type '#{pkg_type}' is invalid. only [#{pkg_type_supported.join('|')}] are valid"
+	exit 1
+end
+
+# sanity check on the parameter apps_name
+if apps_name[0..5] != "neoip-"
+        puts "ERROR: apps_name '#{apps_name}' is invalid. all apps_name MUST start with 'neoip-'"
+	exit 1
+end
+
+# loop over all the build_op at the end of the command line parameter
+for curr_arg in (2..ARGV.length-1)
+	# get the build_op
+	
+	build_op	= ARGV[curr_arg]
+	
+	# sanity check on the parameter build_op
+	if( build_op != "mkdir" and build_op != "rmdir" and build_op != "mkpkg" and build_op != "rmpkg" and build_op != "upload")
+	        puts "ERROR: build_op '#{build_op}' is invalid. only 'mkdir', 'rmdir', 'mkpkg', 'rmpkg' and 'upload'  are valid."
+		exit 1
+	end
+
+	# call the various function depending on the build_op
+	if build_op == "mkdir"
+		apps_mkdir( pkg_type, apps_name )
+	elsif build_op == "rmdir"
+		apps_rmdir( pkg_type, apps_name )
+	elsif build_op == "mkpkg"
+		apps_mkpkg( pkg_type, apps_name )
+	elsif build_op == "rmpkg"
+		apps_rmpkg( pkg_type, apps_name )
+	elsif build_op == "upload"
+		apps_upload( pkg_type, apps_name )
+	end
+end

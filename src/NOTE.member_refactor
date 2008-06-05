@@ -1,0 +1,29 @@
+Note about the new member service:
+----------------------------------
+- Role:
+  o member: peer which belong to a given group
+    + leader member: which maintain the membership of the whole group
+    + simple member: which maintain only its own membership
+  o non-member: peer which doesnt belong to the group but query its membership
+- member_join/leave(group, memberid)
+  o leader election via publishget
+  o leader feed the member_list
+- member_query(group, criteria)
+  o for any role: member or non-member
+  o if the peer is simple member, the query is made over the member connection and feed the member_list
+  o if the peer is non-member, a connection is established toward the leader and the query made over it
+    + this connection has a idle timeout
+  o if the peer is leader member, there is no query sent
+- member_list(group):
+  o which cache the previous result obtained by the query
+  o how to scan the list if still unclear, i will see on experience
+    * likely the use of a member_neglist to list the one i tried to connect unsuccessfully
+----------------------------------
+- there is a membership struct which contains info about a single member
+  o info: network coordinate, uptime, peerid, rdvpt?
+    * the rdvpt may be obtained thru ns, but it would increase the latency and load the ns
+  o there is a packet format for it
+- there is a packet for the query and for its reply
+  o payl_member_list
+  o payl_member
+  o similar to otsp_addr_list

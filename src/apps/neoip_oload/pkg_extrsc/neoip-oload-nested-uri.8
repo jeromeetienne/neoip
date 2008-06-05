@@ -1,0 +1,132 @@
+.\" -*- nroff -*-
+.TH NEOIP_OLOAD_NESTED_URI 8 "Dec 2006" "neoip-oload nested uri(1)" "neoip-oload nested uri's Manual"
+.SH NAME
+neoip-oload's nested uri - the http uri which are used to download thru neoip-oload
+.SH DESCRIPTION
+TODO write a better description.
+currently this page is a stub. improve it when needed. It is mainly done to centralize
+all the possible options of the nested uri for neoip-oload.
+
+explain the mod raw/flv
+mod flv only to get the funky range request for seeking in flv from flash plugin
+
+.SH list of valid metavar in the inner uri
+Sometimes this is required to modify the variables of the inner_uri. Those variables
+will be recognized by neoip-apps and removed before using the uri toward the actual 
+servers. They can be used for the inner_uri itself or for the dupuri outter variables.
+Those variables have very specific names, especially designed to avoid conflict with 
+actual variables. All those variables will be prefixed by "neoip_metavar_"
+.TP
+.I "http_mod_type type"
+Determine the type of range-request which gonna be performed on this uri. The valid
+values are "raw" or "flv". If unspecified, it is considered equal to "raw".
+"raw" causes normal range-request (e.g. http range-request for http).
+"flv" causes is valid only for http uri and cause to do range-request according to 
+the usual "?pos=" trick for flv seeking.
+.TP
+.I "http_mod_flv_varname name"
+This is valid IIF "http_mod_type" variable is set to "flv".
+It specify the variable name which gonna be used for specifying the begining 
+of the range.
+.TP
+.I "http_useragent_mimic value"
+It specify the useragent to use/mimic when doing a http request.
+If "value" is one of the predefined alias, it is replaced by the value of the alias
+else the "value" is used directly.
+TODO The alias stuff is not figured out, so there is only one which matchs "firefox" 
+with "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)"
+this is totally arbitrary.
+.TP
+.I "oload_flv_rangereq_beg size"
+This is valid IIF neoip-oload mod is "flv".
+TODO to doc. see noeip_oload_mod_flv.cpp for details
+.TP
+.I "oload_flv_rangereq_end size"
+This is valid IIF neoip-oload mod is "flv".
+TODO to doc. see noeip_oload_mod_flv.cpp for details
+
+
+.SH list of valid outter_var
+.TP
+.I "httpo_maxrate size"
+Determine the maximum rate at which the data will be delivered.
+This option is optional and default to unlimited.
+.TP
+.I "httpo_maxrate_thres size"
+Determine after which size the httpo_maxrate gonna becomes effective.
+This option is optional and default to 10 times httpo_maxrate. 
+This option is valid iif httpo_maxrate is explicitly speficied.
+.TP
+.I "httpo_full_id youridentificationstring"
+It is used to 'uniquely' identify this http connections. This is used by function
+like the neoip_oload_httpo_ctrl_xmlrpc.cgi xmlrpc to control the http connection
+during its lifetime.
+TODO: issue this id should be unique in neoip-oload, and this is the client which 
+choose it.... 
+.TP
+.I "httpo_content_attach bool"
+Determine if the http reply header for this httpo_full must contain 
+a "Content-Disposition: attachment" or not. if default to false.
+.TP
+.I "read_ahead size"
+Determine how much data neoip-oload will try to read ahead of the current httpo position.
+.TP
+.I "static_filelen size"
+Determine specify the length of the file. This is used IIF the link_type is "static".
+It allows not to have to determine it automatically (aka to ask the outter_uri server
+about it). It should be noted that as a consequence it wont check if the server actually
+allow http range-request.
+For the outter_uri server, it reduces the burden by avoiding one connection by 
+neoip-oload users.
+For the users, it slightly improve the initialization latency by avoiding a connection
+before starting.
+For the users, it allows to download even if the outter_uri server is unreachable.
+.TP
+.I "http_peersrc_uri uri"
+Determine the http_peersrc_uri to use if none is already provided. e.g. if the outter_uri points
+to a torrent, it will likely contains a http_peersrc_uri. but if the outter_uri points to a 
+static_http, it wont contains a http_peersrc_uri. 
+it should be noted that the uri should be encoded in base64 with url-safe alphabet.
+.TP
+.I "piecelen size"
+Determine the length of the pieces to use, if not already provided by the
+outter_uri (e.g. in a .torrent). Usefull in case of a static http for example.
+.TP
+.I "do_jamrc4 boolean"
+Determine if the swarm created for this uri should do jamrc4 or not. If not 
+explicitly specified, it default to true;
+.TP
+.I "link_type type"
+Determine the type of the outter_uri. Usefull when guessing is impossible.
+TODO explain how it is guessed. give all possible values.
+.TP
+.I "subfile_level level"
+Usefull to select a given file when the outter_uri is a multi file mfile.
+TODO explain what is this level, how to put the subfile_path inside the nested_uri
+.TP
+.I "subfile_byteoffset value"
+The value is the begining of the range request. Part of the flv range-request trick.
+TODO write better documentation.
+TODO change this by a uri_rangereq_beg/uri_rangereq_end
+.TP
+.I "dupuri uri"
+Determine a duplicate uri available for the selected file of the outter_uri. It
+is possible to provide several dupuri in a given nested_uri. 
+it should be noted that the uri should be encoded in base64 with url-safe alphabet.
+
+
+.SH EXAMPLES
+TODO write example
+
+.SH LICENSE
+The license is proprietary and this programm should be used for testing purpose only
+
+.SH AUTHOR
+.B neoip-oload
+has been written by Jerome Etienne <jme@off.net>
+
+NeoIP's homepage is http://off.net/~jme/neoip
+
+.SH BUGS
+If you find bugs, email me.
+Note that the metalink support is experimental.

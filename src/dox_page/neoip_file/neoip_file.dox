@@ -1,0 +1,9 @@
+/*! \page neoip-file NeoIP-File
+
+\section cmp Comparison with current ways to exchange files
+- no access control
+- no upload/backup/mirror
+- may not have index
+- may not have NAT traversal
+
+*/

@@ -1,0 +1,62 @@
+%{!?_dist: %{expand: %%define dist fc2}}
+
+#
+# Preamble
+#
+Summary: Stuff which does stuff
+Name: 	 neoip_kad_daemon
+Version: 007
+Release: %{dist}
+License: Proprietary
+Source: neoip_kad_daemon.tgz
+Group: 	Applications/Internet
+URL: 	http://off.net/~jme/neoip
+
+%description
+stuff whic does stuff but good ones
+
+%prep
+rm -rf $RPM_BUILD_DIR/neoip_kad_daemon
+zcat $RPM_SOURCE_DIR/neoip_kad_daemon.tgz | tar -xvf -
+
+%build
+make -C yavipin/src -f Makefile.static all
+
+%install
+make -C yavipin/src -f Makefile.static install_kad_daemon
+
+%clean
+make -C yavipin/src -f Makefile.static uninstall_kad_daemon
+
+%files
+/usr/lib/neoip_kad_daemon/neoip_kad_daemon-bin
+/usr/lib/neoip_kad_daemon/neoip_kad_daemon_configurator.sh
+/usr/bin/neoip_kad_daemon
+/usr/bin/neoip_kad_daemon_tui
+/usr/bin/neoip_kad_daemon_gui
+/etc/init.d/neoip_kad_daemon
+/usr/man/man8/neoip_kad_daemon.8
+/etc/neoip_kad_daemon/neoip_lib.ini
+/etc/neoip_kad_daemon/neoip_lib_default.ini
+/etc/neoip_kad_daemon/neoip_kad_daemon.ini
+/etc/neoip_kad_daemon/neoip_kad_daemon_default.ini
+/etc/neoip_kad_daemon/root_ca_cert.pem
+/etc/neoip_kad_daemon/neoip.ico
+/usr/share/applications/neoip_kad_daemon.desktop
+/usr/share/pixmaps/neoip_kad_daemon.png
+
+%post
+/sbin/chkconfig --add neoip_kad_daemon
+# to start the service just after the install
+#service neoip_kad_daemon start
+                                                                                
+%preun
+if [ $1 = 0 ]; then
+		service neoip_kad_daemon stop
+        /sbin/chkconfig --del neoip_kad_daemon
+fi
+
+
+%changelog
+* Wed Feb 09 2004 jme
+- initial rpm release

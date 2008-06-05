@@ -1,0 +1,133 @@
+/*! \page socket-swlayer NeoIP Socket Software Layers
+
+\section bloublou layers
+- find the ordered of those layers
+- determine the parameters used for those layers
+- determine the type of data they have up and down
+- stuff to handle
+  - nagle
+  - liveness
+
+\subsection list-of-layers list of layers
+- The security layer
+  - see \ref neoip-socket-secu
+  - able to work on top of unreliable datagram and reliable datagram
+  - needs to know if the lower layer is reliable or not
+  - upper layer data = datagram
+  - lower layer data = datagram
+- The layer to compress data thru the \ref neoip-socket
+  - see \ref neoip-socket-comp
+  - upper layer data = datagram
+  - lower layer data = datagram
+- the fragmentation/reassembly layer
+  - see \ref neoip-socket-reasm
+- The packet scrambler packet
+  - ability to modify, discard, delay packets
+  - usefull for debuging
+  - upper layer data = datagram
+  - lower layer data = datagram
+- The congestion layer
+  - upper layer data = datagram for \ref neoip-socket-type-rdm, \ref neoip-socket-type-seqpacket
+    and bytestream for \ref neoip-socket-type-stream
+  - lower layer data = datagram
+  - to handle \ref neoip-socket-type-rdm, \ref neoip-socket-type-seqpacket
+    or \ref neoip-socket-type-stream when the outter transport is DGRAM
+- the nat traversal layer
+  - used only in \ref neoip-socket-omni
+- the liveness layer
+  - upper layer data = datagram
+  - lower layer data = datagram
+  - needs to know if the lower layer is reliable or not
+ 
+\section socket-swlayer-existing-examples Existing Examples
+This aims to help understand how the multiple layers related with each other
+and especially their respective order.
+
+It is a first shoot at it
+
+\subsection socket-swlayer-existing-tls TLS features
+\par Provided Features
+- \b Feature compressed secured reliable bytestream
+- this includes TLS, SSL and SSH as they all provides the same features
+- nat traversal isnt provided
+
+\par emulation if the outter transport is a ordered reliable bytestream
+  -# top API
+     - upper = bytestream
+     - lower = bytestream
+  -# packetisation
+     - upper = bytestream
+     - lower = datagram
+  -# compression
+     - upper = datagram
+     - lower = datagram
+  -# security
+     - upper = datagram
+     - lower = datagram
+  -# reliable bytestream (e.g. a tcp connection)
+
+\par emulation if the outter transport is an unordered unreliable datagram
+  -# top API
+     - upper = bytestream
+     - lower = bytestream
+  -# packetisation
+     - upper = bytestream
+     - lower = datagram
+  -# ordered reliable bytestream
+     - upper = datagram
+     - lower = datagram
+  -# compression
+     - upper = datagram
+     - lower = datagram
+  -# security
+     - upper = datagram
+     - lower = datagram
+  -# unordered unreliable datagram (e.g. a udp connection)
+
+
+\subsection socket-swlayer-existing-ipsec IPSec features
+\par Provided Features
+- \b Feature compressed secured unordered unreliable datagram
+
+\par emulation if the outter transport is a ordered reliable bytestream
+  -# top API
+     - upper = datagram
+     - lower = datagram
+
+\par emulation if the outter transport is an unordered unreliable datagram
+  -# top API
+     - upper = datagram
+     - lower = datagram
+
+\subsection socket-swlayer-existing-tcp TCP features
+\par Provided Features
+- \b Feature uncompressed unsecured ordered reliable bytestream
+
+\par emulation if the outter transport is a ordered reliable bytestream
+  -# top API
+     - upper = bytestream
+     - lower = bytestream
+
+\par emulation if the outter transport is an unordered unreliable datagram
+  -# top API
+     - upper = bytestream
+     - lower = bytestream
+
+\subsection socket-swlayer-existing-udp UDP features
+\par Provided Features
+- \b Feature uncompressed unsecured unordered unreliable datagram
+- no nat traversal or liveness
+
+\par emulation if the outter transport is a ordered reliable bytestream
+  -# top API
+     - upper = datagram
+     - lower = datagram
+  -# reliable bytestream (e.g. a tcp connection)
+
+\par emulation if the outter transport is an unordered unreliable datagram
+  -# top API
+     - upper = datagram
+     - lower = datagram
+  -# unordered unreliable datagram (e.g. a udp connection)
+
+*/

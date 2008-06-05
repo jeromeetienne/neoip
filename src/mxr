@@ -1,0 +1,11 @@
+# ! /bin/sh
+
+#EXE_NAME=neoip_nunitapps
+EXE_NAME=neoip_routerd
+#EXE_NAME=neoip_buddy
+#EXE_NAME=neoip_kad_daemon
+
+#CONFIG_DIR=conf_netcat1/
+CONFIG_DIR=conf_router_resp/
+
+exec ./mx $EXE_NAME -c $CONFIG_DIR $*

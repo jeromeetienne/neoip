@@ -1,0 +1,61 @@
+/*!\page ns-bootstrapping NS Bootstrapping
+
+\section Description
+Bootstrapping is the mechanism used to find the first peers in a network. The 
+current techniques are :
+-# The local peer maintains a cache of previous peers from this network and the 
+   next time it tries to connect the network, it attempts to connect old peers
+   until one answer.
+-# to have one or more servers which run without interruption and keep the same
+   network address.
+
+\subsection bootstrap-tech-cmp Pro/Con of each techniques
+Each of techniques has its own advantage/disadvantages:
+- the cache of previous peers assumption has trouble because:
+  -# \b CON: It is based on the assumption that those previous peers are still part of
+     the network and still have the same network address (on the internet, it is IP address and port).
+     But on the current internet, a very large number of IP address are dynamically
+     allocated, hence may change with time.
+  -# \b CON: peers, belonguing to p2p network, have typically a high \ref churn-rate. So
+     a previous peer may very well be offline when a peer is trying to join the network.
+  -# \b CON: those 2 facts implies that many connections will likely be attempted before
+     one succeed, producing a slow startup while connecting the network.
+  -# \b PRO: it is easy to create new networks
+- To have fixed server running all the time has trouble because:   
+  -# \b CON: running such server require an organisation to maintain it, so limit the
+     ease to create new networks
+  -# \b CON: running such server will likely cost money, so limit the ease to create
+     new networks
+  -# \b CON: If there is a single of such server, it is a single point of faillure i.e. 
+     if it become unreachable, the whole network is unreachable to joining peers. 
+     This risk is reduced by adding more of such servers, but it requires more money
+     and administration to operate.
+  -# \b PRO: it allow a fast startup.
+
+\section ns-bootstrap-tech 
+- \ref neoip-ns unifies both techniques in order to take advantages of both i.e.
+  if there is a fixed server running all the timer, use it and if there is 
+  not, try old peers.
+
+- TODO describe the 2 way to bootstrapping
+  - hardcoded servers which are supposed to run all the time
+    - ala dns
+  - list of cached peers which may be still alive
+    - ala gnutella
+- TODO describe how you fix it nicely
+- \ref ns-outdated-record are used in any \ref ns-realm, not just the \ref ns-realm-mother
+  - it helps the bootstrap of any \ref ns-realm
+  - it helps to connect a given \ref ns-realm when it is impossible to connect a 
+    parent \ref ns-realm
+
+\section ns-realm-mother Ns Realm Mother
+- the mother of all ns realm for a given \ref neoip-network
+- people wishing to use a distinct \ref neoip-network for any reason can define their own \ref ns-realm-mother
+  - security, administration
+- a public \ref ns-realm-mother will run, to help people using \ref neoip.
+- \ref ns-realm-mother is different than other \ref ns-realm because it has no parent \ref ns-realm.
+  - all \ref ns-put and \ref ns-get in the parent of the \ref ns-realm-mother are directed to the
+    \ref ns-realm-mother itself.
+  - TODO explain why this allow bootstrapping thanks to \ref ns-outdated-record
+
+*/

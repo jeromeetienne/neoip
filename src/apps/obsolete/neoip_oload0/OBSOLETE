@@ -1,0 +1,3 @@
+- neoip-oload0 has been refactored by neoip-oload
+- neoip-oload is cleaner code, and is on top of bt_ez instead of going
+  low level to bt_core wihtout need

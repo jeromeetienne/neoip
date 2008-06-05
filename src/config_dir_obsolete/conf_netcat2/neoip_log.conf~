@@ -1,0 +1,9 @@
+# this is the log configuration file
+default_level=WARNING
+apps/neoip_netcat/main.cpp=INFO
+#*closure*=debug
+#*reachpeer*=debug
+#*kad_rpccli*=error
+#*kad_server*=error
+#*main.cpp=none
+#*kad_utest*=none

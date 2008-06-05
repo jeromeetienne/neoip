@@ -1,0 +1,21 @@
+/*! \page neoip-socket-omni NeoIP Socket OMNI
+
+\ref neoip-socket-omni is part of the \ref neoip-socket.
+
+It may perform connections on top of various \ref neoip-socket-domain, choosing
+the best depending on the situation. See \ref neoip_socket-omni-domain-choice
+to see what best means here.
+
+Its main advantage is to provide transparent NAT traversal and mobility.
+
+\section neoip-socket-omni-addr NeoIP Socket OMNI Address Space
+- the port and the peer address are both 128-bit opaque data
+
+\section neoip_socket-omni-domain-choice Choice of Outter Socket Domain by Socket OMNI
+- TODO explain how the choice is made
+- depends on the \ref neoip-socket-type
+- depends on the network location (nat/firewall etc...)
+- depends on the callers preferences
+  - it is a MUST
+
+*/

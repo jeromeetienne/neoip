@@ -1,0 +1,14 @@
+/*! \page neoip-lib NeoIP library
+
+The NeoIP library is composed of 3 main subparts:
+-# \ref neoip-ns to maintain, query, organize, control the access of name service
+-# \ref neoip-cnx to establish connections between peers
+-# \ref neoip-ft to exchange files between peers
+ 
+
+
+
+*/
+
+
+

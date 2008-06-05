@@ -1,0 +1,63 @@
+/*! \page neoip-kad-sec NeoIP Kademlia Security
+
+This page describes the security of kademlia:
+
+TODO describe all the attacks
+- massive STORE to consume other nodes memories
+  - may be countered by the cookie
+- inserting fake nodes to accept records from others but never answer query
+  for them
+- insert new nodes to trigger the caching timer and make other nodes discards
+  their records
+- can i find a way to change others kbucket contents ?
+  - in theory no, thanks to the kbucket management
+- relation with bizantine resistance
+- list the attacks and their consequences
+
+\section neoip-kad-sec-original Original kademlia security
+The only security mechanism described in the paper is, in section 2.2,
+a nounce included in all requests which MUST be returned in the replied.
+This mechanism prevents off-path attackers from sending forged reply.
+
+\section neoip-kad-sec-cookie Adding cookie to STORE
+Additionnaly, on the dht used in bittorrent, either mainline or azureus, the 
+receiver, say alice, of a STORE request requires it to contain a valid cookie
+(see photuris rfc).
+This cookie has been previously given to the STORE sender in FINDNODE replies.
+
+\par Full Publishing
+This works during the original publishing because the publishing procedure
+is (i) use FINDNODE to get all the 'k' closest nodes to the key (ii) until
+all the 'k' nodes replied. So when sending a STORE to a given node, the sender
+is ensured to have received a FINDNODE reply so a valid cookie.
+
+\par Using STORE to populate the cache
+In order to populate the cache, a node trying to get a record MUST store it
+on the closest node which report not to have it (aka a FINDVALUE returning
+a list of nodes instead of the value).
+This cookie works in this case too, if the FINDVALUE reply contains a
+valid cookie.
+
+\par Using STORE to duplicate local records on closer nodes
+In order to maintain the assertion 'the k closest nodes to a key store this key,value pair',
+a node MUST replicates its record when it observes a new node closer to the record key.
+
+This procedure needs to be modified to work with the cookie, as the STORE rpc may
+be sent on any newly observed node, so even if it comes from an FINDNODE from another
+node. In this case, the sender doesn't have the cookie of the newly observed node.
+The modification is simply (i) send a dummy FINDNODE to the newly observed node and 
+then (ii) send the STORE.
+
+\par Purpose
+This protections is made to prevent attackers to send STORE request while forging
+their source address.
+
+
+*/
+
+
+
+
+
+
+

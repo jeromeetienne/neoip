@@ -1,0 +1,271 @@
+/*! \file
+    \brief Definition of the \ref host2ip_fork_t class
+
+\par Brief description
+\ref host2ip_fork_t convert a hostname into a list of ip_addr_t. this particular
+implementation performs it via a fork() and pipe() and then call an external
+executable to perform the gethostbyname.
+
+\par Relation with thread
+- the main advantate of this implementation is to avoid using threads
+- i have great fear of thread because they are hard to debug
+- thread when started cause the libc to perform thread mutex for the rest
+  of the program execution, EVEN if there are no more thread running.
+  - this slows down the execution
+  - glib has the same issue and i measured its impact to 70% of my whole cpu 
+    usage !!!!!
+  - the cpu impact for glibc is unclear, but for example each malloc/free 
+    requires mutex check. i did some basic measurement at 7-8% of my whole cpu.
+- using fork is likely to use more rescources than thread DURING the host2ip_fork_t
+  - but wont use any rescource AFTER host2ip_fork_t
+- as using host2ip is rather rare in practice, the overall cost of the fork 
+  implementation is likely much lower, than the thread one.
+
+\par possible improvement
+- to create a generic asyncexe_t and use it here
+  - it is a bit more complex to write so i use a special case here the time
+    to sort out the details of this fork/pipe stuff
+
+*/
+
+/* system include */
+#include <fcntl.h>
+#include <sys/wait.h>
+/* local include */
+#include "neoip_host2ip_fork.hpp"
+#include "neoip_lib_session.hpp"
+#include "neoip_file_path.hpp"
+#include "neoip_ip_addr.hpp"
+#include "neoip_fdwatch.hpp"
+#include "neoip_nipmem_alloc.hpp"
+#include "neoip_log.hpp"
+
+NEOIP_NAMESPACE_BEGIN;
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                                  CTOR/DTOR
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief Constructor
+ */
+host2ip_fork_t::host2ip_fork_t()	throw()
+{
+	// zero some fields
+	fdwatch	= NULL;
+}
+
+/** \brief Destructor
+ */
+host2ip_fork_t::~host2ip_fork_t()	throw()
+{
+	// delete fdwatch_t if needed
+	nipmem_zdelete	fdwatch;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+//                    START function
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+/** \brief Start the operation
+ */
+inet_err_t	host2ip_fork_t::start(const std::string &m_hostname, host2ip_cb_t *callback
+							, void *userptr)	throw()
+{
+	// copy the parameter
+	this->m_hostname	= m_hostname;
+	this->callback		= callback;
+	this->userptr		= userptr;
+	// launch the zerotimer_t to perform the action in the next iteration of the event loop
+	zerotimer.append(this, NULL);
+	
+	// return no error
+	return inet_err_t::OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			zerotimer_t callback
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief callback called when the \ref zerotimer_t expire
+ */
+bool	host2ip_fork_t::neoip_zerotimer_expire_cb(zerotimer_t &cb_zerotimer, void *userptr)	throw()
+{
+	lib_session_t *	lib_session	= lib_session_get();
+	file_path_t	exe_path	= lib_session->conf_rootdir() / "neoip-dnsresolve.sh";
+	int		pipefrom[2];    // pipe to get the executable output
+	int		res;
+	// log to debug
+	KLOG_DBG("enter");
+	
+	// create the pipe fd's
+	res	= pipe( pipefrom );
+	if( res != 0 ){
+		std::string reason	= "failed pipe() due to " + neoip_strerror(errno);
+		return notify_callback_err(inet_err_t(inet_err_t::ERROR, reason));
+	}
+
+	// fork the execution
+	childpid= fork(); 
+	if( childpid == -1 ){
+		std::string reason	= "failed fork() due to " + neoip_strerror(errno);
+		return notify_callback_err(inet_err_t(inet_err_t::ERROR, reason));
+	}
+	// if it is the child running here, do the child processing
+	if( childpid == 0 ){
+		// set the stdout fd to the pipe one
+		dup2( pipefrom[1], STDOUT_FILENO  );
+		// close the pipefrom fd's - the STDOUT_FILENO remain open tho
+		close( pipefrom[0] );
+		close( pipefrom[1] );
+		// go thru the whole fd table to close all fd except the STDOUT_FILENO or STDERR_FILENO
+		// - NOTE: this seems rather dirty but it is the less worst alternative due to :
+		//   - the other alternative is to set the 'close-on-exec' flag on all other fd
+		//     opened anywhere in the code. via the fnctl() F_SETFD
+		//   - this would spread this special case on the whole code
+		//   - getdtablesize() defaults to 1024 on linux (so rather small)
+		//   - getdtablesize() is well contained in here, so match the locality rule
+		// - the STDERR_FILENO is kept only to be able to log error to stderr if execl() fails
+		size_t	nb_fd_max	= getdtablesize();
+		for(size_t cur_fd = 0; cur_fd < nb_fd_max; cur_fd++ ){
+			// if cur_fd is STDOUT_FILENO or STDERR_FILENO, goto the next
+			if( cur_fd == STDOUT_FILENO || cur_fd == STDERR_FILENO )	continue;
+			// close the cur_fd
+			close(cur_fd);
+		}
+		// launch the external program now
+		execl(exe_path.to_string().c_str(), "neoip-dnsresolve.sh", hostname().c_str(), NULL);
+		// if this point is reached, the execl() failed, log the event
+		// - STDERR_FILENO has been left open just for that
+		KLOG_STDERR("Cant exec " << exe_path << " due to " << neoip_strerror(errno) << "\n");
+		// report -1 as error to the parent process
+		exit(-1);
+	}
+	// NOTE: here only the parent is running
+	DBG_ASSERT( childpid != 0 );
+	
+	// close the pipefrom useless fd
+	close( pipefrom[1] );
+
+	 // set this pipefrom[0] in non blocking
+	res	= fcntl(pipefrom[0], F_SETFL, O_NONBLOCK);
+	if( res != 0 ){
+		std::string reason	= "failed fcntl() due to " + neoip_strerror(errno);
+		return notify_callback_err(inet_err_t(inet_err_t::ERROR, reason));
+	}
+
+	// launch a fdwatch on the pipefrom[0]
+	// start the fdwatch
+	fdwatch = nipmem_new fdwatch_t();
+	fdwatch->start(pipefrom[0], fdwatch_t::INPUT|fdwatch_t::ERROR, this, NULL);
+
+	// return tokeep
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			fdwatch_cb_t callback
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief callback notified with fdwatch_t has an condition to notify
+ */
+bool	host2ip_fork_t::neoip_fdwatch_cb( void *cb_userptr, const fdwatch_t &cb_fdwatch
+						, const fdwatch_cond_t &fdwatch_cond )	throw()
+{
+	int	readlen		= 0;	
+	size_t	recv_max_len	= 16*1024;
+	// log the event
+	KLOG_DBG("enter fdwatch_cond=" << fdwatch_cond);
+
+	// if the condition is input
+	if( fdwatch_cond.is_input() ){
+		void *	buffer	= nipmem_alloca(recv_max_len);
+		// read data in the socket
+		readlen = read(fdwatch->get_fd(), buffer, recv_max_len);
+		// if readlen < 0, treat it as error
+		// - due to a weird bug in glib|linux, G_IO_ERR/HUP isnt received
+		//   so there is a test if (cond.is_input() && readlen==0) fallthru
+		//   and treat it as error
+		if( readlen < 0 )	readlen = 0;
+		// if some data have been read, add them to the recved_data bytearray_t
+		if( readlen > 0 )	recved_data.append(buffer, readlen);
+	}
+	
+	/* due to glib iowatch, G_IO_ERR isnt recevied for unknown reason ?!?!!?
+	 * - the work around is 'if G_IO_IN is set and no data to read, treat it as G_IO_ERR'
+	 * - NOTED LATER: it is unclear this is a glib issue as libevent does the same
+	 *   it may be a linux issue
+ 	 */
+
+	// handle a connection error
+	if( fdwatch_cond.is_error() || (fdwatch_cond.is_input() && readlen == 0) ){
+		std::string			recved_str	= recved_data.to_stdstring();
+		std::vector<std::string> 	arr_str		= string_t::split(recved_str, "/");
+		std::vector<ip_addr_t>		arr_ipaddr;
+		// wait for the pid to get the result
+		int status;
+		waitpid(childpid, &status, 0);
+		KLOG_DBG("childpid=" << childpid << " return status=" << status );
+		// log to debug
+		KLOG_DBG("received error. now recved_data=" << recved_data.to_datum() );
+		// parse the arr_str into arr_ipaddr
+		for(size_t i = 0; i < arr_str.size(); i++){
+			// if this string is empty, leave the loop
+			if( arr_str[i].empty() )	break;
+			// sanity check - the non empty string MUST be convertible in a ip_addr_t
+			DBGNET_ASSERT( !ip_addr_t(arr_str[i]).is_null() );
+			// else add the ip_addr_t to the arr_ipaddr
+			arr_ipaddr.push_back(ip_addr_t(arr_str[i]));
+		}
+		// notify the caller with a faillure if the arr_ipaddr is empty
+		if( arr_ipaddr.size() == 0 ){
+			std::string reason	= "resolution failed";
+			return notify_callback_err(inet_err_t(inet_err_t::ERROR, reason));
+		}
+		// else notify the caller with a success
+		return notify_callback(inet_err_t::OK, arr_ipaddr);
+	}
+
+	// return tokeep
+	return true;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//                     main notification function
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief notify the callback with the host2ip_fork_t error
+ */
+bool	host2ip_fork_t::notify_callback_err(const inet_err_t &inet_err)		throw()
+{
+	return notify_callback(inet_err, std::vector<ip_addr_t>() );
+}
+
+/** \brief notify the callback with the host2ip_fork_t result
+ */
+bool host2ip_fork_t::notify_callback(const inet_err_t &inet_err, const std::vector<ip_addr_t> &result)	throw()
+{
+	// sanity check - the callback MUST NOT be NULL
+	DBG_ASSERT( callback );
+	// backup the tokey_check_t context to check after the callback notification
+	TOKEEP_CHECK_BACKUP_DFL(*callback);
+	// notify the caller
+	bool tokeep = callback->neoip_host2ip_cb(userptr, *this, inet_err, result);
+	// sanity check - tokeep MUST be false if the local object has been deleted, true otherwise 
+	TOKEEP_CHECK_MATCH_DFL(tokeep);
+	// return the tokeep
+	return tokeep;
+}
+
+NEOIP_NAMESPACE_END
+
