@@ -28,10 +28,10 @@ nunit_res_t	base64_testclass_t::norm_alphabet(const nunit_testclass_ftor_t &test
 	// define the alphabet to use in the base64_t operation
 	std::string alphabet	= base64_t::norm_alphabet;
 	// some 'test vector' from the rfc3548
-	char *	testvect[]	= {  	"\x14\xfb\x9c\x03\xd9\x7e",
+	const char * testvect[]	= {  	"\x14\xfb\x9c\x03\xd9\x7e",
 					"\x14\xfb\x9c\x03\xd9",
 					"\x14\xfb\x9c\x03"};
-	char *	testres[]	= {	"FPucA9l+",
+	const char * testres[]	= {	"FPucA9l+",
 					"FPucA9k=",
 					"FPucAw=="};
 	// go thru all the test vectors
@@ -75,10 +75,10 @@ nunit_res_t	base64_testclass_t::safe_alphabet(const nunit_testclass_ftor_t &test
 	// define the alphabet to use in the base64_t operation
 	std::string alphabet	= base64_t::safe_alphabet;
 	// some 'test vector' from the rfc3548
-	char *	testvect[]	= {  	"\x14\xfb\x9c\x03\xd9\x7e",
+	const char * testvect[]	= {  	"\x14\xfb\x9c\x03\xd9\x7e",
 					"\x14\xfb\x9c\x03\xd9",
 					"\x14\xfb\x9c\x03"};
-	char *	testres[]	= {	"FPucA9l-",		// NOTE: modified to fit safe_alphabet
+	const char * testres[]	= {	"FPucA9l-",		// NOTE: modified to fit safe_alphabet
 					"FPucA9k=",
 					"FPucAw=="};
 	// go thru all the test vectors

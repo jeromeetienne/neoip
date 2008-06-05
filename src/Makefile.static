@@ -1806,7 +1806,7 @@ ifeq ($(DEBUG_BUILD),1)
 # supposed to be the same as -g but much faster to link statically
 # - testing show otherwise
 #	DBG_OPT += -gstabs+
-#	DBG_OPT += -Werror
+	DBG_OPT += -Werror
 # NOTE: while compiling in -O i get a lot of false alarm on unitilized variable
 # - some in even in stl code... so i cant even fix it
 	DBG_OPT += -Wno-uninitialized

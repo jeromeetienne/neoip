@@ -33,7 +33,7 @@ private:
 	static bool		is_padding(uint8_t c)	throw()	{ return c == '='; }
 public:
 	/*************** encode/decode function	*******************************/
-	static std::string	encode(void *data_ptr, size_t data_len, const std::string &alphabet = base64_t::norm_alphabet)	throw();
+	static std::string	encode(const void *data_ptr, size_t data_len, const std::string &alphabet = base64_t::norm_alphabet)	throw();
 	static datum_t		decode(const std::string &str, const std::string &alphabet = base64_t::norm_alphabet)		throw();
 	static std::string	encode_safe(void *data_ptr, size_t data_len)	throw()	{ return encode(data_ptr, data_len, safe_alphabet);	}
 	static datum_t		decode_safe(const std::string &str)		throw()	{ return decode(str, safe_alphabet);			}

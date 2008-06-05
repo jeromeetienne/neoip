@@ -38,7 +38,7 @@ const std::string base64_t::safe_alphabet =	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
  * 
  * - the base64 described here is the rfc3548.5 one
  */
-std::string base64_t::encode(void *data_ptr, size_t data_len, const std::string &alphabet)throw()
+std::string base64_t::encode(const void *data_ptr, size_t data_len, const std::string &alphabet)throw()
 {
 	uint8_t		enc_quantum[3];
 	size_t		enc_idx = 0;

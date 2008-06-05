@@ -18,9 +18,9 @@ int neoip_slotpool_utest()
 {
 	int		n_error = 0;
 	slotpool_t	slotpool;
-	char *		str1	= "Hello";
-	char *		str2	= "new";
-	char *		str3	= "world!";
+	const char *	str1	= "Hello";
+	const char *	str2	= "new";
+	const char *	str3	= "world!";
 	
 	// populate the slotpool_t
 	slot_id_t	slot1	= slotpool.allocate(str1);

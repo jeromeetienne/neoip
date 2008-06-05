@@ -35,7 +35,7 @@ nunit_res_t	datum_testclass_t::general(const nunit_testclass_ftor_t &testclass_f
 	NUNIT_ASSERT( datum_t("hello") + datum_t(" world") == datum_t("hello world") );
 	
 	// test the nocopy flag
-	char *	text	= "hello";
+	const char * text	= "hello";
 	NUNIT_ASSERT( datum_t(text, 5, datum_t::NOCOPY).char_ptr() == text	);
 	NUNIT_ASSERT( datum_t(text, 5, datum_t::NOCOPY).is_nocopy()		);
 
