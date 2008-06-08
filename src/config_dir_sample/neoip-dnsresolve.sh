@@ -21,7 +21,6 @@ HOSTNAME_TO_QUERY=$1
 ###############################################
 host $HOSTNAME_TO_QUERY | grep "has address" | cut -d" " -f4 | tr '\n' '/' 2>/dev/null
 
-
 ###############################################
 # ruby version which works with ipv6 hosts
 ###############################################

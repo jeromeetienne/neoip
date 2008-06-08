@@ -34,7 +34,7 @@ NEOIP_NAMESPACE_BEGIN;
 #define NEOIP_APPS_HUMAN_NAME	"NeoIP webpack"
 #define	NEOIP_APPS_VERSION	"0.0.1"
 #define NEOIP_APPS_SUMMARY	"bundle neoip-casti, neoip-casto and neoip-oload"
-#define NEOIP_APPS_TYPE		"USR_BOOT"
+#define NEOIP_APPS_TYPE		"SYS_BOOT"
 #define NEOIP_APPS_LONGDESC		\
 		"sloaaaaaa one\n"	\
 		"sloaaaaaa two\n"	\
