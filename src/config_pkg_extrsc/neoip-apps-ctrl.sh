@@ -20,6 +20,9 @@
 #   - start-stop-daemon --stop  => killproc $EXEC_NAME
 #   - look at init.d function... those function seems to be quite complete
 
+# - NOTE: because EEEpc xandros doesnt put /sbin in default $PATH, and it contains start-stop-daemon
+#   - im not sure how to include it in here for now
+#   - PATH=$PATH:/sbin
 
 # get the FULL_PATH and BASE_NAME from $0 (first parameter of cmdline)
 FULL_PATH=`case $0 in /*) echo $0;; *) echo $PWD/$0;; esac`

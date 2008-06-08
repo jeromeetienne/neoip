@@ -15,6 +15,9 @@ HOSTNAME_TO_QUERY=$1
 
 ###############################################
 # bash version relying on 'host' (with specifically asking for IPv4)
+# - TODO EEEpc default xandros (4G and likely other version) doesnt have 'host' cmdline command
+#   - it does have getent, but only with 'hosts' and no 'ahostsv4'
+#   - getend hosts is available but got issue with IPv6 - see above comment
 ###############################################
 host $HOSTNAME_TO_QUERY | grep "has address" | cut -d" " -f4 | tr '\n' '/' 2>/dev/null
 
