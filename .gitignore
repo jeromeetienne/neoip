@@ -1,4 +1,7 @@
 # jme- special include directory used as a trick to put all .hpp in 
 #      a single directory
-.include/*.hpp
+/.include/*.hpp
+
+# remove the .gitignore 
+.gitignore
 
