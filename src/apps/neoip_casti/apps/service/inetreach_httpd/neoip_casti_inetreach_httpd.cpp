@@ -19,6 +19,7 @@ this object is have a http_listener_t which attempts to be inetreach
 #include "neoip_http_listener.hpp"
 #include "neoip_ndiag_aview.hpp"
 #include "neoip_ndiag_err.hpp"
+#include "neoip_ipport_aview_helper.hpp"
 #include "neoip_log.hpp"
 #include "neoip_nipmem_alloc.hpp"
 
@@ -68,27 +69,25 @@ bt_err_t	casti_inetreach_httpd_t::start(casti_inetreach_httpd_cb_t *callback
 	this->callback		= callback;
 	this->userptr		= userptr;
 
+	// get the tcp listen_aview from the config
+	ipport_aview_t	listen_aview;
+	listen_aview	= ipport_aview_helper_t::tcp_listen_aview_from_conf();
+	// sanity check - the listen_aview local view MUST NOT be null
+	DBG_ASSERT( !listen_aview.is_null() );
+
 	/*************** init the http_listener_t	***********************/
 	// build the resp_arg for the http_listener_t 
 	socket_resp_arg_t	resp_arg;
 	resp_arg	= socket_resp_arg_t().profile(socket_profile_t(socket_domain_t::TCP))
 					.domain(socket_domain_t::TCP).type(socket_type_t::STREAM)
-					.listen_addr("tcp://0.0.0.0:0");
+					.listen_addr("tcp://" + listen_aview.lview().to_string());
 	// start the http_listener_t
 	http_err_t	http_err;
 	m_http_listener	= nipmem_new http_listener_t();
 	http_err	= m_http_listener->start(resp_arg);
 	if( http_err.failed() )		return bt_err_from_http(http_err);
 	
-	/*************** init the ndiag_aview_t	*******************************/
-	// get the listen_addrfrom the m_http_listener
-	// - NOTE: going thru string to convert socket_addr_t into ipport_addr_t is ugly
-	ipport_addr_t	listen_addr	= m_http_listener->listen_addr().get_peerid_vapi()->to_string()
-					+ std::string(":")
-					+ m_http_listener->listen_addr().get_portid_vapi()->to_string();
-	KLOG_ERR("http listen addr=" << listen_addr );
 	// create a ndiag_aview_t for the http listener
-	ipport_aview_t	listen_aview	= ipport_aview_t().lview(listen_addr);
 	ndiag_err_t	ndiag_err;
 	m_ndiag_aview	= nipmem_new ndiag_aview_t();	
 	ndiag_err	= m_ndiag_aview->start(listen_aview, upnp_sockfam_t::TCP
