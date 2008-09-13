@@ -26,7 +26,7 @@ FACTORY_PRODUCT_DEFINITION(compress_vapi_t, compress_bzip_t);
  */
 datum_t	compress_bzip_t::compress(const datum_t &datum, size_t max_len)	throw()
 {
-	size_t	outlen  = max_len;
+	unsigned int	outlen  = max_len;
 	// allocate the output buffer
 	char	*outbuf = (char *)nipmem_alloca(max_len);
 	// try to compress the data and put them in the output buffer
@@ -47,7 +47,7 @@ datum_t	compress_bzip_t::compress(const datum_t &datum, size_t max_len)	throw()
  */
 datum_t	compress_bzip_t::uncompress(const datum_t &datum, size_t max_len)	throw()
 {
-	size_t	outlen	= max_len;
+	unsigned int	outlen	= max_len;
 	// allocate the output buffer
 	char	*outbuf = (char *)nipmem_alloca(max_len);
 	// try to uncompress the data and put them in the output buffer
