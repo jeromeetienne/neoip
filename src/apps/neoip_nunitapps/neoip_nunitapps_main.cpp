@@ -72,7 +72,7 @@ static void nunitapps_gsuite_fct(nunit_suite_t &nunit_suite)
 	inet_nunit_gsuite->populate(nunit_suite);
 	upnp_nunit_gsuite->populate(nunit_suite);
 	ndiag_nunit_gsuite->populate(nunit_suite);
-#ifndef _WIN32
+#ifdef __linux__
 	dnsgrab_nunit_gsuite->populate(nunit_suite);
 	router_nunit_gsuite->populate(nunit_suite);
 	netif_nunit_gsuite->populate(nunit_suite);
