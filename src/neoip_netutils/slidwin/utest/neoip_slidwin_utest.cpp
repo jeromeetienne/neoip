@@ -29,7 +29,7 @@ int neoip_slidwin_utest()
 // long array chunk	
 
 	seqnb = seqnb.get_max_diff() - 5;
-
+#if 0
 	for( int i = 1; i < 15; i++ ){
 		slidwin.set( seqnb, i );
 		seqnb += 2;
@@ -39,6 +39,7 @@ int neoip_slidwin_utest()
 			sstream << " " << std::hex << slidwin.get(idx);
 		KLOG_ERR( std::hex << i  << "=>" << sstream.str() );
 	}
+#endif
 
 	if( n_error )	goto error;
 	KLOG_ERR("SLIDWIN_UTEST PASSED");
