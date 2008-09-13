@@ -96,7 +96,7 @@ time_t	base_oswarp_t::timegm(struct tm *tm)				throw()
 void *	base_oswarp_t::memmem(const void *haystack, size_t haystacklen
 					, const void *needle, size_t needlelen)	throw()
 {
-#ifndef	_WIN32
+#if	!defined(_WIN32) && !defined(__APPLE__)
 	return	::memmem(haystack, haystacklen, needle, needlelen);
 #else
 	const char *begin;
