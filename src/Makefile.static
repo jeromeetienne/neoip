@@ -1829,7 +1829,7 @@ else
 endif
 
 ifeq ($(DEBUG_BUILD),1)
-#	DBG_OPT += -g
+	DBG_OPT += -g
 # supposed to be the same as -g but much faster to link statically
 # - testing show otherwise
 #	DBG_OPT += -gstabs+
@@ -2172,7 +2172,7 @@ neoip-kad_daemon-bin-static$(EXE_EXT): $(APP_KAD_DAEMON_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_KAD_DAEMON_OBJS) $(APP_KAD_DAEMON_LINK) -Wl,--end-group $(LINKLIB)
 	
 neoip-nunitapps$(EXE_EXT): $(APP_UNITTEST_DEPS_DYNA)
-	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_UNITTEST_OBJS) $(APP_UNITTEST_LINK) -Wl,--end-group $(LINKLIB)
+	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_UNITTEST_OBJS) $(APP_UNITTEST_LINK) $(LINKLIB)
 
 neoip-nunitapps-bin-static$(EXE_EXT): $(APP_UNITTEST_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_UNITTEST_OBJS) $(APP_UNITTEST_LINK) $(LINKLIB) -Wl,--end-group 
