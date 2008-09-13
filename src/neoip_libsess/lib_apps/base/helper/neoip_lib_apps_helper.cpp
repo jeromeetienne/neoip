@@ -35,6 +35,7 @@ libsess_err_t	lib_apps_helper_t::daemonize()	throw()
 	// - with nochdir to keep all the file_path_t valid
 	// - without noclose to release fd on stdin/stdout/stderr
 #if !defined(_WIN32) && !defined(__APPLE__)
+	// note: daemon is obsoleted on macosx for "launchd cmdline"
 	if( daemon(1, 0) )	return libsess_err_t(libsess_err_t::ERROR, "Cant demonize due to " + neoip_strerror(errno));
 #else
 	EXP_ASSERT(0);

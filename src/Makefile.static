@@ -2225,7 +2225,9 @@ neoip-bstrapntudp-bin-static$(EXE_EXT): $(APP_BSTRAPNTUDP_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BSTRAPNTUDP_OBJS) $(APP_BSTRAPNTUDP_LINK) -Wl,--end-group $(LINKLIB)
 
 neoip-webpack$(EXE_EXT): $(APP_WEBPACK_DEPS_DYNA)
-	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_WEBPACK_OBJS) $(APP_WEBPACK_LINK) -Wl,--end-group $(LINKLIB)
+	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_WEBPACK_OBJS) $(APP_WEBPACK_LINK) $(LINKLIB)
+
+#	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_WEBPACK_OBJS) $(APP_WEBPACK_LINK) -Wl,--end-group $(LINKLIB)
 
 neoip-webpack-bin-static$(EXE_EXT): $(APP_WEBPACK_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_WEBPACK_OBJS) $(APP_WEBPACK_LINK) -Wl,--end-group $(LINKLIB)
