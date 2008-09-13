@@ -11,7 +11,7 @@
 
 /* system include */
 #include <sys/types.h>
-#ifndef _WIN32
+#ifdef __linux__
 #	include <netinet/in.h>
 #	include <linux/types.h>
 #	include <linux/errqueue.h>
@@ -370,7 +370,7 @@ inet_err_t	udp_full_t::start()						throw()
 		}
 	}
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__APPLE__)
 	// mark the socket as willing to do path mtu discovery
 {	int	optval = 1;
 	if(setsockopt(sock_fd, SOL_IP, IP_RECVERR, &optval, sizeof(optval)) < 0){
@@ -428,7 +428,7 @@ inet_err_t udp_full_t::start(udp_full_cb_t *callback, void *userptr)		throw()
  */
 void	udp_full_t::mtu_pathdisc(bool onoff)	throw()
 {
-#ifndef	_WIN32
+#ifdef __linux__
 	int	optval;
 	// reset the timer policy
 	mtugrow_delaygen.reset();
@@ -516,7 +516,7 @@ bool	udp_full_t::neoip_timeout_expire_cb(void *userptr, timeout_t &cb_timeout)	t
  */
 size_t	udp_full_t::mtu_outter_from_kernel()					const throw()
 {
-#ifndef	_WIN32
+#ifdef __linux__
 	size_t		kernel_mtu;
 	socklen_t	optlen	 = sizeof(kernel_mtu);
 	// get the outter MTU of this connected socket for the whole datagram
@@ -546,7 +546,7 @@ size_t	udp_full_t::mtu_outter_from_kernel()					const throw()
  */
 void	udp_full_t::purge_msg_errqueue()				throw()
 {
-#ifndef _WIN32
+#ifdef __linux__
 	char 			error_msg[8192];
 	struct sockaddr_in	in_addr;
 	struct msghdr 		msg;
