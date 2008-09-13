@@ -166,4 +166,38 @@ xmlrpc_parse_t &operator >> (xmlrpc_parse_t& xmlrpc_parse, float &value)	throw(x
 	// return the object itself
 	return xmlrpc_parse;
 }
+
+#ifdef __APPLE__	// just a workaround because i forgot many serialisation of size_t
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                           XMLRPC size_t
+// - NOTE: this is only a kudge because i got many size_t serialization i forgot
+//   - it triggered no error on linux/win32 but cause compilation error on macos
+//   - so this is just a workaround... this is a temporary fix
+//   - the trick is to handle it as a uint32_t serialisation
+//   - same thing on xmlrpc_build_t/xmlrpc_parse_t and serial_t
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief Put a uint32_t into a xmlrpc string (because xmlrpc doesnt support unsigned integer)
+ */
+xmlrpc_build_t &operator << (xmlrpc_build_t& xmlrpc_build, const size_t &value)	throw()
+{
+	// put a string representing the value
+	return xmlrpc_build	<< uint32_t(value);
+}
+
+/** \brief Get a uint32_t from a xmlrpc string (because xmlrpc doesnt support unsigned integer)
+ */
+xmlrpc_parse_t &operator >> (xmlrpc_parse_t& xmlrpc_parse, size_t &value)	throw(xml_except_t)
+{
+	uint32_t	tmp;
+	// get the value from the xmlrpc
+	xmlrpc_parse	>> tmp;
+	// return the object itself
+	return xmlrpc_parse;
+}
+#endif
+
+
 NEOIP_NAMESPACE_END
