@@ -194,6 +194,8 @@ xmlrpc_parse_t &operator >> (xmlrpc_parse_t& xmlrpc_parse, size_t &value)	throw(
 	uint32_t	tmp;
 	// get the value from the xmlrpc
 	xmlrpc_parse	>> tmp;
+	// copy the uint32_t into value
+	value	= tmp;
 	// return the object itself
 	return xmlrpc_parse;
 }
