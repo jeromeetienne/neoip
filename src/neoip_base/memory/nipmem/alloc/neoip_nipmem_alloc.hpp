@@ -11,6 +11,9 @@
 #define __NEOIP_NIPMEM_ALLOC_HPP__ 
 /* system include */
 #include <stdlib.h>
+#ifdef _WIN32
+#	include <malloc.h>
+#endif
 /* local include */
 #include "neoip_nipmem_tracker.hpp"
 #include "neoip_cpp_demangle.hpp"
