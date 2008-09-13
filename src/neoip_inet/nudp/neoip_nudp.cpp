@@ -150,7 +150,7 @@ inet_err_t	nudp_t::start()						throw()
 		goto close_socket;
 	}	
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__APPLE__)
 	// set IP_PKTINFO - to get the source address of the incoming packet
 	// - getsockname() returns the listen address and if it listen on ip ANY, it fails
 	inet_err= inet_oswarp_t::setsockopt(sock_fd, IPPROTO_IP, IP_PKTINFO, &opt_on, sizeof(opt_on));
@@ -311,7 +311,7 @@ inet_err_t nudp_t::send_to(const void *buf_ptr, size_t buf_len, const ipport_add
 ssize_t	nudp_t::recvfromto(void *buf_ptr, int buf_len, ipport_addr_t &local_addr
 						, ipport_addr_t &remote_addr)	throw()
 {
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__APPLE__)
 	struct 	sockaddr_in	addr_in;
 	ssize_t			read_len;
 	
