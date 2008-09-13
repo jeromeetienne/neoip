@@ -162,7 +162,11 @@ public:
 	friend serial_t& operator >> (serial_t& serial, double &val)		throw(serial_except_t);
 	friend serial_t& operator << (serial_t& serial, const std::string &val)	throw();
 	friend serial_t& operator >> (serial_t& serial, std::string &val)	throw(serial_except_t);
-
+#ifdef __APPLE__	// just a workaround because i forgot many serialisation of size_t
+	friend serial_t& operator << (serial_t& serial, const size_t &val)	throw();
+	friend serial_t& operator >> (serial_t& serial, size_t &val)		throw(serial_except_t);
+#endif
+        
 /** \brief unserialize a type but dont modify the serial_t data
  */
 template <class T> serial_t &unserial_peek(T &val) throw(serial_except_t)
@@ -442,7 +446,7 @@ inline serial_t & operator >> (serial_t& serial, double &val)	throw(serial_excep
 inline serial_t& operator << (serial_t& serial, const std::string &val)	throw()
 {
 	// serialize the length of the std::string
-	serial	<< uint32_t(val.size());
+	serial	<< (uint32_t)(val.size());
 	// append the data in the std::string
 	serial.append(val.c_str(), val.size());
 	// return the object itself
@@ -466,6 +470,38 @@ inline serial_t & operator >> (serial_t& serial, std::string &val)	throw(serial_
 	return serial;
 }
 
+
+#ifdef __APPLE__	// just a workaround because i forgot many serialisation of size_t
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                         inline serialization of size_t
+// - NOTE: this is only a kudge because i got many size_t serialization i forgot
+//   - it triggered no error on linux/win32 but cause compilation error on macos
+//   - so this is just a workaround... this is a temporary fix
+//   - the trick is to handle it as a uint32_t serialisation
+//   - same thing on xmlrpc_build_t/xmlrpc_parse_t and serial_t
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief overload the << operator
+ */
+inline serial_t& operator << (serial_t& serial, const size_t &val)	throw()
+{
+	// return the object itself
+	return serial << uint32_t(val);
+}
+
+/** \brief overload the >> operator
+ */
+inline serial_t & operator >> (serial_t& serial, size_t &val)	throw(serial_except_t)
+{
+	uint32_t	tmp;
+        serial >> tmp;
+        val = tmp;
+	// return the serial_t itself
+	return serial;
+}
+#endif
 
 // undefine the #define to optionally compile serial_stat_t code
 #undef SERIAL_STAT_CODE
