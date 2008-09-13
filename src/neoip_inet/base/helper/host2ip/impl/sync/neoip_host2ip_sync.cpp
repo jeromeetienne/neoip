@@ -81,7 +81,7 @@ bool	host2ip_sync_t::neoip_zerotimer_expire_cb(zerotimer_t &cb_zerotimer, void *
 {
 	// log to debug
 	KLOG_DBG("enter hostname="<< hostname());
-#ifndef _WIN32
+#ifdef	__linux__
 	char		buf[10*1024];
 	struct hostent	hostbuf, *entry;
 	int		herr, res;
