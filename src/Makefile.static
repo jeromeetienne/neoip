@@ -2190,7 +2190,7 @@ neoip-btcli-bin-static$(EXE_EXT): $(APP_BTCLI_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BTCLI_OBJS) $(APP_BTCLI_LINK) -Wl,--end-group $(LINKLIB)
 
 neoip-oload$(EXE_EXT): $(APP_OLOAD_DEPS_DYNA)
-	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_OLOAD_OBJS) $(APP_OLOAD_LINK) -Wl,--end-group $(LINKLIB)
+	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_OLOAD_OBJS) $(APP_OLOAD_LINK) $(LINKLIB)
 
 neoip-oload-bin-static$(EXE_EXT): $(APP_OLOAD_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_OLOAD_OBJS) $(APP_OLOAD_LINK) -Wl,--end-group $(LINKLIB)
@@ -2202,13 +2202,13 @@ neoip-btrelay-bin-static$(EXE_EXT): $(APP_BTRELAY_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BTRELAY_OBJS) $(APP_BTRELAY_LINK) -Wl,--end-group $(LINKLIB)
 
 neoip-casti$(EXE_EXT): $(APP_CASTI_DEPS_DYNA)
-	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_CASTI_OBJS) $(APP_CASTI_LINK) -Wl,--end-group $(LINKLIB)
+	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_CASTI_OBJS) $(APP_CASTI_LINK) $(LINKLIB)
 
 neoip-casti-bin-static$(EXE_EXT): $(APP_CASTI_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_CASTI_OBJS) $(APP_CASTI_LINK) -Wl,--end-group $(LINKLIB)
 
 neoip-casto$(EXE_EXT): $(APP_CASTO_DEPS_DYNA)
-	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_CASTO_OBJS) $(APP_CASTO_LINK) -Wl,--end-group $(LINKLIB)
+	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_CASTO_OBJS) $(APP_CASTO_LINK) $(LINKLIB)
 
 neoip-casto-bin-static$(EXE_EXT): $(APP_CASTO_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_CASTO_OBJS) $(APP_CASTO_LINK) -Wl,--end-group $(LINKLIB)
