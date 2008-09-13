@@ -131,7 +131,7 @@ httpd_err_t nipmem_tracker_http_wikidbg_t::page(const std::string &keyword, void
 	// put the title
 	oss << h.pagetitle("nipmem_tracker_t Page");
 	
-#ifndef	_WIN32
+#ifdef	__linux__
 	struct mallinfo	m_info	= mallinfo();
 	oss << h.s_sub1title() << "mallinfo from libc:" << h.e_sub1title();
 	oss << h.br();
