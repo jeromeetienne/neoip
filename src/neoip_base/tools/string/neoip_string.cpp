@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
-#include <cmath>
+#include <math.h>
 /* local include */
 #include "neoip_string.hpp"
 #include "neoip_base_oswarp.hpp"
