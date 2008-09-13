@@ -15,6 +15,9 @@
 
 /* system include */
 #include <stdlib.h>
+#ifdef	__linux__
+#	include <malloc.h>	// for mallinfo()
+#endif
 /* local include */
 #include "neoip_nipmem_tracker_http_wikidbg.hpp"
 #include "neoip_nipmem_tracker_http.hpp"

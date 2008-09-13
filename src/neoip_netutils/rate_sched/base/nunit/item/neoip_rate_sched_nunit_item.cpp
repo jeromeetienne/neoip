@@ -134,7 +134,7 @@ bool	rate_sched_nunit_item_t::neoip_rate_limit_cb(void *cb_userptr, rate_limit_t
  */
 bool	rate_sched_nunit_item_t::try_send_data()				throw()
 {
-	size_t			request_len	= std::min(4000000u, chunk_stop_len - chunk_sent_len);
+	size_t			request_len	= std::min(4000000ul, chunk_stop_len - chunk_sent_len);
 	rate_limit_tmp_t	rate_tmp;
 
 	// log to debug
