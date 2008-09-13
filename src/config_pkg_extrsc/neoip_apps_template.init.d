@@ -17,7 +17,7 @@
 set -e
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/bin/@APPS_NAME@-ctrl
+DAEMON=/usr/lib/@APPS_NAME@-ctrl
 
 # Gracefully exit if the package has been removed.
 test -x $DAEMON || exit 0

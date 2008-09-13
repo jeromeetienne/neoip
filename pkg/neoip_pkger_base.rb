@@ -350,7 +350,7 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 	# write the result to the .epm_list file
 	File.open("#{apps_name}.epm_list", "w") { |fOut|
 		fOut.puts("%product #{apps_name} - #{apps_summary}")
-		fOut.puts("%copyright 2007")
+		fOut.puts("%copyright 2008")
 		fOut.puts("%vendor NeoIP")
 		fOut.puts("%version #{apps_version}")
 		fOut.puts("%readme \"Read http://www.web4web.tv\" ")
@@ -364,10 +364,13 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 		
 		# if appt_type == *_BOOT
 		# - make the binary exec in ${apps_name}-bin
-		# - add a ctrl scrip in ${apps_name}-ctrl
+		# - add a ctrl script in ${apps_name}-ctrl
 		# else (aka if apps_type == *_TEMP)
 		# - make the binary exec in #{apps_name}
-		if apps_type =~ /.*_BOOT/
+		if apps_type =~ /SYS_BOOT/
+			fOut.puts("f 755 root root /usr/lib/#{canon_name}/#{apps_name}-bin #{build_dir}/#{apps_name}-bin-static")
+			fOut.puts("f 755 root root /usr/lib/#{apps_name}-ctrl #{build_dir}/pkg_extrsc/#{apps_name}-ctrl.sh")
+		elsif apps_type =~ /USR_BOOT/
 			fOut.puts("f 755 root root /usr/lib/#{canon_name}/#{apps_name}-bin #{build_dir}/#{apps_name}-bin-static")
 			fOut.puts("f 755 root root /usr/bin/#{apps_name}-ctrl #{build_dir}/pkg_extrsc/#{apps_name}-ctrl.sh")
 		else
@@ -423,7 +426,7 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 			fOut << "fi\n"
 		elsif apps_type == "SYS_BOOT"
 			# if SYS_BOOT, launch it as root now
-			fOut << "#{apps_name}-ctrl start\n"
+			fOut << "/usr/lib/#{apps_name}-ctrl start\n"
 		end
 		fOut << "	exit 0\n"
 		fOut << "EOF\n"			
@@ -484,7 +487,7 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 	end
 	
 	# remove the configuration file
-	#FileUtils.rm_f "#{apps_name}.epm_list"
+	FileUtils.rm_f "#{apps_name}.epm_list"
 end
 
 # mkpkg for deb_install
@@ -506,7 +509,7 @@ end
 # mkpkg for rpm_install
 def apps_rmpkg_rpm_install(pkg_type, apps_name)
 	# remove the .rpm for all version
-	Dir.glob("#{apps_name}_*.rpm") { |filename| FileUtils.rm_f filename	}
+	Dir.glob("#{apps_name}*.rpm") { |filename| FileUtils.rm_f filename	}
 end
 
 ################################################################################
@@ -603,7 +606,7 @@ def apps_upload_deb_install(pkg_type, apps_name)
 	# get the data specific to this apps_name
 	apps_version	= get_apps_version(pkg_type, apps_name)
 	# upload to jmeserv
-	system("scp #{apps_name}_#{apps_version}_i386.deb jmeserv:public_html/download/linux")
+	system("scp #{apps_name}_#{apps_version}_i386.deb dedixl.jetienne.com:public_html/download/linux")
 end
 
 # upload for rpm_install
@@ -613,7 +616,7 @@ def apps_upload_rpm_install(pkg_type, apps_name)
 	# get the data specific to this apps_name
 	apps_version	= get_apps_version(pkg_type, apps_name)
 	# upload to jmeserv
-	system("scp #{apps_name}-#{apps_version}.rpm jmeserv:public_html/download/linux")
+	system("scp #{apps_name}-#{apps_version}.rpm dedixl.jetienne.com:public_html/download/linux")
 end
 
 # upload for tgz_install
@@ -623,15 +626,15 @@ def apps_upload_tgz_install(pkg_type, apps_name)
 	# get the data specific to this apps_name
 	apps_version	= get_apps_version('tgz_install', apps_name)
 	# upload to jmeserv
-	system("scp #{apps_name}_#{apps_version}_i386.tgz jmeserv:public_html/download/linux")
+	system("scp #{apps_name}_#{apps_version}_i386.tgz dedixl.jetienne.com:public_html/download/linux")
 end
 
 # upload for nsis_install
 def apps_upload_nsis_install(pkg_type, apps_name)
 	# get the data specific to this apps_name
 	apps_version	= get_apps_version('nsis_install', apps_name)
-	# upload to jmeserv
-	system("scp #{apps_name}-#{apps_version}.exe jmeserv:public_html/download/win32")
+	# upload to http://web4web.tv/download
+	system("scp #{apps_name}-#{apps_version}.exe dedixl.jetienne.com:public_html/download/win32")
 end
 
 ################################################################################

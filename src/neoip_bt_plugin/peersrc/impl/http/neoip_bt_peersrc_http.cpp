@@ -209,7 +209,7 @@ bt_tracker_request_t	bt_peersrc_http_t::build_tracker_request(const std::string 
 		tracker_request.compact	( true				);
 
 	// log to debug
-	KLOG_DBG("tracker_request=" << tracker_request);
+	KLOG_ERR("tracker_request=" << tracker_request);
 	// return the just built request
 	return tracker_request;
 }

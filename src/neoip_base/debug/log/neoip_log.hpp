@@ -40,13 +40,33 @@ NEOIP_NAMESPACE_BEGIN;
 #define KLOG_WARNING( nlog_data )	KLOG_LEVEL( log_level_t::WARNING, nlog_data )
 #define KLOG_NOTICE( nlog_data )	KLOG_LEVEL( log_level_t::NOTICE	, nlog_data )
 #define KLOG_INFO( nlog_data )		KLOG_LEVEL( log_level_t::INFO	, nlog_data )
+#define KLOG_DEBUG( nlog_data )		KLOG_LEVEL( log_level_t::DEBUG	, nlog_data )
 
 #if NO_DBG_TRACE
-#	define KLOG_DEBUG( nlog_data )		do{}while(0)
-#else
-#	define KLOG_DEBUG( nlog_data )		KLOG_LEVEL( log_level_t::DEBUG	, nlog_data )
+#	undef	KLOG_DEBUG
+#	define	KLOG_DEBUG( nlog_data )		do{}while(0)
 #endif
 
+#if NO_TRACE_AT_ALL
+#	undef	KLOG_EMERG
+#	undef	KLOG_ALERT
+#	undef	KLOG_CRITICAL
+#	undef	KLOG_ERROR
+#	undef	KLOG_WARNING
+#	undef	KLOG_NOTICE
+#	undef	KLOG_INFO
+#	undef	KLOG_DEBUG
+#	define	KLOG_EMERG( nlog_data )		do{}while(0)
+#	define	KLOG_ALERT( nlog_data )		do{}while(0)
+#	define	KLOG_CRITICAL( nlog_data )	do{}while(0)
+#	define	KLOG_ERROR( nlog_data )		do{}while(0)
+#	define	KLOG_WARNING( nlog_data )	do{}while(0)
+#	define	KLOG_NOTICE( nlog_data )	do{}while(0)
+#	define	KLOG_INFO( nlog_data )		do{}while(0)
+#	define	KLOG_DEBUG( nlog_data )		do{}while(0)
+#endif
+
+// some alias on the other define to make it more readable
 #define KLOG_CRIT( nlog_data )		KLOG_CRITICAL( nlog_data )
 #define KLOG_ERR( nlog_data )		KLOG_ERROR( nlog_data )
 #define KLOG_WARN( nlog_data )		KLOG_WARNING( nlog_data )

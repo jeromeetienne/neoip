@@ -11,6 +11,21 @@ ifndef NEOIP_TARGET
 	#NEOIP_TARGET	= win32
 endif
 
+# change the executable extension depending on the target
+ifeq ($(NEOIP_TARGET), linux)	
+	EXE_EXT		:= 
+	SHAREDLIB_EXT	:= .so
+	STATICLIB_EXT	:= .a
+else ifeq ($(NEOIP_TARGET), win32)	
+	EXE_EXT		:= .exe
+	SHAREDLIB_EXT	:= .so
+	STATICLIB_EXT	:= .a
+else ifeq ($(NEOIP_TARGET), macos)	
+	EXE_EXT		:=
+	SHAREDLIB_EXT	:= .dylib
+	STATICLIB_EXT	:= .a
+endif
+
 # SRC_DIR is the variable to get the path of the source dir from the build dir
 SRC_DIR=.
 
@@ -861,8 +876,8 @@ NEOIP_NETIF_OBJS =							\
 	$(NEOIP_NETIF_DIR)/base/err/neoip_netif_err.o				\
 	$(NEOIP_NETIF_DIR)/base/nunit_gsuite/neoip_netif_nunit_gsuite.o
 
-# if NEOIP_TARGET is win32, compile only netif_err_t in libneoip_netif
-ifeq ($(NEOIP_TARGET), win32)
+# if NEOIP_TARGET is not linux, compile only netif_err_t in libneoip_netif
+ifneq ($(NEOIP_TARGET), linux)
 NEOIP_NETIF_OBJS =							\
 	$(NEOIP_NETIF_DIR)/base/err/neoip_netif_err.o
 endif
@@ -1476,8 +1491,8 @@ APP_ALL_LIB=		neoip_base		neoip_eloop		neoip_nunit		\
 			neoip_bt_ez		neoip_bt_misc		neoip_bt_cast		\
 			neoip_flv
 
-# if NEOIP_TARGET is win32, dont compile neoip_router neoip_dnsgrab
-ifeq ($(NEOIP_TARGET), win32)
+# if NEOIP_TARGET is not linux, dont compile neoip_router neoip_dnsgrab
+ifneq ($(NEOIP_TARGET), linux)
 	APP_ALL_LIB := $(filter-out neoip_router neoip_dnsgrab, $(APP_ALL_LIB))
 endif
 
@@ -1488,8 +1503,8 @@ APP_KAD_DAEMON_OBJS= 								\
 	$(APP_KAD_DAEMON_DIR)/neoip_kad_daemon_main.o
 APP_KAD_DAEMON_LIB=	$(APP_ALL_LIB)
 APP_KAD_DAEMON_LINK= $(addprefix -l, $(APP_KAD_DAEMON_LIB))
-APP_KAD_DAEMON_DEPS_DYNA= $(APP_KAD_DAEMON_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_KAD_DAEMON_LIB)))
-APP_KAD_DAEMON_DEPS_STAT= $(APP_KAD_DAEMON_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_KAD_DAEMON_LIB)))
+APP_KAD_DAEMON_DEPS_DYNA= $(APP_KAD_DAEMON_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_KAD_DAEMON_LIB)))
+APP_KAD_DAEMON_DEPS_STAT= $(APP_KAD_DAEMON_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_KAD_DAEMON_LIB)))
 
 ######################## Build the neoip_nunitapps  ############################
 APP_UNITTEST_DIR=apps/neoip_nunitapps
@@ -1498,8 +1513,8 @@ APP_UNITTEST_OBJS= 								\
 	$(APP_UNITTEST_DIR)/neoip_nunitapps_main.o
 APP_UNITTEST_LIB=	$(APP_ALL_LIB)
 APP_UNITTEST_LINK= $(addprefix -l, $(APP_UNITTEST_LIB))
-APP_UNITTEST_DEPS_DYNA= $(APP_UNITTEST_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_UNITTEST_LIB)))
-APP_UNITTEST_DEPS_STAT= $(APP_UNITTEST_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_UNITTEST_LIB)))
+APP_UNITTEST_DEPS_DYNA= $(APP_UNITTEST_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_UNITTEST_LIB)))
+APP_UNITTEST_DEPS_STAT= $(APP_UNITTEST_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_UNITTEST_LIB)))
 
 ######################## Build the neoip_get  ###############################
 APP_GET_DIR=apps/neoip_get
@@ -1509,8 +1524,8 @@ APP_GET_OBJS= 									\
 	$(APP_GET_DIR)/apps/base/profile/neoip_get_profile.o
 APP_GET_LIB=	$(APP_ALL_LIB)
 APP_GET_LINK= $(addprefix -l, $(APP_GET_LIB))
-APP_GET_DEPS_DYNA= $(APP_GET_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_GET_LIB)))
-APP_GET_DEPS_STAT= $(APP_GET_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_GET_LIB)))
+APP_GET_DEPS_DYNA= $(APP_GET_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_GET_LIB)))
+APP_GET_DEPS_STAT= $(APP_GET_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_GET_LIB)))
 
 ######################## Build the neoip_btcli  ###############################
 APP_BTCLI_DIR=apps/neoip_btcli
@@ -1526,8 +1541,8 @@ APP_BTCLI_OBJS= 								\
 	$(APP_BTCLI_DIR)/neoip_btcli_main.o
 APP_BTCLI_LIB=	$(APP_ALL_LIB)
 APP_BTCLI_LINK= $(addprefix -l, $(APP_BTCLI_LIB))
-APP_BTCLI_DEPS_DYNA= $(APP_BTCLI_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_BTCLI_LIB)))
-APP_BTCLI_DEPS_STAT= $(APP_BTCLI_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_BTCLI_LIB)))
+APP_BTCLI_DEPS_DYNA= $(APP_BTCLI_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_BTCLI_LIB)))
+APP_BTCLI_DEPS_STAT= $(APP_BTCLI_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_BTCLI_LIB)))
 
 
 ######################## Build the neoip_oload  ###############################
@@ -1552,8 +1567,8 @@ APP_OLOAD_OBJS= 								\
 	
 APP_OLOAD_LIB=	$(APP_ALL_LIB)
 APP_OLOAD_LINK= $(addprefix -l, $(APP_OLOAD_LIB))
-APP_OLOAD_DEPS_DYNA= $(APP_OLOAD_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_OLOAD_LIB)))
-APP_OLOAD_DEPS_STAT= $(APP_OLOAD_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_OLOAD_LIB)))
+APP_OLOAD_DEPS_DYNA= $(APP_OLOAD_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_OLOAD_LIB)))
+APP_OLOAD_DEPS_STAT= $(APP_OLOAD_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_OLOAD_LIB)))
 
 
 ######################## Build the neoip_btrelay  ###############################
@@ -1570,8 +1585,8 @@ APP_BTRELAY_OBJS= 								\
 	
 APP_BTRELAY_LIB=	$(APP_ALL_LIB)
 APP_BTRELAY_LINK= $(addprefix -l, $(APP_BTRELAY_LIB))
-APP_BTRELAY_DEPS_DYNA= $(APP_BTRELAY_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_BTRELAY_LIB)))
-APP_BTRELAY_DEPS_STAT= $(APP_BTRELAY_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_BTRELAY_LIB)))
+APP_BTRELAY_DEPS_DYNA= $(APP_BTRELAY_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_BTRELAY_LIB)))
+APP_BTRELAY_DEPS_STAT= $(APP_BTRELAY_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_BTRELAY_LIB)))
 
 ######################## Build the neoip_casti  ###############################
 APP_CASTI_DIR=apps/neoip_casti
@@ -1601,8 +1616,8 @@ APP_CASTI_OBJS= 								\
 	
 APP_CASTI_LIB=	$(APP_ALL_LIB)
 APP_CASTI_LINK= $(addprefix -l, $(APP_CASTI_LIB))
-APP_CASTI_DEPS_DYNA= $(APP_CASTI_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_CASTI_LIB)))
-APP_CASTI_DEPS_STAT= $(APP_CASTI_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_CASTI_LIB)))
+APP_CASTI_DEPS_DYNA= $(APP_CASTI_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_CASTI_LIB)))
+APP_CASTI_DEPS_STAT= $(APP_CASTI_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_CASTI_LIB)))
 
 ######################## Build the neoip_casto  ###############################
 APP_CASTO_DIR=apps/neoip_casto
@@ -1622,8 +1637,8 @@ APP_CASTO_OBJS= 								\
 	
 APP_CASTO_LIB=	$(APP_ALL_LIB)
 APP_CASTO_LINK= $(addprefix -l, $(APP_CASTO_LIB))
-APP_CASTO_DEPS_DYNA= $(APP_CASTO_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_CASTO_LIB)))
-APP_CASTO_DEPS_STAT= $(APP_CASTO_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_CASTO_LIB)))
+APP_CASTO_DEPS_DYNA= $(APP_CASTO_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_CASTO_LIB)))
+APP_CASTO_DEPS_STAT= $(APP_CASTO_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_CASTO_LIB)))
 
 
 ######################## Build the neoip_router  ###############################
@@ -1634,8 +1649,8 @@ APP_ROUTER_OBJS= 							\
 	$(APP_ROUTER_DIR)/neoip_router_main.o
 APP_ROUTER_LIB=	$(APP_ALL_LIB)
 APP_ROUTER_LINK= $(addprefix -l, $(APP_ROUTER_LIB))
-APP_ROUTER_DEPS_DYNA= $(APP_ROUTER_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_ROUTER_LIB)))
-APP_ROUTER_DEPS_STAT= $(APP_ROUTER_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_ROUTER_LIB)))
+APP_ROUTER_DEPS_DYNA= $(APP_ROUTER_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_ROUTER_LIB)))
+APP_ROUTER_DEPS_STAT= $(APP_ROUTER_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_ROUTER_LIB)))
 
 
 ######################## Build the neoip_bstrapntudp	########################
@@ -1645,8 +1660,8 @@ APP_BSTRAPNTUDP_OBJS= 							\
 	$(APP_BSTRAPNTUDP_DIR)/neoip_bstrapntudp_main.o
 APP_BSTRAPNTUDP_LIB=	$(APP_ALL_LIB)
 APP_BSTRAPNTUDP_LINK= $(addprefix -l, $(APP_BSTRAPNTUDP_LIB))
-APP_BSTRAPNTUDP_DEPS_DYNA= $(APP_BSTRAPNTUDP_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_BSTRAPNTUDP_LIB)))
-APP_BSTRAPNTUDP_DEPS_STAT= $(APP_BSTRAPNTUDP_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_BSTRAPNTUDP_LIB)))
+APP_BSTRAPNTUDP_DEPS_DYNA= $(APP_BSTRAPNTUDP_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_BSTRAPNTUDP_LIB)))
+APP_BSTRAPNTUDP_DEPS_STAT= $(APP_BSTRAPNTUDP_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_BSTRAPNTUDP_LIB)))
 
 ######################## Build the neoip_webpack  ###############################
 APP_WEBPACK_DIR=apps/neoip_webpack
@@ -1658,8 +1673,8 @@ APP_WEBPACK_OBJS	+= $(filter-out $(APP_CASTO_DIR)/neoip_casto_main.o, $(APP_CAST
 APP_WEBPACK_OBJS	+= $(filter-out $(APP_OLOAD_DIR)/neoip_oload_main.o, $(APP_OLOAD_OBJS))
 APP_WEBPACK_LIB=	$(APP_ALL_LIB)
 APP_WEBPACK_LINK= $(addprefix -l, $(APP_WEBPACK_LIB))
-APP_WEBPACK_DEPS_DYNA= $(APP_WEBPACK_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_WEBPACK_LIB)))
-APP_WEBPACK_DEPS_STAT= $(APP_WEBPACK_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_WEBPACK_LIB)))
+APP_WEBPACK_DEPS_DYNA= $(APP_WEBPACK_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_WEBPACK_LIB)))
+APP_WEBPACK_DEPS_STAT= $(APP_WEBPACK_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_WEBPACK_LIB)))
 
 ######################## Build the neoip_upnp  ###############################
 APP_UPNP_DIR=apps/neoip_upnp
@@ -1668,8 +1683,8 @@ APP_UPNP_OBJS= 									\
 	$(APP_UPNP_DIR)/apps/neoip_upnp_apps.o	
 APP_UPNP_LIB=	$(APP_ALL_LIB)
 APP_UPNP_LINK= $(addprefix -l, $(APP_UPNP_LIB))
-APP_UPNP_DEPS_DYNA= $(APP_UPNP_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_UPNP_LIB)))
-APP_UPNP_DEPS_STAT= $(APP_UPNP_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_UPNP_LIB)))
+APP_UPNP_DEPS_DYNA= $(APP_UPNP_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_UPNP_LIB)))
+APP_UPNP_DEPS_STAT= $(APP_UPNP_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_UPNP_LIB)))
 
 ######################## Build the neoip_flv2xml  ###############################
 APP_FLV2XML_DIR=apps/neoip_flv2xml
@@ -1678,8 +1693,8 @@ APP_FLV2XML_OBJS= 									\
 	$(APP_FLV2XML_DIR)/apps/neoip_flv2xml_apps.o
 APP_FLV2XML_LIB=	$(APP_ALL_LIB)
 APP_FLV2XML_LINK= $(addprefix -l, $(APP_FLV2XML_LIB))
-APP_FLV2XML_DEPS_DYNA= $(APP_FLV2XML_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_FLV2XML_LIB)))
-APP_FLV2XML_DEPS_STAT= $(APP_FLV2XML_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_FLV2XML_LIB)))
+APP_FLV2XML_DEPS_DYNA= $(APP_FLV2XML_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_FLV2XML_LIB)))
+APP_FLV2XML_DEPS_STAT= $(APP_FLV2XML_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_FLV2XML_LIB)))
 
 
 ######################## Build the neoip_rtmp2flv  ###############################
@@ -1689,8 +1704,8 @@ APP_RTMP2FLV_OBJS= 									\
 	$(APP_RTMP2FLV_DIR)/apps/neoip_rtmp2flv_apps.o
 APP_RTMP2FLV_LIB=	$(APP_ALL_LIB)
 APP_RTMP2FLV_LINK= $(addprefix -l, $(APP_RTMP2FLV_LIB))
-APP_RTMP2FLV_DEPS_DYNA= $(APP_RTMP2FLV_OBJS) $(addprefix lib, $(addsuffix .so, $(APP_RTMP2FLV_LIB)))
-APP_RTMP2FLV_DEPS_STAT= $(APP_RTMP2FLV_OBJS) $(addprefix lib, $(addsuffix .a , $(APP_RTMP2FLV_LIB)))
+APP_RTMP2FLV_DEPS_DYNA= $(APP_RTMP2FLV_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_RTMP2FLV_LIB)))
+APP_RTMP2FLV_DEPS_STAT= $(APP_RTMP2FLV_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_RTMP2FLV_LIB)))
 
 
 # jme- some experiment to automatize the makefile a lot more that the current full-manual version
@@ -1748,11 +1763,18 @@ else
 	LINKLIB 	+= -lgnutls -lgcrypt -lgpg-error -ltasn1
 endif
 ################ for xmlrpc_t
-ifeq ($(NEOIP_TARGET), win32)
+ifeq ($(NEOIP_TARGET), linux)
+#	LINKLIB 	+= `xml2-config --libs`
+#	INCLUDEOPT	+= `xml2-config --cflags`
+# jme- just a test because libxml2 2.6.31.dfsg-2ubuntu1 on ubuntu hardy core dump when linked statically
+# - this bug has been reported and blogged
+	LINKLIB 	+= $(SRC_DIR)/../libxml2-2.6.27/.libs/libxml2.a -lz -lpthread -lm
+	INCLUDEOPT	+= -I$(SRC_DIR)/../libxml2-2.6.27/include
+else ifeq ($(NEOIP_TARGET), win32)
 	LINKLIB 	+= 
 	LINKLIB		+= /home/jerome/win32/glib/inst/lib/libxml2.a
 	INCLUDEOPT	+= -I/home/jerome/win32/glib/inst/include/libxml2
-else
+else ifeq ($(NEOIP_TARGET), macos)
 	LINKLIB 	+= `xml2-config --libs`
 	INCLUDEOPT	+= `xml2-config --cflags`
 endif
@@ -1783,6 +1805,11 @@ DEBUG_BUILD=1
 #	LINKLIB += -lefence
 #endif
 
+# jme- not sure it is needed, and for sure this is macos only
+ifeq ($(NEOIP_TARGET), macos)
+	MAIN_OPT	+= -dynamic
+endif
+
 # change the compiling tools depending on the target
 ifeq ($(NEOIP_TARGET), win32)
 	CXX	:= i586-mingw32msvc-g++
@@ -1802,12 +1829,13 @@ else
 endif
 
 ifeq ($(DEBUG_BUILD),1)
-	DBG_OPT += -g
+#	DBG_OPT += -g
 # supposed to be the same as -g but much faster to link statically
 # - testing show otherwise
 #	DBG_OPT += -gstabs+
+# jme- disabled to get win32 to compile on 
 	DBG_OPT += -Werror
-# NOTE: while compiling in -O i get a lot of false alarm on unitilized variable
+# NOTE: while compiling in  i get a lot of false alarm on unitilized variable
 # - some in even in stl code... so i cant even fix it
 	DBG_OPT += -Wno-uninitialized
 #	DBG_OPT += -fpic
@@ -1832,11 +1860,18 @@ endif
 #	DBG_OPT += -DUSE_HOST2IP_AGAI
 	DBG_OPT += -DNO_DBG_TRACE=1
 	DBG_OPT += -DNO_DBG_ASSERT=1
-	DBG_OPT += -DNO_TOKEEP_CHECK_DECLARE=1
-	DBG_OPT += -DNO_TOKEEP_CHECK_USAGE=1
-	DBG_OPT += -DNO_NIPMEM_SMASHING=1
-	DBG_OPT += -DNO_NIPMEM_TRACKING=1
-#	DBG_OPT += -DNO_WIKIDBG_OBJ=1
+#	DBG_OPT	+= -DNO_TRACE_AT_ALL=1
+	
+#	DBG_OPT += -DNO_TOKEEP_CHECK_DECLARE=1
+#	DBG_OPT += -DNO_TOKEEP_CHECK_USAGE=1
+	
+#	DBG_OPT += -DNO_NIPMEM_SMASHING=1
+#	DBG_OPT += -DNO_NIPMEM_TRACKING=1
+	# on ubuntu hardy, mlock is limited to 32kbyte per user... so unreliable... so disabling it all for now
+	DBG_OPT += -DNO_NIPMEM_LOCKING=1
+
+	DBG_OPT += -DNO_WIKIDBG_OBJ=1
+
 # jme- to make the template instance unique at link-time. i dont really get what it is or how to use it tho
 #      would make the code smaller. i tried and it created compilation error at link time
 #	DBG_OPT += -frepo
@@ -1861,354 +1896,270 @@ ALL_EXE += neoip-webpack
 
 all: $(ALL_EXE)
 
-libneoip_base.a: $(NEOIP_BASE_OBJS)
+######################################################
+# setup the command to build libraries shared/static on all NEOIP_TARGET
+########
+ifeq ($(NEOIP_TARGET), linux)
+define build_sharedlib
+	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
+endef
+define build_staticlib
 	$(AR) rcs $@ $^
 	$(RANLIB) $@
-
-libneoip_base.so: $(NEOIP_BASE_OBJS)
+endef
+else ifeq ($(NEOIP_TARGET), win32)
+define build_sharedlib
 	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_eloop.a: $(NEOIP_ELOOP_OBJS)
+endef
+define build_staticlib
 	$(AR) rcs $@ $^
 	$(RANLIB) $@
-
-libneoip_eloop.so: $(NEOIP_ELOOP_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-
-# jme- experiment to create a .dll
-# - issue with all the interdependant libraries
-libneoip_eloop.dll: $(NEOIP_ELOOP_OBJS)
-	$(CXX) -shared -o $@				\
-		-Wl,--out-implib=$@.a			\
-		-Wl,--export-all-symbols		\
-		-Wl,--enable-auto-import		\
-		-Wl,--whole-archive $(NEOIP_ELOOP_OBJS)	\
-		-Wl,--start-group			\
-		-L. -Wl,--no-whole-archive libneoip_base.a 	\
-		libneoip_nunit.a libneoip_httpd.a		\
-		libneoip_libsess.a libneoip_file.a		\
-		libneoip_socket_ntlay.a				\
-		libneoip_socket_udp.a				\
-		libneoip_ndiag.a				\
-		libneoip_inet.a					\
-		/home/jerome/win32/aux/inst/lib/libevent.a	\
-		-Wl,--end-group
-
-libneoip_file.a: $(NEOIP_FILE_OBJS)
+endef
+else ifeq ($(NEOIP_TARGET), macos)
+define build_sharedlib
+	libtool -dynamic -flat_namespace -undefined dynamic_lookup -o $@ $^
+endef
+define build_staticlib
 	$(AR) rcs $@ $^
 	$(RANLIB) $@
+endef
+endif
+######################################################
 
-libneoip_file.so: $(NEOIP_FILE_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
+libneoip_base$(SHAREDLIB_EXT):		$(NEOIP_BASE_OBJS)
+	$(build_sharedlib)	
+libneoip_base$(STATICLIB_EXT):		$(NEOIP_BASE_OBJS)
+	$(build_staticlib)
 
-libneoip_http.a: $(NEOIP_HTTP_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
+libneoip_eloop$(SHAREDLIB_EXT):		$(NEOIP_ELOOP_OBJS)
+	$(build_sharedlib)
+libneoip_eloop$(STATICLIB_EXT):		$(NEOIP_ELOOP_OBJS)
+	$(build_staticlib)
 
-libneoip_http.so: $(NEOIP_HTTP_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
+libneoip_file$(SHAREDLIB_EXT):		$(NEOIP_FILE_OBJS)
+	$(build_sharedlib)
+libneoip_file$(STATICLIB_EXT):		$(NEOIP_FILE_OBJS)
+	$(build_staticlib)
 
-libneoip_httpd.a: $(NEOIP_HTTPD_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
+libneoip_http$(SHAREDLIB_EXT):		$(NEOIP_HTTP_OBJS)
+	$(build_sharedlib)
+libneoip_http$(STATICLIB_EXT):		$(NEOIP_HTTP_OBJS)
+	$(build_staticlib)
 
-libneoip_httpd.so: $(NEOIP_HTTPD_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
+libneoip_httpd$(SHAREDLIB_EXT):		$(NEOIP_HTTPD_OBJS)
+	$(build_sharedlib)
+libneoip_httpd$(STATICLIB_EXT):		$(NEOIP_HTTPD_OBJS)
+	$(build_staticlib)
 
-libneoip_inet.a: $(NEOIP_INET_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
+libneoip_inet$(SHAREDLIB_EXT):		$(NEOIP_INET_OBJS)
+	$(build_sharedlib)
+libneoip_inet$(STATICLIB_EXT):		$(NEOIP_INET_OBJS)
+	$(build_staticlib)
 
-libneoip_inet.so: $(NEOIP_INET_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
+libneoip_upnp$(SHAREDLIB_EXT):		$(NEOIP_UPNP_OBJS)
+	$(build_sharedlib)
+libneoip_upnp$(STATICLIB_EXT):		$(NEOIP_UPNP_OBJS)
+	$(build_staticlib)
 	
-libneoip_upnp.a: $(NEOIP_UPNP_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
+libneoip_ndiag$(SHAREDLIB_EXT):		$(NEOIP_NDIAG_OBJS)
+	$(build_sharedlib)
+libneoip_ndiag$(STATICLIB_EXT):		$(NEOIP_NDIAG_OBJS)
+	$(build_staticlib)
+		
+libneoip_ntudp$(SHAREDLIB_EXT):		$(NEOIP_NTUDP_OBJS)
+	$(build_sharedlib)
+libneoip_ntudp$(STATICLIB_EXT):		$(NEOIP_NTUDP_OBJS)
+	$(build_staticlib)
 
-libneoip_upnp.so: $(NEOIP_UPNP_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
+libneoip_netif$(SHAREDLIB_EXT):		$(NEOIP_NETIF_OBJS)
+	$(build_sharedlib)
+libneoip_netif$(STATICLIB_EXT):		$(NEOIP_NETIF_OBJS)
+	$(build_staticlib)
 	
-libneoip_ndiag.a: $(NEOIP_NDIAG_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_ndiag.so: $(NEOIP_NDIAG_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-	
-libneoip_ntudp.a: $(NEOIP_NTUDP_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_ntudp.so: $(NEOIP_NTUDP_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_netif.a: $(NEOIP_NETIF_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_netif.so: $(NEOIP_NETIF_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-	
-libneoip_nunit.a: $(NEOIP_NUNIT_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_nunit.so: $(NEOIP_NUNIT_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_crypto.a: $(NEOIP_CRYPTO_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_crypto.so: $(NEOIP_CRYPTO_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_compress.a: $(NEOIP_COMPRESS_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_compress.so: $(NEOIP_COMPRESS_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_router.a: $(NEOIP_ROUTER_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_router.so: $(NEOIP_ROUTER_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_bt_core.a: $(NEOIP_BT_CORE_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_bt_core.so: $(NEOIP_BT_CORE_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_bt_plugin.a: $(NEOIP_BT_PLUGIN_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_bt_plugin.so: $(NEOIP_BT_PLUGIN_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_bt_ez.a: $(NEOIP_BT_EZ_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_bt_ez.so: $(NEOIP_BT_EZ_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_bt_misc.a: $(NEOIP_BT_MISC_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_bt_misc.so: $(NEOIP_BT_MISC_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_bt_cast.a: $(NEOIP_BT_CAST_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_bt_cast.so: $(NEOIP_BT_CAST_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_flv.a: $(NEOIP_FLV_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_flv.so: $(NEOIP_FLV_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_kad.a: $(NEOIP_KAD_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_kad.so: $(NEOIP_KAD_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_kad_rpc.a: $(NEOIP_KAD_RPC_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_kad_rpc.so: $(NEOIP_KAD_RPC_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_xml.a: $(NEOIP_XML_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_xml.so: $(NEOIP_XML_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_xmlrpc.a: $(NEOIP_XMLRPC_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_xmlrpc.so: $(NEOIP_XMLRPC_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_xmlrpc_net.a: $(NEOIP_XMLRPC_NET_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_xmlrpc_net.so: $(NEOIP_XMLRPC_NET_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_libsess.a: $(NEOIP_LIBSESS_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_libsess.so: $(NEOIP_LIBSESS_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_dnsgrab.a: $(NEOIP_DNSGRAB_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_dnsgrab.so: $(NEOIP_DNSGRAB_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_socket_glue.a: $(NEOIP_SOCKET_GLUE_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_socket_glue.so: $(NEOIP_SOCKET_GLUE_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_socket_udp.a: $(NEOIP_SOCKET_UDP_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_socket_udp.so: $(NEOIP_SOCKET_UDP_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_socket_ntlay.a: $(NEOIP_SOCKET_NTLAY_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_socket_ntlay.so: $(NEOIP_SOCKET_NTLAY_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_socket_ntudp.a: $(NEOIP_SOCKET_NTUDP_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_socket_ntudp.so: $(NEOIP_SOCKET_NTUDP_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_socket_tcp.a: $(NEOIP_SOCKET_TCP_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_socket_tcp.so: $(NEOIP_SOCKET_TCP_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_socket_stcp.a: $(NEOIP_SOCKET_STCP_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_socket_stcp.so: $(NEOIP_SOCKET_STCP_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_slay_glue.a: $(NEOIP_SLAY_GLUE_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_slay_glue.so: $(NEOIP_SLAY_GLUE_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_slay_tls.a: $(NEOIP_SLAY_TLS_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_slay_tls.so: $(NEOIP_SLAY_TLS_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_slay_btjamstd.a: $(NEOIP_SLAY_BTJAMSTD_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_slay_btjamstd.so: $(NEOIP_SLAY_BTJAMSTD_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_slay_btjamrc4.a: $(NEOIP_SLAY_BTJAMRC4_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_slay_btjamrc4.so: $(NEOIP_SLAY_BTJAMRC4_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_proto_nunit.a: $(NEOIP_PROTO_NUNIT_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_proto_nunit.so: $(NEOIP_PROTO_NUNIT_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_pktcomp.a: $(NEOIP_PKTCOMP_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_pktcomp.so: $(NEOIP_PKTCOMP_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_scnx.a: $(NEOIP_SCNX_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_scnx.so: $(NEOIP_SCNX_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_rdgram.a: $(NEOIP_RDGRAM_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_rdgram.so: $(NEOIP_RDGRAM_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_ordgram.a: $(NEOIP_ORDGRAM_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_ordgram.so: $(NEOIP_ORDGRAM_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_pktfrag.a: $(NEOIP_PKTFRAG_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_pktfrag.so: $(NEOIP_PKTFRAG_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_reachpeer.a: $(NEOIP_REACHPEER_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_reachpeer.so: $(NEOIP_REACHPEER_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_simuwan.a: $(NEOIP_SIMUWAN_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_simuwan.so: $(NEOIP_SIMUWAN_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_nlay.a: $(NEOIP_NLAY_OBJS) $(NEOIP_NLAY_BRICK_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_nlay.so: $(NEOIP_NLAY_OBJS) $(NEOIP_NLAY_BRICK_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
-
-libneoip_netutils.a: $(NEOIP_NETUTILS_OBJS)
-	$(AR) rcs $@ $^
-	$(RANLIB) $@
-
-libneoip_netutils.so: $(NEOIP_NETUTILS_OBJS)
-	$(CXX) -shared -o $@ -Wl,-soname,$@ $^
+libneoip_nunit$(SHAREDLIB_EXT):		$(NEOIP_NUNIT_OBJS)
+	$(build_sharedlib)
+libneoip_nunit$(STATICLIB_EXT):		$(NEOIP_NUNIT_OBJS)
+	$(build_staticlib)
+
+libneoip_crypto$(SHAREDLIB_EXT):	$(NEOIP_CRYPTO_OBJS)
+	$(build_sharedlib)
+libneoip_crypto$(STATICLIB_EXT):	$(NEOIP_CRYPTO_OBJS)
+	$(build_staticlib)
+
+libneoip_compress$(SHAREDLIB_EXT):	$(NEOIP_COMPRESS_OBJS)
+	$(build_sharedlib)
+libneoip_compress$(STATICLIB_EXT):	$(NEOIP_COMPRESS_OBJS)
+	$(build_staticlib)
+
+libneoip_router$(SHAREDLIB_EXT):	$(NEOIP_ROUTER_OBJS)
+	$(build_sharedlib)
+libneoip_router$(STATICLIB_EXT):	$(NEOIP_ROUTER_OBJS)
+	$(build_staticlib)
+
+libneoip_bt_core$(SHAREDLIB_EXT):	$(NEOIP_BT_CORE_OBJS)
+	$(build_sharedlib)
+libneoip_bt_core$(STATICLIB_EXT):	$(NEOIP_BT_CORE_OBJS)
+	$(build_staticlib)
+
+libneoip_bt_plugin$(SHAREDLIB_EXT):	$(NEOIP_BT_PLUGIN_OBJS)
+	$(build_sharedlib)
+libneoip_bt_plugin$(STATICLIB_EXT):	$(NEOIP_BT_PLUGIN_OBJS)
+	$(build_staticlib)
+
+libneoip_bt_ez$(SHAREDLIB_EXT):		$(NEOIP_BT_EZ_OBJS)
+	$(build_sharedlib)
+libneoip_bt_ez$(STATICLIB_EXT):		$(NEOIP_BT_EZ_OBJS)
+	$(build_staticlib)
+
+libneoip_bt_misc$(SHAREDLIB_EXT):	$(NEOIP_BT_MISC_OBJS)
+	$(build_sharedlib)
+libneoip_bt_misc$(STATICLIB_EXT):	$(NEOIP_BT_MISC_OBJS)
+	$(build_staticlib)
+
+libneoip_bt_cast$(SHAREDLIB_EXT):	$(NEOIP_BT_CAST_OBJS)
+	$(build_sharedlib)
+libneoip_bt_cast$(STATICLIB_EXT):	$(NEOIP_BT_CAST_OBJS)
+	$(build_staticlib)
+
+libneoip_flv$(SHAREDLIB_EXT):		$(NEOIP_FLV_OBJS)
+	$(build_sharedlib)
+libneoip_flv$(STATICLIB_EXT):		$(NEOIP_FLV_OBJS)
+	$(build_staticlib)
+
+libneoip_kad$(SHAREDLIB_EXT):		$(NEOIP_KAD_OBJS)
+	$(build_sharedlib)
+libneoip_kad$(STATICLIB_EXT):		$(NEOIP_KAD_OBJS)
+	$(build_staticlib)
+
+libneoip_kad_rpc$(SHAREDLIB_EXT):	$(NEOIP_KAD_RPC_OBJS)
+	$(build_sharedlib)
+libneoip_kad_rpc$(STATICLIB_EXT):	$(NEOIP_KAD_RPC_OBJS)
+	$(build_staticlib)
+
+libneoip_xml$(SHAREDLIB_EXT):		$(NEOIP_XML_OBJS)
+	$(build_sharedlib)
+libneoip_xml$(STATICLIB_EXT):		$(NEOIP_XML_OBJS)
+	$(build_staticlib)
+
+libneoip_xmlrpc$(SHAREDLIB_EXT):	$(NEOIP_XMLRPC_OBJS)
+	$(build_sharedlib)
+libneoip_xmlrpc$(STATICLIB_EXT):	$(NEOIP_XMLRPC_OBJS)
+	$(build_staticlib)
+
+libneoip_xmlrpc_net$(SHAREDLIB_EXT):	$(NEOIP_XMLRPC_NET_OBJS)
+	$(build_sharedlib)
+libneoip_xmlrpc_net$(STATICLIB_EXT):	$(NEOIP_XMLRPC_NET_OBJS)
+	$(build_staticlib)
+
+libneoip_libsess$(SHAREDLIB_EXT):	$(NEOIP_LIBSESS_OBJS)
+	$(build_sharedlib)
+libneoip_libsess$(STATICLIB_EXT):	$(NEOIP_LIBSESS_OBJS)
+	$(build_staticlib)
+
+libneoip_dnsgrab$(SHAREDLIB_EXT):	$(NEOIP_DNSGRAB_OBJS)
+	$(build_sharedlib)
+libneoip_dnsgrab$(STATICLIB_EXT):	$(NEOIP_DNSGRAB_OBJS)
+	$(build_staticlib)
+
+libneoip_socket_glue$(SHAREDLIB_EXT):	$(NEOIP_SOCKET_GLUE_OBJS)
+	$(build_sharedlib)
+libneoip_socket_glue$(STATICLIB_EXT):	$(NEOIP_SOCKET_GLUE_OBJS)
+	$(build_staticlib)
+
+libneoip_socket_udp$(SHAREDLIB_EXT):	$(NEOIP_SOCKET_UDP_OBJS)
+	$(build_sharedlib)
+libneoip_socket_udp$(STATICLIB_EXT):	$(NEOIP_SOCKET_UDP_OBJS)
+	$(build_staticlib)
+
+libneoip_socket_ntlay$(SHAREDLIB_EXT):	$(NEOIP_SOCKET_NTLAY_OBJS)
+	$(build_sharedlib)
+libneoip_socket_ntlay$(STATICLIB_EXT):	$(NEOIP_SOCKET_NTLAY_OBJS)
+	$(build_staticlib)
+
+libneoip_socket_ntudp$(SHAREDLIB_EXT):	$(NEOIP_SOCKET_NTUDP_OBJS)
+	$(build_sharedlib)
+libneoip_socket_ntudp$(STATICLIB_EXT):	$(NEOIP_SOCKET_NTUDP_OBJS)
+	$(build_staticlib)
+
+libneoip_socket_tcp$(SHAREDLIB_EXT):	$(NEOIP_SOCKET_TCP_OBJS)
+	$(build_sharedlib)
+libneoip_socket_tcp$(STATICLIB_EXT):	$(NEOIP_SOCKET_TCP_OBJS)
+	$(build_staticlib)
+
+libneoip_socket_stcp$(SHAREDLIB_EXT):	$(NEOIP_SOCKET_STCP_OBJS)
+	$(build_sharedlib)
+libneoip_socket_stcp$(STATICLIB_EXT):	$(NEOIP_SOCKET_STCP_OBJS)
+	$(build_staticlib)
+
+libneoip_slay_glue$(SHAREDLIB_EXT):	$(NEOIP_SLAY_GLUE_OBJS)
+	$(build_sharedlib)
+libneoip_slay_glue$(STATICLIB_EXT):	$(NEOIP_SLAY_GLUE_OBJS)
+	$(build_staticlib)
+
+libneoip_slay_tls$(SHAREDLIB_EXT):	$(NEOIP_SLAY_TLS_OBJS)
+	$(build_sharedlib)
+libneoip_slay_tls$(STATICLIB_EXT):	$(NEOIP_SLAY_TLS_OBJS)
+	$(build_staticlib)
+
+libneoip_slay_btjamstd$(SHAREDLIB_EXT):	$(NEOIP_SLAY_BTJAMSTD_OBJS)
+	$(build_sharedlib)
+libneoip_slay_btjamstd$(STATICLIB_EXT):	$(NEOIP_SLAY_BTJAMSTD_OBJS)
+	$(build_staticlib)
+
+libneoip_slay_btjamrc4$(SHAREDLIB_EXT):	$(NEOIP_SLAY_BTJAMRC4_OBJS)
+	$(build_sharedlib)
+libneoip_slay_btjamrc4$(STATICLIB_EXT):	$(NEOIP_SLAY_BTJAMRC4_OBJS)
+	$(build_staticlib)
+
+libneoip_proto_nunit$(SHAREDLIB_EXT):	$(NEOIP_PROTO_NUNIT_OBJS)
+	$(build_sharedlib)
+libneoip_proto_nunit$(STATICLIB_EXT):	$(NEOIP_PROTO_NUNIT_OBJS)
+	$(build_staticlib)
+
+libneoip_pktcomp$(SHAREDLIB_EXT):	$(NEOIP_PKTCOMP_OBJS)
+	$(build_sharedlib)
+libneoip_pktcomp$(STATICLIB_EXT):	$(NEOIP_PKTCOMP_OBJS)
+	$(build_staticlib)
+
+libneoip_scnx$(SHAREDLIB_EXT):		$(NEOIP_SCNX_OBJS)
+	$(build_sharedlib)
+libneoip_scnx$(STATICLIB_EXT):		$(NEOIP_SCNX_OBJS)
+	$(build_staticlib)
+
+libneoip_rdgram$(SHAREDLIB_EXT):	$(NEOIP_RDGRAM_OBJS)
+	$(build_sharedlib)
+libneoip_rdgram$(STATICLIB_EXT):	$(NEOIP_RDGRAM_OBJS)
+	$(build_staticlib)
+
+libneoip_ordgram$(SHAREDLIB_EXT):	$(NEOIP_ORDGRAM_OBJS)
+	$(build_sharedlib)
+libneoip_ordgram$(STATICLIB_EXT):	$(NEOIP_ORDGRAM_OBJS)
+	$(build_staticlib)
+
+libneoip_pktfrag$(SHAREDLIB_EXT):	$(NEOIP_PKTFRAG_OBJS)
+	$(build_sharedlib)
+libneoip_pktfrag$(STATICLIB_EXT):	$(NEOIP_PKTFRAG_OBJS)
+	$(build_staticlib)
+
+libneoip_reachpeer$(SHAREDLIB_EXT):	$(NEOIP_REACHPEER_OBJS)
+	$(build_sharedlib)
+libneoip_reachpeer$(STATICLIB_EXT):	$(NEOIP_REACHPEER_OBJS)
+	$(build_staticlib)
+
+libneoip_simuwan$(SHAREDLIB_EXT):	$(NEOIP_SIMUWAN_OBJS)
+	$(build_sharedlib)
+libneoip_simuwan$(STATICLIB_EXT):	$(NEOIP_SIMUWAN_OBJS)
+	$(build_staticlib)
+
+libneoip_nlay$(SHAREDLIB_EXT):		$(NEOIP_NLAY_OBJS) $(NEOIP_NLAY_BRICK_OBJS)
+	$(build_sharedlib)
+libneoip_nlay$(STATICLIB_EXT):		$(NEOIP_NLAY_OBJS) $(NEOIP_NLAY_BRICK_OBJS)
+	$(build_staticlib)
+
+libneoip_netutils$(SHAREDLIB_EXT):	$(NEOIP_NETUTILS_OBJS)
+	$(build_sharedlib)
+libneoip_netutils$(STATICLIB_EXT):	$(NEOIP_NETUTILS_OBJS)
+	$(build_staticlib)
 
 
 

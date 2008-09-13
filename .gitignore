@@ -2,6 +2,4 @@
 #      a single directory
 /.include/*.hpp
 
-# remove the .gitignore 
-.gitignore
 

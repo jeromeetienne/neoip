@@ -30,7 +30,7 @@ void *	nipmem_malloc_(size_t len, bool secure_f, const char * filename, int line
 	void *	ptr	= malloc(len);
 	// sanity check - the malloc MUST succeed
 	DBG_ASSERT( ptr );
-#ifndef _WIN32
+#if !defined(_WIN32) && !NO_NIPMEM_LOCKING
 	// lock the memory if the memory is secured
 	if( secure_f && mlock(ptr, len) )	EXP_ASSERT( 0 );
 #else

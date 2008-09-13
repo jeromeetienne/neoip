@@ -131,11 +131,11 @@ int	lib_apps_oswarp_t::main_for_daemon(const char *apps_name
 	// if "-d" is present, launch main_internal directly without creating a service
 	if( i != argc )	return (*main_internal)(argc, argv);
 	// fake insertion the "-d" option at the end the argv
-	static char *	argv_buff[255];
+	static const char *	argv_buff[255];
 	for(int i = 0; i < argc; i++ )	argv_buff[i] = argv[i];
 	argv_buff[argc++]	= "-d";
 	argv_buff[argc]		= NULL;
-	argv			= argv_buff;
+	argv			= (char **)argv_buff;
 #endif
 
 	// on win32, create a window service 
@@ -145,7 +145,7 @@ int	lib_apps_oswarp_t::main_for_daemon(const char *apps_name
 	//   it gonna trigger a SIGTERM signal in the main_internal thread
 
 	// copy the parameters
-	backup_apps_name	= apps_name;
+	backup_apps_name	= (CHAR *)apps_name;
 	backup_main_internal	= main_internal;
 	backup_argc		= argc;
 	backup_argv		= argv;

@@ -31,7 +31,7 @@ nunit_res_t	xml_build_testclass_t::general(const nunit_testclass_ftor_t &testcla
 	xml_build.element_beg("myownroot").element_att("version", "3.0");
 	xml_build	.element_val("myrootvalue");
 	xml_build	.element_beg("myfirstchild");
-	xml_build		.element_val("mychildval<br>ue");
+	xml_build		.element_val("mychildvalue");
 	xml_build	.element_end();
 	xml_build.element_end();
 

@@ -82,6 +82,8 @@ void	lib_apps_helper_t::pidfile_create()		throw()
 	file_path_t	file_path	= pidfile_path();
 	// sanity check - file_path MUST NOT be null
 	DBG_ASSERT( !file_path.is_null() );
+	// log to debug
+	KLOG_ERR("Write pidfile into " << file_path);
 	// save the file
 	file_err_t	file_err;
 	file_err	= file_sio_t::writeall(file_path, datum_t(OSTREAMSTR(current_pid())));

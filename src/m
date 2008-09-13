@@ -16,6 +16,8 @@ if [ "$BASE_DIR" = "build_linux" ]; then
 	TARGET_OPT="NEOIP_TARGET=linux"
 elif [ "$BASE_DIR" = "build_win32" ]; then
 	TARGET_OPT="NEOIP_TARGET=win32"
+elif [ "$BASE_DIR" = "build_macos" ]; then
+	TARGET_OPT="NEOIP_TARGET=macos"
 fi
 
 # remote compilation via ssh+nfs on jmehost2
@@ -40,8 +42,10 @@ if [ "$BASE_DIR" = "build_linux" ]; then
 	CXX_VAL="ccache g++"
 elif [ "$BASE_DIR" = "build_win32" ]; then
 	CXX_VAL="ccache i586-mingw32msvc-g++"
+elif [ "$BASE_DIR" = "build_macos" ]; then
+	CXX_VAL="ccache g++-4.2"
 fi
-exec make -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
+exec make -j2 -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
 
 # Distributed build using distcc
 #export DISTCC_HOSTS="jmehost2"

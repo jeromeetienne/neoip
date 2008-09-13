@@ -20,9 +20,10 @@
 #   - start-stop-daemon --stop  => killproc $EXEC_NAME
 #   - look at init.d function... those function seems to be quite complete
 
-# - NOTE: because EEEpc xandros doesnt put /sbin in default $PATH, and it contains start-stop-daemon
-#   - im not sure how to include it in here for now
-#   - PATH=$PATH:/sbin
+# in some linux distribution (e.g xandros and debian), /sbin is not the path
+# - /sbin is required to use start-stop-daemon
+# - adding it now, all the time, it cant hurt
+PATH=$PATH:/sbin
 
 # get the FULL_PATH and BASE_NAME from $0 (first parameter of cmdline)
 FULL_PATH=`case $0 in /*) echo $0;; *) echo $PWD/$0;; esac`
@@ -31,10 +32,8 @@ INST_DIR=`dirname $FULL_PATH`
 # get the APPS_NAME from the BASENAME
 APPS_NAME="$BASE_NAME"
 
-
 # APPS_EXT is the extension to add to the APPS_NAME to get the neoip apps executable name
 APPS_EXT="-bin"
-
 
 CANON_NAME=`echo "$APPS_NAME" | tr "-" "_"`
 EXTRSC_ROOTDIR="$INST_DIR/pkg_extrsc"
@@ -67,6 +66,13 @@ else
 	LOG_ROOTDIR=/var/log
 fi
 
+
+# if APPS_TYPE is SYS_* , return an error if the user is not root
+echo $APPS_TYPE | grep SYS_ >/dev/null
+if [ "$?" = "0" -a "`id -u`" != "0" ]; then
+	echo "It is required to be root to run this script. try 'sudo $0 $*'"
+	exit -1
+fi
 
 # determine if the script is running on a rpm-based distribution or not
 # - if $is_rpm_based="0", then it is assumed to be a deb_based
@@ -142,8 +148,7 @@ hook_post_run_if_present() {
 display_start() {
 	# Start the daemon
 	if [ "$is_rpm_based" = "1" ]; then
-		killproc $EXEC_NAME
-                daemon $EXEC_NAME $EXEC_CMDLINE_OPT
+		daemon --pidfile=$PIDFILE $EXEC_NAME $EXEC_CMDLINE_OPT
 	else
 		start-stop-daemon --start --quiet --pidfile $PIDFILE -u `id -u`		\
 					--exec $EXEC_NAME -- $EXEC_CMDLINE_OPT
@@ -160,7 +165,7 @@ display_start() {
 display_stop() {
 	# stop the daemon
 	if [ "$is_rpm_based" = "1" ]; then
-		killproc $EXEC_NAME
+		killproc -p $PIDFILE $EXEC_NAME
 	else
 		start-stop-daemon --stop --quiet --pidfile $PIDFILE -u `id -u`		\
 				--exec $EXEC_NAME
@@ -177,7 +182,7 @@ display_stop() {
 display_status() {
 	# test if the daemon is running
 	if [ "$is_rpm_based" = "1" ]; then
-		status $EXEC_NAME
+		status -p $PIDFILE $EXEC_NAME
 	else	
 		# --quiet is not honored, so i have to put >/dev/null, hourray
 		start-stop-daemon --start --test --quiet --pidfile $PIDFILE -u `id -u`	\
@@ -202,19 +207,23 @@ hook_pre_run_if_present;
 case "$CTRL_CMD" in
 	start)	echo -n "Starting $DESC: $NAME"
 		display_start
-		echo ".";;
+		echo ;;
 	stop)	echo -n "Stopping $DESC: $NAME"
 		display_stop
-		echo ".";;
+		echo ;;
 	restart)echo -n "Stopping $DESC: $NAME"
 		display_stop
-		echo "."
+		echo
 		echo -n "Starting $DESC: $NAME"
 		display_start
-		echo ".";;
-	status)	echo -n "Statuing $DESC: $NAME"
+		echo ;;
+	status)	if [ "$is_rpm_based" = "0" ]; then
+			echo -n "Statuing $DESC: $NAME"
+		else
+			echo -n "Statuing $DESC: "
+		fi
 		display_status
-		echo "."
+		[ "$is_rpm_based" = "0" ] && echo
 		;;
 	help)	display_long_help;;
 	*)	echo "$APPS_NAME-ctrl: ERROR: $CTRL_CMD is an unknown command."
