@@ -3,7 +3,7 @@
 
 */
 
-#ifndef _WIN32
+#ifdef __linux__
 
 #ifndef __NEOIP_HOST2IP_AGAI_HPP__ 
 #define __NEOIP_HOST2IP_AGAI_HPP__ 

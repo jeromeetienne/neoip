@@ -13,7 +13,7 @@ call specific to glibc. it uses thread.
 
 */
 
-#ifndef _WIN32
+#ifdef __linux__
 
 /* system include */
 #include <netdb.h>
