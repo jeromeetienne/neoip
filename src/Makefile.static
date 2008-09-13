@@ -1898,6 +1898,7 @@ all: $(ALL_EXE)
 
 ######################################################
 # setup the command to build libraries shared/static on all NEOIP_TARGET
+# - http://www.gnu.org/software/make/manual/make.html#Sequences
 ########
 ifeq ($(NEOIP_TARGET), linux)
 define build_sharedlib
