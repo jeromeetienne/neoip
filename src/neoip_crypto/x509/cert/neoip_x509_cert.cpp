@@ -95,7 +95,7 @@ bool	x509_cert_t::is_null()		const throw()
  */
 std::string	x509_cert_t::algo_name()	const throw()
 {
-	size_t	nb_bit	= 0;
+	unsigned int	nb_bit	= 0;
 	// get the public key algo from gnutls
 	int	pk_algo = gnutls_x509_crt_get_pk_algorithm(gnutls_cert, &nb_bit);
 	// if an error occured, return std::string()
@@ -110,7 +110,7 @@ std::string	x509_cert_t::algo_name()	const throw()
  */
 size_t	x509_cert_t::key_length()	const throw()
 {
-	size_t	nb_bit	= 0;
+	unsigned int	nb_bit	= 0;
 	// get the public key algo from gnutls
 	int	pk_algo = gnutls_x509_crt_get_pk_algorithm(gnutls_cert, &nb_bit);
 	// if an error occured, return 0
