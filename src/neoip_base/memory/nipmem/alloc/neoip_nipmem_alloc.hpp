@@ -10,7 +10,7 @@
 #ifndef __NEOIP_NIPMEM_ALLOC_HPP__ 
 #define __NEOIP_NIPMEM_ALLOC_HPP__ 
 /* system include */
-#include <malloc.h>
+#include <stdlib.h>
 /* local include */
 #include "neoip_nipmem_tracker.hpp"
 #include "neoip_cpp_demangle.hpp"
