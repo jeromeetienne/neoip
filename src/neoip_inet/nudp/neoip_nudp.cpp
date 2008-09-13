@@ -360,7 +360,7 @@ ssize_t	nudp_t::recvfromto(void *buf_ptr, int buf_len, ipport_addr_t &local_addr
 #else
 	struct 	sockaddr_in	addr_in;
 	ssize_t			read_len;
-	int			fromlen	= sizeof(addr_in);
+	socklen_t		fromlen	= sizeof(addr_in);
 
 	// do the recvmsg
 	read_len	= recvfrom(fdwatch->get_fd(), (char *)buf_ptr, buf_len, 0
