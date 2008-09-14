@@ -167,10 +167,10 @@ bool	host2ip_testclass_t::neoip_host2ip_cb(void *cb_userptr, host2ip_vapi_t &cb_
 	launch_host2ip();
 	
 	// if now the host2ip_db is empty, the test is completed
-	if( host2ip_db.empty() )	return nunit_ftor(NUNIT_RES_OK);
+	if( host2ip_db.empty() )	nunit_ftor(NUNIT_RES_OK);
 	
-	// return tokeep
-	return true;
+	// return dontkeep - host2ip_t has just been deleted
+	return false;
 }
 
 NEOIP_NAMESPACE_END

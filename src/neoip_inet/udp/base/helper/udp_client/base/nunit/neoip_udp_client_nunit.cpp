@@ -219,7 +219,8 @@ bool	udp_client_testclass_t::neoip_udp_client_event_cb(void *userptr, udp_client
 			udp_client_db.remove(udp_client);
 			nipmem_zdelete	udp_client;
 			// if udp_client_db is empty, return success			
-			if( udp_client_db.empty() )	return nunit_ftor(NUNIT_RES_OK);
+			if( udp_client_db.empty() )	nunit_ftor(NUNIT_RES_OK);
+			return false;
 			break;}
 	default:	DBG_ASSERT(0);
 	}
