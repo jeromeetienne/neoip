@@ -136,7 +136,6 @@ bool nslan_testclass_t::neoip_nslan_query_cb(void *cb_userptr, nslan_query_t &cb
 			// if the received record is NOT the expected one, continue the query
 			if( nslan_event.get_got_record(NULL) != nslan_publish->get_record() )
 				return true;
-			return true;
 			// if the recieved record IS the expected one, report a positive
 			nunit_res	= NUNIT_RES_OK;
 			break;
