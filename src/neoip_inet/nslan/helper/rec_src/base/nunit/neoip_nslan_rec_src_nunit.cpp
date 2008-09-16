@@ -62,7 +62,7 @@ nunit_err_t	nslan_rec_src_testclass_t::neoip_nunit_testclass_init()	throw()
 	
 	// create a nslan_listener_t
 	nslan_listener	= nipmem_new nslan_listener_t();
-	inet_err	= nslan_listener->start("127.255.255.255:4000");
+	inet_err	= nslan_listener->start("255.255.255.255:4000");
 	if( inet_err.failed() )	return nunit_err_t(nunit_err_t::ERROR, inet_err.to_string());
 	
 	// create a nslan_peer_t
