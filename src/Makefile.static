@@ -1748,6 +1748,9 @@ ifeq ($(NEOIP_TARGET), win32)
 	LINKLIB 	+=
 	LINKLIB		+= /home/jerome/win32/aux/inst/lib/libevent.a
 	INCLUDEOPT	+= -I/home/jerome/win32/aux/inst/include
+else ifeq ($(NEOIP_TARGET), macos)
+	LINKLIB 	+= -levent
+	INCLUDEOPT	+=
 else
 	LINKLIB 	+= -L$(SRC_DIR) -levent
 	INCLUDEOPT	+= -I$(SRC_DIR)/libevent

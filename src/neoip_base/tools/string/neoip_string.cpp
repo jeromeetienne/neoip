@@ -323,7 +323,7 @@ std::string	string_t::progress_bar_str(double curavail_pct, double oldavail_pct,
 	// put the head of the progress bar
 	oss << "[";
 
-	double	oldcur_ratio	= oldavail_pct / curavail_pct;
+	double	oldcur_ratio	= curavail_pct ? (oldavail_pct / curavail_pct) : 1.0;
 	double	char_percent	= 1.0 / (width-2);
 	size_t	nb_anyavail	= size_t(curavail_pct / char_percent);
 	size_t	nb_oldavail	= size_t(oldcur_ratio * nb_anyavail);
