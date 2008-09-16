@@ -79,7 +79,6 @@ tcp_itor_t &	tcp_itor_t::local_addr(const ipport_addr_t &p_local_addr)	throw()
 inet_err_t	tcp_itor_t::start(const ipport_addr_t &p_remote_addr
 				, tcp_itor_cb_t *callback, void *userptr)	throw()
 {
-	int			opt_on	= 1;
 	struct 	sockaddr_in	addr_in;
 	std::string		errstr;	
 	inet_err_t		inet_err;
@@ -102,7 +101,7 @@ inet_err_t	tcp_itor_t::start(const ipport_addr_t &p_remote_addr
 		goto error;
 	}
 	// set REUSEADDR
-	inet_err	= inet_oswarp_t::setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &opt_on, sizeof(opt_on));
+	inet_err	= inet_oswarp_t::set_reuseaddr(sock_fd);
 	if( inet_err.failed() ){
 		errstr = "setsockopt SO_REUSEADDR failed due to " + inet_err.to_string();
 		goto close_socket;

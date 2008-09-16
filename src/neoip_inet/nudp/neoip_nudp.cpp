@@ -137,12 +137,13 @@ inet_err_t	nudp_t::start()						throw()
 		errstr = "Cant create socket. errno=" + inet_oswarp_t::sock_strerror();
 		goto error;
 	}
-	// set REUSEADDR - to allow the socket to bind an address already bound
-	inet_err= inet_oswarp_t::setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &opt_on, sizeof(opt_on));
+	// set SO_REUSEADDR - to allow the socket to bind an address already bound
+	inet_err= inet_oswarp_t::set_reuseaddr(sock_fd);
 	if( inet_err.failed() ){
-		errstr = "setsockopt SO_REUSEADDR failed due to " + inet_err.to_string();
+		errstr = "setsockopt SO_REUSEPORT failed due to " + inet_err.to_string();
 		goto close_socket;
 	}
+
 	// set BROADCAST - to allow the socket to send packet to broadcast address
 	inet_err= inet_oswarp_t::setsockopt(sock_fd, SOL_SOCKET, SO_BROADCAST, &opt_on, sizeof(opt_on));
 	if( inet_err.failed() ){

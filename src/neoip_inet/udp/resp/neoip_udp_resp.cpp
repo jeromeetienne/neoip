@@ -271,8 +271,7 @@ bool	udp_resp_t::neoip_fdwatch_cb( void *cb_userptr, const fdwatch_t &cb_fdwatch
 	
 #if 1	// set REUSEADDR - part of the SO_REUSEADDR kludge, see udp_resp_t comment for details
 	int	opt_on	= 1;
-	inet_err	= inet_oswarp_t::setsockopt(fdwatch->get_fd(), SOL_SOCKET, SO_REUSEADDR
-							, &opt_on, sizeof(opt_on));
+	inet_err	= inet_oswarp_t::set_reuseaddr(fdwatch->get_fd());
 	if( inet_err.failed() ){
 		KLOG_ERR("Cant setsockopt REUSEADDR due to " << inet_err );
 		DBG_ASSERT( 0 );
@@ -285,8 +284,7 @@ bool	udp_resp_t::neoip_fdwatch_cb( void *cb_userptr, const fdwatch_t &cb_fdwatch
 
 #if 1	// unset REUSEADDR - part of the SO_REUSEADDR kludge, see udp_resp_t comment for details
 	opt_on	= 0;	
-	inet_err	= inet_oswarp_t::setsockopt(fdwatch->get_fd(), SOL_SOCKET, SO_REUSEADDR
-							, &opt_on, sizeof(opt_on));
+	inet_err	= inet_oswarp_t::set_reuseaddr(fdwatch->get_fd());
 	if( inet_err.failed() ){
 		KLOG_ERR("Cant setsockopt REUSEADDR due to " << inet_err );
 		DBG_ASSERT( 0 );

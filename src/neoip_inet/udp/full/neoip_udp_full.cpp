@@ -150,9 +150,7 @@ inet_err_t	udp_full_t::set_local_addr(const ipport_addr_t &local_addr)	throw()
 	if( inet_err.failed() )	return inet_err;
 	
 #if 1	// set REUSEADDR - part of the SO_REUSEADDR kludge, see udp_resp_t comment for details
-	int	opt_on	= 1;
-	inet_err	= inet_oswarp_t::setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR
-							, &opt_on, sizeof(opt_on));
+	inet_err	= inet_oswarp_t::set_reuseaddr(sock_fd);
 	if( inet_err.failed() )	return inet_err;
 #endif
 	// bind the socket
@@ -177,9 +175,7 @@ inet_err_t	udp_full_t::set_local_addr(const ipport_addr_t &local_addr)	throw()
 #endif
 
 #if 0	// unset REUSEADDR - part of the SO_REUSEADDR kludge, see udp_resp_t comment for details
-	opt_on		= 0;
-	inet_err	= inet_oswarp_t::setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR
-							, &opt_on, sizeof(opt_on));
+	inet_err	= inet_oswarp_t::set_reuseaddr(sock_fd, false);
 	if( inet_err.failed() ){
 		KLOG_ERR("Cant setsockopt REUSEADDR due to " << inet_err.to_string());
 		DBG_ASSERT( 0 );

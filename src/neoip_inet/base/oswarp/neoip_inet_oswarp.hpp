@@ -42,6 +42,7 @@ public:
 					, const void *optval, socklen_t optlen)	throw();
 	static inet_err_t	getsockopt(int sock_fd, int level, int optname
 					, void *optval, socklen_t *optlen)	throw();
+	static inet_err_t	set_reuseaddr(int sock_fd, bool on = true)	throw();
 	static inet_err_t	set_nonblock(int sock_fd)			throw();
 	static inet_err_t	inet_aton(const char *name_str
 						, struct in_addr *inaddr_dest)	throw();
