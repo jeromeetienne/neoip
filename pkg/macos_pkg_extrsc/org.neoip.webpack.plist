@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE plist PUBLIC -//Apple Computer//DTD PLIST 1.0//EN
+http://www.apple.com/DTDs/PropertyList-1.0.dtd >
+<plist version='1.0'>
+<dict>
+<key>Label</key><string>org.neoip.webpack</string>
+<key>ProgramArguments</key>
+<array>
+        <string>/Users/jerome/workspace/yavipin/build_macos/neoip-webpack</string>
+        <string>-d</string>
+        <string>-c</string>
+        <string>/Users/jerome/workspace/yavipin/src/config_dir_debug1</string>
+</array>
+<key>WorkingDirectory</key>        
+	<string>/Users/jerome/workspace/yavipin/build_macos</string>
+<key>Debug</key><false/>
+<key>OnDemand</key><false/>
+<key>RunAtLoad</key><true/>
+</dict>
+</plist>
