@@ -6,7 +6,7 @@ http://www.apple.com/DTDs/PropertyList-1.0.dtd >
 <key>Label</key><string>org.neoip.webpack</string>
 <key>ProgramArguments</key>
 <array>
-        <string>/Applications/neoip-webpack/neoip-webpack-bin</string>
+        <string>/Applications/neoip-webpack/neoip-webpack-bin-static</string>
         <string>-d</string>
         <string>-c</string>
         <string>/Applications/neoip-webpack/config_dir_sample</string>
