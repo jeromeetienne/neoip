@@ -6,13 +6,13 @@ http://www.apple.com/DTDs/PropertyList-1.0.dtd >
 <key>Label</key><string>org.neoip.webpack</string>
 <key>ProgramArguments</key>
 <array>
-        <string>/Users/jerome/workspace/yavipin/build_macos/neoip-webpack</string>
+        <string>/Applications/neoip-webpack/neoip-webpack-bin</string>
         <string>-d</string>
         <string>-c</string>
-        <string>/Users/jerome/workspace/yavipin/src/config_dir_debug1</string>
+        <string>/Applications/neoip-webpack/config_dir_sample</string>
 </array>
 <key>WorkingDirectory</key>        
-	<string>/Users/jerome/workspace/yavipin/build_macos</string>
+	<string>/Applications/neoip-webpack/</string>
 <key>Debug</key><false/>
 <key>OnDemand</key><false/>
 <key>RunAtLoad</key><true/>

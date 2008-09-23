@@ -8,6 +8,8 @@
 # - only for SYSBOOT apps
 ln -sf /Applications/neoip-webpack/org.neoip.webpack.plist /Library/LaunchDaemons
 
+# TODO what if it is already installed ?
+# - i should stop the previous one
 
 # Start the apps
 launchctl load /Library/LaunchDaemons/org.neoip.webpack.plist
