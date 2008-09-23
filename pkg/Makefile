@@ -15,5 +15,8 @@ deb_based:
 win32:
 	./neoip_pkger.rb nsis_install neoip-webpack full
 
+macos:
+	./neoip_pkger.rb macos_install neoip-webpack full
+
 clean:
 	./neoip_pkger.rb all all clean

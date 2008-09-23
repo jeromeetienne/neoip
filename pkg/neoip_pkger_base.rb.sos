@@ -12,7 +12,19 @@
 #     - seems like an error from the past... try with canon_name with '-'
 #     - remove canon_name and use only apps_name
 # - TODO start deamon on install. see comment on epm postint
+# - the current naming of the pkt_type is poor
+#   - TODO to refactor it
+#   - list of package description
+#     - deb linux i386 dev
+#     - rpm linux i64 rel
+#     - nsis win32 i386 dev
 
+# - TODO about EEEpc xandros packaging
+#   - there is an issue in the neoip-webpack-ctrl with start-stop-daemon and the PATH
+#     - just add the /sbin in PATH at the begining of the script if it is not present in PATH
+#   - there is an issue with the neoip-dnsresolv.sh with a tools which is not present
+#     - found a work around on the EEEpc install
+#   - neoip-webpack.desktop is not called
 
 require "fileutils"
 
@@ -20,7 +32,7 @@ require "fileutils"
 # yavipin/pkg
 
 # determine all the possible pkg_type
-pkg_type_supported = ['nsis_install', 'epm_install', "tgz_install"]
+pkg_type_supported = ['nsis_install', 'deb_install', 'rpm_install', "tgz_install"]
 
 ################################################################################
 # Build a standalone directory for the application 
@@ -30,7 +42,9 @@ def mainsrc_dir()
 end
 
 def get_build_target(pkg_type)
-	if pkg_type == "epm_install"
+	if pkg_type == "deb_install"
+		return "linux"
+	elsif pkg_type == "rpm_install"
 		return "linux"
 	elsif pkg_type == "tgz_install"
 		return "linux";
@@ -245,9 +259,10 @@ def apps_mkdir_win32(pkg_type, apps_name)
 	FileUtils.cp "#{exec_dir}/#{apps_name}-bin-static.exe", "#{build_dir}"
 	system("i586-mingw32msvc-strip #{build_dir}/#{apps_name}-bin-static.exe")
 	# NOTE: for whatever reason im unable to link those lib statically
-	FileUtils.ln_s("/home/samba_share/libglib-2.0-0.dll"	, "#{build_dir}")
-	FileUtils.ln_s("/home/samba_share/libiconv-2.dll"	, "#{build_dir}")
-	FileUtils.ln_s("/home/samba_share/libintl-3.dll"	, "#{build_dir}")	
+	dll_srcdir	= "/home/jerome/win32/glib/inst/bin";
+	FileUtils.ln_s("#{dll_srcdir}/libglib-2.0-0.dll"	, build_dir)
+	FileUtils.ln_s("#{dll_srcdir}/libiconv-2.dll"		, build_dir)
+	FileUtils.ln_s("#{dll_srcdir}/libintl-3.dll"		, build_dir)	
 
 	# ************** templating of all the .bat	************************
 	# get external rescources templates
@@ -290,27 +305,27 @@ def apps_mkpkg(pkg_type, apps_name)
 	# log the event
 	puts "mkpkg #{apps_name} for #{pkg_type}"
 	# forward to pkg_type-specific function
-	send("apps_mkpkg_#{pkg_type}", apps_name)
+	send("apps_mkpkg_#{pkg_type}", pkg_type, apps_name)
 end
 
 def apps_rmpkg(pkg_type, apps_name)
 	# log the event
 	puts "rmpkg #{apps_name} for #{pkg_type}"
 	# forward to pkg_type-specific function
-	send("apps_rmpkg_#{pkg_type}", apps_name)
+	send("apps_rmpkg_#{pkg_type}", pkg_type, apps_name)
 end
 
 ################################################################################
 # mkpkg/rmpkg for epm_install - assume the standalone directory is already built
 ################################################################################
 
-# mkpkg for epm_install
-def apps_mkpkg_epm_install(apps_name)
+# mkpkg common for all pkg_type using epm
+def apps_mkpkg_epm_common(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
 	# get the data specific to this apps_name
 	canon_name	= get_canon_name(apps_name)
-	apps_version	= get_apps_version('epm_install', apps_name)
+	apps_version	= get_apps_version(pkg_type, apps_name)
 	apps_summary	= get_apps_summary(apps_name)
 	apps_description= get_apps_description(apps_name)
 	apps_type	= get_apps_type(apps_name)
@@ -336,10 +351,10 @@ def apps_mkpkg_epm_install(apps_name)
 	# write the result to the .epm_list file
 	File.open("#{apps_name}.epm_list", "w") { |fOut|
 		fOut.puts("%product #{apps_name} - #{apps_summary}")
-		fOut.puts("%copyright 2007")
+		fOut.puts("%copyright 2008")
 		fOut.puts("%vendor NeoIP")
 		fOut.puts("%version #{apps_version}")
-		fOut.puts("%readme \"Read http://off.net/~jme\" ")
+		fOut.puts("%readme \"Read http://www.web4web.tv\" ")
 		fOut.puts("%license \"http://donotusethissoft.ever\"")
 		apps_description.collect { |x| "%description #{x}" }.each { |x| 
 			fOut.puts("#{x}")
@@ -350,10 +365,13 @@ def apps_mkpkg_epm_install(apps_name)
 		
 		# if appt_type == *_BOOT
 		# - make the binary exec in ${apps_name}-bin
-		# - add a ctrl scrip in ${apps_name}-ctrl
+		# - add a ctrl script in ${apps_name}-ctrl
 		# else (aka if apps_type == *_TEMP)
 		# - make the binary exec in #{apps_name}
-		if apps_type =~ /.*_BOOT/
+		if apps_type =~ /SYS_BOOT/
+			fOut.puts("f 755 root root /usr/lib/#{canon_name}/#{apps_name}-bin #{build_dir}/#{apps_name}-bin-static")
+			fOut.puts("f 755 root root /usr/lib/#{apps_name}-ctrl #{build_dir}/pkg_extrsc/#{apps_name}-ctrl.sh")
+		elsif apps_type =~ /USR_BOOT/
 			fOut.puts("f 755 root root /usr/lib/#{canon_name}/#{apps_name}-bin #{build_dir}/#{apps_name}-bin-static")
 			fOut.puts("f 755 root root /usr/bin/#{apps_name}-ctrl #{build_dir}/pkg_extrsc/#{apps_name}-ctrl.sh")
 		else
@@ -368,7 +386,15 @@ def apps_mkpkg_epm_install(apps_name)
 
 		# add all the desktop
 		all_desktop.each { |src_file|
-			dst_dirname	= "/usr/share/autostart"
+			# - TODO to sort it out
+			#   - apparently it would be /usr/share/xdg under fedora
+			if pkg_type == "deb_install"
+				dst_dirname	= "/usr/share/autostart"
+			elsif pkg_type == "rpm_install"
+				dst_dirname	= "/usr/xdg/autostart"
+			else
+				throw "this should never happen"
+			end
 			fOut.puts("f 644 root root #{dst_dirname}/#{src_file} #{build_dir}/pkg_extrsc/#{src_file}")
 		}
 
@@ -382,10 +408,16 @@ def apps_mkpkg_epm_install(apps_name)
 		fOut << "%postinstall <<EOF\n"
 		fOut << "	#{postinstall_hook}\n"
 		if all_initd.size > 0 
-			# if there are init.d files, do a update-rc.d		
-			# - update-rc.d is debian specific
-			# - apparnetly it is "chkconfig" for fedora
-			fOut << "update-rc.d #{apps_name} defaults\n"
+			# if there are init.d files, install it		
+			if pkg_type == "deb_install"
+				# - update-rc.d is debian specific
+				fOut << "update-rc.d #{apps_name} defaults\n"
+			elsif pkg_type == "rpm_install"
+				# - FEDORA ~= "chkconfig --add #{apps_name}"
+				fOut << "chkconfig --add #{apps_name}\n"
+			else
+				throw "this should never happen"
+			end
 		end
 		# start the application automatically in the postinstall
 		if apps_type == "USR_BOOT"
@@ -395,7 +427,7 @@ def apps_mkpkg_epm_install(apps_name)
 			fOut << "fi\n"
 		elsif apps_type == "SYS_BOOT"
 			# if SYS_BOOT, launch it as root now
-			fOut << "#{apps_name}-ctrl start\n"
+			fOut << "/usr/lib/#{apps_name}-ctrl start\n"
 		end
 		fOut << "	exit 0\n"
 		fOut << "EOF\n"			
@@ -403,9 +435,16 @@ def apps_mkpkg_epm_install(apps_name)
 		fOut << "%postremove <<EOF\n"
 		fOut << "	#{postremove_hook}\n"
 		if all_initd.size > 0 
-			# if there are init.d files, do a update-rc.d		
-			# - update-rc.d is debian specific
-			fOut << "	update-rc.d #{apps_name} remove\n"
+			# if there are init.d files, remove it
+			if pkg_type == "deb_install"
+				# - update-rc.d is debian specific
+				fOut << "	update-rc.d #{apps_name} remove\n"
+			elsif pkg_type == "rpm_install"
+				# - FEDORA ~= "chkconfig --del #{apps_name}"
+				fOut << "	chkconfig --del #{apps_name}\n"
+			else
+				throw "this should never happen"
+			end
 		end
 		fOut << "	exit 0\n"
 		fOut << "EOF\n"			
@@ -439,29 +478,47 @@ def apps_mkpkg_epm_install(apps_name)
 	
 	# build the package itself
 	puts ("Doing 'sudo epm' to build the epm_package. if it asks for a password, give sudo password.")
-	system("sudo epm -n --output-dir . -f deb #{apps_name} #{apps_name}.epm_list")
+	epm_format	= pkg_type.split('_')[0];
+	system("sudo epm -n --output-dir . -f #{epm_format} #{apps_name} #{apps_name}.epm_list")
 
-	# epm put '-' between name/version, and version/arch
+	# IF pkg_type=="deb_install" => epm put '-' between name/version, and version/arch
 	# - just rename it the usual debian way
-	system("mv #{apps_name}-#{apps_version}.deb #{apps_name}_#{apps_version}_i386.deb")
+	if pkg_type == "deb_install"
+		system("mv #{apps_name}-#{apps_version}.deb #{apps_name}_#{apps_version}_i386.deb")
+	end
 	
 	# remove the configuration file
-	#FileUtils.rm_f "#{apps_name}.epm_list"
+	FileUtils.rm_f "#{apps_name}.epm_list"
 end
 
-# mkpkg for epm_install
-def apps_rmpkg_epm_install(apps_name)
+# mkpkg for deb_install
+def apps_mkpkg_deb_install(pkg_type, apps_name)
+	apps_mkpkg_epm_common(pkg_type, apps_name)
+end
+
+# mkpkg for deb_install
+def apps_rmpkg_deb_install(pkg_type, apps_name)
 	# remove the .deb for all version
 	Dir.glob("#{apps_name}_*_i386.deb") { |filename| FileUtils.rm_f filename	}
 end
 
+# mkpkg for rpm_install
+def apps_mkpkg_rpm_install(pkg_type, apps_name)
+	apps_mkpkg_epm_common(pkg_type, apps_name)
+end
+
+# mkpkg for rpm_install
+def apps_rmpkg_rpm_install(pkg_type, apps_name)
+	# remove the .rpm for all version
+	Dir.glob("#{apps_name}*.rpm") { |filename| FileUtils.rm_f filename	}
+end
 
 ################################################################################
 # mkpkg/rmpkg for tgz_install - assume the standalone directory is already built
 ################################################################################
 
 # mkpkg for tgz_install
-def apps_mkpkg_tgz_install(apps_name)
+def apps_mkpkg_tgz_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
 	# get the data specific to this apps_name
@@ -488,7 +545,7 @@ def apps_mkpkg_tgz_install(apps_name)
 end
 
 # mkpkg for tgz_install
-def apps_rmpkg_tgz_install(apps_name)
+def apps_rmpkg_tgz_install(pkg_type, apps_name)
 	# remove the installer .tgz for all version
 	Dir.glob("#{apps_name}_*.tgz") { |filename| FileUtils.rm_f filename	}
 end
@@ -498,7 +555,7 @@ end
 ################################################################################
 
 # mkpkg for nsis_install
-def apps_mkpkg_nsis_install(apps_name)
+def apps_mkpkg_nsis_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
 	# get the data specific to this apps_name
@@ -525,7 +582,7 @@ def apps_mkpkg_nsis_install(apps_name)
 end
 
 # mkpkg for nsis_install
-def apps_rmpkg_nsis_install(apps_name)
+def apps_rmpkg_nsis_install(pkg_type, apps_name)
 	# remove the installer .exe for all version
 	Dir.glob("#{apps_name}-*.exe") { |filename| FileUtils.rm_f filename	}
 	# remove the nsis configuration file
@@ -540,35 +597,45 @@ def apps_upload(pkg_type, apps_name)
 	# log the event
 	puts "upload #{apps_name} for #{pkg_type}"
 	# forward to pkg_type-specific function
-	send("apps_upload_#{pkg_type}", apps_name)
+	send("apps_upload_#{pkg_type}", pkg_type, apps_name)
 end
 
-# upload for epm_install
-def apps_upload_epm_install(apps_name)
+# upload for deb_install
+def apps_upload_deb_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
 	# get the data specific to this apps_name
-	apps_version	= get_apps_version('epm_install', apps_name)
+	apps_version	= get_apps_version(pkg_type, apps_name)
 	# upload to jmeserv
-	system("scp #{apps_name}_#{apps_version}_i386.deb jmeserv:public_html/download/linux")
+	system("scp #{apps_name}_#{apps_version}_i386.deb dedixl.jetienne.com:public_html/download/linux")
+end
+
+# upload for rpm_install
+def apps_upload_rpm_install(pkg_type, apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	# get the data specific to this apps_name
+	apps_version	= get_apps_version(pkg_type, apps_name)
+	# upload to jmeserv
+	system("scp #{apps_name}-#{apps_version}.rpm dedixl.jetienne.com:public_html/download/linux")
 end
 
 # upload for tgz_install
-def apps_upload_tgz_install(apps_name)
+def apps_upload_tgz_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
 	# get the data specific to this apps_name
 	apps_version	= get_apps_version('tgz_install', apps_name)
 	# upload to jmeserv
-	system("scp #{apps_name}_#{apps_version}_i386.tgz jmeserv:public_html/download/linux")
+	system("scp #{apps_name}_#{apps_version}_i386.tgz dedixl.jetienne.com:public_html/download/linux")
 end
 
 # upload for nsis_install
-def apps_upload_nsis_install(apps_name)
+def apps_upload_nsis_install(pkg_type, apps_name)
 	# get the data specific to this apps_name
 	apps_version	= get_apps_version('nsis_install', apps_name)
-	# upload to jmeserv
-	system("scp #{apps_name}-#{apps_version}.exe jmeserv:public_html/download/win32")
+	# upload to http://web4web.tv/download
+	system("scp #{apps_name}-#{apps_version}.exe dedixl.jetienne.com:public_html/download/win32")
 end
 
 ################################################################################

@@ -32,7 +32,7 @@ require "fileutils"
 # yavipin/pkg
 
 # determine all the possible pkg_type
-pkg_type_supported = ['nsis_install', 'deb_install', 'rpm_install', "tgz_install"]
+pkg_type_supported = ['nsis_install', 'macos_install', 'deb_install', 'rpm_install', "tgz_install"]
 
 ################################################################################
 # Build a standalone directory for the application 
@@ -42,16 +42,27 @@ def mainsrc_dir()
 end
 
 def get_build_target(pkg_type)
-	if pkg_type == "deb_install"
-		return "linux"
-	elsif pkg_type == "rpm_install"
-		return "linux"
-	elsif pkg_type == "tgz_install"
-		return "linux";
-	elsif pkg_type == "nsis_install"
-		return "win32";
-	end
-	throw "should never happen"
+	arr	= {
+		"deb_install"	=> "linux",
+		"rpm_install"	=> "linux",
+		"tgz_install"	=> "linux",
+		"nsis_install"	=> "win32",
+		"macos_install"	=> "macos",
+		}
+	throw "should never happen" if !arr[pkg_type]
+	return arr[pkg_type]
+end
+
+def get_pkg_fext(pkg_type)
+	arr	= {
+		"deb_install"	=> "deb",
+		"rpm_install"	=> "rpm",
+		"tgz_install"	=> "tgz",
+		"nsis_install"	=> "exe",
+		"macos_install"	=> "dmg",
+		}
+	throw "should never happen" if !arr[pkg_type]
+	return arr[pkg_type]
 end
 
 # TODO here there is an nameing issue
@@ -95,7 +106,7 @@ end
 # - apps_type is SYS_BOOT/USR_BOOT/USR_TEMP
 def get_apps_type(apps_name)
 	canon_name	= get_canon_name(apps_name)
-	apps_type	= `grep -e '^#define.*APPS_TYPE' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info.hpp | cut -d'"' -f 2 | head -c -1`
+	apps_type	= `grep -e '^#define.*APPS_TYPE' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info.hpp | cut -d'"' -f 2 | tr -d "\n"`
 	return	apps_type
 end
 
@@ -104,7 +115,7 @@ end
 #   the #{apps_name}_main.o compile time
 def get_apps_version(pkg_type, apps_name)
 	canon_name	= get_canon_name(apps_name)
-	apps_version	= `grep -e '^#define.*APPS_VERSION' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info.hpp | cut -d'"' -f 2 | head -c -1`
+	apps_version	= `grep -e '^#define.*APPS_VERSION' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info.hpp | cut -d'"' -f 2 | tr -d "\n"`
 	apps_compiletime= File.stat("#{get_exec_dir(pkg_type)}/apps/#{canon_name}/#{canon_name}_main.o").mtime
 	return apps_version + "-" + apps_compiletime.strftime("%Y%m%d%H%M")
 end
@@ -201,7 +212,7 @@ def apps_mkdir_common(pkg_type, apps_name)
 	# copy the extrsc directory if it exist
 	# - NOTE: use directly cp to use the -L option aka 'follow symlink'
 	if FileTest.exist?("#{mainsrc_dir}/apps/#{canon_name}/pkg_extrsc")
-		system("cp -Lr #{mainsrc_dir}/apps/#{canon_name}/pkg_extrsc #{build_dir}")
+		system("cp -LR #{mainsrc_dir}/apps/#{canon_name}/pkg_extrsc #{build_dir}")
 	end
 end
 
@@ -259,10 +270,10 @@ def apps_mkdir_win32(pkg_type, apps_name)
 	FileUtils.cp "#{exec_dir}/#{apps_name}-bin-static.exe", "#{build_dir}"
 	system("i586-mingw32msvc-strip #{build_dir}/#{apps_name}-bin-static.exe")
 	# NOTE: for whatever reason im unable to link those lib statically
-	dll_srcdir	= "/home/jerome/win32/glib/inst/bin";
-	FileUtils.ln_s("#{dll_srcdir}/libglib-2.0-0.dll"	, build_dir)
-	FileUtils.ln_s("#{dll_srcdir}/libiconv-2.dll"		, build_dir)
-	FileUtils.ln_s("#{dll_srcdir}/libintl-3.dll"		, build_dir)	
+	dll_srcdir	= "/home/jerome/win32/glib/inst/bin"
+	FileUtils.ln_s("#{dll_srcdir}/libglib-2.0-0.dll"	, "#{build_dir}")
+	FileUtils.ln_s("#{dll_srcdir}/libiconv-2.dll"		, "#{build_dir}")
+	FileUtils.ln_s("#{dll_srcdir}/libintl-3.dll"		, "#{build_dir}")	
 
 	# ************** templating of all the .bat	************************
 	# get external rescources templates
@@ -281,6 +292,36 @@ def apps_mkdir_win32(pkg_type, apps_name)
 		# write the result to the .xml file
 		File.open("#{file_path}", "w") { |fOut| fOut << file_data }	
 	}
+end
+
+# do the macos-specific part of mkdir
+def apps_mkdir_macos(pkg_type, apps_name)
+	# get pkg_type/apps_name derivative variables
+	exec_dir	= get_exec_dir(pkg_type)
+	build_dir	= get_build_dir(apps_name)	
+	apps_type	= get_apps_type(apps_name)
+	
+	# TODO support the other apps_type too
+	throw "only SYS_BOOT apps is implemented for macos build" unless apps_type == "SYS_BOOT"
+
+	# copy the executable
+	FileUtils.cp "#{exec_dir}/#{apps_name}-bin-static", "#{build_dir}"
+	system("strip #{build_dir}/#{apps_name}-bin-static")
+
+	# copy the launchd plist script
+	# - TODO should be done for SYS_BOOT ONLY
+	FileUtils.cp "macos_pkg_extrsc/org.neoip.webpack.plist", "#{build_dir}/pkg_extrsc"
+	
+	# Move the typical install directory into a subdirectory #{apps_name}
+	FileUtils.mkdir "#{build_dir}/#{apps_name}"
+	["config_dir_sample", "#{apps_name}-bin-static", "pkg_extrsc"].each { |fName|
+		FileUtils.mv("#{build_dir}/#{fName}", "#{build_dir}/#{apps_name}")
+	}
+
+	# copy file which are needed to build the packages
+	FileUtils.cp "macos_pkg_extrsc/neoip-webpack.packproj"	, "#{build_dir}/"
+	FileUtils.cp "macos_pkg_extrsc/my_postflight.sh"	, "#{build_dir}/"
+	FileUtils.cp "macos_pkg_extrsc/television.jpg"		, "#{build_dir}/"
 end
 
 ################################################################################
@@ -354,7 +395,7 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 		fOut.puts("%copyright 2008")
 		fOut.puts("%vendor NeoIP")
 		fOut.puts("%version #{apps_version}")
-		fOut.puts("%readme \"Read http://www.web4web.tv\" ")
+		fOut.puts("%readme \"Read http://urfastr.net/webpack\" ")
 		fOut.puts("%license \"http://donotusethissoft.ever\"")
 		apps_description.collect { |x| "%description #{x}" }.each { |x| 
 			fOut.puts("#{x}")
@@ -559,7 +600,7 @@ def apps_mkpkg_nsis_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
 	# get the data specific to this apps_name
-	apps_version	= get_apps_version('nsis_install', apps_name)
+	apps_version	= get_apps_version(pkg_type, apps_name)
 	apps_type	= get_apps_type(apps_name)
 	
 	# read the template
@@ -590,6 +631,49 @@ def apps_rmpkg_nsis_install(pkg_type, apps_name)
 end
 
 ################################################################################
+# mkpkg/rmpkg for macos_install - assume the standalone directory is already built
+################################################################################
+
+# mkpkg for macos_install
+def apps_mkpkg_macos_install(pkg_type, apps_name)
+	# get the data specific to this pkg_type/apps_name
+	pkg_fext	= get_pkg_fext(pkg_type)
+	build_dir	= get_build_dir(apps_name)
+	apps_version	= get_apps_version(pkg_type, apps_name)
+	
+	# call iceberg to build the .pkg
+	system("freeze #{build_dir}/#{apps_name}.packproj");
+	
+	# compute for variable
+	volume_name	= "#{apps_name}"
+	mount_point	= "/Volumes/#{volume_name}"
+	tmpdmg_fname	= "#{build_dir}/#{apps_name}.#{pkg_fext}"
+	reldmg_fname	= "#{apps_name}_#{apps_version}.#{pkg_fext}"
+	
+	# build and attach the disk image
+	system("hdiutil create -size 32m -fs HFS+ -volname #{volume_name} #{tmpdmg_fname}")
+	system("hdiutil attach #{tmpdmg_fname}")
+	
+	# copy the kad_bstrap directory	
+	FileUtils.cp_r("#{build_dir}/build/#{apps_name}.pkg", "#{mount_point}");
+
+	# detach the disk image	
+	device_name	= `df | grep #{mount_point} | cut -d' ' -f 1`
+	system("hdiutil detach #{device_name}")
+
+	# convert the temporary disk image into a read-only one with compression
+	# - i experimented a bit with UDBZ or -imagekey zlib-level=value to decrease the package size
+	# - the gain was negligible (under 1%) so decided "it doesnt worth the complication"
+	system("hdiutil convert #{tmpdmg_fname} -format UDZO -o #{reldmg_fname}");
+end
+
+# mkpkg for macos_install
+def apps_rmpkg_macos_install(pkg_type, apps_name)
+	# remove the package for all version
+	Dir.glob("#{apps_name}_*.dmg") { |filename| FileUtils.rm_f filename	}
+end
+
+################################################################################
 # upload the package - assume the package has been built
 ################################################################################
 
@@ -604,20 +688,25 @@ end
 def apps_upload_deb_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
+	build_target	= get_build_target(pkg_type)
 	# get the data specific to this apps_name
 	apps_version	= get_apps_version(pkg_type, apps_name)
+	dest
 	# upload to jmeserv
-	system("scp #{apps_name}_#{apps_version}_i386.deb dedixl.jetienne.com:public_html/download/linux")
+	scp_dest	= "dedixl.jetienne.com:public_html/download/#{build_target}"
+	system("scp #{apps_name}_#{apps_version}_i386.deb #{scp_dest}")
 end
 
 # upload for rpm_install
 def apps_upload_rpm_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
+	build_target	= get_build_target(pkg_type)	
 	# get the data specific to this apps_name
 	apps_version	= get_apps_version(pkg_type, apps_name)
 	# upload to jmeserv
-	system("scp #{apps_name}-#{apps_version}.rpm dedixl.jetienne.com:public_html/download/linux")
+	scp_dest	= "dedixl.jetienne.com:public_html/download/#{build_target}"
+	system("scp #{apps_name}-#{apps_version}.rpm #{scp_dest}")
 end
 
 # upload for tgz_install
@@ -625,24 +714,37 @@ def apps_upload_tgz_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
 	# get the data specific to this apps_name
-	apps_version	= get_apps_version('tgz_install', apps_name)
+	apps_version	= get_apps_version(pkg_type, apps_name)
 	# upload to jmeserv
-	system("scp #{apps_name}_#{apps_version}_i386.tgz dedixl.jetienne.com:public_html/download/linux")
+	scp_dest	= "dedixl.jetienne.com:public_html/download/#{build_target}"
+	system("scp #{apps_name}_#{apps_version}_i386.tgz #{scp_dest}")
 end
 
 # upload for nsis_install
 def apps_upload_nsis_install(pkg_type, apps_name)
 	# get the data specific to this apps_name
-	apps_version	= get_apps_version('nsis_install', apps_name)
-	# upload to http://web4web.tv/download
-	system("scp #{apps_name}-#{apps_version}.exe dedixl.jetienne.com:public_html/download/win32")
+	apps_version	= get_apps_version(pkg_type, apps_name)
+	# upload to http://urfastr.net/webpack/download
+	scp_dest	= "dedixl.jetienne.com:public_html/download/#{build_target}"
+	system("scp #{apps_name}-#{apps_version}.exe #{scp_dest}")
 end
 
+# upload for nsis_install
+def apps_upload_macos_install(pkg_type, apps_name)
+	# get the data specific to this apps_name
+	apps_version	= get_apps_version(pkg_type, apps_name)
+	build_target	= get_build_target(pkg_type)
+	pkg_fext	= get_pkg_fext(pkg_type)
+	# upload to http://urfastr.net/webpack/download
+	scp_dest	= "dedixl.jetienne.com:public_html/download/#{build_target}"
+	system("scp #{apps_name}_#{apps_version}.#{pkg_fext} #{scp_dest}")
+end
 ################################################################################
 ################################################################################
 # Program itself
 ################################################################################
 ################################################################################
+
 
 # if the number of argument is not 3, display an inline help and return an error
 if ARGV.length < 3

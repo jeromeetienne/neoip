@@ -25,7 +25,7 @@ end
 # expand all pkg_type_list with the shortcut
 pkg_type_list.collect! { |pkg_type|
 	if pkg_type == "all"
-		pkg_type = ["deb_install", "rpm_install", "tgz_install","nsis_install"]
+		pkg_type = ["deb_install", "rpm_install", "tgz_install","nsis_install", "macos_install"]
 	end
 	pkg_type
 }.flatten!
