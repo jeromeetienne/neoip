@@ -317,6 +317,12 @@ def apps_mkdir_macos(pkg_type, apps_name)
 	["config_dir_sample", "#{apps_name}-bin-static", "pkg_extrsc"].each { |fName|
 		FileUtils.mv("#{build_dir}/#{fName}", "#{build_dir}/#{apps_name}")
 	}
+	
+	# TODO what about all the shared lib i included thru macport ?
+	# - "otool -L youexecname" to see the list
+	# - should i copy them in the home directory ?
+	# - likely... how to test ? ask alain ?
+	# - waiting for some users to complain :)
 
 	# copy file which are needed to build the packages
 	FileUtils.cp "macos_pkg_extrsc/neoip-webpack.packproj"	, "#{build_dir}/"
