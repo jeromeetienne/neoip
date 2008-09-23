@@ -1803,15 +1803,11 @@ ifeq ($(NEOIP_TARGET), win32)
 endif
 
 
-DEBUG_BUILD=1
+DEBUG_BUILD=0
 #ifeq ($(DEBUG_BUILD),1)
 #	LINKLIB += -lefence
 #endif
 
-# jme- not sure it is needed, and for sure this is macos only
-ifeq ($(NEOIP_TARGET), macos)
-	MAIN_OPT	+= -dynamic
-endif
 
 # change the compiling tools depending on the target
 ifeq ($(NEOIP_TARGET), win32)
@@ -1831,58 +1827,91 @@ else
 	EXE_EXT	:=
 endif
 
+
 ifeq ($(DEBUG_BUILD),1)
 #	DBG_OPT += -g
 # supposed to be the same as -g but much faster to link statically
 # - testing show otherwise
 #	DBG_OPT += -gstabs+
-# jme- disabled to get win32 to compile on 
-	DBG_OPT += -Werror
-# NOTE: while compiling in  i get a lot of false alarm on unitilized variable
+endif
+
+
+DBG_OPT += -Werror
+
+# NOTE: while compiling in  i get a lot of false alarm on uninitilized variable
 # - some in even in stl code... so i cant even fix it
-	DBG_OPT += -Wno-uninitialized
-#	DBG_OPT += -fpic
-#	DBG_OPT += -fPIC
-	DBG_OPT += -D_FILE_OFFSET_BITS=64
-	DBG_OPT += -O0
+#DBG_OPT += -Wno-uninitialized
+
+# DBG_OPT += -fpic
+# DBG_OPT += -fPIC
+
+DBG_OPT += -D_FILE_OFFSET_BITS=64
+
+# DBG_OPT += -O0
 #	DBG_OPT += -O2
 #	DBG_OPT += -O3
 #	DBG_OPT += -march=pentium4
 # TODO to renable those one... i disabled them when porting to a new gcc
 #	DBG_OPT += -fvisibility-inlines-hidden
 
-#	DBG_OPT += -DUSE_ELOOP_GLIB
-	DBG_OPT += -DUSE_ELOOP_LEVT
+# DBG_OPT += -DUSE_ELOOP_GLIB
+DBG_OPT += -DUSE_ELOOP_LEVT
+
 ifeq ($(NEOIP_TARGET), linux)
 	DBG_OPT += -DUSE_HOST2IP_FORK
 else
 	DBG_OPT += -DUSE_HOST2IP_SYNC
 endif
-#	DBG_OPT += -DUSE_HOST2IP_SYNC
-#	DBG_OPT += -DUSE_HOST2IP_FORK
-#	DBG_OPT += -DUSE_HOST2IP_AGAI
-	DBG_OPT += -DNO_DBG_TRACE=1
-	DBG_OPT += -DNO_DBG_ASSERT=1
-#	DBG_OPT	+= -DNO_TRACE_AT_ALL=1
-	
-#	DBG_OPT += -DNO_TOKEEP_CHECK_DECLARE=1
-#	DBG_OPT += -DNO_TOKEEP_CHECK_USAGE=1
-	
-#	DBG_OPT += -DNO_NIPMEM_SMASHING=1
-#	DBG_OPT += -DNO_NIPMEM_TRACKING=1
-	# on ubuntu hardy, mlock is limited to 32kbyte per user... so unreliable... so disabling it all for now
-	DBG_OPT += -DNO_NIPMEM_LOCKING=1
+# DBG_OPT += -DUSE_HOST2IP_SYNC
+# DBG_OPT += -DUSE_HOST2IP_FORK
+# DBG_OPT += -DUSE_HOST2IP_AGAI
 
-	DBG_OPT += -DNO_WIKIDBG_OBJ=1
+DBG_OPT		+= -DNO_DBG_TRACE=1
+# DBG_OPT	+= -DNO_DBG_ASSERT=1
+# DBG_OPT	+= -DNO_TRACE_AT_ALL=1
+	
+# DBG_OPT	+= -DNO_TOKEEP_CHECK_DECLARE=1
+# DBG_OPT	+= -DNO_TOKEEP_CHECK_USAGE=1
+	
+# DBG_OPT	+= -DNO_NIPMEM_SMASHING=1
+# DBG_OPT	+= -DNO_NIPMEM_TRACKING=1
+
 
 # jme- to make the template instance unique at link-time. i dont really get what it is or how to use it tho
 #      would make the code smaller. i tried and it created compilation error at link time
-#	DBG_OPT += -frepo
+# DBG_OPT += -frepo
 # jme- for stuff i dont really get about precompiled header (not important as they are not compatible with distcc)
-#	DBG_OPT += -fpch-preprocess
-else
-	DBG_OPT += -O2 -DNEOIP_NODEBUG_COMPIL=1 -DNO_DBG_TRACE=1
-#-DNO_TRACE_AT_ALL
+# DBG_OPT += -fpch-preprocess
+
+
+#RELEASE_BUILD=1
+ifeq ($(RELEASE_BUILD),1)
+	DBG_OPT += -O2
+	DBG_OPT += -DNO_DBG_TRACE=1
+	DBG_OPT += -DNO_DBG_ASSERT=1
+	DBG_OPT	+= -DNO_TRACE_AT_ALL=1
+	
+	DBG_OPT += -DNO_TOKEEP_CHECK_DECLARE=1
+	DBG_OPT += -DNO_TOKEEP_CHECK_USAGE=1
+	
+	DBG_OPT += -DNO_NIPMEM_SMASHING=1
+	DBG_OPT += -DNO_NIPMEM_TRACKING=1
+	DBG_OPT += -DNO_WIKIDBG_OBJ=1
+
+	# remove the warning for unknown variables
+	# - because of all the stuff i disable, some variable are unused
+	DBG_OPT += -Wno-unused
+endif
+
+
+
+# jme- not sure it is needed, and for sure this is macos only
+ifeq ($(NEOIP_TARGET), macos)
+	MAIN_OPT	+= -dynamic
+endif
+ifeq ($(NEOIP_TARGET), linux)
+	# on ubuntu hardy, mlock is limited to 32kbyte per user... so unreliable... so disabling it all for now
+	DBG_OPT += -DNO_NIPMEM_LOCKING=1
 endif
 
 COMMON_CFLAGS= $(MAIN_OPT) $(INCLUDEOPT) $(PROF_OPT) $(DBG_OPT)

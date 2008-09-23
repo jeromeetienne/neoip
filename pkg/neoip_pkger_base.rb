@@ -259,9 +259,10 @@ def apps_mkdir_win32(pkg_type, apps_name)
 	FileUtils.cp "#{exec_dir}/#{apps_name}-bin-static.exe", "#{build_dir}"
 	system("i586-mingw32msvc-strip #{build_dir}/#{apps_name}-bin-static.exe")
 	# NOTE: for whatever reason im unable to link those lib statically
-	FileUtils.ln_s("/home/samba_share/libglib-2.0-0.dll"	, "#{build_dir}")
-	FileUtils.ln_s("/home/samba_share/libiconv-2.dll"	, "#{build_dir}")
-	FileUtils.ln_s("/home/samba_share/libintl-3.dll"	, "#{build_dir}")	
+	dll_srcdir	= "/home/jerome/win32/glib/inst/bin";
+	FileUtils.ln_s("#{dll_srcdir}/libglib-2.0-0.dll"	, build_dir)
+	FileUtils.ln_s("#{dll_srcdir}/libiconv-2.dll"		, build_dir)
+	FileUtils.ln_s("#{dll_srcdir}/libintl-3.dll"		, build_dir)	
 
 	# ************** templating of all the .bat	************************
 	# get external rescources templates
