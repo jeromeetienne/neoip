@@ -2263,7 +2263,7 @@ neoip-webpack$(EXE_EXT): $(APP_WEBPACK_DEPS_DYNA)
 # TODO to remove - just testing a link with all neoip lib in static and the rest in shared
 # - aimed at macos
 neoip-webpack-bla$(EXE_EXT): $(APP_WEBPACK_DEPS_STAT)
-	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_WEBPACK_DEPS_STAT) -Wl,--end-group $(LINKLIB) $(LINKLIB)
+	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_WEBPACK_DEPS_STAT) $(LINKLIB)
 
 neoip-webpack-bin-static$(EXE_EXT): $(APP_WEBPACK_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_WEBPACK_OBJS) $(APP_WEBPACK_LINK) -Wl,--end-group $(LINKLIB)
