@@ -12,7 +12,7 @@ http://www.apple.com/DTDs/PropertyList-1.0.dtd >
         <string>/Applications/neoip-webpack/config_dir_sample</string>
 </array>
 <key>WorkingDirectory</key>        
-	<string>/Applications/neoip-webpack/</string>
+	<string>/Applications/neoip-webpack</string>
 <key>Debug</key><false/>
 <key>OnDemand</key><false/>
 <key>RunAtLoad</key><true/>
