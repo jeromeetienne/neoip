@@ -414,28 +414,30 @@ NEOIP_BT_CAST_OBJS =									\
 
 NEOIP_FLV_DIR=neoip_flv
 NEOIP_FLV_OBJS =							\
-	$(NEOIP_FLV_DIR)/base/basic/codecid/neoip_flv_codecid.o		\
-	$(NEOIP_FLV_DIR)/base/basic/frametype/neoip_flv_frametype.o	\
-	$(NEOIP_FLV_DIR)/base/basic/soundtype/neoip_flv_soundtype.o	\
-	$(NEOIP_FLV_DIR)/base/basic/soundsize/neoip_flv_soundsize.o	\
-	$(NEOIP_FLV_DIR)/base/basic/soundrate/neoip_flv_soundrate.o	\
-	$(NEOIP_FLV_DIR)/base/basic/soundformat/neoip_flv_soundformat.o	\
-	$(NEOIP_FLV_DIR)/base/basic/tagtype/neoip_flv_tagtype.o		\
-	$(NEOIP_FLV_DIR)/base/err/neoip_flv_err.o			\
-	$(NEOIP_FLV_DIR)/base/nunit_gsuite/neoip_flv_nunit_gsuite.o	\
-	$(NEOIP_FLV_DIR)/base/taghd/neoip_flv_taghd.o			\
-	$(NEOIP_FLV_DIR)/base/taghd/audio/neoip_flv_taghd_audio.o	\
-	$(NEOIP_FLV_DIR)/base/taghd/video/neoip_flv_taghd_video.o	\
-	$(NEOIP_FLV_DIR)/base/tophd/neoip_flv_tophd.o			\
-	$(NEOIP_FLV_DIR)/base/tophd/flag/neoip_flv_tophd_flag.o		\
+	$(NEOIP_FLV_DIR)/0base/basic/codecid/neoip_flv_codecid.o		\
+	$(NEOIP_FLV_DIR)/0base/basic/frametype/neoip_flv_frametype.o	\
+	$(NEOIP_FLV_DIR)/0base/basic/soundtype/neoip_flv_soundtype.o	\
+	$(NEOIP_FLV_DIR)/0base/basic/soundsize/neoip_flv_soundsize.o	\
+	$(NEOIP_FLV_DIR)/0base/basic/soundrate/neoip_flv_soundrate.o	\
+	$(NEOIP_FLV_DIR)/0base/basic/soundformat/neoip_flv_soundformat.o	\
+	$(NEOIP_FLV_DIR)/0base/basic/tagtype/neoip_flv_tagtype.o		\
+	$(NEOIP_FLV_DIR)/0base/err/neoip_flv_err.o			\
+	$(NEOIP_FLV_DIR)/0base/nunit_gsuite/neoip_flv_nunit_gsuite.o	\
+	$(NEOIP_FLV_DIR)/0base/taghd/neoip_flv_taghd.o			\
+	$(NEOIP_FLV_DIR)/0base/taghd/audio/neoip_flv_taghd_audio.o	\
+	$(NEOIP_FLV_DIR)/0base/taghd/video/neoip_flv_taghd_video.o	\
+	$(NEOIP_FLV_DIR)/0base/tophd/neoip_flv_tophd.o			\
+	$(NEOIP_FLV_DIR)/0base/tophd/flag/neoip_flv_tophd_flag.o	\
 	$(NEOIP_FLV_DIR)/parse/base/event/neoip_flv_parse_event.o	\
 	$(NEOIP_FLV_DIR)/parse/base/helper/neoip_flv_parse_helper.o	\
 	$(NEOIP_FLV_DIR)/parse/base/profile/neoip_flv_parse_profile.o	\
 	$(NEOIP_FLV_DIR)/parse/base/state/neoip_flv_parse_state.o	\
 	$(NEOIP_FLV_DIR)/parse/base/nunit/neoip_flv_parse_nunit.o	\
 	$(NEOIP_FLV_DIR)/parse/base/wikidbg/neoip_flv_parse_wikidbg.o	\
-	$(NEOIP_FLV_DIR)/helper/amf_parse/neoip_flv_amf_parse.o		\
-	$(NEOIP_FLV_DIR)/helper/amf_parse/type/neoip_flv_amf_type.o	\
+	$(NEOIP_FLV_DIR)/amf0/0base/type/neoip_amf0_type.o		\
+	$(NEOIP_FLV_DIR)/amf0/0base/nunit/neoip_amf0_nunit.o		\
+	$(NEOIP_FLV_DIR)/amf0/parse/neoip_amf0_parse.o			\
+	$(NEOIP_FLV_DIR)/amf0/build/neoip_amf0_build.o			\
 	$(NEOIP_FLV_DIR)/rtmp/resp/neoip_rtmp_resp.o				\
 	$(NEOIP_FLV_DIR)/rtmp/resp/base/wikidbg/neoip_rtmp_resp_wikidbg.o	\
 	$(NEOIP_FLV_DIR)/rtmp/resp/cnx/neoip_rtmp_resp_cnx.o			\
