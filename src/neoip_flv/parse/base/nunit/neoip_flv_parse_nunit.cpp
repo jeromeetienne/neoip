@@ -53,10 +53,10 @@ nunit_err_t	flv_parse_testclass_t::neoip_nunit_testclass_init()	throw()
 	file_path_t	file_path;
 	file_err_t	file_err;
 	// get the file_path_t for the FLV file to read
-	file_path	= "/home/jerome/public_html/golfers.flv";
+//	file_path	= "/home/jerome/public_html/golfers.flv";
 //	file_path	= "/home/jerome/public_html/hypo_from_vgoogle.flv";
 //	file_path	= "/tmp/novell.flv";
-//	file_path	= "/home/jerome/public_html/output.flv";
+	file_path	= "/home/jerome/public_html/output.flv";
 //	file_path	= "/home/jerome/public_html/output2.flv";
 
 	// get the size of the file
@@ -226,10 +226,10 @@ bool	flv_parse_testclass_t::neoip_flv_parse_cb(void *cb_userptr, flv_parse_t &cb
 			// log to debug
 			KLOG_ERR("META DATA:");
 			// parse the tag_data as AMF data
-			flv_err	= flv_amf_parse_t::amf_to_dvar(bytearray, event_name_dvar);
+			flv_err	= amf0_parse_t::amf_to_dvar(bytearray, event_name_dvar);
 			DBG_ASSERT( flv_err.succeed() ); 
 			KLOG_ERR("event_name="	<< event_name_dvar);
-			flv_err	= flv_amf_parse_t::amf_to_dvar(bytearray, event_data_dvar);
+			flv_err	= amf0_parse_t::amf_to_dvar(bytearray, event_data_dvar);
 			DBG_ASSERT( flv_err.succeed() ); 
 			KLOG_ERR("event_data="	<< event_data_dvar);
 		}

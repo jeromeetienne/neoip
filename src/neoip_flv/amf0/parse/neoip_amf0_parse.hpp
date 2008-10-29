@@ -1,5 +1,5 @@
 /*! \file
-    \brief Header of the flv_amf_parse_helper_t class
+    \brief Header of the amf0_parse_helper_t class
     
 */
 
@@ -22,11 +22,11 @@ class	datum_t;
 
 /** \brief static function to parse Actionscript data types in AMF
  */
-class flv_amf_parse_t {
+class amf0_parse_t {
 private:
 	static dvar_t	parser(bytearray_t &bytearray)				throw(serial_except_t);
 public:
-	static flv_err_t amf_to_dvar(bytearray_t &amf_ata, dvar_t &dvar_out)	throw();
+	static flv_err_t amf_to_dvar(bytearray_t &amf0_ata, dvar_t &dvar_out)	throw();
 };
 
 NEOIP_NAMESPACE_END
