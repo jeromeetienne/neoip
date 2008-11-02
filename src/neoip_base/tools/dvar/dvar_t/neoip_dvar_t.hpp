@@ -19,11 +19,13 @@ NEOIP_NAMESPACE_BEGIN
 class	dvar_int_t;
 class	dvar_dbl_t;
 class	dvar_str_t;
+class	dvar_boolean_t;
+class	dvar_nil_t;
 class	dvar_arr_t;
 class	dvar_map_t;
 
 /** \brief a dvar_t of any dvar_type_t
- */ 
+ */
 class dvar_t : NEOIP_COPY_CTOR_ALLOW {
 private:
 	dvar_vapi_t *	dvar_vapi;	//!< pointer on the dvar_vapi of this variable
@@ -49,7 +51,7 @@ public:
 	bool 	operator <= (const dvar_t & other)	const throw()	{ return compare(other) <= 0;	}
 	bool 	operator >  (const dvar_t & other)	const throw()	{ return compare(other) >  0;	}
 	bool 	operator >= (const dvar_t & other)	const throw()	{ return compare(other) >= 0;	}
-		
+
 	/*************** Convertion to subtype	*******************************/
 	const dvar_int_t &	integer()	const throw();
 	dvar_int_t &		integer()	throw();
@@ -57,6 +59,10 @@ public:
 	dvar_dbl_t &		dbl()		throw();
 	const dvar_str_t &	str()		const throw();
 	dvar_str_t &		str()		throw();
+	const dvar_boolean_t &	boolean()	const throw();
+	dvar_boolean_t &	boolean()	throw();
+	const dvar_nil_t &	nil()		const throw();
+	dvar_nil_t &		nil()		throw();
 	const dvar_arr_t &	arr()		const throw();
 	dvar_arr_t &		arr()		throw();
 	const dvar_map_t &	map()		const throw();

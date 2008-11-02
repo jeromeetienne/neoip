@@ -14,7 +14,7 @@ NEOIP_NAMESPACE_BEGIN;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//                   
+//
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +44,7 @@ nunit_res_t	dvar_testclass_t::general(const nunit_testclass_ftor_t &testclass_ft
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//                   
+//
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -61,13 +61,13 @@ nunit_res_t	dvar_testclass_t::integer(const nunit_testclass_ftor_t &testclass_ft
 	NUNIT_ASSERT( !dvar.is_null() );
 	NUNIT_ASSERT( dvar.type() == dvar_type_t::INTEGER );
 	NUNIT_ASSERT( dvar.integer().get() == 42 );
-	// set another value 
+	// set another value
 	dvar.integer().set(43);
 	NUNIT_ASSERT( dvar.integer().get() == 43 );
 	// set another value but in 64bit
 	dvar.integer().set(0x7000000000000000LL);
 	NUNIT_ASSERT( dvar.integer().to_int64() == 0x7000000000000000LL );
-	
+
 	// test comparison operator intra type
 	dvar_t	dvar1	= dvar_int_t(42);
 	dvar_t	dvar2	= dvar_int_t(99);
@@ -75,14 +75,14 @@ nunit_res_t	dvar_testclass_t::integer(const nunit_testclass_ftor_t &testclass_ft
 	NUNIT_ASSERT( dvar1 != dvar2 );
 	NUNIT_ASSERT( dvar1 <  dvar2 );
 	NUNIT_ASSERT( dvar2 >  dvar1 );
-	
+
 	// return no error
 	return NUNIT_RES_OK;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//                   
+//
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -99,10 +99,10 @@ nunit_res_t	dvar_testclass_t::dbl(const nunit_testclass_ftor_t &testclass_ftor) 
 	NUNIT_ASSERT( !dvar.is_null() );
 	NUNIT_ASSERT( dvar.type() == dvar_type_t::DOUBLE );
 	NUNIT_ASSERT( dvar.dbl().get() == 42.6 );
-	// set another value 
+	// set another value
 	dvar.dbl().set(43.9);
 	NUNIT_ASSERT( dvar.dbl().get() == 43.9 );
-	
+
 	// test comparison operator intra type
 	dvar_t	dvar1	= dvar_dbl_t(42.5);
 	dvar_t	dvar2	= dvar_dbl_t(99.9);
@@ -110,14 +110,14 @@ nunit_res_t	dvar_testclass_t::dbl(const nunit_testclass_ftor_t &testclass_ftor) 
 	NUNIT_ASSERT( dvar1 != dvar2 );
 	NUNIT_ASSERT( dvar1 <  dvar2 );
 	NUNIT_ASSERT( dvar2 >  dvar1 );
-	
+
 	// return no error
 	return NUNIT_RES_OK;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//                   
+//
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -127,7 +127,7 @@ nunit_res_t	dvar_testclass_t::string(const nunit_testclass_ftor_t &testclass_fto
 {
 	// log to debug
 	KLOG_DBG("enter");
-	
+
 
 // test dvar_str_t
 	dvar_t	dvar	= dvar_str_t("Hello world.");
@@ -135,9 +135,9 @@ nunit_res_t	dvar_testclass_t::string(const nunit_testclass_ftor_t &testclass_fto
 	NUNIT_ASSERT( !dvar.is_null() );
 	NUNIT_ASSERT( dvar.type() == dvar_type_t::STRING );
 	NUNIT_ASSERT( dvar.str().get() == "Hello world." );
-	// set another value 
+	// set another value
 	dvar.str().set("gratefull salutation");
-	NUNIT_ASSERT( dvar.str().get() == "gratefull salutation" );	
+	NUNIT_ASSERT( dvar.str().get() == "gratefull salutation" );
 
 	// test comparison operator intra type
 	dvar_t	dvar1	= dvar_str_t("gratefull salutation");
@@ -153,7 +153,70 @@ nunit_res_t	dvar_testclass_t::string(const nunit_testclass_ftor_t &testclass_fto
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//                   
+//
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief function to test a dvar_t
+ */
+nunit_res_t	dvar_testclass_t::boolean(const nunit_testclass_ftor_t &testclass_ftor) throw()
+{
+	// log to debug
+	KLOG_DBG("enter");
+
+// test dvar_boolean_t
+	dvar_t	dvar	= dvar_boolean_t(true);
+	// test some query function on the dvar_boolean_t
+	NUNIT_ASSERT( !dvar.is_null() );
+	NUNIT_ASSERT( dvar.type() == dvar_type_t::BOOLEAN );
+	NUNIT_ASSERT( dvar.boolean().get() == true );
+	// set another value
+	dvar.boolean().set(false);
+	NUNIT_ASSERT( dvar.boolean().get() == false );
+
+	// test comparison operator intra type
+	dvar_t	dvar1	= dvar_boolean_t(false);
+	dvar_t	dvar2	= dvar_boolean_t(true);
+	NUNIT_ASSERT( dvar1 == dvar1 );
+	NUNIT_ASSERT( dvar1 != dvar2 );
+	NUNIT_ASSERT( dvar1 <  dvar2 );
+	NUNIT_ASSERT( dvar2 >  dvar1 );
+
+	// return no error
+	return NUNIT_RES_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief function to test a dvar_t
+ */
+nunit_res_t	dvar_testclass_t::nil(const nunit_testclass_ftor_t &testclass_ftor) throw()
+{
+	// log to debug
+	KLOG_DBG("enter");
+
+// test dvar_nil_t
+	dvar_t	dvar	= dvar_nil_t();
+	// test some query function on the dvar_nil_t
+	NUNIT_ASSERT( !dvar.is_null() );
+	NUNIT_ASSERT( dvar.type() == dvar_type_t::NIL );
+
+	// test comparison operator intra type
+	dvar_t	dvar1	= dvar_nil_t();
+	dvar_t	dvar2	= dvar_nil_t();
+	NUNIT_ASSERT( dvar1 == dvar1 );
+
+	// return no error
+	return NUNIT_RES_OK;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -190,7 +253,7 @@ nunit_res_t	dvar_testclass_t::array(const nunit_testclass_ftor_t &testclass_ftor
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//                   
+//
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -229,7 +292,7 @@ nunit_res_t	dvar_testclass_t::map(const nunit_testclass_ftor_t &testclass_ftor) 
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//                   
+//
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -249,7 +312,7 @@ nunit_res_t	dvar_testclass_t::to_xml(const nunit_testclass_ftor_t &testclass_fto
 	dvar_main.map().insert("singleint", dvar_int_t(42));
 	dvar_main.map().insert("singlestttrring", dvar_str_t("slota"));
 	dvar_main.map().insert("megamap", dvar_map1);
-	
+
 	// NOTE: this is not a real nunit, aka it will succeed everytime
 	// - this is more a testbed
 	KLOG_DBG("dvar=" << dvar_main);

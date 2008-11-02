@@ -21,7 +21,7 @@ NEOIP_NAMESPACE_BEGIN
  */
 dvar_vapi_t *	dvar_map_t::clone()	const throw()
 {
-	return nipmem_new dvar_map_t(*this);	
+	return nipmem_new dvar_map_t(*this);
 }
 
 /** \brief Insert a new dvar_t in the dvar_map_t
@@ -59,7 +59,7 @@ const dvar_t &	dvar_map_t::operator[](const std::string &key)	const throw()
 	// sanity check - the key MUST be contained in the dvar_map_t
 	DBG_ASSERT( contain(key) );
 	// return the object
-	return map.find(key)->second;	
+	return map.find(key)->second;
 }
 
 /** \brief operator [] for dvar_map_t
@@ -69,7 +69,7 @@ dvar_t &	dvar_map_t::operator[](const std::string &key)	throw()
 	// sanity check - the key MUST be contained in the dvar_map_t
 	DBG_ASSERT( contain(key) );
 	// return the object
-	return map.find(key)->second;	
+	return map.find(key)->second;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ std::string	dvar_map_t::to_string()	const throw()
 	std::ostringstream				oss;
 	std::map<std::string, dvar_t>::const_iterator	iter;
 	// put the begining of the map
-	oss << "[";
+	oss << "{";
 	// put each element of the map
 	for(iter = map.begin(); iter != map.end(); iter++ ){
 		const std::string &	key	= iter->first;
@@ -115,9 +115,9 @@ std::string	dvar_map_t::to_string()	const throw()
 		oss << "[\"" << key << "\"=" << dvar << "]";
 	}
 	// put the end of the map
-	oss << "]";
+	oss << "}";
 	// return the just built string
-	return oss.str();	
+	return oss.str();
 }
 
 NEOIP_NAMESPACE_END

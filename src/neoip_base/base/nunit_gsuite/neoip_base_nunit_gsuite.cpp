@@ -63,7 +63,7 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 	// add the testclass to the nunit_suite
 	base_suite->append(nipmem_testclass);
 #endif
-	
+
 	/********************* obj_factory_t	***************************************/
 	// init the testclass for the obj_factory_t
 	nunit_testclass_t<obj_factory_testclass_t> *	obj_factory_testclass;
@@ -97,7 +97,7 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 	slotpool_testclass->append("general"	, &slotpool_testclass_t::general);
 	// add the testclass to the nunit_suite
 	base_suite->append(slotpool_testclass);
-	
+
 
 /********************* tokeep_check_t	***************************************/
 	// init the testclass for the tokeep_check_t
@@ -134,7 +134,7 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 	event_hook_testclass->append("general"	, &event_hook_testclass_t::general);
 	// add the testclass to the nunit_suite
 	base_suite->append(event_hook_testclass);
-	
+
 /********************* errtype_t	***************************************/
 	// init the testclass for the errtype_t
 	nunit_testclass_t<errtype_testclass_t> *	errtype_testclass;
@@ -144,8 +144,8 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 	errtype_testclass->append("general"	, &errtype_testclass_t::general);
 	// add the testclass to the nunit_suite
 	base_suite->append(errtype_testclass);
-	
-	
+
+
 /********************* strtype_t	***************************************/
 	// init the testclass for the strtype_t
 	nunit_testclass_t<strtype_testclass_t> *	strtype_testclass;
@@ -168,7 +168,7 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 	pkttype_testclass->append("serial_consistency"	, &pkttype_testclass_t::serial_consistency);
 	// add the testclass to the nunit_suite
 	base_suite->append(pkttype_testclass);
-	
+
 /********************* expireset_t	***************************************/
 	// init the testclass for the expireset_t
 	nunit_testclass_t<expireset_testclass_t> *	expireset_testclass;
@@ -255,7 +255,7 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 	interval_testclass->append("interval_serial_consistency", &interval_testclass_t::interval_serial_consistency);
 	// add the testclass to the nunit_suite
 	base_suite->append(interval_testclass);
-	
+
 
 /********************* dvar_t	***************************************/
 	// init the testclass for the dvar_t
@@ -267,6 +267,8 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 	dvar_testclass->append("integer"	, &dvar_testclass_t::integer);
 	dvar_testclass->append("dbl"		, &dvar_testclass_t::dbl);
 	dvar_testclass->append("string"		, &dvar_testclass_t::string);
+	dvar_testclass->append("boolean"	, &dvar_testclass_t::boolean);
+	dvar_testclass->append("nil"		, &dvar_testclass_t::nil);
 	dvar_testclass->append("array"		, &dvar_testclass_t::array);
 	dvar_testclass->append("map"		, &dvar_testclass_t::map);
 	dvar_testclass->append("to_xml"		, &dvar_testclass_t::to_xml);
@@ -303,7 +305,7 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 	strvar_db_testclass->append("general"	, &strvar_db_testclass_t::general);
 	// add the testclass to the nunit_suite
 	base_suite->append(strvar_db_testclass);
-	
+
 /********************* datum_t	***************************************/
 	// init the testclass for the datum_t
 	nunit_testclass_t<datum_testclass_t> *	datum_testclass;
@@ -400,7 +402,7 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 // definition of the nunit_gsuite_t for base
 NUNIT_GSUITE_DEFINITION(base_nunit_gsuite);
 
-// example of inserting a gsuite function in a nunit_gsuite_t 
+// example of inserting a gsuite function in a nunit_gsuite_t
 NUNIT_GSUITE_INSERTER(base_nunit_gsuite, 0, base_gsuite_fct);
 
 NEOIP_NAMESPACE_END
