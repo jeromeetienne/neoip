@@ -4,7 +4,7 @@
 \par Subdirectory meaning
 - conf_rootdir
   - may be shared by several neoip application
-  - persistance: irrelevant as it is read-only and provided by external means 
+  - persistance: irrelevant as it is read-only and provided by external means
   - goal: contains configuration for neoip application
   - access control: read only
 - temp_rootdir
@@ -25,9 +25,9 @@
 - log_rootdir
   - shared by several application
   - goal: contains the log file
-  - persistence: may be erased between run 
+  - persistence: may be erased between run
   - access control: write only
-  
+
 */
 
 /* system include */
@@ -75,7 +75,7 @@ lib_session_t::lib_session_t() throw()
 {
 	// allocate the default profile
 	profile		= nipmem_new lib_session_profile_t();
-	// allocate the event loop 
+	// allocate the event loop
 	// - NOTE: dont use nipmem_new not to disturb the nipmem tracker
 	eloop		= nipmem_new eloop_t();
 
@@ -89,7 +89,7 @@ lib_session_t::lib_session_t() throw()
 lib_session_t::~lib_session_t() throw()
 {
 #if 1
-	// deinit the ndiag_watch_t 
+	// deinit the ndiag_watch_t
 	ndiag_watch_deinit();
 #endif
 
@@ -117,12 +117,12 @@ lib_session_t::~lib_session_t() throw()
 	compress_layer_deinit();
 	// deinit the crypto layer
 	crypto_layer_deinit();
-	
+
 	// delete the exit_zerotimer and exit_timeout
 	nipmem_zdelete	exit_zerotimer;
 	nipmem_zdelete	exit_timeout;
 
-	
+
 	// delete the session_conf
 	nipmem_zdelete	m_session_conf;
 	// delete the event_hook
@@ -130,10 +130,10 @@ lib_session_t::~lib_session_t() throw()
 
 	// delete the eloop_t
 	nipmem_zdelete	eloop;
-	
+
 	// delete the lib_session_profile_t
 	nipmem_zdelete	profile;
-	
+
 	// display a summary of the nipmem_tracker
 	get_global_nipmem_tracker()->display_summary();
 }
@@ -150,7 +150,7 @@ lib_session_t::~lib_session_t() throw()
 lib_session_t &	lib_session_t::set_profile(const lib_session_profile_t &profile)throw()
 {
 	// sanity check - the profile MUST be checked OK
-	DBG_ASSERT( profile.check().succeed() );	
+	DBG_ASSERT( profile.check().succeed() );
 	// delete the previous profile if needed
 	nipmem_zdelete	this->profile;
 	// copy the parameter
@@ -161,19 +161,19 @@ lib_session_t &	lib_session_t::set_profile(const lib_session_profile_t &profile)
 
 
 /** \brief start the session
- * 
+ *
  * @return false if no error occured, true otherwise
  */
 libsess_err_t lib_session_t::start(lib_apps_t *p_lib_apps)	throw()
-{	
+{
 	libsess_err_t	libsess_err;
 	// copy the parameter
 	this->m_lib_apps	= p_lib_apps;
-	
+
 	// init all the rootdir
 	libsess_err	= rootdir_init();
 	if( libsess_err.failed() )	return libsess_err;
-	
+
 	// load the session conf
 	m_session_conf	= nipmem_new strvar_db_t();
 	*m_session_conf	= strvar_helper_t::from_file(conf_rootdir() / "neoip_session.conf");
@@ -189,7 +189,7 @@ libsess_err_t lib_session_t::start(lib_apps_t *p_lib_apps)	throw()
 	strvar_db_t	log_conf;
 	log_conf	= strvar_helper_t::from_file(conf_rootdir() / "neoip_log.conf");
 	get_global_log_layer()->set_config_varfile(log_conf);
-	
+
 	// init the crypto layer
 	crypto_layer_init();
 	// init the compress layer
@@ -213,7 +213,7 @@ libsess_err_t lib_session_t::start(lib_apps_t *p_lib_apps)	throw()
 	// build the ndiag_watch_profile_t
 	ndiag_watch_profile_t	watch_profile	= get_profile().ndiag_watch();
 	// if session_conf contains a use_upnp set to false,
-	// - NOTE: trick rather kludgy to disable upnp from the lib_session.conf 
+	// - NOTE: trick rather kludgy to disable upnp from the lib_session.conf
 	std::string	use_upnp_str	= session_conf().get_first_value("use_upnp" ,"yes");
 	bool		use_upnp	= string_t::convert_to_bool(use_upnp_str);
 	watch_profile.enable_upnp_watch(use_upnp);
@@ -237,7 +237,7 @@ libsess_err_t	lib_session_t::rootdir_init()		throw()
  *   - put all the rootdir within this custom rootdir, thus all the files
  *     are localized within this custom_dir which is the desired behaviour
  *     for the caller.
- * 
+ *
  * - e.g. neoip-oload which is a USR_BOOT apps
  *   - ~/.config/neoip-oload for the config dir itself, in read-only
  *   - ~/.cache/neoip-oload for the m_cache_rootdir
@@ -246,12 +246,12 @@ libsess_err_t	lib_session_t::rootdir_init()		throw()
  *     - run_dir should be erased at boot/login time for self-healing
  *     - it should not conflict if 2 users uses it at the same time
  *   - the run_dir should be constant in order to be found by external programms
- *     - typically to get the pidfile 
+ *     - typically to get the pidfile
  *     - ~/.var/run/neoip-oload.pid ?
 
  * - look at http://standards.freedesktop.org/basedir-spec/basedir-spec-0.6.html
  *   - should it respect the XDG env var ?
- * 
+ *
  * TODO:
  * - should i check/create directory in this?
  *   - either that or i rely on the installer to do it for me
@@ -260,8 +260,8 @@ libsess_err_t	lib_session_t::rootdir_init()		throw()
  *     - e.g. do it for all but conf_rootdir
  *     - test if it exists and is_dir with file_stat_t, do nothing
  *     - if not, try to create them recursivly, if creation failed, return error
- *  
- * - clean up this mess 
+ *
+ * - clean up this mess
  *   - remove the default for libconf_roodir
  *   - is this prgconf_rootdir usefull ? is it just used ? i bet not
  *     - if not remove it. i check this is not used
@@ -272,7 +272,7 @@ libsess_err_t	lib_session_t::rootdir_init()		throw()
  *   - e.g. neoip-router should write in /var/log/neoip_router.log
  */
 
-	// if conf_rootdir() is explicitly set, put all stuff below it 
+	// if conf_rootdir() is explicitly set, put all stuff below it
 	if( apps_option.contain_key("config-dir") ){
 		m_conf_rootdir	= apps_option.get_first_value("config-dir");
 		m_temp_rootdir	= conf_rootdir() / "tmp";
@@ -289,7 +289,7 @@ libsess_err_t	lib_session_t::rootdir_init()		throw()
 		m_log_rootdir	= home_dir / ".var" / "log";
 		// if this user has NO user-specific config directory, try the system one
 		if( file_stat_t(conf_rootdir() / "neoip_session.conf").is_null() )
-			m_conf_rootdir	= file_path_t("/etc") / lib_apps()->canon_name();		
+			m_conf_rootdir	= file_path_t("/etc") / lib_apps()->canon_name();
 	}else if( lib_apps()->apps_type().is_system() ){
 		// if the lib_apps_t::appstype() is "system"
 		m_conf_rootdir	= file_path_t("/etc") / lib_apps()->canon_name();
@@ -300,12 +300,12 @@ libsess_err_t	lib_session_t::rootdir_init()		throw()
 	}else {
 		DBG_ASSERT(0);
 	}
-	
+
 	// if conf_rootdir() / "neoip_session.conf" doesnt exist, return an error
 	file_path_t	sessconf_path	= conf_rootdir() / "neoip_session.conf";
 	if( file_stat_t(sessconf_path).is_null() )
 		return libsess_err_t(libsess_err_t::ERROR, sessconf_path.to_os_path_string() + " is not present");
-	
+
 	// create all dir with are not mandatorily containing file
 	// - aka all but conf_rootdir
 	libsess_err_t	libsess_err;
@@ -317,7 +317,7 @@ libsess_err_t	lib_session_t::rootdir_init()		throw()
 	if( libsess_err.failed() )	return libsess_err;
 	libsess_err	= rootdir_create_if_needed(log_rootdir());
 	if( libsess_err.failed() )	return libsess_err;
-	
+
 	// return no error
 	return libsess_err_t::OK;
 }
@@ -325,12 +325,12 @@ libsess_err_t	lib_session_t::rootdir_init()		throw()
 /** \brief create the dir_path if needed
  */
 libsess_err_t	lib_session_t::rootdir_create_if_needed(const file_path_t &dir_path)	throw()
-{	
+{
 	// test if the dir_path exists and is a directory, return now
 	file_stat_t	file_stat	= file_stat_t(dir_path);
 	if( !file_stat.is_null() ){
 	 	if( file_stat.is_dir() )	return libsess_err_t::OK;
-		return libsess_err_t(libsess_err_t::ERROR, dir_path.to_os_path_string() + " exists BUT is not a directory.");	 	
+		return libsess_err_t(libsess_err_t::ERROR, dir_path.to_os_path_string() + " exists BUT is not a directory.");
 	}
 
 	// try to create the dir_path
@@ -339,7 +339,7 @@ libsess_err_t	lib_session_t::rootdir_create_if_needed(const file_path_t &dir_pat
 	if( file_err.failed() )	return libsess_err_from_file(file_err);
 
 	// return no error
-	return libsess_err_t::OK;	
+	return libsess_err_t::OK;
 }
 
 
@@ -372,7 +372,7 @@ clineopt_arr_t	lib_session_t::clineopt_arr()	throw()
 //////////////////////////////////////////////////..////////////////////////////
 
 
-/** \brief run the loop 
+/** \brief run the loop
  */
 void	lib_session_t::loop_run()	throw()
 {
@@ -400,7 +400,7 @@ bool	lib_session_t::loop_stopping()						const throw()
 }
 
 /** \brief Function to be called when the user whish to interrupt
- * 
+ *
  * - there is a zerotimer_t before triggering the stopping
  * - so it should not be expected to stop on the next iteration of the event loop
  *   - if it is what is desired, use loop_stop_now()
@@ -415,7 +415,7 @@ void	lib_session_t::loop_stop_asap()	throw()
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//			timer callback for lib_session_exit_t stuff 
+//			timer callback for lib_session_exit_t stuff
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -424,15 +424,15 @@ void	lib_session_t::loop_stop_asap()	throw()
 bool	lib_session_t::neoip_zerotimer_expire_cb(zerotimer_t &cb_zerotimer, void *userptr)	throw()
 {
 	// log to debug
-	KLOG_ERR("enter session_exit_db.size()=" << session_exit_db.size());
-	KLOG_ERR("Start stopping");
+	KLOG_DBG("enter session_exit_db.size()=" << session_exit_db.size());
+	KLOG_DBG("Start stopping");
 
 	// sanity check - the exit_timeout MUST NOT be running
 	DBG_ASSERT( !exit_timeout->is_running() );
 	// start the exit_timeout_t
 	exit_timeout->start(profile->exit_expire_delay(), this, NULL);
 
-	// launch all the next batch of lib_session_exit_t	
+	// launch all the next batch of lib_session_exit_t
 	launch_next_exit_order();
 
 	// return tokeep
@@ -444,7 +444,7 @@ bool	lib_session_t::neoip_zerotimer_expire_cb(zerotimer_t &cb_zerotimer, void *u
 bool	lib_session_t::neoip_timeout_expire_cb(void *userptr, timeout_t &cb_timeout)		throw()
 {
 	// log the event
-	KLOG_ERR("Lib session stopping timed out. panic time :)");
+	KLOG_DBG("Lib session stopping timed out. panic time :)");
 	// stop the exit_timeout
 	exit_timeout->stop();
 	// stop the event loop
@@ -460,7 +460,7 @@ bool	lib_session_t::neoip_timeout_expire_cb(void *userptr, timeout_t &cb_timeout
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief Launch the next patch of lib_session_exit_t with the lowest exit_order
- * 
+ *
  * - assume that no lib_session_exit_t in session_exit_db are in_exiting()
  * - NOTE: this function may call eloop->loop_stop();
  */
@@ -470,7 +470,8 @@ void	lib_session_t::launch_next_exit_order()			throw()
 	KLOG_DBG("enter session_exit_db.size()=" << session_exit_db.size());
 	// if there are no lib_session_exit, interrupt the loop now
 	if( session_exit_db.empty() ){
-		KLOG_ERR("stopping ended gracefully");
+		// log to debug
+		KLOG_DBG("stopping ended gracefully");
 		eloop->loop_stop();
 		return;
 	}
@@ -479,7 +480,7 @@ void	lib_session_t::launch_next_exit_order()			throw()
 	size_t	first_exit_order	= session_exit_db.begin()->second->exit_order();
 	// log to debug
 	KLOG_DBG("first_exit_order="<< first_exit_order);
-	
+
 	// notify all the lib_session_exit_t
 	session_exit_db_t::iterator	iter;
 	for(iter = session_exit_db.begin(); iter != session_exit_db.end(); iter++ ){
@@ -533,7 +534,7 @@ void	lib_session_t::exit_unlink(lib_session_exit_t *session_exit)	throw()
 		DBG_ASSERT(session_exit_order == session_exit_db.begin()->second->exit_order());
 		return;
 	}
-	// launch all the next batch of lib_session_exit_t	
+	// launch all the next batch of lib_session_exit_t
 	launch_next_exit_order();
 }
 
