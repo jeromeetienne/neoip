@@ -1,6 +1,6 @@
 /*! \file
     \brief main() for neoip_nunitapps
-    
+
 */
 
 /* system include */
@@ -47,6 +47,7 @@
 #include "neoip_bt_plugin_nunit_gsuite.hpp"
 #include "neoip_bt_cast_nunit_gsuite.hpp"
 #include "neoip_flv_nunit_gsuite.hpp"
+#include "neoip_rtmp_nunit_gsuite.hpp"
 
 using namespace neoip;
 
@@ -96,12 +97,13 @@ static void nunitapps_gsuite_fct(nunit_suite_t &nunit_suite)
 	bt_plugin_nunit_gsuite->populate(nunit_suite);
 	bt_cast_nunit_gsuite->populate(nunit_suite);
 	flv_nunit_gsuite->populate(nunit_suite);
+	rtmp_nunit_gsuite->populate(nunit_suite);
 }
 
 // definition of the nunit_gsuite_t for nunitapps
 NUNIT_GSUITE_DEFINITION(nunitapps_nunit_gsuite);
 
-// example of inserting a gsuite function in a nunit_gsuite_t 
+// example of inserting a gsuite function in a nunit_gsuite_t
 NUNIT_GSUITE_INSERTER(nunitapps_nunit_gsuite, 0, nunitapps_gsuite_fct);
 NEOIP_NAMESPACE_END
 
@@ -250,9 +252,9 @@ int main(int argc, char **argv)
 	// - NOTE: this kind of stuff could be directly included in nunit_path_t
 	path_pattern	/= "*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*";
 	KLOG_DBG("path_pattern="<< path_pattern);
-	
+
 	// create the nunit_utest
-	nunitapps_runner_t *	nunitapps_runner;	
+	nunitapps_runner_t *	nunitapps_runner;
 	nunitapps_runner	= nipmem_new nunitapps_runner_t(path_pattern, nunitapps_nunit_gsuite);
 
 	// log the event
@@ -265,7 +267,7 @@ int main(int argc, char **argv)
 
 	// standard deinit
 	nipmem_zdelete	lib_apps;
-	
+
 	// return no error
 	return 0;
 }
