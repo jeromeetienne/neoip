@@ -7,6 +7,7 @@
 /* local include */
 #include "neoip_flv_parse_nunit.hpp"
 #include "neoip_flv.hpp"
+#include "neoip_amf0_parse.hpp"
 #include "neoip_dvar.hpp"
 #include "neoip_file.hpp"
 #include "neoip_log.hpp"
@@ -69,12 +70,12 @@ nunit_err_t	flv_parse_testclass_t::neoip_nunit_testclass_init()	throw()
 	flv_parse	= nipmem_new flv_parse_t();
 	flv_err		= flv_parse->start(this, NULL);
 	if( flv_err.failed() )	return nunit_err_t(nunit_err_t::ERROR, flv_err.to_string() );
-	
+
 	// start a file_aio_t
 	file_aio	= nipmem_new file_aio_t();
 	file_err	= file_aio->start(file_path, file_mode_t::READ);
 	if( file_err.failed() )	return nunit_err_t(nunit_err_t::ERROR, file_err.to_string() );
-	
+
 	// return no error
 	return nunit_err_t::OK;
 }
@@ -118,10 +119,10 @@ flv_err_t	flv_parse_testclass_t::launch_next_read()	throw()
 	file_err_t	file_err;
 	// sanity check - file_aread MUST be NULL
 	DBG_ASSERT( !file_aread );
-	
+
 	// if all the file has been read, do nothing
 	if( file_size == read_size )	return flv_err_t::OK;
-	
+
 	// determine the chunk_size
 	file_size_t	chunk_size	= 5120;
 	chunk_size	= std::min(chunk_size, file_size - read_size);
@@ -152,7 +153,7 @@ bool	flv_parse_testclass_t::neoip_file_aread_cb(void *cb_userptr, file_aread_t &
 	if( file_err.failed() ){
 		neoip_nunit_testclass_deinit();
 		nunit_ftor(NUNIT_RES_ERROR);
-		return false;	
+		return false;
 	}
 
 	// update read_size
@@ -189,7 +190,7 @@ bool	flv_parse_testclass_t::neoip_flv_parse_cb(void *cb_userptr, flv_parse_t &cb
 {
 	// log to debug
 	KLOG_ERR("enter event=" << parse_event);
-	
+
 	// if flv_parse_event_t is fatal, report an error
 	if( parse_event.is_fatal() ){
 		neoip_nunit_testclass_deinit();
@@ -201,11 +202,11 @@ bool	flv_parse_testclass_t::neoip_flv_parse_cb(void *cb_userptr, flv_parse_t &cb
 	DBG_ASSERT( flv_parse->buffer().size() >= parse_event.byte_length() );
 	size_t	unparsed_len	= flv_parse->buffer().size() - parse_event.byte_length();
 	// if unparsed_len == 0 and no more data to read, leave asap
-	// - do a -4 because it should point to the flv_taghd_t::type and 
+	// - do a -4 because it should point to the flv_taghd_t::type and
 	//   not the flv_taghd_t::prevtag_size which is an uint32_t
-	//   - this flv_taghd_t::prevtag_size crap is as well in 
+	//   - this flv_taghd_t::prevtag_size crap is as well in
 	//     flv_parse_helper_t::kframe_boffset_from(), in the flv_parse_t nunit
-	//     and neoip-flvfilter 
+	//     and neoip-flvfilter
 	//   - i dont like it, seems like a bug in the flv_parse_t architechture
 	//   - it is spreaded everywhere, likely a misunderstanding of the flv format
 	if( unparsed_len <= sizeof(uint32_t) && file_size == read_size ){
@@ -213,7 +214,7 @@ bool	flv_parse_testclass_t::neoip_flv_parse_cb(void *cb_userptr, flv_parse_t &cb
 		nunit_ftor(NUNIT_RES_OK);
 		return false;
 	}
-	
+
 	// if this parse_event_t is a tag flv_tagtype_t::META, display the AMF it contains
 	if( parse_event.is_tag() ){
 		datum_t		tag_data;
@@ -227,21 +228,21 @@ bool	flv_parse_testclass_t::neoip_flv_parse_cb(void *cb_userptr, flv_parse_t &cb
 			KLOG_ERR("META DATA:");
 			// parse the tag_data as AMF data
 			flv_err	= amf0_parse_t::amf_to_dvar(bytearray, event_name_dvar);
-			DBG_ASSERT( flv_err.succeed() ); 
+			DBG_ASSERT( flv_err.succeed() );
 			KLOG_ERR("event_name="	<< event_name_dvar);
 			flv_err	= amf0_parse_t::amf_to_dvar(bytearray, event_data_dvar);
-			DBG_ASSERT( flv_err.succeed() ); 
+			DBG_ASSERT( flv_err.succeed() );
 			KLOG_ERR("event_data="	<< event_data_dvar);
 		}
 	}
-	
-	
+
+
 	// display the kframe_boffset if any
 	file_size_t	kframe_boffset;
 	kframe_boffset	= flv_parse_helper_t::kframe_boffset_from(flv_parse, parse_event);
 	if( !kframe_boffset.is_null() )	KLOG_ERR("KEY frame at " << kframe_boffset);
 
-	
+
 	// return tokeep
 	return true;
 }

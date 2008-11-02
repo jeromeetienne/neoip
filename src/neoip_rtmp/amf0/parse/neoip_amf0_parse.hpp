@@ -1,14 +1,15 @@
 /*! \file
     \brief Header of the amf0_parse_helper_t class
-    
+
 */
 
 
-#ifndef __NEOIP_FLV_AMF_PARSE_HPP__ 
-#define __NEOIP_FLV_AMF_PARSE_HPP__ 
+#ifndef __NEOIP_FLV_AMF_PARSE_HPP__
+#define __NEOIP_FLV_AMF_PARSE_HPP__
 /* system include */
 #include <stdio.h>
 /* local include */
+#include "neoip_dvar.hpp"
 #include "neoip_serial_except.hpp"
 #include "neoip_namespace.hpp"
 

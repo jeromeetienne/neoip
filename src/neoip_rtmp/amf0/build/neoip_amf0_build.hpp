@@ -9,6 +9,7 @@
 /* system include */
 #include <sstream>
 /* local include */
+#include "neoip_dvar.hpp"
 #include "neoip_bytearray.hpp"
 #include "neoip_namespace.hpp"
 

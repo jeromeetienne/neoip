@@ -22,7 +22,7 @@ NEOIP_NAMESPACE_BEGIN
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//			
+//
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -48,7 +48,7 @@ flv_err_t amf0_parse_t::amf_to_dvar(bytearray_t &amf0_data, dvar_t &dvar_out)	th
 dvar_t	amf0_parse_t::parser(bytearray_t &amf0_data)	throw(serial_except_t)
 {
 	amf0_type_t	amf0_type;
-	
+
 	// get the amf0_type_t
 	amf0_data	>> amf0_type;
 	if( amf0_type == amf0_type_t::NUMBER ){
@@ -64,7 +64,7 @@ dvar_t	amf0_parse_t::parser(bytearray_t &amf0_data)	throw(serial_except_t)
 		// log to debug
 		KLOG_DBG(amf0_type.to_string() << "=" << (value ? "true" : "false"));
 		// return the boolean as a int
-		return	dvar_int_t(value);
+		return	dvar_boolean_t(value);
 	}else if( amf0_type == amf0_type_t::STRING ){
 		uint16_t	str_size;
 		datum_t		str_data;
@@ -77,14 +77,14 @@ dvar_t	amf0_parse_t::parser(bytearray_t &amf0_data)	throw(serial_except_t)
 		// log to debug
 		KLOG_DBG(amf0_type.to_string() << "=" << str_data.to_stdstring());
 		return	dvar_str_t(str_data.to_stdstring());
-	}else if( amf0_type == amf0_type_t::OBJECT ){	
+	}else if( amf0_type == amf0_type_t::OBJECT ){
 		dvar_t	dvar	= dvar_map_t();
 		// log to debug
 		KLOG_DBG(amf0_type.to_string() << ": start");
 		// parse the array itself
 		while(true){
 			// if the amf0_data is now empty, return the value now
-			// - some .flv dont include the 0x00, 0x00, 0x09 at the end if it is 
+			// - some .flv dont include the 0x00, 0x00, 0x09 at the end if it is
 			//   the last data of the amf0_data
 			// - this is not in the osflash page, but e.g. youtube does it this way
 			if( amf0_data.empty() )	return dvar;
@@ -112,6 +112,9 @@ dvar_t	amf0_parse_t::parser(bytearray_t &amf0_data)	throw(serial_except_t)
 		}
 		// NOTE: this points MUST never be reached
 		DBG_ASSERT( 0 );
+	}else if( amf0_type == amf0_type_t::NIL ){
+		// return a dvar_nil_t
+		return	dvar_nil_t();
 	}else if( amf0_type == amf0_type_t::UNDEFINED ){
 		// return a null dvar_t
 		return	dvar_t();
@@ -119,17 +122,17 @@ dvar_t	amf0_parse_t::parser(bytearray_t &amf0_data)	throw(serial_except_t)
 		dvar_t	dvar	= dvar_map_t();
 		// get the higuest_idx of this array
 		// - NOTE: this is unclear what is the purpose of this
-		// - "the highest numeric index in the array, or 0 if there are 
+		// - "the highest numeric index in the array, or 0 if there are
 		//    none or they are all negative."
 		uint32_t	highest_index;
 		amf0_data	>> highest_index;
-		
+
 		// log to debug
 		KLOG_DBG(amf0_type.to_string() << ": start highest_index=" << highest_index);
 		// parse the array itself
 		while(true){
 			// if the amf0_data is now empty, return the value now
-			// - some .flv dont include the 0x00, 0x00, 0x09 at the end if it is 
+			// - some .flv dont include the 0x00, 0x00, 0x09 at the end if it is
 			//   the last data of the amf0_data
 			// - this is not in the osflash page, but e.g. youtube does it this way
 			if( amf0_data.empty() )	return dvar;
@@ -140,7 +143,7 @@ dvar_t	amf0_parse_t::parser(bytearray_t &amf0_data)	throw(serial_except_t)
 			key_data	= amf0_data.head_consume(key_size);
 			// log to debug
 			KLOG_DBG("key_data=" << key_data.to_stdstring());
-			
+
 			// if key_size == 0 and the next byte is 0x09, this is the end of this
 			if( key_size == 0 && !amf0_data.empty() && *amf0_data.char_ptr() == 0x09){
 				uint8_t	dummy;
@@ -151,7 +154,7 @@ dvar_t	amf0_parse_t::parser(bytearray_t &amf0_data)	throw(serial_except_t)
 				// return the resulting dvar_t
 				return	dvar;
 			}
-			
+
 			// parse the value
 			dvar_t	value	= parser(amf0_data);
 			// insert this key/value inside the dva
@@ -181,7 +184,7 @@ dvar_t	amf0_parse_t::parser(bytearray_t &amf0_data)	throw(serial_except_t)
 		// return it as a dvar_dbl_t (ignoring the gmt_offset_min)
 		return	dvar_dbl_t(from_epoch_ms);
 	}else{
-		nthrow_serial_plain("unparse amf0_type " + amf0_type.to_string() + "... given up");	
+		nthrow_serial_plain("unparse amf0_type " + amf0_type.to_string() + "... given up");
 	}
 }
 

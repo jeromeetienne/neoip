@@ -9,7 +9,6 @@
 #include "neoip_nunit.hpp"
 
 #include "neoip_flv_parse_nunit.hpp"
-#include "neoip_amf0_nunit.hpp"
 
 NEOIP_NAMESPACE_BEGIN;
 
@@ -31,15 +30,6 @@ static void flv_gsuite_fct(nunit_suite_t &nunit_suite)
 	flv_parse_testclass->append("general"	, &flv_parse_testclass_t::general);
 	// add the testclass to the nunit_suite
 	flv_suite->append(flv_parse_testclass);
-
-/********************* amf0 stuff	***************************************/
-	// init the testclass for the amf0_build_t
-	nunit_testclass_t<amf0_testclass_t> *	amf0_testclass;
-	amf0_testclass	= nipmem_new nunit_testclass_t<amf0_testclass_t>("amf0", nipmem_new amf0_testclass_t());
-	// add some test functions
-	amf0_testclass->append("general"	, &amf0_testclass_t::general);
-	// add the testclass to the nunit_suite
-	flv_suite->append(amf0_testclass);
 
 	// add the flv_suite to the nunit_suite
 	nunit_suite.append(flv_suite);

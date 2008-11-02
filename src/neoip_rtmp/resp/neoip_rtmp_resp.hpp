@@ -1,11 +1,11 @@
 /*! \file
     \brief Header of the \ref rtmp_resp_t
-    
+
 */
 
 
-#ifndef __NEOIP_RTMP_RESP_HPP__ 
-#define __NEOIP_RTMP_RESP_HPP__ 
+#ifndef __NEOIP_RTMP_RESP_HPP__
+#define __NEOIP_RTMP_RESP_HPP__
 /* system include */
 #include <list>
 /* local include */
@@ -18,6 +18,7 @@
 NEOIP_NAMESPACE_BEGIN
 
 // list of forward declaration
+class	rtmp_resp_cnx_t;
 
 /** \brief Accept the http connections and then spawn rtmp_resp_cnx_t to handle them
  */
@@ -31,15 +32,15 @@ public:
 	/*************** ctor/dtor	***************************************/
 	rtmp_resp_t()		throw();
 	~rtmp_resp_t()		throw();
-	
+
 	/*************** Setup function	***************************************/
 	flv_err_t		start(const socket_resp_arg_t &resp_arg)	throw();
-	
+
 	/*************** Query function	***************************************/
 	const socket_addr_t  &	listen_addr()					const throw();
 
-
 	/*************** list of friend class	*******************************/
+	friend class	rtmp_resp_cnx_t;
 };
 
 NEOIP_NAMESPACE_END
