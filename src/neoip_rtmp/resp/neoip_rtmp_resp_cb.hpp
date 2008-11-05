@@ -15,7 +15,7 @@ NEOIP_NAMESPACE_BEGIN
 
 // forward declaration
 class	rtmp_resp_t;
-class	rtmp_event_t;
+class	rtmp_full_t;
 
 /** \brief the callback class for rtmp_resp_t
  */
@@ -26,7 +26,7 @@ public:
 	 * @return true if the rtmp_resp_t is still valid after the callback
 	 */
 	virtual bool neoip_rtmp_resp_cb(void *cb_userptr, rtmp_resp_t &cb_rtmp_resp
-						, const rtmp_event_t &rtmp_event)	throw() = 0;
+						, rtmp_full_t *rtmp_full)	throw() = 0;
 	// virtual destructor
 	virtual ~rtmp_resp_cb_t() {};
 };

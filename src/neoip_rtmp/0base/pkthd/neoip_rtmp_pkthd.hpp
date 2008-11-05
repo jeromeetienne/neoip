@@ -1,11 +1,11 @@
 /*! \file
-    \brief Header of the \ref rtmp_header_t
+    \brief Header of the \ref rtmp_pkthd_t
 
 */
 
 
-#ifndef __NEOIP_RTMP_HEADER_HPP__
-#define __NEOIP_RTMP_HEADER_HPP__
+#ifndef __NEOIP_RTMP_PKTHD_HPP__
+#define __NEOIP_RTMP_PKTHD_HPP__
 /* system include */
 #include <string>
 /* local include */
@@ -21,10 +21,12 @@ NEOIP_NAMESPACE_BEGIN
 
 /** \brief to store the parameters replied by a tracker
  */
-class rtmp_header_t : NEOIP_COPY_CTOR_ALLOW {
+class rtmp_pkthd_t : NEOIP_COPY_CTOR_ALLOW {
 public:	/*************** Constant declaration	*******************************/
-	//! the total length of a rtmp_header_t - which is constant
-	static const size_t	TOTAL_LENGTH;
+	//! the maximum chunk length for a rtmp pkt
+	static const size_t	CHUNK_MAXLEN;
+	//! the maximum length for a rtmp_pkthd_t
+	static const size_t	PKTHD_MAXLEN;
 private:
 public:
 	/*************** query function	***************************************/
@@ -34,7 +36,7 @@ public:
 #	define RES_VAR_DIRECT(var_type, var_name)							\
 	private:var_type	var_name##_val;								\
 	public:	const var_type &var_name()	const throw()	{ return var_name ## _val; }		\
-	public:	rtmp_header_t &var_name(const var_type &var_name)	throw()				\
+	public:	rtmp_pkthd_t &var_name(const var_type &var_name)	throw()				\
 						{ var_name ## _val = var_name; return *this; }
 #	define RES_VAR_STRUCT(var_type, var_name)							\
 	public:	var_type &	var_name()	throw()		{ return var_name ## _val; }		\
@@ -53,15 +55,15 @@ public:
 
 	/************** display function	*******************************/
 	std::string	to_string()	const throw();
-	friend	std::ostream & operator << (std::ostream & oss, const rtmp_header_t &rtmp_header) throw()
-						{ return oss << rtmp_header.to_string();	}
+	friend	std::ostream & operator << (std::ostream & oss, const rtmp_pkthd_t &rtmp_pkthd) throw()
+						{ return oss << rtmp_pkthd.to_string();	}
 
 	/*************** serial_t function	*******************************/
-	friend	serial_t& operator << (serial_t& serial, const rtmp_header_t &rtmp_header)	throw();
-	friend	serial_t& operator >> (serial_t & serial, rtmp_header_t &rtmp_header) 		throw(serial_except_t);
+	friend	serial_t& operator << (serial_t& serial, const rtmp_pkthd_t &rtmp_pkthd)	throw();
+	friend	serial_t& operator >> (serial_t & serial, rtmp_pkthd_t &rtmp_pkthd) 		throw(serial_except_t);
 };
 
 NEOIP_NAMESPACE_END
 
-#endif	/* __NEOIP_RTMP_HEADER_HPP__  */
+#endif	/* __NEOIP_RTMP_PKTHD_HPP__  */
 

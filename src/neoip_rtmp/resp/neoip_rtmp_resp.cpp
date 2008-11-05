@@ -6,13 +6,18 @@
 /* system include */
 /* local include */
 #include "neoip_rtmp_resp.hpp"
+#include "neoip_rtmp_resp_cnx.hpp"
+#include "neoip_rtmp_full.hpp"
 #include "neoip_socket_resp.hpp"
 #include "neoip_socket_full.hpp"
 #include "neoip_socket_event.hpp"
 #include "neoip_log.hpp"
 
 NEOIP_NAMESPACE_BEGIN
-	
+
+// definition of \ref rtmp_parse_profile_t constant
+const size_t	rtmp_resp_t::HANDSHAKE_PADLEN	= 1536;
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //                     ctor/dtor
@@ -27,7 +32,7 @@ rtmp_resp_t::rtmp_resp_t()	throw()
 	// log to debug
 	KLOG_DBG("enter");
 	// zero some field
-	socket_resp	= NULL;	
+	socket_resp	= NULL;
 }
 
 /** \brief Destructor
@@ -36,8 +41,10 @@ rtmp_resp_t::~rtmp_resp_t()	throw()
 {
 	// log to debug
 	KLOG_DBG("enter");
+	// close all pending rtmp_resp_cnx_t
+	while( !cnx_db.empty() )	nipmem_delete cnx_db.front();
 	// delete the socket_resp if needed
-	nipmem_zdelete	socket_resp;	
+	nipmem_zdelete	socket_resp;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,16 +55,20 @@ rtmp_resp_t::~rtmp_resp_t()	throw()
 
 /** \brief Start the operation
  */
-flv_err_t	rtmp_resp_t::start(const socket_resp_arg_t &resp_arg)	throw()
+rtmp_err_t	rtmp_resp_t::start(const socket_resp_arg_t &resp_arg
+			, rtmp_resp_cb_t *callback, void *userptr)	throw()
 {
-	socket_err_t	socket_err;
+	// copy the callback parameter
+	this->callback	= callback;
+	this->userptr	= userptr;
 	// start the socket_resp_t
+	socket_err_t	socket_err;
 	socket_resp	= nipmem_new socket_resp_t();
 	socket_err	= socket_resp->start(resp_arg, this, NULL);
-	if( socket_err.failed() )	return flv_err_from_socket(socket_err);	
-	
+	if( socket_err.failed() )	return rtmp_err_from_socket(socket_err);
+
 	// return no error
-	return flv_err_t::OK;
+	return rtmp_err_t::OK;
 }
 
 
@@ -76,18 +87,46 @@ bool	rtmp_resp_t::neoip_socket_resp_event_cb(void *userptr, socket_resp_t &cb_so
 	KLOG_ERR("enter event=" << socket_event);
 	// sanity check - the event MUST be resp_ok
 	DBG_ASSERT( socket_event.is_resp_ok() );
-	
+
 	// handle each possible events from its type
 	switch( socket_event.get_value() ){
 	case socket_event_t::CNX_ESTABLISHED:{
-			socket_full_t *	socket_full	= socket_event.get_cnx_established();
-			nipmem_zdelete	socket_full;
+			rtmp_resp_cnx_t *	resp_cnx;
+			rtmp_err_t	rtmp_err;
+			resp_cnx	= nipmem_new rtmp_resp_cnx_t();
+			rtmp_err	= resp_cnx->start(this, socket_event.get_cnx_established());
+			if( rtmp_err.failed() )	nipmem_delete resp_cnx;
 			return true;}
 	default:	DBG_ASSERT(0);
 	}
 	// return tokeep
 	return true;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                     main function to notify event to the caller
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief notify the caller callback
+ *
+ * @return a tokeep
+ */
+bool 	rtmp_resp_t::notify_callback(rtmp_full_t *rtmp_full)	throw()
+{
+	// sanity check - the callback MUST NOT be NULL
+	DBG_ASSERT( callback );
+	// backup the tokey_check_t context to check after the callback notification
+	TOKEEP_CHECK_BACKUP_DFL(*callback);
+	// notify the caller
+	bool tokeep = callback->neoip_rtmp_resp_cb(userptr, *this, rtmp_full);
+	// sanity check - tokeep MUST be false if the local object has been deleted, true otherwise
+	TOKEEP_CHECK_MATCH_DFL(tokeep);
+	// return the tokeep
+	return tokeep;
+}
+
 
 NEOIP_NAMESPACE_END;
 
