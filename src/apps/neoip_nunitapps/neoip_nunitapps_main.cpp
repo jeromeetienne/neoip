@@ -48,6 +48,9 @@
 #include "neoip_bt_cast_nunit_gsuite.hpp"
 #include "neoip_flv_nunit_gsuite.hpp"
 #include "neoip_rtmp_nunit_gsuite.hpp"
+#include "neoip_flv_amf0_nunit_gsuite.hpp"
+#include "neoip_rtmp_net_nunit_gsuite.hpp"
+#include "neoip_rtmp_cam_nunit_gsuite.hpp"
 
 using namespace neoip;
 
@@ -97,7 +100,10 @@ static void nunitapps_gsuite_fct(nunit_suite_t &nunit_suite)
 	bt_plugin_nunit_gsuite->populate(nunit_suite);
 	bt_cast_nunit_gsuite->populate(nunit_suite);
 	flv_nunit_gsuite->populate(nunit_suite);
+	flv_amf0_nunit_gsuite->populate(nunit_suite);
 	rtmp_nunit_gsuite->populate(nunit_suite);
+	rtmp_net_nunit_gsuite->populate(nunit_suite);
+	rtmp_cam_nunit_gsuite->populate(nunit_suite);
 }
 
 // definition of the nunit_gsuite_t for nunitapps

@@ -10,6 +10,7 @@
 
 // list of the include for each nunit
 #include "neoip_http_uri_nunit.hpp"
+#include "neoip_http_uri2_nunit.hpp"
 #include "neoip_http_reqhd_nunit.hpp"
 #include "neoip_http_rephd_nunit.hpp"
 #include "neoip_http_listener_nunit.hpp"
@@ -25,7 +26,7 @@ NEOIP_NAMESPACE_BEGIN;
 static void http_gsuite_fct(nunit_suite_t &nunit_suite)
 {
 	// init the nunit_suite
-	nunit_suite_t *	http_suite	= nipmem_new nunit_suite_t("http");		
+	nunit_suite_t *	http_suite	= nipmem_new nunit_suite_t("http");
 	// log to debug
 	KLOG_DBG("enter");
 
@@ -37,8 +38,22 @@ static void http_gsuite_fct(nunit_suite_t &nunit_suite)
 	http_uri_testclass->append("general"		, &http_uri_testclass_t::general);
 	http_uri_testclass->append("serial_consistency"	, &http_uri_testclass_t::serial_consistency);
 	http_uri_testclass->append("scramble"		, &http_uri_testclass_t::scramble);
+	http_uri_testclass->append("http_scheme"	, &http_uri_testclass_t::http_scheme);
 	// add the testclass to the nunit_suite
 	http_suite->append(http_uri_testclass);
+
+#if 0
+/********************* http_uri2_t	***************************************/
+	// init the testclass for the http_uri2_t
+	nunit_testclass_t<http_uri2_testclass_t> *	http_uri2_testclass;
+	http_uri2_testclass	= nipmem_new nunit_testclass_t<http_uri2_testclass_t>("uri2", nipmem_new http_uri2_testclass_t());
+	// add some test functions
+	http_uri2_testclass->append("general"		, &http_uri2_testclass_t::general);
+	http_uri2_testclass->append("serial_consistency", &http_uri2_testclass_t::serial_consistency);
+	http_uri2_testclass->append("scramble"		, &http_uri2_testclass_t::scramble);
+	// add the testclass to the nunit_suite
+	http_suite->append(http_uri2_testclass);
+#endif
 
 /********************* http_reqhd_t	***************************************/
 	// init the testclass for the http_reqhd_t
@@ -102,13 +117,13 @@ static void http_gsuite_fct(nunit_suite_t &nunit_suite)
 	http_suite->append(http_nested_uri_testclass);
 
 	// add the http_suite to the nunit_suite
-	nunit_suite.append(http_suite);	
+	nunit_suite.append(http_suite);
 }
 
 // definition of the nunit_gsuite_t for http
 NUNIT_GSUITE_DEFINITION(http_nunit_gsuite);
 
-// example of inserting a gsuite function in a nunit_gsuite_t 
+// example of inserting a gsuite function in a nunit_gsuite_t
 NUNIT_GSUITE_INSERTER(http_nunit_gsuite, 0, http_gsuite_fct);
 
 NEOIP_NAMESPACE_END

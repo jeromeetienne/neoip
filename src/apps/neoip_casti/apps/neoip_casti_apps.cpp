@@ -408,7 +408,7 @@ casti_swarm_arg_t	casti_apps_t::swarm_arg_default()			throw()
 	// build the object
 	swarm_arg.casti_apps		(this);
 	swarm_arg.mdata_srv_uri		(dfl_mdata_srv_uri());
-	swarm_arg.httpi_mod		(bt_httpi_mod_type_t::RAW);
+	swarm_arg.scasti_mod		(bt_scasti_mod_type_t::RAW);
 	swarm_arg.http_peersrc_uri	(dfl_http_peersrc_uri());
 	// return the just built object
 	return swarm_arg;

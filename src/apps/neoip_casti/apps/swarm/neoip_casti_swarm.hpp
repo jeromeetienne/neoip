@@ -13,7 +13,7 @@
 #include "neoip_bt_cast_mdata_dopublish_cb.hpp"
 #include "neoip_bt_cast_mdata_unpublish_cb.hpp"
 #include "neoip_bt_cast_id.hpp"
-#include "neoip_bt_httpi_mod_type.hpp"
+#include "neoip_bt_scasti_mod_type.hpp"
 #include "neoip_bt_ezswarm_cb.hpp"
 #include "neoip_bt_err.hpp"
 #include "neoip_bt_httpi_cb.hpp"
@@ -55,7 +55,7 @@ private:
 	std::string		m_cast_privtext;//!< the cast_privtext for this swarm
 	http_uri_t		m_mdata_srv_uri;//!< the http_uri_t for the mdata_server
 	http_uri_t		m_httpi_uri;	//!< source http_uri_t for this casti_swarm_t
-	bt_httpi_mod_type_t	m_httpi_mod;	//!< the bt_httpi_mod_type_t for this casti_swarm_t 
+	bt_scasti_mod_type_t	m_scasti_mod;	//!< the bt_scasti_mod_type_t for this casti_swarm_t 
 	http_uri_t		m_http_peersrc_uri;//!< http_uri_t for the bt_peersrc_http_t
 
 	size_t			pieceq_beg;
@@ -108,7 +108,7 @@ public:
 	const http_uri_t &		http_peersrc_uri()const throw()	{ return m_http_peersrc_uri;}
 	bt_cast_id_t			cast_id()	const throw()	{ return m_cast_id;	}
 	const http_uri_t &		httpi_uri()	const throw()	{ return m_httpi_uri;	}
-	const bt_httpi_mod_type_t &	httpi_mod()	const throw()	{ return m_httpi_mod;	}
+	const bt_scasti_mod_type_t &	scasti_mod()	const throw()	{ return m_scasti_mod;	}
 	bt_ezswarm_t *			bt_ezswarm()	const throw()	{ return m_bt_ezswarm;	}
 	casti_swarm_udata_t *		swarm_udata()	const throw()	{ return m_swarm_udata;	}
 	casti_swarm_spos_t *		swarm_spos()	const throw()	{ return m_swarm_spos;	}

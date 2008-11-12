@@ -23,10 +23,10 @@ and write it in a bt_io_pfile_t as a "circular buffer"
 /* system include */
 /* local include */
 #include "neoip_bt_httpi.hpp"
-#include "neoip_bt_httpi_event.hpp"
-#include "neoip_bt_httpi_mod_vapi.hpp"
-#include "neoip_bt_httpi_mod_raw.hpp"
-#include "neoip_bt_httpi_mod_flv.hpp"
+#include "neoip_bt_scasti_event.hpp"
+#include "neoip_bt_scasti_mod_vapi.hpp"
+#include "neoip_bt_scasti_mod_raw.hpp"
+#include "neoip_bt_scasti_mod_flv.hpp"
 #include "neoip_bt_io_write.hpp"
 #include "neoip_bt_io_vapi.hpp"
 #include "neoip_bt_io_pfile.hpp"
@@ -63,7 +63,7 @@ bt_httpi_t::~bt_httpi_t()	throw()
 {
 	// log to debug
 	KLOG_DBG("enter");
-	// delete the bt_httpi_mod_vapi_t if needed
+	// delete the bt_scasti_mod_vapi_t if needed
 	nipmem_zdelete	m_mod_vapi;
 	// delete the bt_io_write_t if needed
 	nipmem_zdelete	bt_io_write;
@@ -95,7 +95,7 @@ bt_httpi_t &	bt_httpi_t::set_profile(const bt_httpi_profile_t &profile)	throw()
 /** \brief Start the operation
  */
 bt_err_t	bt_httpi_t::start(const http_uri_t &m_http_uri, bt_io_vapi_t *m_io_vapi
-				, const bt_httpi_mod_type_t &mod_type
+				, const bt_scasti_mod_type_t &mod_type
 				, bt_httpi_cb_t *callback, void *userptr) 	throw()
 {
 	// log to debug
@@ -115,7 +115,7 @@ bt_err_t	bt_httpi_t::start(const http_uri_t &m_http_uri, bt_io_vapi_t *m_io_vapi
 	http_err	= http_client->start(http_reqhd_t().uri(http_uri()), this, NULL);
 	if( http_err.failed() )	return bt_err_from_http(http_err);
 
-	// start the bt_httpi_mod_vapi_t
+	// start the bt_scasti_mod_vapi_t
 	bt_err_t	bt_err;
 	bt_err		= mod_vapi_ctor(mod_type);
 	if( bt_err.failed() )	return bt_err; 
@@ -126,25 +126,25 @@ bt_err_t	bt_httpi_t::start(const http_uri_t &m_http_uri, bt_io_vapi_t *m_io_vapi
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//			bt_httpi_mod_vapi_t stuff
+//			bt_scasti_mod_vapi_t stuff
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-/** \brief Construct the bt_httpi_mod_vapi_t based on the bt_httpi_mod_type_t
+/** \brief Construct the bt_scasti_mod_vapi_t based on the bt_scasti_mod_type_t
  */
-bt_err_t	bt_httpi_t::mod_vapi_ctor(const bt_httpi_mod_type_t &mod_type)	throw()
+bt_err_t	bt_httpi_t::mod_vapi_ctor(const bt_scasti_mod_type_t &mod_type)	throw()
 {
 	bt_err_t		bt_err	= bt_err_t::OK;
-	bt_httpi_mod_raw_t *	mod_raw;
-	bt_httpi_mod_flv_t *	mod_flv;
-	// construct the bt_httpi_mod_vapi_t depending on the bt_httpi_mod_type_t
+	bt_scasti_mod_raw_t *	mod_raw;
+	bt_scasti_mod_flv_t *	mod_flv;
+	// construct the bt_scasti_mod_vapi_t depending on the bt_scasti_mod_type_t
 	switch( mod_type.get_value() ){
-	case bt_httpi_mod_type_t::RAW:	mod_raw		= nipmem_new bt_httpi_mod_raw_t();
+	case bt_scasti_mod_type_t::RAW:	mod_raw		= nipmem_new bt_scasti_mod_raw_t();
 					m_mod_vapi	= mod_raw;
 					bt_err		= mod_raw->profile(profile.mod_raw())
 								.start(this);
 					break;
-	case bt_httpi_mod_type_t::FLV:	mod_flv		= nipmem_new bt_httpi_mod_flv_t();
+	case bt_scasti_mod_type_t::FLV:	mod_flv		= nipmem_new bt_scasti_mod_flv_t();
 					m_mod_vapi	= mod_flv;
 					bt_err		= mod_flv->start(this);
 					break;
@@ -154,11 +154,11 @@ bt_err_t	bt_httpi_t::mod_vapi_ctor(const bt_httpi_mod_type_t &mod_type)	throw()
 	return bt_err_t::OK;
 }
 
-/** \brief Called by bt_httpi_mod_vapi_t to notify event to the caller
+/** \brief Called by bt_scasti_mod_vapi_t to notify event to the caller
  */
-bool	bt_httpi_t::mod_vapi_notify_callback(const bt_httpi_event_t &event)	throw()
+bool	bt_httpi_t::mod_vapi_notify_callback(const bt_scasti_event_t &event)	throw()
 {
-	// just forward the bt_httpi_event_t to the caller
+	// just forward the bt_scasti_event_t to the caller
 	return notify_callback(event);
 }
 
@@ -250,7 +250,7 @@ bool	bt_httpi_t::handle_recved_data(pkt_t &pkt)	throw()
 	// log to debug
 	KLOG_DBG("enter pkt=" << pkt);
 
-	// notify the data to the bt_httpi_mod_vapi_t
+	// notify the data to the bt_scasti_mod_vapi_t
 	m_mod_vapi->notify_data(pkt.to_datum(datum_t::NOCOPY));
 
 	// sanity check - no bt_io_write_t MUST be inprogress
@@ -287,10 +287,10 @@ bool	bt_httpi_t::neoip_bt_io_write_cb(void *cb_userptr, bt_io_write_t &cb_io_wri
 	// if the bt_io_write_t failed, notify an error
 	if( bt_err.failed() )	return notify_callback_failed(bt_err);
 
-	// build the bt_httpi_event_t::CHUNK_AVAIL
-	bt_httpi_event_t httpi_event;
-	httpi_event	= bt_httpi_event_t::build_chunk_avail(bt_io_write->written_len());
-	bool	tokeep	= notify_callback(httpi_event);
+	// build the bt_scasti_event_t::CHUNK_AVAIL
+	bt_scasti_event_t scasti_event;
+	scasti_event	= bt_scasti_event_t::build_chunk_avail(bt_io_write->written_len());
+	bool	tokeep	= notify_callback(scasti_event);
 	if( !tokeep )	return false;
 
 	// update the m_cur_offset
@@ -318,22 +318,22 @@ bool	bt_httpi_t::neoip_bt_io_write_cb(void *cb_userptr, bt_io_write_t &cb_io_wri
  */
 bool	bt_httpi_t::notify_callback_failed(const bt_err_t &bt_err)		throw()
 {
-	// build the bt_httpi_event_t
-	bt_httpi_event_t httpi_event	= bt_httpi_event_t::build_error(bt_err);
+	// build the bt_scasti_event_t
+	bt_scasti_event_t scasti_event	= bt_scasti_event_t::build_error(bt_err);
 	// forward to notify_callback
-	return notify_callback(httpi_event);
+	return notify_callback(scasti_event);
 }
 
-/** \brief notify the callback with the bt_httpi_event_t
+/** \brief notify the callback with the bt_scasti_event_t
  */
-bool	bt_httpi_t::notify_callback(const bt_httpi_event_t &httpi_event)	throw()
+bool	bt_httpi_t::notify_callback(const bt_scasti_event_t &scasti_event)	throw()
 {
 	// sanity check - the callback MUST NOT be NULL
 	DBG_ASSERT( callback );
 	// backup the tokey_check_t context to check after the callback notification
 	TOKEEP_CHECK_BACKUP_DFL(*callback);
 	// notify the caller
-	bool tokeep = callback->neoip_bt_httpi_cb(userptr, *this, httpi_event);
+	bool tokeep = callback->neoip_bt_httpi_cb(userptr, *this, scasti_event);
 	// sanity check - tokeep MUST be false if the local object has been deleted, true otherwise 
 	TOKEEP_CHECK_MATCH_DFL(tokeep);
 	// return the tokeep

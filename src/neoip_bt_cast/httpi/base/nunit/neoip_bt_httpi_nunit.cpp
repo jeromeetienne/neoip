@@ -7,7 +7,7 @@
 /* local include */
 #include "neoip_bt_httpi_nunit.hpp"
 #include "neoip_bt_httpi.hpp"
-#include "neoip_bt_httpi_event.hpp"
+#include "neoip_bt_scasti_event.hpp"
 #include "neoip_bt_cast_mdata.hpp"
 #include "neoip_bt_cast_helper.hpp"
 #include "neoip_bt_mfile.hpp"
@@ -98,7 +98,7 @@ nunit_res_t	bt_httpi_testclass_t::general(const nunit_testclass_ftor_t &testclas
 	// start the bt_httpi_t
 	bt_httpi	= nipmem_new bt_httpi_t();
 	bt_err		= bt_httpi->start("http://jmehost2:8000/example1.ogg", bt_io_pfile
-					, bt_httpi_mod_type_t::RAW, this, NULL);
+					, bt_scasti_mod_type_t::RAW, this, NULL);
 	NUNIT_ASSERT( bt_err.succeed() );
 
 	// copy the functor to report nunit_res_t asynchronously
@@ -115,15 +115,15 @@ nunit_res_t	bt_httpi_testclass_t::general(const nunit_testclass_ftor_t &testclas
 /** \brief callback notified by \ref bt_httpi_t to provide event
  */
 bool	bt_httpi_testclass_t::neoip_bt_httpi_cb(void *cb_userptr, bt_httpi_t &cb_bt_httpi
-				, const bt_httpi_event_t &httpi_event)	throw() 
+				, const bt_scasti_event_t &scasti_event)	throw() 
 {
 	// log to debug
-	KLOG_ERR("enter bt_httpi_event_t=" << httpi_event);
+	KLOG_ERR("enter bt_scasti_event_t=" << scasti_event);
 
 	// TODO to code something here :)
 	// - currently 
 	
-	if( httpi_event.is_fatal() ){
+	if( scasti_event.is_fatal() ){
 		neoip_nunit_testclass_deinit();
 		nunit_ftor( NUNIT_RES_ERROR	);
 	}

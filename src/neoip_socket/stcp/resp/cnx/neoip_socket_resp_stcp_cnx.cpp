@@ -17,7 +17,7 @@
 #include "neoip_nipmem_alloc.hpp"
 #include "neoip_log.hpp"
 
-NEOIP_NAMESPACE_BEGIN 
+NEOIP_NAMESPACE_BEGIN
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -56,10 +56,10 @@ bool	socket_resp_stcp_cnx_t::autodelete(const std::string &reason)		throw()
 {
 	// if there is a reason, log it
 	if( !reason.empty() )	KLOG_ERR(reason);
-	// autodelete 
+	// autodelete
 	nipmem_delete	this;
 	// return dontkeep for convenience
-	return false;	
+	return false;
 }
 
 
@@ -79,7 +79,7 @@ socket_err_t	socket_resp_stcp_cnx_t::start()	throw()
 	if( inet_err.failed() )		return socket_err_from_inet(inet_err);
 	// configure the tcp_full_t
 	// - TODO i dont like those setting
-	//   - they interfer with the neutral aspect of socket_itor_t 
+	//   - they interfer with the neutral aspect of socket_itor_t
 	m_tcp_full->rcvdata_maxlen( 512*1024 );
 	m_tcp_full->xmitbuf_maxlen( 50*1024 );
 	m_tcp_full->maysend_tshold( socket_full_t::UNLIMITED );
@@ -114,7 +114,7 @@ bool	socket_resp_stcp_cnx_t::neoip_tcp_full_event_cb(void *userptr, tcp_full_t &
 
 	// if the udp_event_t is fatal, delete this cnx_t
 	if( tcp_event.is_fatal() )	return autodelete(tcp_event.to_string());
-	
+
 	// handle each possible events from its type
 	switch( tcp_event.get_value() ){
 	case tcp_event_t::RECVED_DATA:		return handle_recved_data(*tcp_event.get_recved_data());
@@ -126,7 +126,7 @@ bool	socket_resp_stcp_cnx_t::neoip_tcp_full_event_cb(void *userptr, tcp_full_t &
 }
 
 /** \brief Handle the socket_event_t::RECVED_DATA event
- * 
+ *
  * @return a tokeep for the socket_client_t
  */
 bool	socket_resp_stcp_cnx_t::handle_recved_data(pkt_t &pkt)	throw()
@@ -136,7 +136,7 @@ bool	socket_resp_stcp_cnx_t::handle_recved_data(pkt_t &pkt)	throw()
 	// log to debug
 	KLOG_DBG("enter pkt.size()=" << pkt.size());
 
-	// notify the data to slay_itor_t - 
+	// notify the data to slay_itor_t -
 	slay_err	= m_slay_resp->notify_recved_data(pkt, &slay_full);
 	if( slay_err.failed() )	return autodelete(slay_err.to_string());
 	// xmit_ifneeded
@@ -171,10 +171,10 @@ void	socket_resp_stcp_cnx_t::xmit_ifneeded()					throw()
 	pkt_t *	xmit_buffer	= &m_slay_resp->xmit_buffer();
 	// log to debug
 	KLOG_DBG("enter");
-	
+
 	// sanity check - this function is used IIF the http_reqhd.method() is POST
 	DBG_ASSERT( m_tcp_full->xmitbuf_freelen() != socket_full_t::UNLIMITED );
-	// compute the length of data to xmit 
+	// compute the length of data to xmit
 	size_t len2xmit	= std::min(m_tcp_full->xmitbuf_freelen(), xmit_buffer->length());
 
 	// write the data thru the socket_client_t
@@ -196,10 +196,10 @@ bool	socket_resp_stcp_cnx_t::spawn_socket_full(slay_full_t *slay_full)		throw()
 	socket_err_t	socket_err;
 	// log to debug
 	KLOG_DBG("enter");
-	
+
 	// backup the object_slotid of the tcp_full_t - to be able to return its tokeep value
 	slot_id_t	tcp_full_slotid	= m_tcp_full->get_object_slotid();
-	// create the socket_full_stcp_t
+	// create the socket_full_stcp_tERR
 	socket_full_stcp_t * socket_full_stcp	= nipmem_new socket_full_stcp_t();
 	// set ctor_param in socket_full_stcp_t
 	socket_err	= socket_full_stcp->set_ctor_param(m_tcp_full, slay_full, m_resp_stcp->profile());

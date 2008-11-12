@@ -17,7 +17,7 @@ NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, http_uri_t		, mdata_srv_uri)
 NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, std::string		, cast_name)
 NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, std::string		, cast_privtext)
 NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, http_uri_t		, httpi_uri)
-NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, bt_httpi_mod_type_t	, httpi_mod)
+NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, bt_scasti_mod_type_t	, scasti_mod)
 NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, httpi_uri_t		, http_peersrc_uri)
 NEOIP_ARGPACK_DEF_CLASS_END(casti_swarm_arg_t)
 
@@ -36,8 +36,8 @@ bt_err_t	casti_swarm_arg_t::check()	const throw()
 		return bt_err_t(bt_err_t::ERROR, "Invalid cast_privtext");
 	if( !httpi_uri_present() || httpi_uri().is_null() )
 		return bt_err_t(bt_err_t::ERROR, "Invalid httpi_uri");
-	if( !httpi_mod_present() || httpi_mod().is_null() )
-		return bt_err_t(bt_err_t::ERROR, "Invalid httpi_mod");
+	if( !scasti_mod_present() || scasti_mod().is_null() )
+		return bt_err_t(bt_err_t::ERROR, "Invalid scasti_mod");
 	// test the optional fields	
 	if( http_peersrc_uri_present() && http_peersrc_uri().is_null() )
 		return bt_err_t(bt_err_t::ERROR, "Invalid http_peersrc_uri");

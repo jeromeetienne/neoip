@@ -1,0 +1,4 @@
+# remove the log file from the git update
+*.log
+
+*.http_url

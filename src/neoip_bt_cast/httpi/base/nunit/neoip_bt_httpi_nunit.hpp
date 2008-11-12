@@ -27,7 +27,7 @@ private:
 	/*************** bt_httpi_t	*******************************/
 	bt_httpi_t *		bt_httpi;
 	bool 			neoip_bt_httpi_cb(void *cb_userptr, bt_httpi_t &cb_bt_httpi
-					, const bt_httpi_event_t &httpi_event)	throw();
+					, const bt_scasti_event_t &scasti_event)	throw();
 public:
 	/*************** ctor/dtor	***************************************/
 	bt_httpi_testclass_t()		throw();

@@ -17,7 +17,7 @@ NEOIP_NAMESPACE_BEGIN;
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-/** \brief general test 
+/** \brief general test
  */
 nunit_res_t	http_uri_testclass_t::general(const nunit_testclass_ftor_t &testclass_ftor) throw()
 {
@@ -26,7 +26,7 @@ nunit_res_t	http_uri_testclass_t::general(const nunit_testclass_ftor_t &testclas
 	// some basic testing of the http_uri_t class
 	NUNIT_ASSERT( http_uri_t("https://off.net/~jme").to_string() == "https://off.net/~jme");
 	NUNIT_ASSERT( http_uri_t("httpdd://off.net/~jme").is_null());
-	
+
 	NUNIT_ASSERT( http_uri_t("slota").is_null() );
 	NUNIT_ASSERT( http_uri_t("http://off.net/~jme").host() == "off.net" );
 	NUNIT_ASSERT( http_uri_t("https://off.net/~jme").port() == 443);
@@ -37,9 +37,9 @@ nunit_res_t	http_uri_testclass_t::general(const nunit_testclass_ftor_t &testclas
 	NUNIT_ASSERT( http_uri_t("http://off.net/~jme#anchooor").anchor() == "anchooor" );
 	NUNIT_ASSERT( http_uri_t("http://off.net/~jme").to_string() == "http://off.net/~jme");
 	NUNIT_ASSERT( http_uri_t("http://off.net/~jme/my%20path").to_string() == "http://off.net/~jme/my%20path");
-	
+
 	NUNIT_ASSERT( http_uri_t("http://off.net") == http_uri_t("http://OFF.Net"));
-	
+
 	// return no error
 	return NUNIT_RES_OK;
 }
@@ -48,7 +48,7 @@ nunit_res_t	http_uri_testclass_t::general(const nunit_testclass_ftor_t &testclas
 /** \brief test the serial consistency
  */
 nunit_res_t	http_uri_testclass_t::serial_consistency(const nunit_testclass_ftor_t &testclass_ftor) throw()
-{	
+{
 	http_uri_t	http_uri_toserial = "http://off.net/~jme?name1=alice#anchooor";
 	http_uri_t	http_uri_unserial;
 	serial_t	serial;
@@ -63,7 +63,7 @@ nunit_res_t	http_uri_testclass_t::serial_consistency(const nunit_testclass_ftor_
 }
 
 
-/** \brief test uri scrambling 
+/** \brief test uri scrambling
  */
 nunit_res_t	http_uri_testclass_t::scramble(const nunit_testclass_ftor_t &testclass_ftor) throw()
 {
@@ -80,8 +80,35 @@ nunit_res_t	http_uri_testclass_t::scramble(const nunit_testclass_ftor_t &testcla
 	NUNIT_ASSERT( ciph_uri.unscramble() == orig_uri );
 // TODO doscramble is not yet coded. as it isnt used at the moment and my brain is off
 //	NUNIT_ASSERT( orig_uri.doscramble() == ciph_uri );
-	
+
 	// return no error
 	return NUNIT_RES_OK;
 }
+
+/** \brief general test
+ */
+nunit_res_t	http_uri_testclass_t::http_scheme(const nunit_testclass_ftor_t &testclass_ftor) throw()
+{
+	// log to debug
+	KLOG_DBG("enter");
+
+	// test an unexisting scheme
+	NUNIT_ASSERT( http_uri_t("httpdd://off.net/~jme").is_null());
+
+	// test of http_scheme_t::HTTP
+	NUNIT_ASSERT( http_uri_t("http://off.net/~jme").scheme() == http_scheme_t::HTTP);
+	NUNIT_ASSERT( http_uri_t("http://off.net/~jme").port() == 80);
+
+	// test of http_scheme_t::HTTPS
+	NUNIT_ASSERT( http_uri_t("https://off.net/~jme").scheme() == http_scheme_t::HTTPS);
+	NUNIT_ASSERT( http_uri_t("https://off.net/~jme").port() == 443);
+
+	// test of http_scheme_t::RTMP
+	NUNIT_ASSERT( http_uri_t("rtmp://off.net/~jme").scheme() == http_scheme_t::RTMP);
+	NUNIT_ASSERT( http_uri_t("rtmp://off.net/~jme").port() == 1935);
+
+	// return no error
+	return NUNIT_RES_OK;
+}
+
 NEOIP_NAMESPACE_END

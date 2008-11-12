@@ -13,7 +13,7 @@
 #include "neoip_namespace.hpp"
 
 // list of include for the various fields
-#include "neoip_bt_httpi_mod_raw_profile.hpp"
+#include "neoip_bt_scasti_mod_raw_profile.hpp"
 
 NEOIP_NAMESPACE_BEGIN
 
@@ -43,7 +43,7 @@ public:
 
 	/*************** declaration of profile fields	***********************/
 	PROFILE_VAR_PLAIN( size_t	, rcvdata_maxlen);
-	PROFILE_VAR_PLAIN( bt_httpi_mod_raw_profile_t	, mod_raw);
+	PROFILE_VAR_PLAIN( bt_scasti_mod_raw_profile_t	, mod_raw);
 
 	/*************** #undef to ease the declaration	***********************/
 #	undef PROFILE_VAR_PLAIN

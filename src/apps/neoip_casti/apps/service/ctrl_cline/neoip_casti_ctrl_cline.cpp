@@ -102,8 +102,8 @@ casti_swarm_arg_t	casti_ctrl_cline_t::build_swarm_arg()	throw()
 	swarm_arg.httpi_uri	(arg_option.get_first_value("httpi_uri"));
 	if( arg_option.contain_key("mdata_srv_uri") )
 		swarm_arg.mdata_srv_uri		(arg_option.get_first_value("mdata_srv_uri"));
-	if( arg_option.contain_key("httpi_mod") )
-		swarm_arg.httpi_mod		(arg_option.get_first_value("httpi_mod"));
+	if( arg_option.contain_key("scasti_mod") )
+		swarm_arg.scasti_mod		(arg_option.get_first_value("scasti_mod"));
 	if( arg_option.contain_key("httpi_peersrc_uri") )
 		swarm_arg.http_peersrc_uri	(arg_option.get_first_value("http_peersrc_uri"));
 	// return the resulting object
@@ -188,10 +188,10 @@ clineopt_arr_t	casti_ctrl_cline_t::clineopt_arr()	throw()
 				.help_string("specify the uri of the http stream to be broadcasted."
 					"\n\t\trequired to access swarm by cmdline");
 	clineopt_arr	+= clineopt;
-	// add the --httpi_mod cmdline option
-	clineopt	= clineopt_t("httpi_mod", clineopt_mode_t::REQUIRED)
+	// add the --scasti_mod cmdline option
+	clineopt	= clineopt_t("scasti_mod", clineopt_mode_t::REQUIRED)
 				.option_mode(clineopt_mode_t::OPTIONAL)
-				.help_string("To set the 'httpi_mod' of the stream [raw|flv]. defaults to raw");
+				.help_string("To set the 'scasti_mod' of the stream [raw|flv]. defaults to raw");
 	clineopt_arr	+= clineopt;
 	// add the --http_peersrc_uri cmdline option
 	clineopt	= clineopt_t("http_peersrc_uri", clineopt_mode_t::REQUIRED)

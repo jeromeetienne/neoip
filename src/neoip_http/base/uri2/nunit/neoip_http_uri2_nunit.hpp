@@ -3,8 +3,8 @@
 */
 
 
-#ifndef __NEOIP_HTTP_URI2_NUNIT_HPP__ 
-#define __NEOIP_HTTP_URI2_NUNIT_HPP__ 
+#ifndef __NEOIP_HTTP_URI2_NUNIT_HPP__
+#define __NEOIP_HTTP_URI2_NUNIT_HPP__
 /* system include */
 /* local include */
 #include "neoip_nunit_testclass_api.hpp"
@@ -21,7 +21,8 @@ private:
 public:
 	/*************** nunit test function	*******************************/
 	nunit_res_t	general(const nunit_testclass_ftor_t &testclass_ftor)			throw();
-	nunit_res_t	serial_consistency(const nunit_testclass_ftor_t &testclass_ftor)	throw();	
+	nunit_res_t	serial_consistency(const nunit_testclass_ftor_t &testclass_ftor)	throw();
+	nunit_res_t	scramble(const nunit_testclass_ftor_t &testclass_ftor)			throw();
 };
 
 

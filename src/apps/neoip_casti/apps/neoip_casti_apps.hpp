@@ -1,11 +1,11 @@
 /*! \file
     \brief Header of the \ref casti_apps_t
-    
+
 */
 
 
-#ifndef __NEOIP_CASTI_APPS_HPP__ 
-#define __NEOIP_CASTI_APPS_HPP__ 
+#ifndef __NEOIP_CASTI_APPS_HPP__
+#define __NEOIP_CASTI_APPS_HPP__
 /* system include */
 /* local include */
 #include "neoip_casti_apps_wikidbg.hpp"
@@ -46,7 +46,7 @@ private:
 
 	apps_httpdetect_t *	m_apps_httpdetect;	//!< to detect this apps from the web
 
-		
+
 	http_uri_t		m_dfl_http_peersrc_uri;	//!< default http_peersrc_uri
 	http_uri_t		m_dfl_mdata_srv_uri;	//!< default mdata_srv_uri
 
@@ -55,10 +55,10 @@ private:
 	bool		neoip_casti_inetreach_httpd_cb(void *cb_userptr
 					, casti_inetreach_httpd_t &cb_inetreach_httpd
 					, const ipport_addr_t &new_ipport_pview)	throw();
-	
+
 	/*************** http_listener_t	*******************************/
 	http_listener_t *	m_http_listener;	//!< the http_listener_t to receive external http
-	bt_err_t		launch_http_listener(const strvar_db_t &casti_conf)	throw();	
+	bt_err_t		launch_http_listener(const strvar_db_t &casti_conf)	throw();
 
 	/*************** bt_ezsession_t	***************************************/
 	bt_ezsession_t *	m_bt_ezsession;
@@ -72,7 +72,7 @@ private:
 					, bt_cast_mdata_t *cast_mdata_out)	throw();
 
 	/*************** casti_swarm_t	***************************************/
-	std::list<casti_swarm_t *>		swarm_db;
+	std::list<casti_swarm_t *>	swarm_db;
 	void swarm_dolink(casti_swarm_t *swarm)	throw()	{ swarm_db.push_back(swarm);	}
 	void swarm_unlink(casti_swarm_t *swarm)	throw()	{ swarm_db.remove(swarm);	}
 	casti_swarm_t *	swarm_by_cast_id(const bt_cast_id_t &cast_id)		const throw();
@@ -80,14 +80,14 @@ public:
 	/*************** ctor/dtor	***************************************/
 	casti_apps_t()		throw();
 	~casti_apps_t()		throw();
-	
+
 	/*************** Setup function	***************************************/
 	bt_err_t		start()		throw();
-	
+
 	/*************** Query function	***************************************/
 	http_listener_t *	http_listener()		const throw()	{ return m_http_listener;	}
-	casti_inetreach_httpd_t* inetreach_httpd()	const throw()	{ return m_inetreach_httpd;	}	
-	bt_cast_mdata_server_t*	mdata_server()		const throw()	{ return m_mdata_server;	}	
+	casti_inetreach_httpd_t* inetreach_httpd()	const throw()	{ return m_inetreach_httpd;	}
+	bt_cast_mdata_server_t*	mdata_server()		const throw()	{ return m_mdata_server;	}
 	bt_ezsession_t *	bt_ezsession()		const throw()	{ return m_bt_ezsession;	}
 	const casti_apps_profile_t &profile()		const throw()	{ return m_profile;		}
 	const file_path_t &	io_pfile_dirpath()	const throw()	{ return m_io_pfile_dirpath;	}

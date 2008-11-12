@@ -82,8 +82,6 @@ OBJECTS = \
 	apps/neoip_router/apps/helper/neoip_router_apps_helper.o \
 	apps/neoip_router/apps/neoip_router_apps.o \
 	apps/neoip_router/neoip_router_main.o \
-	apps/neoip_rtmp2flv/apps/neoip_rtmp2flv_apps.o \
-	apps/neoip_rtmp2flv/neoip_rtmp2flv_main.o \
 	apps/neoip_upnp/apps/neoip_upnp_apps.o \
 	apps/neoip_upnp/neoip_upnp_main.o \
 	apps/neoip_webpack/apps/neoip_webpack_apps.o \
@@ -241,9 +239,11 @@ OBJECTS = \
 	neoip_base/tools/dvar/dvar_t/neoip_dvar_t.o \
 	neoip_base/tools/dvar/helper/neoip_dvar_helper.o \
 	neoip_base/tools/dvar/subtype/arr/neoip_dvar_arr.o \
+	neoip_base/tools/dvar/subtype/boolean/neoip_dvar_boolean.o \
 	neoip_base/tools/dvar/subtype/dbl/neoip_dvar_dbl.o \
 	neoip_base/tools/dvar/subtype/int/neoip_dvar_int.o \
 	neoip_base/tools/dvar/subtype/map/neoip_dvar_map.o \
+	neoip_base/tools/dvar/subtype/nil/neoip_dvar_nil.o \
 	neoip_base/tools/dvar/subtype/str/neoip_dvar_str.o \
 	neoip_base/tools/errtype/nunit/neoip_errtype_nunit.o \
 	neoip_base/tools/event_hook/neoip_event_hook.o \
@@ -282,14 +282,14 @@ OBJECTS = \
 	neoip_bt_cast/base/pidx/neoip_bt_cast_pidx.o \
 	neoip_bt_cast/base/spos/arr/neoip_bt_cast_spos_arr.o \
 	neoip_bt_cast/base/spos/neoip_bt_cast_spos.o \
-	neoip_bt_cast/httpi/base/event/neoip_bt_httpi_event.o \
+	neoip_bt_cast/httpi/base/event/neoip_bt_scasti_event.o \
 	neoip_bt_cast/httpi/base/nunit/neoip_bt_httpi_nunit.o \
 	neoip_bt_cast/httpi/base/profile/neoip_bt_httpi_profile.o \
 	neoip_bt_cast/httpi/base/wikidbg/neoip_bt_httpi_wikidbg.o \
-	neoip_bt_cast/httpi/mod/base/type/neoip_bt_httpi_mod_type.o \
-	neoip_bt_cast/httpi/mod/impl/flv/neoip_bt_httpi_mod_flv.o \
-	neoip_bt_cast/httpi/mod/impl/raw/neoip_bt_httpi_mod_raw.o \
-	neoip_bt_cast/httpi/mod/impl/raw/profile/neoip_bt_httpi_mod_raw_profile.o \
+	neoip_bt_cast/httpi/mod/base/type/neoip_bt_scasti_mod_type.o \
+	neoip_bt_cast/httpi/mod/impl/flv/neoip_bt_scasti_mod_flv.o \
+	neoip_bt_cast/httpi/mod/impl/raw/neoip_bt_scasti_mod_raw.o \
+	neoip_bt_cast/httpi/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.o \
 	neoip_bt_cast/httpi/neoip_bt_httpi.o \
 	neoip_bt_cast/httpo/base/event/neoip_bt_httpo_event.o \
 	neoip_bt_cast/httpo/full/base/arg/neoip_bt_httpo_full_arg.o \
@@ -711,8 +711,6 @@ OBJECTS = \
 	neoip_flv/base/taghd/video/neoip_flv_taghd_video.o \
 	neoip_flv/base/tophd/flag/neoip_flv_tophd_flag.o \
 	neoip_flv/base/tophd/neoip_flv_tophd.o \
-	neoip_flv/helper/amf_parse/neoip_flv_amf_parse.o \
-	neoip_flv/helper/amf_parse/type/neoip_flv_amf_type.o \
 	neoip_flv/parse/base/event/neoip_flv_parse_event.o \
 	neoip_flv/parse/base/helper/neoip_flv_parse_helper.o \
 	neoip_flv/parse/base/nunit/neoip_flv_parse_nunit.o \
@@ -720,12 +718,11 @@ OBJECTS = \
 	neoip_flv/parse/base/state/neoip_flv_parse_state.o \
 	neoip_flv/parse/base/wikidbg/neoip_flv_parse_wikidbg.o \
 	neoip_flv/parse/neoip_flv_parse.o \
-	neoip_flv/rtmp/full/neoip_rtmp_full.o \
-	neoip_flv/rtmp/full/wikidbg/neoip_rtmp_full_wikidbg.o \
-	neoip_flv/rtmp/resp/base/wikidbg/neoip_rtmp_resp_wikidbg.o \
-	neoip_flv/rtmp/resp/cnx/neoip_rtmp_resp_cnx.o \
-	neoip_flv/rtmp/resp/cnx/wikidbg/neoip_rtmp_resp_cnx_wikidbg.o \
-	neoip_flv/rtmp/resp/neoip_rtmp_resp.o \
+	neoip_flv_amf0/base/nunit/neoip_amf0_nunit.o \
+	neoip_flv_amf0/base/nunit_gsuite/neoip_flv_amf0_nunit_gsuite.o \
+	neoip_flv_amf0/base/type/neoip_amf0_type.o \
+	neoip_flv_amf0/build/neoip_amf0_build.o \
+	neoip_flv_amf0/parse/neoip_amf0_parse.o \
 	neoip_http/base/err/neoip_http_err.o \
 	neoip_http/base/method/neoip_http_method.o \
 	neoip_http/base/nunit_gsuite/neoip_http_nunit_gsuite.o \
@@ -1273,6 +1270,30 @@ OBJECTS = \
 	neoip_router/resp/cnx/wikidbg/neoip_router_resp_cnx_wikidbg.o \
 	neoip_router/resp/neoip_router_resp.o \
 	neoip_router/resp/wikidbg/neoip_router_resp_wikidbg.o \
+	neoip_rtmp/base/err/neoip_rtmp_err.o \
+	neoip_rtmp/base/event/neoip_rtmp_event.o \
+	neoip_rtmp/base/nunit_gsuite/neoip_rtmp_nunit_gsuite.o \
+	neoip_rtmp/base/pkthd/neoip_rtmp_pkthd.o \
+	neoip_rtmp/base/type/neoip_rtmp_type.o \
+	neoip_rtmp/build/neoip_rtmp_build.o \
+	neoip_rtmp/build/nunit/neoip_rtmp_build_nunit.o \
+	neoip_rtmp/parse/base/nunit/neoip_rtmp_parse_nunit.o \
+	neoip_rtmp/parse/base/profile/neoip_rtmp_parse_profile.o \
+	neoip_rtmp/parse/chanctx/neoip_rtmp_parse_chanctx.o \
+	neoip_rtmp/parse/neoip_rtmp_parse.o \
+	neoip_rtmp_cam/base/nunit_gsuite/neoip_rtmp_cam_nunit_gsuite.o \
+	neoip_rtmp_cam/full/neoip_rtmp_cam_full.o \
+	neoip_rtmp_cam/full/nunit/neoip_rtmp_cam_full_nunit.o \
+	neoip_rtmp_cam/listener/neoip_rtmp_cam_listener.o \
+	neoip_rtmp_cam/resp/neoip_rtmp_cam_resp.o \
+	neoip_rtmp_net/base/nunit_gsuite/neoip_rtmp_net_nunit_gsuite.o \
+	neoip_rtmp_net/full/helper/full_webcam/neoip_rtmp_full_webcam.o \
+	neoip_rtmp_net/full/helper/full_webcam/nunit/neoip_rtmp_full_webcam_nunit.o \
+	neoip_rtmp_net/full/neoip_rtmp_full.o \
+	neoip_rtmp_net/resp/base/nunit/neoip_rtmp_resp_nunit.o \
+	neoip_rtmp_net/resp/cnx/neoip_rtmp_resp_cnx.o \
+	neoip_rtmp_net/resp/cnx/state/neoip_rtmp_resp_cnx_state.o \
+	neoip_rtmp_net/resp/neoip_rtmp_resp.o \
 	neoip_slay/_glue/base/domain/neoip_slay_domain.o \
 	neoip_slay/_glue/base/err/neoip_slay_err.o \
 	neoip_slay/_glue/base/nunit/neoip_slay_nunit.o \
@@ -1536,8 +1557,6 @@ LINTS = \
 	apps/neoip_router/apps/helper/neoip_router_apps_helper.lint \
 	apps/neoip_router/apps/neoip_router_apps.lint \
 	apps/neoip_router/neoip_router_main.lint \
-	apps/neoip_rtmp2flv/apps/neoip_rtmp2flv_apps.lint \
-	apps/neoip_rtmp2flv/neoip_rtmp2flv_main.lint \
 	apps/neoip_upnp/apps/neoip_upnp_apps.lint \
 	apps/neoip_upnp/neoip_upnp_main.lint \
 	apps/neoip_webpack/apps/neoip_webpack_apps.lint \
@@ -1695,9 +1714,11 @@ LINTS = \
 	neoip_base/tools/dvar/dvar_t/neoip_dvar_t.lint \
 	neoip_base/tools/dvar/helper/neoip_dvar_helper.lint \
 	neoip_base/tools/dvar/subtype/arr/neoip_dvar_arr.lint \
+	neoip_base/tools/dvar/subtype/boolean/neoip_dvar_boolean.lint \
 	neoip_base/tools/dvar/subtype/dbl/neoip_dvar_dbl.lint \
 	neoip_base/tools/dvar/subtype/int/neoip_dvar_int.lint \
 	neoip_base/tools/dvar/subtype/map/neoip_dvar_map.lint \
+	neoip_base/tools/dvar/subtype/nil/neoip_dvar_nil.lint \
 	neoip_base/tools/dvar/subtype/str/neoip_dvar_str.lint \
 	neoip_base/tools/errtype/nunit/neoip_errtype_nunit.lint \
 	neoip_base/tools/event_hook/neoip_event_hook.lint \
@@ -1736,14 +1757,14 @@ LINTS = \
 	neoip_bt_cast/base/pidx/neoip_bt_cast_pidx.lint \
 	neoip_bt_cast/base/spos/arr/neoip_bt_cast_spos_arr.lint \
 	neoip_bt_cast/base/spos/neoip_bt_cast_spos.lint \
-	neoip_bt_cast/httpi/base/event/neoip_bt_httpi_event.lint \
+	neoip_bt_cast/httpi/base/event/neoip_bt_scasti_event.lint \
 	neoip_bt_cast/httpi/base/nunit/neoip_bt_httpi_nunit.lint \
 	neoip_bt_cast/httpi/base/profile/neoip_bt_httpi_profile.lint \
 	neoip_bt_cast/httpi/base/wikidbg/neoip_bt_httpi_wikidbg.lint \
-	neoip_bt_cast/httpi/mod/base/type/neoip_bt_httpi_mod_type.lint \
-	neoip_bt_cast/httpi/mod/impl/flv/neoip_bt_httpi_mod_flv.lint \
-	neoip_bt_cast/httpi/mod/impl/raw/neoip_bt_httpi_mod_raw.lint \
-	neoip_bt_cast/httpi/mod/impl/raw/profile/neoip_bt_httpi_mod_raw_profile.lint \
+	neoip_bt_cast/httpi/mod/base/type/neoip_bt_scasti_mod_type.lint \
+	neoip_bt_cast/httpi/mod/impl/flv/neoip_bt_scasti_mod_flv.lint \
+	neoip_bt_cast/httpi/mod/impl/raw/neoip_bt_scasti_mod_raw.lint \
+	neoip_bt_cast/httpi/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.lint \
 	neoip_bt_cast/httpi/neoip_bt_httpi.lint \
 	neoip_bt_cast/httpo/base/event/neoip_bt_httpo_event.lint \
 	neoip_bt_cast/httpo/full/base/arg/neoip_bt_httpo_full_arg.lint \
@@ -2165,8 +2186,6 @@ LINTS = \
 	neoip_flv/base/taghd/video/neoip_flv_taghd_video.lint \
 	neoip_flv/base/tophd/flag/neoip_flv_tophd_flag.lint \
 	neoip_flv/base/tophd/neoip_flv_tophd.lint \
-	neoip_flv/helper/amf_parse/neoip_flv_amf_parse.lint \
-	neoip_flv/helper/amf_parse/type/neoip_flv_amf_type.lint \
 	neoip_flv/parse/base/event/neoip_flv_parse_event.lint \
 	neoip_flv/parse/base/helper/neoip_flv_parse_helper.lint \
 	neoip_flv/parse/base/nunit/neoip_flv_parse_nunit.lint \
@@ -2174,12 +2193,11 @@ LINTS = \
 	neoip_flv/parse/base/state/neoip_flv_parse_state.lint \
 	neoip_flv/parse/base/wikidbg/neoip_flv_parse_wikidbg.lint \
 	neoip_flv/parse/neoip_flv_parse.lint \
-	neoip_flv/rtmp/full/neoip_rtmp_full.lint \
-	neoip_flv/rtmp/full/wikidbg/neoip_rtmp_full_wikidbg.lint \
-	neoip_flv/rtmp/resp/base/wikidbg/neoip_rtmp_resp_wikidbg.lint \
-	neoip_flv/rtmp/resp/cnx/neoip_rtmp_resp_cnx.lint \
-	neoip_flv/rtmp/resp/cnx/wikidbg/neoip_rtmp_resp_cnx_wikidbg.lint \
-	neoip_flv/rtmp/resp/neoip_rtmp_resp.lint \
+	neoip_flv_amf0/base/nunit/neoip_amf0_nunit.lint \
+	neoip_flv_amf0/base/nunit_gsuite/neoip_flv_amf0_nunit_gsuite.lint \
+	neoip_flv_amf0/base/type/neoip_amf0_type.lint \
+	neoip_flv_amf0/build/neoip_amf0_build.lint \
+	neoip_flv_amf0/parse/neoip_amf0_parse.lint \
 	neoip_http/base/err/neoip_http_err.lint \
 	neoip_http/base/method/neoip_http_method.lint \
 	neoip_http/base/nunit_gsuite/neoip_http_nunit_gsuite.lint \
@@ -2727,6 +2745,30 @@ LINTS = \
 	neoip_router/resp/cnx/wikidbg/neoip_router_resp_cnx_wikidbg.lint \
 	neoip_router/resp/neoip_router_resp.lint \
 	neoip_router/resp/wikidbg/neoip_router_resp_wikidbg.lint \
+	neoip_rtmp/base/err/neoip_rtmp_err.lint \
+	neoip_rtmp/base/event/neoip_rtmp_event.lint \
+	neoip_rtmp/base/nunit_gsuite/neoip_rtmp_nunit_gsuite.lint \
+	neoip_rtmp/base/pkthd/neoip_rtmp_pkthd.lint \
+	neoip_rtmp/base/type/neoip_rtmp_type.lint \
+	neoip_rtmp/build/neoip_rtmp_build.lint \
+	neoip_rtmp/build/nunit/neoip_rtmp_build_nunit.lint \
+	neoip_rtmp/parse/base/nunit/neoip_rtmp_parse_nunit.lint \
+	neoip_rtmp/parse/base/profile/neoip_rtmp_parse_profile.lint \
+	neoip_rtmp/parse/chanctx/neoip_rtmp_parse_chanctx.lint \
+	neoip_rtmp/parse/neoip_rtmp_parse.lint \
+	neoip_rtmp_cam/base/nunit_gsuite/neoip_rtmp_cam_nunit_gsuite.lint \
+	neoip_rtmp_cam/full/neoip_rtmp_cam_full.lint \
+	neoip_rtmp_cam/full/nunit/neoip_rtmp_cam_full_nunit.lint \
+	neoip_rtmp_cam/listener/neoip_rtmp_cam_listener.lint \
+	neoip_rtmp_cam/resp/neoip_rtmp_cam_resp.lint \
+	neoip_rtmp_net/base/nunit_gsuite/neoip_rtmp_net_nunit_gsuite.lint \
+	neoip_rtmp_net/full/helper/full_webcam/neoip_rtmp_full_webcam.lint \
+	neoip_rtmp_net/full/helper/full_webcam/nunit/neoip_rtmp_full_webcam_nunit.lint \
+	neoip_rtmp_net/full/neoip_rtmp_full.lint \
+	neoip_rtmp_net/resp/base/nunit/neoip_rtmp_resp_nunit.lint \
+	neoip_rtmp_net/resp/cnx/neoip_rtmp_resp_cnx.lint \
+	neoip_rtmp_net/resp/cnx/state/neoip_rtmp_resp_cnx_state.lint \
+	neoip_rtmp_net/resp/neoip_rtmp_resp.lint \
 	neoip_slay/_glue/base/domain/neoip_slay_domain.lint \
 	neoip_slay/_glue/base/err/neoip_slay_err.lint \
 	neoip_slay/_glue/base/nunit/neoip_slay_nunit.lint \
@@ -2991,8 +3033,6 @@ INCLUDEPATH = \
 	-Iapps/neoip_router/apps/helper \
 	-Iapps/neoip_router/apps \
 	-Iapps/neoip_router \
-	-Iapps/neoip_rtmp2flv/apps \
-	-Iapps/neoip_rtmp2flv \
 	-Iapps/neoip_upnp/apps \
 	-Iapps/neoip_upnp \
 	-Iapps/neoip_webpack/apps \
@@ -3127,9 +3167,11 @@ INCLUDEPATH = \
 	-Ineoip_base/tools/dvar/helper \
 	-Ineoip_base/tools/dvar \
 	-Ineoip_base/tools/dvar/subtype/arr \
+	-Ineoip_base/tools/dvar/subtype/boolean \
 	-Ineoip_base/tools/dvar/subtype/dbl \
 	-Ineoip_base/tools/dvar/subtype/int \
 	-Ineoip_base/tools/dvar/subtype/map \
+	-Ineoip_base/tools/dvar/subtype/nil \
 	-Ineoip_base/tools/dvar/subtype/str \
 	-Ineoip_base/tools/errtype \
 	-Ineoip_base/tools/errtype/nunit \
@@ -3624,8 +3666,6 @@ INCLUDEPATH = \
 	-Ineoip_flv/base/taghd/video \
 	-Ineoip_flv/base/tophd/flag \
 	-Ineoip_flv/base/tophd \
-	-Ineoip_flv/helper/amf_parse \
-	-Ineoip_flv/helper/amf_parse/type \
 	-Ineoip_flv \
 	-Ineoip_flv/parse/base/event \
 	-Ineoip_flv/parse/base/helper \
@@ -3634,12 +3674,12 @@ INCLUDEPATH = \
 	-Ineoip_flv/parse/base/state \
 	-Ineoip_flv/parse/base/wikidbg \
 	-Ineoip_flv/parse \
-	-Ineoip_flv/rtmp/full \
-	-Ineoip_flv/rtmp/full/wikidbg \
-	-Ineoip_flv/rtmp/resp/base/wikidbg \
-	-Ineoip_flv/rtmp/resp/cnx \
-	-Ineoip_flv/rtmp/resp/cnx/wikidbg \
-	-Ineoip_flv/rtmp/resp \
+	-Ineoip_flv_amf0/base/nunit \
+	-Ineoip_flv_amf0/base/nunit_gsuite \
+	-Ineoip_flv_amf0/base/type \
+	-Ineoip_flv_amf0/build \
+	-Ineoip_flv_amf0 \
+	-Ineoip_flv_amf0/parse \
 	-Ineoip_http/base/err \
 	-Ineoip_http/base/method \
 	-Ineoip_http/base/nunit_gsuite \
@@ -4213,6 +4253,32 @@ INCLUDEPATH = \
 	-Ineoip_router/resp/cnx/wikidbg \
 	-Ineoip_router/resp \
 	-Ineoip_router/resp/wikidbg \
+	-Ineoip_rtmp/base/err \
+	-Ineoip_rtmp/base/event \
+	-Ineoip_rtmp/base/nunit_gsuite \
+	-Ineoip_rtmp/base/pkthd \
+	-Ineoip_rtmp/base/type \
+	-Ineoip_rtmp/build \
+	-Ineoip_rtmp/build/nunit \
+	-Ineoip_rtmp \
+	-Ineoip_rtmp/parse/base/nunit \
+	-Ineoip_rtmp/parse/base/profile \
+	-Ineoip_rtmp/parse/chanctx \
+	-Ineoip_rtmp/parse \
+	-Ineoip_rtmp_cam/base/nunit_gsuite \
+	-Ineoip_rtmp_cam/full \
+	-Ineoip_rtmp_cam/full/nunit \
+	-Ineoip_rtmp_cam/listener \
+	-Ineoip_rtmp_cam \
+	-Ineoip_rtmp_cam/resp \
+	-Ineoip_rtmp_net/base/nunit_gsuite \
+	-Ineoip_rtmp_net/full/helper/full_webcam \
+	-Ineoip_rtmp_net/full/helper/full_webcam/nunit \
+	-Ineoip_rtmp_net/full \
+	-Ineoip_rtmp_net/resp/base/nunit \
+	-Ineoip_rtmp_net/resp/cnx \
+	-Ineoip_rtmp_net/resp/cnx/state \
+	-Ineoip_rtmp_net/resp \
 	-Ineoip_slay/_glue/base/domain \
 	-Ineoip_slay/_glue/base/err \
 	-Ineoip_slay/_glue/base/nunit \

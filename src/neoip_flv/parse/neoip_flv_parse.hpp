@@ -1,11 +1,11 @@
 /*! \file
     \brief Header of the flv_parse_t
-    
+
 */
 
 
-#ifndef __NEOIP_FLV_PARSE_HPP__ 
-#define __NEOIP_FLV_PARSE_HPP__ 
+#ifndef __NEOIP_FLV_PARSE_HPP__
+#define __NEOIP_FLV_PARSE_HPP__
 /* system include */
 /* local include */
 #include "neoip_flv_parse_wikidbg.hpp"
@@ -33,9 +33,9 @@ private:
 	file_size_t		m_parsed_length;//!< the amount of data already parsed
 	bytearray_t		m_buffer;	//!< the buffer bytearray_t
 	flv_parse_profile_t	m_profile;	//!< the profile to use for this flv_parse_t
-	
+
 	/*************** parsing function	*******************************/
-	bool			parse_buffer()		throw();
+	bool			parse_buffer()				throw();
 	bool			parse_tophd(bool *stop_parsing)		throw();
 	bool			parse_tag(bool *stop_parsing)		throw();
 
@@ -59,14 +59,14 @@ public:
 	flv_err_t	start(flv_parse_cb_t *callback, void *userptr) 	throw();
 
 	/*************** query function	***************************************/
-	const flv_parse_state_t& state()	const throw()	{ return m_state;		} 
+	const flv_parse_state_t& state()	const throw()	{ return m_state;		}
 	const flv_parse_profile_t & profile()	const throw()	{ return m_profile;		}
 	const file_size_t &	parsed_length()	const throw()	{ return m_parsed_length;	}
 	const bytearray_t &	buffer()	const throw()	{ return m_buffer;		}
 
 	/*************** action function	*******************************/
 	void		notify_data(const datum_t &new_data)		throw();
-	
+
 	/*************** List of friend class	*******************************/
 	friend class	flv_parse_wikidbg_t;
 };

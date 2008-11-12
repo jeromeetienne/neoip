@@ -382,14 +382,14 @@ NEOIP_BT_CAST_OBJS =									\
 	$(NEOIP_BT_CAST_DIR)/httpo/full/base/profile/neoip_bt_httpo_full_profile.o	\
 	$(NEOIP_BT_CAST_DIR)/httpo/full/base/wikidbg/neoip_bt_httpo_full_wikidbg.o	\
 	$(NEOIP_BT_CAST_DIR)/httpi/neoip_bt_httpi.o				\
-	$(NEOIP_BT_CAST_DIR)/httpi/base/event/neoip_bt_httpi_event.o		\
+	$(NEOIP_BT_CAST_DIR)/httpi/base/event/neoip_bt_scasti_event.o		\
 	$(NEOIP_BT_CAST_DIR)/httpi/base/profile/neoip_bt_httpi_profile.o	\
 	$(NEOIP_BT_CAST_DIR)/httpi/base/nunit/neoip_bt_httpi_nunit.o		\
 	$(NEOIP_BT_CAST_DIR)/httpi/base/wikidbg/neoip_bt_httpi_wikidbg.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/mod/base/type/neoip_bt_httpi_mod_type.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/raw/neoip_bt_httpi_mod_raw.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/raw/profile/neoip_bt_httpi_mod_raw_profile.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/flv/neoip_bt_httpi_mod_flv.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/mod/base/type/neoip_bt_scasti_mod_type.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/raw/neoip_bt_scasti_mod_raw.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.o	\
+	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/flv/neoip_bt_scasti_mod_flv.o	\
 	$(NEOIP_BT_CAST_DIR)/mdata/neoip_bt_cast_mdata.o			\
 	$(NEOIP_BT_CAST_DIR)/mdata/server/neoip_bt_cast_mdata_server.o			\
 	$(NEOIP_BT_CAST_DIR)/mdata/server/wikidbg/neoip_bt_cast_mdata_server_wikidbg.o	\
@@ -414,37 +414,68 @@ NEOIP_BT_CAST_OBJS =									\
 
 NEOIP_FLV_DIR=neoip_flv
 NEOIP_FLV_OBJS =							\
-	$(NEOIP_FLV_DIR)/0base/basic/codecid/neoip_flv_codecid.o		\
-	$(NEOIP_FLV_DIR)/0base/basic/frametype/neoip_flv_frametype.o	\
-	$(NEOIP_FLV_DIR)/0base/basic/soundtype/neoip_flv_soundtype.o	\
-	$(NEOIP_FLV_DIR)/0base/basic/soundsize/neoip_flv_soundsize.o	\
-	$(NEOIP_FLV_DIR)/0base/basic/soundrate/neoip_flv_soundrate.o	\
-	$(NEOIP_FLV_DIR)/0base/basic/soundformat/neoip_flv_soundformat.o	\
-	$(NEOIP_FLV_DIR)/0base/basic/tagtype/neoip_flv_tagtype.o		\
-	$(NEOIP_FLV_DIR)/0base/err/neoip_flv_err.o			\
-	$(NEOIP_FLV_DIR)/0base/nunit_gsuite/neoip_flv_nunit_gsuite.o	\
-	$(NEOIP_FLV_DIR)/0base/taghd/neoip_flv_taghd.o			\
-	$(NEOIP_FLV_DIR)/0base/taghd/audio/neoip_flv_taghd_audio.o	\
-	$(NEOIP_FLV_DIR)/0base/taghd/video/neoip_flv_taghd_video.o	\
-	$(NEOIP_FLV_DIR)/0base/tophd/neoip_flv_tophd.o			\
-	$(NEOIP_FLV_DIR)/0base/tophd/flag/neoip_flv_tophd_flag.o	\
+	$(NEOIP_FLV_DIR)/base/basic/codecid/neoip_flv_codecid.o		\
+	$(NEOIP_FLV_DIR)/base/basic/frametype/neoip_flv_frametype.o	\
+	$(NEOIP_FLV_DIR)/base/basic/soundtype/neoip_flv_soundtype.o	\
+	$(NEOIP_FLV_DIR)/base/basic/soundsize/neoip_flv_soundsize.o	\
+	$(NEOIP_FLV_DIR)/base/basic/soundrate/neoip_flv_soundrate.o	\
+	$(NEOIP_FLV_DIR)/base/basic/soundformat/neoip_flv_soundformat.o	\
+	$(NEOIP_FLV_DIR)/base/basic/tagtype/neoip_flv_tagtype.o		\
+	$(NEOIP_FLV_DIR)/base/err/neoip_flv_err.o			\
+	$(NEOIP_FLV_DIR)/base/nunit_gsuite/neoip_flv_nunit_gsuite.o	\
+	$(NEOIP_FLV_DIR)/base/taghd/neoip_flv_taghd.o			\
+	$(NEOIP_FLV_DIR)/base/taghd/audio/neoip_flv_taghd_audio.o	\
+	$(NEOIP_FLV_DIR)/base/taghd/video/neoip_flv_taghd_video.o	\
+	$(NEOIP_FLV_DIR)/base/tophd/neoip_flv_tophd.o			\
+	$(NEOIP_FLV_DIR)/base/tophd/flag/neoip_flv_tophd_flag.o	\
 	$(NEOIP_FLV_DIR)/parse/base/event/neoip_flv_parse_event.o	\
 	$(NEOIP_FLV_DIR)/parse/base/helper/neoip_flv_parse_helper.o	\
 	$(NEOIP_FLV_DIR)/parse/base/profile/neoip_flv_parse_profile.o	\
 	$(NEOIP_FLV_DIR)/parse/base/state/neoip_flv_parse_state.o	\
 	$(NEOIP_FLV_DIR)/parse/base/nunit/neoip_flv_parse_nunit.o	\
 	$(NEOIP_FLV_DIR)/parse/base/wikidbg/neoip_flv_parse_wikidbg.o	\
-	$(NEOIP_FLV_DIR)/amf0/0base/type/neoip_amf0_type.o		\
-	$(NEOIP_FLV_DIR)/amf0/0base/nunit/neoip_amf0_nunit.o		\
-	$(NEOIP_FLV_DIR)/amf0/parse/neoip_amf0_parse.o			\
-	$(NEOIP_FLV_DIR)/amf0/build/neoip_amf0_build.o			\
-	$(NEOIP_FLV_DIR)/rtmp/resp/neoip_rtmp_resp.o				\
-	$(NEOIP_FLV_DIR)/rtmp/resp/base/wikidbg/neoip_rtmp_resp_wikidbg.o	\
-	$(NEOIP_FLV_DIR)/rtmp/resp/cnx/neoip_rtmp_resp_cnx.o			\
-	$(NEOIP_FLV_DIR)/rtmp/resp/cnx/wikidbg/neoip_rtmp_resp_cnx_wikidbg.o	\
-	$(NEOIP_FLV_DIR)/rtmp/full/neoip_rtmp_full.o				\
-	$(NEOIP_FLV_DIR)/rtmp/full/wikidbg/neoip_rtmp_full_wikidbg.o		\
 	$(NEOIP_FLV_DIR)/parse/neoip_flv_parse.o
+
+NEOIP_FLV_AMF0_DIR=neoip_flv_amf0
+NEOIP_FLV_AMF0_OBJS =								\
+	$(NEOIP_FLV_AMF0_DIR)/base/nunit_gsuite/neoip_flv_amf0_nunit_gsuite.o	\
+	$(NEOIP_FLV_AMF0_DIR)/base/nunit/neoip_amf0_nunit.o			\
+	$(NEOIP_FLV_AMF0_DIR)/base/type/neoip_amf0_type.o			\
+	$(NEOIP_FLV_AMF0_DIR)/parse/neoip_amf0_parse.o				\
+	$(NEOIP_FLV_AMF0_DIR)/build/neoip_amf0_build.o
+
+NEOIP_RTMP_DIR=neoip_rtmp
+NEOIP_RTMP_OBJS =							\
+	$(NEOIP_RTMP_DIR)/base/nunit_gsuite/neoip_rtmp_nunit_gsuite.o	\
+	$(NEOIP_RTMP_DIR)/base/pkthd/neoip_rtmp_pkthd.o			\
+	$(NEOIP_RTMP_DIR)/base/err/neoip_rtmp_err.o			\
+	$(NEOIP_RTMP_DIR)/base/type/neoip_rtmp_type.o			\
+	$(NEOIP_RTMP_DIR)/base/event/neoip_rtmp_event.o			\
+	$(NEOIP_RTMP_DIR)/build/neoip_rtmp_build.o			\
+	$(NEOIP_RTMP_DIR)/build/nunit/neoip_rtmp_build_nunit.o		\
+	$(NEOIP_RTMP_DIR)/parse/neoip_rtmp_parse.o			\
+	$(NEOIP_RTMP_DIR)/parse/chanctx/neoip_rtmp_parse_chanctx.o	\
+	$(NEOIP_RTMP_DIR)/parse/base/profile/neoip_rtmp_parse_profile.o	\
+	$(NEOIP_RTMP_DIR)/parse/base/nunit/neoip_rtmp_parse_nunit.o
+
+NEOIP_RTMP_NET_DIR=neoip_rtmp_net
+NEOIP_RTMP_NET_OBJS =								\
+	$(NEOIP_RTMP_NET_DIR)/base/nunit_gsuite/neoip_rtmp_net_nunit_gsuite.o	\
+	$(NEOIP_RTMP_NET_DIR)/resp/neoip_rtmp_resp.o				\
+	$(NEOIP_RTMP_NET_DIR)/resp/base/nunit/neoip_rtmp_resp_nunit.o		\
+	$(NEOIP_RTMP_NET_DIR)/resp/cnx/neoip_rtmp_resp_cnx.o			\
+	$(NEOIP_RTMP_NET_DIR)/resp/cnx/state/neoip_rtmp_resp_cnx_state.o	\
+	$(NEOIP_RTMP_NET_DIR)/full/neoip_rtmp_full.o				\
+	$(NEOIP_RTMP_NET_DIR)/full/helper/full_webcam/neoip_rtmp_full_webcam.o	\
+	$(NEOIP_RTMP_NET_DIR)/full/helper/full_webcam/nunit/neoip_rtmp_full_webcam_nunit.o
+
+NEOIP_RTMP_CAM_DIR=neoip_rtmp_cam
+NEOIP_RTMP_CAM_OBJS =								\
+	$(NEOIP_RTMP_CAM_DIR)/base/nunit_gsuite/neoip_rtmp_cam_nunit_gsuite.o	\
+	$(NEOIP_RTMP_CAM_DIR)/full/nunit/neoip_rtmp_cam_full_nunit.o		\
+	$(NEOIP_RTMP_CAM_DIR)/full/neoip_rtmp_cam_full.o			\
+	$(NEOIP_RTMP_CAM_DIR)/resp/neoip_rtmp_cam_resp.o			\
+	$(NEOIP_RTMP_CAM_DIR)/listener/neoip_rtmp_cam_listener.o
 
 NEOIP_KAD_DIR=neoip_kad
 NEOIP_KAD_OBJS =								\
@@ -968,6 +999,8 @@ NEOIP_BASE_OBJS :=								\
 	$(NEOIP_BASE_DIR)/tools/dvar/subtype/int/neoip_dvar_int.o		\
 	$(NEOIP_BASE_DIR)/tools/dvar/subtype/str/neoip_dvar_str.o		\
 	$(NEOIP_BASE_DIR)/tools/dvar/subtype/dbl/neoip_dvar_dbl.o		\
+	$(NEOIP_BASE_DIR)/tools/dvar/subtype/boolean/neoip_dvar_boolean.o	\
+	$(NEOIP_BASE_DIR)/tools/dvar/subtype/nil/neoip_dvar_nil.o		\
 	$(NEOIP_BASE_DIR)/tools/dvar/subtype/arr/neoip_dvar_arr.o		\
 	$(NEOIP_BASE_DIR)/tools/dvar/subtype/map/neoip_dvar_map.o		\
 	$(NEOIP_BASE_DIR)/tools/dvar/helper/neoip_dvar_helper.o			\
@@ -1491,7 +1524,8 @@ APP_ALL_LIB=		neoip_base		neoip_eloop		neoip_nunit		\
 			neoip_router								\
 			neoip_bt_core		neoip_bt_plugin					\
 			neoip_bt_ez		neoip_bt_misc		neoip_bt_cast		\
-			neoip_flv
+			neoip_flv		neoip_rtmp		neoip_flv_amf0		\
+			neoip_rtmp_net		neoip_rtmp_cam
 
 # if NEOIP_TARGET is not linux, dont compile neoip_router neoip_dnsgrab
 ifneq ($(NEOIP_TARGET), linux)
@@ -1698,16 +1732,6 @@ APP_FLV2XML_LINK= $(addprefix -l, $(APP_FLV2XML_LIB))
 APP_FLV2XML_DEPS_DYNA= $(APP_FLV2XML_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_FLV2XML_LIB)))
 APP_FLV2XML_DEPS_STAT= $(APP_FLV2XML_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_FLV2XML_LIB)))
 
-
-######################## Build the neoip_rtmp2flv  ###############################
-APP_RTMP2FLV_DIR=apps/neoip_rtmp2flv
-APP_RTMP2FLV_OBJS= 									\
-	$(APP_RTMP2FLV_DIR)/neoip_rtmp2flv_main.o					\
-	$(APP_RTMP2FLV_DIR)/apps/neoip_rtmp2flv_apps.o
-APP_RTMP2FLV_LIB=	$(APP_ALL_LIB)
-APP_RTMP2FLV_LINK= $(addprefix -l, $(APP_RTMP2FLV_LIB))
-APP_RTMP2FLV_DEPS_DYNA= $(APP_RTMP2FLV_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_RTMP2FLV_LIB)))
-APP_RTMP2FLV_DEPS_STAT= $(APP_RTMP2FLV_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_RTMP2FLV_LIB)))
 
 
 # jme- some experiment to automatize the makefile a lot more that the current full-manual version
@@ -2061,6 +2085,26 @@ libneoip_flv$(SHAREDLIB_EXT):		$(NEOIP_FLV_OBJS)
 libneoip_flv$(STATICLIB_EXT):		$(NEOIP_FLV_OBJS)
 	$(build_staticlib)
 
+libneoip_rtmp$(SHAREDLIB_EXT):		$(NEOIP_RTMP_OBJS)
+	$(build_sharedlib)
+libneoip_rtmp$(STATICLIB_EXT):		$(NEOIP_RTMP_OBJS)
+	$(build_staticlib)
+
+libneoip_flv_amf0$(SHAREDLIB_EXT):	$(NEOIP_FLV_AMF0_OBJS)
+	$(build_sharedlib)
+libneoip_flv_amf0$(STATICLIB_EXT):	$(NEOIP_FLV_AMF0_OBJS)
+	$(build_staticlib)
+
+libneoip_rtmp_net$(SHAREDLIB_EXT):	$(NEOIP_RTMP_NET_OBJS)
+	$(build_sharedlib)
+libneoip_rtmp_net$(STATICLIB_EXT):	$(NEOIP_RTMP_NET_OBJS)
+	$(build_staticlib)
+
+libneoip_rtmp_cam$(SHAREDLIB_EXT):	$(NEOIP_RTMP_CAM_OBJS)
+	$(build_sharedlib)
+libneoip_rtmp_cam$(STATICLIB_EXT):	$(NEOIP_RTMP_CAM_OBJS)
+	$(build_staticlib)
+
 libneoip_kad$(SHAREDLIB_EXT):		$(NEOIP_KAD_OBJS)
 	$(build_sharedlib)
 libneoip_kad$(STATICLIB_EXT):		$(NEOIP_KAD_OBJS)
@@ -2288,12 +2332,6 @@ neoip-flv2xml$(EXE_EXT): $(APP_FLV2XML_DEPS_DYNA)
 neoip-flv2xml-bin-static$(EXE_EXT): $(APP_FLV2XML_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_FLV2XML_OBJS) $(APP_FLV2XML_LINK) -Wl,--end-group $(LINKLIB)
 
-neoip-rtmp2flv$(EXE_EXT): $(APP_RTMP2FLV_DEPS_DYNA)
-	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_RTMP2FLV_OBJS) $(APP_RTMP2FLV_LINK) $(LINKLIB)
-
-neoip-rtmp2flv-bin-static$(EXE_EXT): $(APP_RTMP2FLV_DEPS_STAT)
-	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_RTMP2FLV_OBJS) $(APP_RTMP2FLV_LINK) -Wl,--end-group $(LINKLIB)
-
 
 # make target to strip all static libraries
 # - usefull to make them smaller and especially link faster
@@ -2319,6 +2357,7 @@ prepare_build: mirror_build_dir build_include_dir dep
 distclean: clean_config_debug_dir clean_include_dir clean_pkg
 	cd ../build_linux && make -f ../src/Makefile.static clean clean_build_dir
 	cd ../build_win32 && make -f ../src/Makefile.static clean clean_build_dir
+	cd ../build_macos && make -f ../src/Makefile.static clean clean_build_dir
 
 #######################################
 # to precompile the .hpp (unclear it is of any use with distcc)

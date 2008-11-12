@@ -20,7 +20,7 @@
 #include "neoip_casti_apps.hpp"
 #include "neoip_casti_swarm.hpp"
 #include "neoip_casti_swarm_arg.hpp"
-#include "neoip_bt_httpi_mod_type.hpp"
+#include "neoip_bt_scasti_mod_type.hpp"
 #include "neoip_bt_ezswarm.hpp"
 #include "neoip_xmlrpc_listener.hpp"
 #include "neoip_xmlrpc_resp.hpp"
@@ -142,7 +142,7 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 	std::string	cast_name;
 	std::string	cast_privtext;
 	http_uri_t	httpi_uri;
-	std::string	httpi_mod_str;
+	std::string	scasti_mod_str;
 	http_uri_t	mdata_srv_uri;
 	http_uri_t	http_peersrc_uri;
 	bt_err_t	bt_err;
@@ -154,7 +154,7 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, cast_name);
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, cast_privtext);
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, httpi_uri);
-	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, httpi_mod_str);
+	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, scasti_mod_str);
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, http_peersrc_uri);
 	NEOIP_XMLRPC_RESP_PARSE_END	(xmlrpc_parse, xmlrpc_err);
 	// if there is a error in the xmlrpc_parse_t, return now
@@ -165,7 +165,7 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 	if( !cast_name.empty() )	swarm_arg.cast_name		(cast_name);
 	if( !cast_privtext.empty() )	swarm_arg.cast_privtext		(cast_privtext);
 	if( !httpi_uri.is_null())	swarm_arg.httpi_uri		(httpi_uri);
-	if( !httpi_mod_str.empty() )	swarm_arg.httpi_mod		(httpi_mod_str);
+	if( !scasti_mod_str.empty() )	swarm_arg.scasti_mod		(scasti_mod_str);
 	if( !http_peersrc_uri.is_null())swarm_arg.http_peersrc_uri	(http_peersrc_uri);
 
 

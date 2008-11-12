@@ -1,15 +1,16 @@
 /*! \file
     \brief Definition of the \ref http_uri2_t
-    
+
 */
 
 /* system include */
 /* local include */
 #include "neoip_http_uri2.hpp"
+#include "neoip_base64.hpp"	// NOTE: needed for the uri scramble
 #include "neoip_log.hpp"
 
 NEOIP_NAMESPACE_BEGIN
-	
+
 
 //! unreserved charset for url from rfc2396.2.3
 const std::string	http_uri2_t::UNRESERVED_CHARSET	=
@@ -33,12 +34,12 @@ void	http_uri2_t::ctor_from_str(const std::string &str)	throw()
 	size_t		strpos;
 	http_scheme_t	tmp_scheme;
 	std::string	tmp_host;
-	size_t		tmp_port	= 80;		// the default http port
-	file_path_t	tmp_path	= "/";		// the default http path	
+	size_t		tmp_port;
+	file_path_t	tmp_path	= "/";		// the default http path
 	std::string	tmp_anchor;
 	// log to debug
-	KLOG_ERR("enter str=" << str);	
-	
+	KLOG_DBG("enter str=" << str);
+
 	// parse the scheme
 	std::string	scheme_sepa	= "://";
 	size_t		scheme_endpos	= string_t::find_substr(str2parse, scheme_sepa);
@@ -48,12 +49,15 @@ void	http_uri2_t::ctor_from_str(const std::string &str)	throw()
 	// remove the scheme from str2parse
 	str2parse.erase(0, scheme_endpos + scheme_sepa.size());
 
-	// try to find a delimiter port ':', or path '/' or query '?' or anchor '#'	
+	// set the default_port based on the scheme
+	tmp_port	= tmp_scheme.default_port();
+
+	// try to find a delimiter port ':', or path '/' or query '?' or anchor '#'
 	strpos	= str2parse.find_first_of(":/?#", 0);
 	// get the host out of it
 	tmp_host	= str2parse.substr(0, strpos);
 	str2parse.erase(0, strpos);
-	
+
 	// if there is a port specified, parse it
 	if( str2parse[0] == ':' ){
 		// consume the port delimiter
@@ -82,7 +86,7 @@ void	http_uri2_t::ctor_from_str(const std::string &str)	throw()
 	// if there is a query specified, parse it
 	if( str2parse[0] == '?' ){
 		// consume the query delimiter
-		str2parse.erase(0, 1);	
+		str2parse.erase(0, 1);
 		// find the end of the query
 		strpos		= str2parse.find_first_of("#");
 		// get the query out of it
@@ -98,18 +102,18 @@ void	http_uri2_t::ctor_from_str(const std::string &str)	throw()
 			std::string var_val	= name_value.size() == 2 ? name_value[1] : std::string();
 			uri_var.append( string_t::unescape(var_key), string_t::unescape(var_val) );
 		}
-	}	
+	}
 
 	// if there is a anchor specified, parse it
 	if( str2parse[0] == '#' ){
 		// consume the query delimiter
-		str2parse.erase(0, 1);	
+		str2parse.erase(0, 1);
 		// the rest of the str2parse if the anchor
 		tmp_anchor	= string_t::unescape(str2parse);
 	}
 	// log to debug
-	KLOG_DBG("uri " << str << " is valid");	
-	
+	KLOG_DBG("uri " << str << " is valid");
+
 	// if this point is reached, the str is considered a valid http_uri2_t
 	uri_scheme	= tmp_scheme;
 	uri_host	= tmp_host;
@@ -125,8 +129,8 @@ void	http_uri2_t::ctor_from_str(const std::string &str)	throw()
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief Clear the hostport part of the http_uri2_t
- * 
- * - aka replace hostport by "0.0.0.0:80"
+ *
+ * - aka replace hostport by "0.0.0.0:80" for http: and "0.0.0.0:443" for https:
  */
 http_uri2_t &	http_uri2_t::clear_hostport()	throw()
 {
@@ -134,7 +138,7 @@ http_uri2_t &	http_uri2_t::clear_hostport()	throw()
 	DBG_ASSERT( !is_null() );
 	// set the 'cleared' value
 	uri_host	= "0.0.0.0";
-	uri_port	= 80;
+	uri_port	= scheme().default_port();
 	// return the object itself
 	return *this;
 }
@@ -150,7 +154,7 @@ http_uri2_t &	http_uri2_t::clear_pathquery()	throw()
 	uri_var		= strvar_db_t();
 	uri_anchor	= std::string();
 	// return the object itself
-	return *this;	
+	return *this;
 }
 
 
@@ -161,7 +165,7 @@ http_uri2_t &	http_uri2_t::clear_pathquery()	throw()
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief compare 2 objects (ala memcmp) - as in rfc2616.3.2.3
- * 
+ *
  * - it return a value <  0 if the local object is less than the external one
  * - it return a value == 0 if the local object is equal to the external one
  * - it return a value >  0 if the local object is greater than the external one
@@ -177,29 +181,78 @@ int http_uri2_t::compare( const http_uri2_t & other )  const throw()
 	// compare the scheme
 	if( scheme()	< other.scheme() )	return -1;
 	if( scheme()	> other.scheme() )	return +1;
-	
+
 	// compare the hostname - MUST be case-insensitive
 	int host_cmp	= string_t::casecmp(host(), other.host());
 	if( host_cmp )	return host_cmp;
-	
+
 	// compare the port
 	if( port()	< other.port() )	return -1;
 	if( port()	> other.port() )	return +1;
-	
+
 	// compare the path
 	if( path()	< other.path() )	return -1;
 	if( path()	> other.path() )	return +1;
-	
+
 	// compare the variable
 	if( var() 	< other.var() )		return -1;
 	if( var() 	> other.var() )		return +1;
-	
+
 	// compare the anchor
 	if( anchor()	< other.anchor() )	return -1;
 	if( anchor()	> other.anchor() )	return +1;
-	
+
 	// note: here both are considered equal
 	return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			uri scramble stuff
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Return true if this http_uri2_t is scrambled, false otherwise
+ */
+bool		http_uri2_t::is_scrambled()		const throw()
+{
+	// log to debug
+	KLOG_DBG("this=" << *this);
+	KLOG_DBG("uri_path.size()=" << uri_path.size());
+	KLOG_DBG("uri_path[0]=" << uri_path[0]);
+	KLOG_DBG("uri_path[1]=" << uri_path[1]);
+	// if there is uri_anchor, return false
+	if( !uri_anchor.empty() )		return false;
+
+	// if the uri_path is not of the proper form, return false
+	if( uri_path.size() != 3 )		return false;
+	if( uri_path[1] != "scrambled" )	return false;
+
+	// if all previous test passed, this http_uri2_t is considered scambled, return true
+	return true;
+}
+/** \brief unscramble this http_uri
+ */
+http_uri2_t	http_uri2_t::unscramble()		const throw()
+{
+	// sanity check - the http_uri2_t MUST be scrambled
+	DBG_ASSERT( is_scrambled() );
+
+	// get the encoded pathquery
+	std::string pathquery_enc	= uri_path[2].to_string();
+	// decode the pathquery
+	std::string pathquery_dec	= base64_t::decode_safe(pathquery_enc).to_stdstring();
+	// build unscrambled uri
+	http_uri2_t	new_uri;
+	new_uri		= scheme().to_string() + "://" + hostport_str() + "/" + pathquery_dec;
+	// merge the var() of this http_uri2_t to the unscrambled one
+	for(size_t i = 0; i < var().size(); i++ )	new_uri.var() += var()[i];
+	// log to debug
+	KLOG_DBG("path_query=" 		<< pathquery_enc);
+	KLOG_DBG("decoded query_query=" << pathquery_dec);
+	KLOG_DBG("decoded req_uri=" 	<< new_uri);
+	// return the just-build new_uri
+	return new_uri;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +269,7 @@ std::string	http_uri2_t::hostport_str()	const throw()
 	// put the host
 	oss	<< host();
 	// put the port is not the default
-	if( port() != 80 )		oss << ":" << port();
+	if( port() != scheme().default_port())		oss << ":" << port();
 	// return the just built string
 	return oss.str();
 }
@@ -278,18 +331,13 @@ std::string	http_uri2_t::to_string()	const throw()
 	std::ostringstream	oss;
 	// if the object is null, return "null"
 	if( is_null() )	return "null";
-	// put the scheme	
-// TODO to modify for the http_scheme_t
-#if 0
-	oss 	<< "http://";
-#else
+	// put the scheme
 	oss 	<< scheme() << "://";
-#endif
 	oss	<< hostport_str();
 	oss	<< path_str();
 	oss	<< query_str();
 	// put the anchor is any
-	if( !anchor().empty() )	oss << "#" << anchor(); 
+	if( !anchor().empty() )	oss << "#" << anchor();
 
 	// return the just built string
 	return oss.str();
@@ -302,7 +350,7 @@ std::string	http_uri2_t::to_string()	const throw()
 ///////////////////////////////////////////////////////////////////////////////
 
 /** \brief serialize a http_uri2_t
- * 
+ *
  * - support null http_uri2_t
  */
 serial_t& operator << (serial_t& serial, const http_uri2_t &http_uri)		throw()
@@ -314,18 +362,18 @@ serial_t& operator << (serial_t& serial, const http_uri2_t &http_uri)		throw()
 }
 
 /** \brief unserialze a http_uri2_t
- * 
+ *
  * - support null http_uri2_t
  */
 serial_t& operator >> (serial_t & serial, http_uri2_t &http_uri)		throw(serial_except_t)
-{	
-	datum_t		http_uri_datum;
+{
+	datum_t		http_uri2_datum;
 	// reset the destination variable
 	http_uri	= http_uri2_t();
 	// unserialize the data
-	serial >> http_uri_datum;
+	serial >> http_uri2_datum;
 	// set the returned variable
-	http_uri	= http_uri_datum.to_stdstring();
+	http_uri	= http_uri2_datum.to_stdstring();
 	// return serial
 	return serial;
 }

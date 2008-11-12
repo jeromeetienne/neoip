@@ -1,11 +1,11 @@
 /*! \file
     \brief Header of the \ref casti_swarm_httpi_t
-    
+
 */
 
 
-#ifndef __NEOIP_CASTI_SWARM_HTTPI_HPP__ 
-#define __NEOIP_CASTI_SWARM_HTTPI_HPP__ 
+#ifndef __NEOIP_CASTI_SWARM_HTTPI_HPP__
+#define __NEOIP_CASTI_SWARM_HTTPI_HPP__
 /* system include */
 /* local include */
 #include "neoip_casti_swarm_httpi_wikidbg.hpp"
@@ -37,12 +37,12 @@ private:
 	/*************** internal function	*******************************/
 	bt_ezswarm_t *		bt_ezswarm()		const throw();
 	casti_swarm_udata_t *	swarm_udata()		const throw();
-	casti_swarm_spos_t*	swarm_spos()	const throw();
+	casti_swarm_spos_t*	swarm_spos()		const throw();
 
 	/*************** bt_httpi_t	***************************************/
 	bt_httpi_t *	m_bt_httpi;
 	bool 		neoip_bt_httpi_cb(void *cb_userptr, bt_httpi_t &cb_bt_httpi
-					, const bt_httpi_event_t &httpi_event)	throw();
+					, const bt_scasti_event_t &scasti_event)	throw();
 	bool		handle_chunk_avail(const file_size_t &chunk_len)	throw();
 	bool		handle_chunk_avail2(const file_size_t &chunk_len)	throw();
 	bool		handle_mod_updated()					throw();

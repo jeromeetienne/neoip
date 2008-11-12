@@ -3,7 +3,7 @@
     
 \par Brief Description
 casti_swarm_spos_t handle all the start position stuff for the casti_swarm_t.
-- this information is obtained by the bt_httpi_mod_vapi_t
+- this information is obtained by the bt_scasti_mod_vapi_t
 
 */
 
@@ -15,7 +15,7 @@ casti_swarm_spos_t handle all the start position stuff for the casti_swarm_t.
 #include "neoip_bt_cast_pidx.hpp"
 
 #include "neoip_bt_httpi.hpp"
-#include "neoip_bt_httpi_mod_vapi.hpp"
+#include "neoip_bt_scasti_mod_vapi.hpp"
 
 #include "neoip_bt_ezswarm.hpp"
 #include "neoip_bt_ezswarm_share.hpp"
@@ -136,7 +136,7 @@ void	casti_swarm_spos_t::notify_pieceq_changed()		throw()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-/** \brief gather the new bt_cast_spos_t from the bt_httpi_mod_vapi_t 
+/** \brief gather the new bt_cast_spos_t from the bt_scasti_mod_vapi_t 
  * 
  * - NOTE: this will appends the bt_cast_spos_t of pieces not yet fully available
  *   - aka bt_cast_spos_arr_t may contains bt_cast_spos_t of pieces not yet fully availlable
@@ -145,8 +145,8 @@ void	casti_swarm_spos_t::gather()		throw()
 {
 	bt_swarm_t *		bt_swarm	= bt_ezswarm()->share()->bt_swarm();
 	const bt_mfile_t &	bt_mfile	= bt_swarm->get_mfile();
-	bt_httpi_mod_vapi_t * 	mod_vapi	= bt_httpi()->mod_vapi();
-	// Append all new bt_httpi_mod_vapi_t::cast_spos to the cast_spos_arr
+	bt_scasti_mod_vapi_t * 	mod_vapi	= bt_httpi()->mod_vapi();
+	// Append all new bt_scasti_mod_vapi_t::cast_spos to the cast_spos_arr
 	// - NOTE: this will appends the bt_cast_spos_t of pieces not yet fully available
 	while( 1 ){
 		// try to pop the available keyframe byteoffset

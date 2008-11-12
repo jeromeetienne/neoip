@@ -142,7 +142,7 @@ httpd_err_t bt_httpi_wikidbg_t::page(const std::string &keyword, void *object_pt
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
-			oss << h.s_td() << h.s_b() << "bt_httpi_mod_vapi_t"	<< h.e_b() << h.e_td();
+			oss << h.s_td() << h.s_b() << "bt_scasti_mod_vapi_t"	<< h.e_b() << h.e_td();
 			oss << h.s_td() << ": " << wikidbg_html("oneword_pageurl", bt_httpi->mod_vapi())
 					<< h.e_td();
 			oss << h.e_tr();

@@ -173,7 +173,7 @@ casto_swarm_t hold a bt_ezswarm_t and all the attached bt_httpo_full_t.
 - the httpo_full_t initial position is currently done with estimation on the
   httpi_t rate.
   - this is rather crude. 
-- with the bt_httpi_mod_flv_t it would be possible to know the exact byte
+- with the bt_scasti_mod_flv_t it would be possible to know the exact byte
   position of each frame, and thus using the frame rate (TODO found where ?)
   one could predict the exact frame byteposition on which to start.    
 - TODO relation with the key frame and inter frame is unknown

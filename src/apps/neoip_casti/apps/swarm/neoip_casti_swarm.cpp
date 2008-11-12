@@ -49,7 +49,7 @@ stream into bt_swarm_t
 #include "neoip_xmlrpc_listener.hpp"
 
 #include "neoip_bt_httpi.hpp"
-#include "neoip_bt_httpi_mod_vapi.hpp"
+#include "neoip_bt_scasti_mod_vapi.hpp"
 
 #include "neoip_bt_ezsession.hpp"
 #include "neoip_bt_ezswarm.hpp"
@@ -164,7 +164,7 @@ bt_err_t casti_swarm_t::start(casti_swarm_arg_t &swarm_arg)	throw()
 	this->m_cast_name	= swarm_arg.cast_name();
 	this->m_cast_privtext	= swarm_arg.cast_privtext();
 	this->m_httpi_uri	= swarm_arg.httpi_uri();
-	this->m_httpi_mod	= swarm_arg.httpi_mod();
+	this->m_scasti_mod	= swarm_arg.scasti_mod();
 	this->m_http_peersrc_uri= swarm_arg.http_peersrc_uri();
 	// link this object to the bt_casti_apps_t
 	casti_apps->swarm_dolink(this);
@@ -316,7 +316,7 @@ bt_cast_mdata_t		casti_swarm_t::current_mdata()	const throw()
 	DBG_ASSERT( bt_ezswarm()->in_share() );
 	// some variable alias to ease readability
 	const bt_cast_spos_arr_t &cast_spos_arr	= swarm_spos()->cast_spos_arr(); 
-	bt_httpi_mod_vapi_t * mod_vapi	= bt_httpi()->mod_vapi();
+	bt_scasti_mod_vapi_t * mod_vapi	= bt_httpi()->mod_vapi();
 	bt_swarm_t *	bt_swarm	= bt_ezswarm()->share()->bt_swarm();
 	const bt_mfile_t &bt_mfile	= bt_swarm->get_mfile();
 	// populate the bt_cast_mdata_t

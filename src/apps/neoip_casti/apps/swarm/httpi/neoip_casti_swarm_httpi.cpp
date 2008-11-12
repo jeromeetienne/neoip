@@ -17,8 +17,8 @@ casti_swarm_httpi_t handle all the httpi stuff for the casti_swarm_t
 #include "neoip_bt_cast_pidx.hpp"
 
 #include "neoip_bt_httpi.hpp"
-#include "neoip_bt_httpi_event.hpp"
-#include "neoip_bt_httpi_mod_vapi.hpp"
+#include "neoip_bt_scasti_event.hpp"
+#include "neoip_bt_scasti_mod_vapi.hpp"
 
 
 #include "neoip_bt_ezswarm.hpp"
@@ -96,7 +96,7 @@ bt_err_t casti_swarm_httpi_t::start(casti_swarm_t *m_casti_swarm)		throw()
 	bt_err_t	bt_err;
 	m_bt_httpi	= nipmem_new bt_httpi_t();
 	bt_err		= bt_httpi()->start(casti_swarm()->httpi_uri(), bt_ezswarm()->io_vapi()
-						, casti_swarm()->httpi_mod(), this, NULL);
+						, casti_swarm()->scasti_mod(), this, NULL);
 	if( bt_err.failed() )	return bt_err;
 	// return no error
 	return bt_err_t::OK;
@@ -138,31 +138,31 @@ casti_swarm_spos_t*	casti_swarm_httpi_t::swarm_spos()	const throw()
 /** \brief callback notified by \ref bt_httpi_t to provide event
  */
 bool	casti_swarm_httpi_t::neoip_bt_httpi_cb(void *cb_userptr, bt_httpi_t &cb_bt_httpi
-				, const bt_httpi_event_t &httpi_event)	throw() 
+				, const bt_scasti_event_t &scasti_event)	throw() 
 {
 	// sanity check - bt_ezswarm MUST be non null and in_share
 	DBG_ASSERT( bt_ezswarm() );
 	DBG_ASSERT( bt_ezswarm()->in_share() );
 	
 	// log to debug
-	KLOG_DBG("enter bt_httpi_event_t=" << httpi_event);
+	KLOG_DBG("enter bt_scasti_event_t=" << scasti_event);
 
 	// in case of error, start a gracefull shutdown of the casti_swarm_t
-	if( httpi_event.is_fatal() ){
+	if( scasti_event.is_fatal() ){
 		// delete bt_httpi_t now
 		// - in case casti_swarm_t->gracefull_shutdown() dont delete this object
 		// - NOTE: based on the regularity rules "if an obj notifies error, delete it"
 		nipmem_zdelete	m_bt_httpi;
 		// do casti_swarm()->gracefull_shutdown()
-		casti_swarm()->gracefull_shutdown(httpi_event.to_string());
+		casti_swarm()->gracefull_shutdown(scasti_event.to_string());
 		// return dontkeep
 		return false;
 	}
 
 	// handle the bt_ezswarm_event_t depending of its type
-	switch(httpi_event.get_value()){
-	case bt_httpi_event_t::CHUNK_AVAIL:	return handle_chunk_avail(httpi_event.get_chunk_avail());
-	case bt_httpi_event_t::MOD_UPDATED:	return handle_mod_updated();	
+	switch(scasti_event.get_value()){
+	case bt_scasti_event_t::CHUNK_AVAIL:	return handle_chunk_avail(scasti_event.get_chunk_avail());
+	case bt_scasti_event_t::MOD_UPDATED:	return handle_mod_updated();	
 	default:	break;
 	}
 	
@@ -170,7 +170,7 @@ bool	casti_swarm_httpi_t::neoip_bt_httpi_cb(void *cb_userptr, bt_httpi_t &cb_bt_
 	return true;
 }
 
-/** \brief Handle a bt_httpi_event_t::CHUNK_AVAIL
+/** \brief Handle a bt_scasti_event_t::CHUNK_AVAIL
  * 
  * @return a tokeep for the bt_httpi_t 
  */
@@ -201,7 +201,7 @@ bool	casti_swarm_httpi_t::handle_chunk_avail(const file_size_t &chunk_len)		thro
 	
 // TODO pass under a specific function
 // - use the bt_cast_pidx_t in it to simplify it
-	// notify all the pieceidx newly available after this bt_httpi_event_t::CHUNK_AVAIL
+	// notify all the pieceidx newly available after this bt_scasti_event_t::CHUNK_AVAIL
 	for(size_t pieceidx = old_httpi_pidx; pieceidx < new_httpi_pidx; pieceidx++){
 		// TODO this breaks the "no nested notification" rules
 		// - this will make a notification to bt_ezswarm_cb_t
@@ -258,13 +258,13 @@ bool	casti_swarm_httpi_t::handle_chunk_avail(const file_size_t &chunk_len)		thro
 	return true;
 }
 
-/** \brief Handle a bt_httpi_event_t::CHUNK_AVAIL
+/** \brief Handle a bt_scasti_event_t::CHUNK_AVAIL
  * 
  * @return a tokeep for the bt_httpi_t 
  */
 bool	casti_swarm_httpi_t::handle_mod_updated()				throw()
 {
-	// gather all the new bt_cast_spos_t from the bt_httpi_mod_vapi_t
+	// gather all the new bt_cast_spos_t from the bt_scasti_mod_vapi_t
 	swarm_spos()->gather();
 	// return tokeep
 	return true;
