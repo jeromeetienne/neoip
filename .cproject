@@ -4,12 +4,7 @@
 <cproject>
 <storageModule moduleId="org.eclipse.cdt.core.settings">
 <cconfiguration id="converted.config.1604453091">
-<storageModule moduleId="org.eclipse.cdt.core.pathentry">
-<pathentry include=".include" kind="inc" path="" system="true"/>
-<pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
-<pathentry kind="src" path=""/>
-<pathentry kind="out" path=""/>
-</storageModule>
+
 <storageModule moduleId="cdt_indexer">
 <indexEnabled indexValue="false"/>
 <indexerProblemsEnabled indexProblemsValue="0"/>
@@ -46,6 +41,15 @@
 <extension id="org.eclipse.cdt.core.nullindexer" point="org.eclipse.cdt.core.CIndexer"/>
 <extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 </extensions>
+</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.core.pathentry">
+<pathentry include=".include" kind="inc" path="" system="true"/>
+<pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
+<pathentry excluding="cam/" kind="src" path=""/>
+<pathentry kind="out" path=""/>
 </storageModule>
 </cconfiguration>
 </storageModule>

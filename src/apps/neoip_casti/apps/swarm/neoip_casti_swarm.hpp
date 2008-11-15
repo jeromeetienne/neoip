@@ -1,11 +1,11 @@
 /*! \file
     \brief Header of the \ref casti_swarm_t
-    
+
 */
 
 
-#ifndef __NEOIP_CASTI_SWARM_HPP__ 
-#define __NEOIP_CASTI_SWARM_HPP__ 
+#ifndef __NEOIP_CASTI_SWARM_HPP__
+#define __NEOIP_CASTI_SWARM_HPP__
 /* system include */
 /* local include */
 #include "neoip_casti_swarm_wikidbg.hpp"
@@ -16,7 +16,6 @@
 #include "neoip_bt_scasti_mod_type.hpp"
 #include "neoip_bt_ezswarm_cb.hpp"
 #include "neoip_bt_err.hpp"
-#include "neoip_bt_httpi_cb.hpp"
 #include "neoip_http_uri.hpp"
 #include "neoip_file_size.hpp"
 #include "neoip_file_size_arr.hpp"
@@ -31,11 +30,12 @@ class	casti_apps_t;
 class	casti_swarm_arg_t;
 class	casti_swarm_udata_t;
 class	casti_swarm_spos_t;
-class	casti_swarm_httpi_t;
+class	casti_swarm_scasti_t;
 class	bt_cast_mdata_t;
 class	bt_cast_udata_t;
 class	bt_mfile_t;
 class	bt_ezswarm_state_t;
+class	bt_httpi_t;		//TODO to remove
 
 /** \brief Handle the swarm part for the bt_oload_stat_t
  */
@@ -55,7 +55,7 @@ private:
 	std::string		m_cast_privtext;//!< the cast_privtext for this swarm
 	http_uri_t		m_mdata_srv_uri;//!< the http_uri_t for the mdata_server
 	http_uri_t		m_httpi_uri;	//!< source http_uri_t for this casti_swarm_t
-	bt_scasti_mod_type_t	m_scasti_mod;	//!< the bt_scasti_mod_type_t for this casti_swarm_t 
+	bt_scasti_mod_type_t	m_scasti_mod;	//!< the bt_scasti_mod_type_t for this casti_swarm_t
 	http_uri_t		m_http_peersrc_uri;//!< http_uri_t for the bt_peersrc_http_t
 
 	size_t			pieceq_beg;
@@ -65,13 +65,13 @@ private:
 	/*************** Sub service	***************************************/
 	casti_swarm_udata_t *	m_swarm_udata;	//!< pointer on the udata handler
 	casti_swarm_spos_t*	m_swarm_spos;	//!< pointer on the bt_cast_spos_arr_t handler
-	casti_swarm_httpi_t *	m_swarm_httpi;	//!< pointer on the bt_httpi handler
-	
+	casti_swarm_scasti_t *	m_swarm_scasti;	//!< pointer on the bt_httpi handler
+
 	/*************** Internal function	*******************************/
 	bool			autodelete(const bt_err_t &bt_err)	throw()	{ return autodelete(bt_err.to_string());	}
 	bool			autodelete(const std::string &reason = "")	throw();
 	bt_httpi_t *		bt_httpi()					const throw();
-	
+
 	/*************** bt_ezswarm_t	***************************************/
 	bt_ezswarm_t *		m_bt_ezswarm;
 	bool 			neoip_bt_ezswarm_cb(void *cb_userptr, bt_ezswarm_t &cb_bt_ezswarm
@@ -100,7 +100,7 @@ public:
 	/*************** Setup function	***************************************/
 	casti_swarm_t &	profile(const casti_swarm_profile_t &profile)			throw();
 	bt_err_t	start(casti_swarm_arg_t &swarm_arg)	throw();
-	
+
 	/*************** Query function	***************************************/
 	const http_uri_t &		mdata_srv_uri()	const throw()	{ return m_mdata_srv_uri;}
 	const std::string &		cast_name()	const throw()	{ return m_cast_name;	}
@@ -112,7 +112,7 @@ public:
 	bt_ezswarm_t *			bt_ezswarm()	const throw()	{ return m_bt_ezswarm;	}
 	casti_swarm_udata_t *		swarm_udata()	const throw()	{ return m_swarm_udata;	}
 	casti_swarm_spos_t *		swarm_spos()	const throw()	{ return m_swarm_spos;	}
-	casti_swarm_httpi_t *		swarm_httpi()	const throw()	{ return m_swarm_httpi;	}
+	casti_swarm_scasti_t *		swarm_scasti()	const throw()	{ return m_swarm_scasti;	}
 	const casti_swarm_profile_t &	profile()	const throw()	{ return m_profile;	}
 	bool				is_published()	const throw();
 	std::string			cast_privhash()	const throw();
@@ -129,7 +129,7 @@ public:
 	friend class	casti_swarm_wikidbg_t;
 	friend class	casti_swarm_udata_t;
 	friend class	casti_swarm_spos_t;
-	friend class	casti_swarm_httpi_t;
+	friend class	casti_swarm_scasti_t;
 };
 
 NEOIP_NAMESPACE_END

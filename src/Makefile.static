@@ -381,15 +381,15 @@ NEOIP_BT_CAST_OBJS =									\
 	$(NEOIP_BT_CAST_DIR)/httpo/full/base/arg/neoip_bt_httpo_full_arg.o	\
 	$(NEOIP_BT_CAST_DIR)/httpo/full/base/profile/neoip_bt_httpo_full_profile.o	\
 	$(NEOIP_BT_CAST_DIR)/httpo/full/base/wikidbg/neoip_bt_httpo_full_wikidbg.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/neoip_bt_httpi.o				\
-	$(NEOIP_BT_CAST_DIR)/httpi/base/event/neoip_bt_scasti_event.o		\
-	$(NEOIP_BT_CAST_DIR)/httpi/base/profile/neoip_bt_httpi_profile.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/base/nunit/neoip_bt_httpi_nunit.o		\
-	$(NEOIP_BT_CAST_DIR)/httpi/base/wikidbg/neoip_bt_httpi_wikidbg.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/mod/base/type/neoip_bt_scasti_mod_type.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/raw/neoip_bt_scasti_mod_raw.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.o	\
-	$(NEOIP_BT_CAST_DIR)/httpi/mod/impl/flv/neoip_bt_scasti_mod_flv.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/neoip_bt_httpi.o				\
+	$(NEOIP_BT_CAST_DIR)/scasti/base/event/neoip_bt_scasti_event.o		\
+	$(NEOIP_BT_CAST_DIR)/scasti/base/profile/neoip_bt_httpi_profile.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/base/nunit/neoip_bt_httpi_nunit.o		\
+	$(NEOIP_BT_CAST_DIR)/scasti/base/wikidbg/neoip_bt_httpi_wikidbg.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/mod/base/type/neoip_bt_scasti_mod_type.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/mod/impl/raw/neoip_bt_scasti_mod_raw.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/mod/impl/flv/neoip_bt_scasti_mod_flv.o	\
 	$(NEOIP_BT_CAST_DIR)/mdata/neoip_bt_cast_mdata.o			\
 	$(NEOIP_BT_CAST_DIR)/mdata/server/neoip_bt_cast_mdata_server.o			\
 	$(NEOIP_BT_CAST_DIR)/mdata/server/wikidbg/neoip_bt_cast_mdata_server_wikidbg.o	\
@@ -1639,9 +1639,9 @@ APP_CASTI_OBJS= 								\
 	$(APP_CASTI_DIR)/apps/swarm/neoip_casti_swarm.o						\
 	$(APP_CASTI_DIR)/apps/swarm/spos/neoip_casti_swarm_spos.o				\
 	$(APP_CASTI_DIR)/apps/swarm/spos/wikidbg/neoip_casti_swarm_spos_wikidbg.o		\
-	$(APP_CASTI_DIR)/apps/swarm/httpi/neoip_casti_swarm_httpi.o				\
-	$(APP_CASTI_DIR)/apps/swarm/httpi/base/profile/neoip_casti_swarm_httpi_profile.o	\
-	$(APP_CASTI_DIR)/apps/swarm/httpi/base/wikidbg/neoip_casti_swarm_httpi_wikidbg.o	\
+	$(APP_CASTI_DIR)/apps/swarm/scasti/neoip_casti_swarm_scasti.o				\
+	$(APP_CASTI_DIR)/apps/swarm/scasti/base/profile/neoip_casti_swarm_scasti_profile.o	\
+	$(APP_CASTI_DIR)/apps/swarm/scasti/base/wikidbg/neoip_casti_swarm_scasti_wikidbg.o	\
 	$(APP_CASTI_DIR)/apps/swarm/udata/neoip_casti_swarm_udata.o				\
 	$(APP_CASTI_DIR)/apps/swarm/udata/base/profile/neoip_casti_swarm_udata_profile.o	\
 	$(APP_CASTI_DIR)/apps/swarm/udata/base/wikidbg/neoip_casti_swarm_udata_wikidbg.o	\

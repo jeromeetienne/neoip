@@ -63,12 +63,12 @@ bt_err_t	bt_swarm_peersrc_t::start(bt_swarm_t *bt_swarm
 
 	// init the itor_blacklist
 	itor_blacklist	= nipmem_new itor_blacklist_t(bt_swarm->profile().itor_blacklist_delay());
-	
+
 	// feed the initial bt_peersrc_peer_arr_t
 	// - TODO should i do a zerotimer to launch them ?
 	//   - YES YES i really dont like the launch them immediatly thing
 	// - there is a matter of priority, the bt_peersrc_peer_t which are the more
-	//   likely to be alive, should be tried first. 
+	//   likely to be alive, should be tried first.
 	//   - e.g. the one from a current request should be tried before the one
 	//     from a previous run
 	//   - later even prioritize the peerid that you like
@@ -97,7 +97,7 @@ bool	bt_swarm_peersrc_t::neoip_bt_peersrc_cb(void *cb_userptr, bt_peersrc_vapi_t
 	bt_peersrc_vapi_t *	peersrc_vapi	= &cb_peersrc_vapi;
 	// log to debug
 	KLOG_DBG("enter peersrc_event=" << peersrc_event);
-	
+
 	// handle each possible events from its type
 	switch( peersrc_event.get_value() ){
 	case bt_peersrc_event_t::DOREGISTER:	peersrc_db.push_back(peersrc_vapi);		break;
@@ -151,8 +151,8 @@ bool	bt_swarm_peersrc_t::is_new_itor_allowed()	const throw()
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief a new peer is feed to the bt_swarm_peersrc_t
- * 
- * - this function doesnt 
+ *
+ * - this function doesnt
  */
 void	bt_swarm_peersrc_t::feed_new_peer(const bt_peersrc_peer_t &peersrc_peer)	throw()
 {
@@ -170,13 +170,13 @@ void	bt_swarm_peersrc_t::feed_new_peer(const bt_peersrc_peer_t &peersrc_peer)	th
 	if( bt_swarm->full_by_remote_addr(peersrc_peer.dest_addr()) )	return;
 
 	// if this bt_peersrc_peer_t is already present in the peersrc_peer_db, do nothing
-	// - NOTE: currently peersrc_peer_db is a list, so it is slow 
+	// - NOTE: currently peersrc_peer_db is a list, so it is slow
 	std::list<bt_peersrc_peer_t>::iterator	iter;
 	iter	= std::find(peersrc_peer_db.begin(), peersrc_peer_db.end(), peersrc_peer);
 	if( iter != peersrc_peer_db.end() )		return;
-	
+
 	// queue this new peer
-	// - TODO unclear i should put it at the end.... 
+	// - TODO unclear i should put it at the end....
 	//   - idea: the livest peer should be tried first.
 	//   - the idea seems good but imply to know how recent is the peersrc_peer
 	//     - currently it is not possible
@@ -184,7 +184,7 @@ void	bt_swarm_peersrc_t::feed_new_peer(const bt_peersrc_peer_t &peersrc_peer)	th
 	//       the request period
 	//     - if from bt_peersrc_nslan_t, it is immediate
 	//     - if from bt_peersrc_utpex_t, it is immediate
-	//     - if from bt_peersrc_kad_t, it is unknown. would require to handle the 
+	//     - if from bt_peersrc_kad_t, it is unknown. would require to handle the
 	//       record age or even last update in kad
 	peersrc_peer_db.push_back(peersrc_peer);
 
@@ -239,7 +239,7 @@ void	bt_swarm_peersrc_t::may_launch_new_itor()	throw()
 ///////////////////////////////////////////////////////////////////////////////
 
 /** \brief callback called when the newitor_zerotimer expire
- * 
+ *
  * - only used to avoid any nested notification issue
  */
 bool	bt_swarm_peersrc_t::neoip_zerotimer_expire_cb(zerotimer_t &cb_zerotimer, void *userptr)	throw()
@@ -258,7 +258,7 @@ bool	bt_swarm_peersrc_t::neoip_zerotimer_expire_cb(zerotimer_t &cb_zerotimer, vo
 
 /** \brief callback notified by \ref bt_tracker_client_t to provide event
  */
-void	bt_swarm_peersrc_t::try_launch_new_itor()	throw() 
+void	bt_swarm_peersrc_t::try_launch_new_itor()	throw()
 {
 	bt_session_t *	bt_session	= bt_swarm->get_session();
 	bt_err_t	bt_err;
@@ -298,7 +298,7 @@ void	bt_swarm_peersrc_t::try_launch_new_itor()	throw()
 		if( itor_by_remote_addr(remote_addr) )			continue;
 		// if this remote_addr is already used for a bt_swarm_full_t, skip it
 		if( bt_swarm->full_by_remote_addr(remote_addr) )	continue;
-		
+
 		// create and start a bt_swarm_itor_t for this peer
 		bt_swarm_itor_t *	swarm_itor;
 		swarm_itor	= nipmem_new bt_swarm_itor_t();
@@ -314,7 +314,7 @@ void	bt_swarm_peersrc_t::try_launch_new_itor()	throw()
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief callback notified by \ref bt_swarm_itor_t when to notify an event
- * 
+ *
  * @return true if the bt_swarm_itor_t is still valid after the callback
  */
 bool	bt_swarm_peersrc_t::neoip_bt_swarm_itor_cb(void *cb_userptr, bt_swarm_itor_t &cb_swarm_itor
@@ -322,7 +322,7 @@ bool	bt_swarm_peersrc_t::neoip_bt_swarm_itor_cb(void *cb_userptr, bt_swarm_itor_
 					, const bytearray_t &recved_data
 					, const bt_handshake_t &remote_handshake)	throw()
 {
-	bt_swarm_itor_t * swarm_itor	= &cb_swarm_itor; 
+	bt_swarm_itor_t * swarm_itor	= &cb_swarm_itor;
 	// log to debug
 	KLOG_ERR("enter bt_err=" << cb_bt_err << " peersrc_peer=" << swarm_itor->peersrc_peer());
 
@@ -334,10 +334,7 @@ bool	bt_swarm_peersrc_t::neoip_bt_swarm_itor_cb(void *cb_userptr, bt_swarm_itor_
 		swarm_full	= nipmem_new bt_swarm_full_t();
 		bt_err		= swarm_full->start(bt_swarm, socket_full, recved_data, remote_handshake);
 		if( bt_err.failed() )	KLOG_ERR("Cant start bt_swarm_full_t due to " << bt_err);
-	}else{	
-#if 1	// TODO to remove - only to debug
-		DBG_ASSERT( 0 );
-#endif
+	}else{
 		// put it in itor_blacklist
 		itor_blacklist->update(swarm_itor->peersrc_peer());
 	}

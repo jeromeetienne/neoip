@@ -117,8 +117,10 @@ bool	rtmp_cam_full_t::neoip_rtmp_full_cb(void *userptr, rtmp_full_t &cb_rtmp_ful
 	case rtmp_type_t::AUDIO:	// fall thru
 	case rtmp_type_t::VIDEO:	return notify_callback(rtmp_event);
 	case rtmp_type_t::INVOKE:	return handle_invoke(rtmp_event);
+	case rtmp_type_t::PING:		return handle_ping(rtmp_event);
 	default:	// simply ignore any other rtmp_type_t
 			// - TODO fix this... this is dirty
+			KLOG_ERR("rtmp_pkthd type is not handle =" << rtmp_pkthd);
 			break;
 	}
 
@@ -139,13 +141,11 @@ bool	rtmp_cam_full_t::handle_invoke(const rtmp_event_t &rtmp_event)	throw()
 	// get the packet from the event
 	datum_t		pktbody;
 	rtmp_pkthd_t	rtmp_pkthd	= rtmp_event.get_packet(&pktbody);
+	// sanity check - at this point, rtmp_pkthd_t MUST BE rtmp_type_t::INVOKE
+	DBG_ASSERT( rtmp_pkthd.type() == rtmp_type_t::INVOKE);
 
 	// log to debug
-	KLOG_ERR("rtmp_pkthd="	<< rtmp_pkthd);
-	KLOG_ERR("pktbody="	<< pktbody);
-
-	// sanity check - at this point, rtmp_pkthd_t MUST BE rtmp_type_t::INVOKE
-	DBG_ASSERT( rtmp_pkthd.type() == rtmp_type_t::INVOKE );
+	//KLOG_ERR("rtmp_pkthd="	<< rtmp_pkthd);	KLOG_ERR("pktbody="	<< pktbody);
 
 	// parse the packet body
 	bytearray_t	amf0_body(pktbody);
@@ -155,7 +155,7 @@ bool	rtmp_cam_full_t::handle_invoke(const rtmp_event_t &rtmp_event)	throw()
 	}else if( dvar.str().get() == "createStream" ){
 		return handle_invoke_createStream(rtmp_pkthd, amf0_body);
 	}else{
-		KLOG_ERR("received INVOKE '" << dvar.str() << "' but not handled");
+		KLOG_ERR("received INVOKE '" << dvar.str() << "' but not handled. remaining body=" << amf0_body);
 	}
 
 	// return tokeep
@@ -193,9 +193,9 @@ bool	rtmp_cam_full_t::handle_invoke_connect(const rtmp_pkthd_t &rtmp_pkthd
 	DBG_ASSERT(rtmp_err.succeed());
 
 	// get the connect_uri from the connect parameter
+	// TODO this ASSERT is may cause useless crash
 	DBG_ASSERT(param1.type().is_map());
 	http_uri_t	connect_uri	= param1.map()["tcUrl"].str().get();
-	KLOG_ERR("tcUrl="<< connect_uri);
 
 	// build and notify a rtmp_event_t::CONNECTED
 	rtmp_event_t	rtmp_event;
@@ -232,6 +232,33 @@ bool	rtmp_cam_full_t::handle_invoke_createStream(const rtmp_pkthd_t &rtmp_pkthd
 	rtmp_err	= rtmp_full->send(data_resp.to_datum());
 	DBG_ASSERT(rtmp_err.succeed());
 
+	// return tokeep
+	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//                     handle rtmp_type_t::PING
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+/** \brief handle rtmp_event_t for rtmp_type_t::PING
+ */
+bool	rtmp_cam_full_t::handle_ping(const rtmp_event_t &rtmp_event)	throw()
+{
+	// get the packet from the event
+	datum_t		pktbody;
+	rtmp_pkthd_t	rtmp_pkthd	= rtmp_event.get_packet(&pktbody);
+	// sanity check - at this point, rtmp_pkthd_t MUST BE rtmp_type_t::PING
+	DBG_ASSERT( rtmp_pkthd.type() == rtmp_type_t::PING);
+
+	// log to debug
+	KLOG_ERR("rtmp_pkthd="	<< rtmp_pkthd);	KLOG_ERR("pktbody="	<< pktbody);
+//rtmp_pkthd=[channel_id=2 timestamp=4h3m51s339ms body_length=10 type=PING stream_id=0]
+//pktbody=len=10 flag=[] data=
+//0000: 00 03 00 00 00 01 00 00 00 00                     | ..........       |
+// from http://www.google.com/codesearch?hl=en&q=onping+show:74yG6nMUPmg:Prr2nCGEhDk:74yG6nMUPmg&sa=N&cd=2&ct=rc&cs_p=http://fluorinefx.googlecode.com/svn&cs_f=trunk/Source/FluorineFx/Messaging/Rtmp/RtmpHandler.cs&exact_package=http://fluorinefx.googlecode.com/svn
+// this means "client want to set the client buffer (00 03) of the stream_id 1 (00 00 00 01) to 0 (00 00 00 00)"
 	// return tokeep
 	return true;
 }

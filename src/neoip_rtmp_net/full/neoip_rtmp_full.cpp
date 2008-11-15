@@ -40,7 +40,7 @@ rtmp_full_t::rtmp_full_t(socket_full_t *p_socket_full, const bytearray_t &recved
 
 	// notify the already received data to rtmp_parse_t
 	// - NOTE: rtmp_parse_t will parse them after a zerotimer_t
-	KLOG_ERR("recved_data" << recved_data);
+	KLOG_DBG("recved_data" << recved_data);
 	rtmp_parse->notify_data(recved_data.to_datum(datum_t::NOCOPY));
 }
 
@@ -157,7 +157,7 @@ bool	rtmp_full_t::neoip_rtmp_parse_cb(void *userptr, rtmp_parse_t &cb_rtmp_parse
 					, const rtmp_event_t &rtmp_event) throw()
 {
 	// log to debug
-	KLOG_ERR("enter event=" << rtmp_event);
+	KLOG_DBG("enter event=" << rtmp_event);
 	// sanity check - rtmp_event_t MUST be is_parse_ok()
 	DBG_ASSERT( rtmp_event.is_parse_ok() );
 

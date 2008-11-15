@@ -176,6 +176,7 @@ bool	rtmp_cam_listener_t::handle_event_connected(rtmp_cam_full_t *cam_full
 	cam_resp	= find_resp(connect_uri);
 	// if none matches, delete rtmp_cam_full_t and return dontkeep
 	if( cam_resp == NULL ){
+		full_unlink(cam_full);
 		nipmem_zdelete cam_full;
 		return false;
 	}

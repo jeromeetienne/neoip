@@ -12,7 +12,7 @@
 - CASE 3
   - same as case 2 + one relay without rate_limit_t
 
-\par TODO better handling of multiple streams 
+\par TODO better handling of multiple streams
 - the multistream feature is very poorly handled
   - aka some part works only for a single casti_swarm_t
   - e.g. the bt_cast_mdata_t reply
@@ -26,15 +26,15 @@
     you have to pay for it"
 - help seeding: this allows to seed the system by having all the CC content
   provider it to use/promote it
-- negligible money cost: this doesnt reduce significantly the money made on it 
-  because CC content providers are unlikely to pay anyway 
+- negligible money cost: this doesnt reduce significantly the money made on it
+  because CC content providers are unlikely to pay anyway
 
 \par About the 2 type of casti_swarm_t initialization
 - if the casti_swarm_t has been triggered by cmdline, it is attempted to stream
   all the time.
   - aka the casti_swarm_t wont be deleted by casti_apps_t (only stopping neoip-casti
     will stop it)
-  - aka if the httpi_t is disconnected, casti_apps_t will periodicatlly retry to 
+  - aka if the scasti_t is disconnected, casti_apps_t will periodicatlly retry to
     reconnect it
 - if the casti_swarm_t has been triggered by webpage
   - stopping: can be done explicitly by the webpage
@@ -156,11 +156,11 @@ bt_err_t	casti_apps_t::start()						throw()
 
 	// load the configuration file for this apps
 	strvar_db_t casti_conf	= strvar_helper_t::from_file(config_path / "neoip_casti.conf");
-	
+
 	// read some defaults value fromt the casti_conf - for future reference
 	m_dfl_http_peersrc_uri	= casti_conf.get_first_value("dfl_http_peersrc_uri");
 	m_dfl_mdata_srv_uri	= casti_conf.get_first_value("dfl_mdata_srv_uri");
-	
+
 	// start the bt_http_listener_t
 	bt_err		= launch_http_listener(casti_conf);
 	if( bt_err.failed() )		return bt_err;
@@ -168,16 +168,16 @@ bt_err_t	casti_apps_t::start()						throw()
 	// start the inetreach_httpd
 	m_inetreach_httpd= nipmem_new casti_inetreach_httpd_t();
 	bt_err		= m_inetreach_httpd->start(this, NULL);
-	if( bt_err.failed() )		return bt_err;	
-	
-	// Launch the apps_httpdetect_t - use directly neoip_*_info.hpp #define 
+	if( bt_err.failed() )		return bt_err;
+
+	// Launch the apps_httpdetect_t - use directly neoip_*_info.hpp #define
 	// - cant use libapps->canon_name() because it would be wrong for neoip-webok
 	libsess_err_t	libsess_err;
 	m_apps_httpdetect = nipmem_new apps_httpdetect_t();
 	libsess_err	= m_apps_httpdetect->start(http_listener(), NEOIP_APPS_CANON_NAME
 							, NEOIP_APPS_VERSION);
 	if( libsess_err.failed() )	return bt_err_t(bt_err_t::ERROR, libsess_err.to_string());
-	
+
 	// start the m_ctrl_cline
 	m_ctrl_cline	= nipmem_new casti_ctrl_cline_t();
 	bt_err		= m_ctrl_cline->start(this);
@@ -192,7 +192,7 @@ bt_err_t	casti_apps_t::start()						throw()
 	m_mdata_server	= nipmem_new bt_cast_mdata_server_t();
 	bt_err		= m_mdata_server->start(m_inetreach_httpd->http_listener(), this, NULL);
 	if( bt_err.failed() )		return bt_err;
-	
+
 	// start the bt_ezsession_t
 	bt_err		= launch_ezsession(casti_conf);
 	if( bt_err.failed() )		return bt_err;
@@ -207,7 +207,7 @@ bt_err_t	casti_apps_t::start()						throw()
 	file_err_t	file_err;
 	file_err	= file_utils_t::create_directory(io_pfile_dirpath(), file_utils_t::NO_RECURSION);
 	if( file_err.failed() )	return bt_err_from_file(file_err);
-		
+
 	// if the arg_option DOES NOT contains the "nodaemon" key, pass daemon
 	// - NOTE: be carefull this change the pid
 	if( !arg_option.contain_key("nodaemon") && lib_apps_helper_t::daemonize().failed() )
@@ -250,7 +250,7 @@ bt_err_t	casti_apps_t::launch_http_listener(const strvar_db_t &casti_conf)	throw
 						, listener_portmin, listener_portmax);
 	if( listener_ipport.is_null() )	return bt_err_t(bt_err_t::ERROR, "no free port for http_listener");
 
-	// build the resp_arg for the http_listener_t 
+	// build the resp_arg for the http_listener_t
 	socket_resp_arg_t	resp_arg;
 	resp_arg	= socket_resp_arg_t().profile(socket_profile_t(socket_domain_t::TCP))
 					.domain(socket_domain_t::TCP).type(socket_type_t::STREAM)
@@ -260,7 +260,7 @@ bt_err_t	casti_apps_t::launch_http_listener(const strvar_db_t &casti_conf)	throw
 	m_http_listener	= nipmem_new http_listener_t();
 	http_err	= m_http_listener->start(resp_arg);
 	if( http_err.failed() )		return bt_err_from_http(http_err);
-	
+
 	// return no error
 	return bt_err_t::OK;
 }
@@ -294,7 +294,7 @@ bt_err_t	casti_apps_t::launch_ezsession(const strvar_db_t &oload_conf)	throw()
 	// set the bt_ezswarm_opt_t
 	bt_ezsession_opt_t	ezsession_opt;
 	ezsession_opt	|= bt_ezsession_opt_t::NSLAN_PEER;
-	// NOTE: disable bt_ezswarm_opt_t::PEERSRC_KAD as kad not stable enougth to be usefull 
+	// NOTE: disable bt_ezswarm_opt_t::PEERSRC_KAD as kad not stable enougth to be usefull
 	//ezsession_opt	|= bt_ezsession_opt_t::KAD_PEER;
 
 	// build the bt_ezsession_profile_t
@@ -302,15 +302,15 @@ bt_err_t	casti_apps_t::launch_ezsession(const strvar_db_t &oload_conf)	throw()
 	ezsession_profile.nslan_addr	(nslan_addr);
 	ezsession_profile.nslan_realmid	("nslan_realm_neoip_bt");
 	ezsession_profile.kad_realmid	("kad_realm_neoip_bt");
-	
+
 	// set bt_session_profile_t::resp_jamrc4_type_arr() support ONLY bt_jamrc4_type_t::DOJAM
 	ezsession_profile.session().resp_jamrc4_type_arr( bt_jamrc4_type_arr_t()
 								.append(bt_jamrc4_type_t::DOJAM)
 							);
-	
+
 // TODO about special case in bt_httpi_t and bt_io_cache_t
 // - bt_io_cache_write_t will read a full block (e.g. 16kbyte) from the disk
-//   if the write is less than 16kbyte  
+//   if the write is less than 16kbyte
 // - but bt_httpi_t write data as they are received (may be 2k or 50k or another size)
 // - this cause bt_io_cache_write_t to fails because it tries to write from a block
 //   (in this case a file because the bt_io_cache_t subio_vapi is bt_io_pfile_t)
@@ -318,8 +318,8 @@ bt_err_t	casti_apps_t::launch_ezsession(const strvar_db_t &oload_conf)	throw()
 // - this is an issue in the handling of bt_io_cache_write_t
 // - currently no brain to fix it
 //   - out of the blue, what about 'if read failed, considere it is 0?'
-//   - this issue seems close to the bt_alloc_t issue which is not done for 
-//     bt_io_pfile_t 
+//   - this issue seems close to the bt_alloc_t issue which is not done for
+//     bt_io_pfile_t
 	// Set the bt_io_cache_t size from oload_conf if any
 	std::string	io_cache_size_s	= oload_conf.get_first_value("io_cache_size", "0");
 	file_size_t	io_cache_size	= string_t::to_uint64(io_cache_size_s);
@@ -329,7 +329,7 @@ bt_err_t	casti_apps_t::launch_ezsession(const strvar_db_t &oload_conf)	throw()
 		// set the io_cache_size in the bt_io_cache_pool_profile_t
 		ezsession_profile.io_cache_pool().pool_maxlen( io_cache_size );
 	}
-	
+
 	// if arg_option contain xmit-maxrate, set it up
 	if( arg_option.contain_key("xmit-maxrate") ){
 		size_t maxrate	= string_t::to_uint32(arg_option.get_first_value("xmit-maxrate"));
@@ -352,7 +352,7 @@ bt_err_t	casti_apps_t::launch_ezsession(const strvar_db_t &oload_conf)	throw()
 	if( bt_err.failed() )	return bt_err;
 
 	// return no error
-	return bt_err_t::OK;	
+	return bt_err_t::OK;
 }
 
 
@@ -399,7 +399,7 @@ casti_swarm_t *	casti_apps_t::swarm_by(const http_uri_t &mdata_srv_uri, const st
 }
 
 /** \brief Return a base casti_swarm_arg_t with some default values
- * 
+ *
  * - NOTE: it is not fully initialized but
  */
 casti_swarm_arg_t	casti_apps_t::swarm_arg_default()			throw()
@@ -453,14 +453,14 @@ bool	casti_apps_t::neoip_casti_inetreach_httpd_cb(void *cb_userptr
 	std::list<casti_swarm_t *>::const_iterator	iter;
 	// log to debug
 	KLOG_ERR("enter new_ipport_pview=" << new_ipport_pview);
-	
+
 	// go throw the whole swarm_db
 	for(iter = swarm_db.begin(); iter != swarm_db.end(); iter++){
 		casti_swarm_t *	casti_swarm	= *iter;
 		// warn this casti_swarm_t that a republish_required
 		casti_swarm->notify_republish_required();
 	}
-	
+
 	// return tokeep
 	return true;
 }

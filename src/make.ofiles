@@ -32,10 +32,10 @@ OBJECTS = \
 	apps/neoip_casti/apps/swarm/base/arg/neoip_casti_swarm_arg.o \
 	apps/neoip_casti/apps/swarm/base/profile/neoip_casti_swarm_profile.o \
 	apps/neoip_casti/apps/swarm/base/wikidbg/neoip_casti_swarm_wikidbg.o \
-	apps/neoip_casti/apps/swarm/httpi/base/profile/neoip_casti_swarm_httpi_profile.o \
-	apps/neoip_casti/apps/swarm/httpi/base/wikidbg/neoip_casti_swarm_httpi_wikidbg.o \
-	apps/neoip_casti/apps/swarm/httpi/neoip_casti_swarm_httpi.o \
 	apps/neoip_casti/apps/swarm/neoip_casti_swarm.o \
+	apps/neoip_casti/apps/swarm/scasti/base/profile/neoip_casti_swarm_scasti_profile.o \
+	apps/neoip_casti/apps/swarm/scasti/base/wikidbg/neoip_casti_swarm_scasti_wikidbg.o \
+	apps/neoip_casti/apps/swarm/scasti/neoip_casti_swarm_scasti.o \
 	apps/neoip_casti/apps/swarm/spos/neoip_casti_swarm_spos.o \
 	apps/neoip_casti/apps/swarm/spos/wikidbg/neoip_casti_swarm_spos_wikidbg.o \
 	apps/neoip_casti/apps/swarm/udata/base/profile/neoip_casti_swarm_udata_profile.o \
@@ -282,15 +282,6 @@ OBJECTS = \
 	neoip_bt_cast/base/pidx/neoip_bt_cast_pidx.o \
 	neoip_bt_cast/base/spos/arr/neoip_bt_cast_spos_arr.o \
 	neoip_bt_cast/base/spos/neoip_bt_cast_spos.o \
-	neoip_bt_cast/httpi/base/event/neoip_bt_scasti_event.o \
-	neoip_bt_cast/httpi/base/nunit/neoip_bt_httpi_nunit.o \
-	neoip_bt_cast/httpi/base/profile/neoip_bt_httpi_profile.o \
-	neoip_bt_cast/httpi/base/wikidbg/neoip_bt_httpi_wikidbg.o \
-	neoip_bt_cast/httpi/mod/base/type/neoip_bt_scasti_mod_type.o \
-	neoip_bt_cast/httpi/mod/impl/flv/neoip_bt_scasti_mod_flv.o \
-	neoip_bt_cast/httpi/mod/impl/raw/neoip_bt_scasti_mod_raw.o \
-	neoip_bt_cast/httpi/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.o \
-	neoip_bt_cast/httpi/neoip_bt_httpi.o \
 	neoip_bt_cast/httpo/base/event/neoip_bt_httpo_event.o \
 	neoip_bt_cast/httpo/full/base/arg/neoip_bt_httpo_full_arg.o \
 	neoip_bt_cast/httpo/full/base/profile/neoip_bt_httpo_full_profile.o \
@@ -311,6 +302,15 @@ OBJECTS = \
 	neoip_bt_cast/mdata/server/wikidbg/neoip_bt_cast_mdata_server_wikidbg.o \
 	neoip_bt_cast/mdata/unpublish/neoip_bt_cast_mdata_unpublish.o \
 	neoip_bt_cast/mdata/unpublish/wikidbg/neoip_bt_cast_mdata_unpublish_wikidbg.o \
+	neoip_bt_cast/scasti/base/event/neoip_bt_scasti_event.o \
+	neoip_bt_cast/scasti/base/nunit/neoip_bt_httpi_nunit.o \
+	neoip_bt_cast/scasti/base/profile/neoip_bt_httpi_profile.o \
+	neoip_bt_cast/scasti/base/wikidbg/neoip_bt_httpi_wikidbg.o \
+	neoip_bt_cast/scasti/mod/base/type/neoip_bt_scasti_mod_type.o \
+	neoip_bt_cast/scasti/mod/impl/flv/neoip_bt_scasti_mod_flv.o \
+	neoip_bt_cast/scasti/mod/impl/raw/neoip_bt_scasti_mod_raw.o \
+	neoip_bt_cast/scasti/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.o \
+	neoip_bt_cast/scasti/neoip_bt_httpi.o \
 	neoip_bt_cast/service/prefetch/base/wikidbg/neoip_bt_cast_prefetch_wikidbg.o \
 	neoip_bt_cast/service/prefetch/cnx/neoip_bt_cast_prefetch_cnx.o \
 	neoip_bt_cast/service/prefetch/cnx/wikidbg/neoip_bt_cast_prefetch_cnx_wikidbg.o \
@@ -1507,10 +1507,10 @@ LINTS = \
 	apps/neoip_casti/apps/swarm/base/arg/neoip_casti_swarm_arg.lint \
 	apps/neoip_casti/apps/swarm/base/profile/neoip_casti_swarm_profile.lint \
 	apps/neoip_casti/apps/swarm/base/wikidbg/neoip_casti_swarm_wikidbg.lint \
-	apps/neoip_casti/apps/swarm/httpi/base/profile/neoip_casti_swarm_httpi_profile.lint \
-	apps/neoip_casti/apps/swarm/httpi/base/wikidbg/neoip_casti_swarm_httpi_wikidbg.lint \
-	apps/neoip_casti/apps/swarm/httpi/neoip_casti_swarm_httpi.lint \
 	apps/neoip_casti/apps/swarm/neoip_casti_swarm.lint \
+	apps/neoip_casti/apps/swarm/scasti/base/profile/neoip_casti_swarm_scasti_profile.lint \
+	apps/neoip_casti/apps/swarm/scasti/base/wikidbg/neoip_casti_swarm_scasti_wikidbg.lint \
+	apps/neoip_casti/apps/swarm/scasti/neoip_casti_swarm_scasti.lint \
 	apps/neoip_casti/apps/swarm/spos/neoip_casti_swarm_spos.lint \
 	apps/neoip_casti/apps/swarm/spos/wikidbg/neoip_casti_swarm_spos_wikidbg.lint \
 	apps/neoip_casti/apps/swarm/udata/base/profile/neoip_casti_swarm_udata_profile.lint \
@@ -1757,15 +1757,6 @@ LINTS = \
 	neoip_bt_cast/base/pidx/neoip_bt_cast_pidx.lint \
 	neoip_bt_cast/base/spos/arr/neoip_bt_cast_spos_arr.lint \
 	neoip_bt_cast/base/spos/neoip_bt_cast_spos.lint \
-	neoip_bt_cast/httpi/base/event/neoip_bt_scasti_event.lint \
-	neoip_bt_cast/httpi/base/nunit/neoip_bt_httpi_nunit.lint \
-	neoip_bt_cast/httpi/base/profile/neoip_bt_httpi_profile.lint \
-	neoip_bt_cast/httpi/base/wikidbg/neoip_bt_httpi_wikidbg.lint \
-	neoip_bt_cast/httpi/mod/base/type/neoip_bt_scasti_mod_type.lint \
-	neoip_bt_cast/httpi/mod/impl/flv/neoip_bt_scasti_mod_flv.lint \
-	neoip_bt_cast/httpi/mod/impl/raw/neoip_bt_scasti_mod_raw.lint \
-	neoip_bt_cast/httpi/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.lint \
-	neoip_bt_cast/httpi/neoip_bt_httpi.lint \
 	neoip_bt_cast/httpo/base/event/neoip_bt_httpo_event.lint \
 	neoip_bt_cast/httpo/full/base/arg/neoip_bt_httpo_full_arg.lint \
 	neoip_bt_cast/httpo/full/base/profile/neoip_bt_httpo_full_profile.lint \
@@ -1786,6 +1777,15 @@ LINTS = \
 	neoip_bt_cast/mdata/server/wikidbg/neoip_bt_cast_mdata_server_wikidbg.lint \
 	neoip_bt_cast/mdata/unpublish/neoip_bt_cast_mdata_unpublish.lint \
 	neoip_bt_cast/mdata/unpublish/wikidbg/neoip_bt_cast_mdata_unpublish_wikidbg.lint \
+	neoip_bt_cast/scasti/base/event/neoip_bt_scasti_event.lint \
+	neoip_bt_cast/scasti/base/nunit/neoip_bt_httpi_nunit.lint \
+	neoip_bt_cast/scasti/base/profile/neoip_bt_httpi_profile.lint \
+	neoip_bt_cast/scasti/base/wikidbg/neoip_bt_httpi_wikidbg.lint \
+	neoip_bt_cast/scasti/mod/base/type/neoip_bt_scasti_mod_type.lint \
+	neoip_bt_cast/scasti/mod/impl/flv/neoip_bt_scasti_mod_flv.lint \
+	neoip_bt_cast/scasti/mod/impl/raw/neoip_bt_scasti_mod_raw.lint \
+	neoip_bt_cast/scasti/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.lint \
+	neoip_bt_cast/scasti/neoip_bt_httpi.lint \
 	neoip_bt_cast/service/prefetch/base/wikidbg/neoip_bt_cast_prefetch_wikidbg.lint \
 	neoip_bt_cast/service/prefetch/cnx/neoip_bt_cast_prefetch_cnx.lint \
 	neoip_bt_cast/service/prefetch/cnx/wikidbg/neoip_bt_cast_prefetch_cnx_wikidbg.lint \
@@ -2982,10 +2982,10 @@ INCLUDEPATH = \
 	-Iapps/neoip_casti/apps/swarm/base/arg \
 	-Iapps/neoip_casti/apps/swarm/base/profile \
 	-Iapps/neoip_casti/apps/swarm/base/wikidbg \
-	-Iapps/neoip_casti/apps/swarm/httpi/base/profile \
-	-Iapps/neoip_casti/apps/swarm/httpi/base/wikidbg \
-	-Iapps/neoip_casti/apps/swarm/httpi \
 	-Iapps/neoip_casti/apps/swarm \
+	-Iapps/neoip_casti/apps/swarm/scasti/base/profile \
+	-Iapps/neoip_casti/apps/swarm/scasti/base/wikidbg \
+	-Iapps/neoip_casti/apps/swarm/scasti \
 	-Iapps/neoip_casti/apps/swarm/spos \
 	-Iapps/neoip_casti/apps/swarm/spos/wikidbg \
 	-Iapps/neoip_casti/apps/swarm/udata/base/profile \
@@ -3221,16 +3221,6 @@ INCLUDEPATH = \
 	-Ineoip_bt_cast/base/pidx \
 	-Ineoip_bt_cast/base/spos/arr \
 	-Ineoip_bt_cast/base/spos \
-	-Ineoip_bt_cast/httpi/base/event \
-	-Ineoip_bt_cast/httpi/base/nunit \
-	-Ineoip_bt_cast/httpi/base/profile \
-	-Ineoip_bt_cast/httpi/base/wikidbg \
-	-Ineoip_bt_cast/httpi/mod/base/type \
-	-Ineoip_bt_cast/httpi/mod/impl/flv \
-	-Ineoip_bt_cast/httpi/mod/impl/raw \
-	-Ineoip_bt_cast/httpi/mod/impl/raw/profile \
-	-Ineoip_bt_cast/httpi/mod \
-	-Ineoip_bt_cast/httpi \
 	-Ineoip_bt_cast/httpo/base/event \
 	-Ineoip_bt_cast/httpo/full/base/arg \
 	-Ineoip_bt_cast/httpo/full/base/profile \
@@ -3251,6 +3241,16 @@ INCLUDEPATH = \
 	-Ineoip_bt_cast/mdata/server/wikidbg \
 	-Ineoip_bt_cast/mdata/unpublish \
 	-Ineoip_bt_cast/mdata/unpublish/wikidbg \
+	-Ineoip_bt_cast/scasti/base/event \
+	-Ineoip_bt_cast/scasti/base/nunit \
+	-Ineoip_bt_cast/scasti/base/profile \
+	-Ineoip_bt_cast/scasti/base/wikidbg \
+	-Ineoip_bt_cast/scasti/mod/base/type \
+	-Ineoip_bt_cast/scasti/mod/impl/flv \
+	-Ineoip_bt_cast/scasti/mod/impl/raw \
+	-Ineoip_bt_cast/scasti/mod/impl/raw/profile \
+	-Ineoip_bt_cast/scasti/mod \
+	-Ineoip_bt_cast/scasti \
 	-Ineoip_bt_cast/service/prefetch/base/wikidbg \
 	-Ineoip_bt_cast/service/prefetch/cnx \
 	-Ineoip_bt_cast/service/prefetch/cnx/wikidbg \

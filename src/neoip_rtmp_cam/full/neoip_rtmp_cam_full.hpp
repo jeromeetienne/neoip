@@ -38,6 +38,7 @@ private:
 						, bytearray_t &amf0_body)	throw();
 	bool		handle_invoke_createStream(const rtmp_pkthd_t &rtmp_pkthd
 						, bytearray_t &amf0_body)	throw();
+	bool		handle_ping(const rtmp_event_t &rtmp_event)		throw();
 
 	/*************** callback stuff	***************************************/
 	rtmp_cam_full_cb_t *	callback;	//!< callback used to notify result

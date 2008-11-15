@@ -4,7 +4,7 @@
 \par Brief Description
 casti_swarm_t hold a bt_ezswarm_t and the bt_httpi_t to import an http
 stream into bt_swarm_t
-- the bt_httpi_t stuff is handled in casti_swarm_httpi_t
+- the bt_httpi_t stuff is handled in casti_swarm_scasti_t
 - the starpos stuff is handled in casti_swarm_spos_t
 - the bt_cast_udata_t xmit stuff is handled in casti_swarm_udata_t
 
@@ -36,7 +36,7 @@ stream into bt_swarm_t
 
 #include "neoip_casti_swarm_udata.hpp"
 #include "neoip_casti_swarm_spos.hpp"
-#include "neoip_casti_swarm_httpi.hpp"
+#include "neoip_casti_swarm_scasti.hpp"
 
 #include "neoip_bt_cast_id.hpp"
 #include "neoip_bt_cast_helper.hpp"
@@ -82,7 +82,7 @@ casti_swarm_t::casti_swarm_t()	throw()
 	m_bt_ezswarm	= NULL;
 	m_swarm_udata	= NULL;
 	m_swarm_spos	= NULL;
-	m_swarm_httpi	= NULL;
+	m_swarm_scasti	= NULL;
 	m_mdata_dopublish=NULL;
 	m_mdata_unpublish=NULL;
 	pieceq_beg	= 0;
@@ -106,8 +106,8 @@ casti_swarm_t::~casti_swarm_t()	throw()
 	nipmem_zdelete	m_swarm_udata;
 	// delete casti_swarm_spos_t if needed
 	nipmem_zdelete	m_swarm_spos;
-	// delete casti_swarm_httpi_t if needed
-	nipmem_zdelete	m_swarm_httpi;
+	// delete casti_swarm_scasti_t if needed
+	nipmem_zdelete	m_swarm_scasti;
 	// delete bt_cast_mdata_dopublish_t if needed
 	nipmem_zdelete	m_mdata_dopublish;
 	// delete bt_cast_mdata_unpublish_t if needed
@@ -199,8 +199,8 @@ bt_err_t casti_swarm_t::start(casti_swarm_arg_t &swarm_arg)	throw()
  */
 bt_httpi_t *	casti_swarm_t::bt_httpi()	const throw()
 {
-	DBG_ASSERT( m_swarm_httpi );
-	return swarm_httpi()->bt_httpi();
+	DBG_ASSERT( m_swarm_scasti );
+	return swarm_scasti()->bt_httpi();
 }
 
 /** \brief Return the bt_ezswarm_state
@@ -496,10 +496,10 @@ bt_err_t	casti_swarm_t::bt_ezswarm_enter_share()				throw()
 {
 	bt_err_t	bt_err;
 	
-	// start the casti_swarm_httpi_t
-	DBG_ASSERT( !m_swarm_httpi );
-	m_swarm_httpi	= nipmem_new casti_swarm_httpi_t();
-	bt_err		= m_swarm_httpi->start(this);
+	// start the casti_swarm_scasti_t
+	DBG_ASSERT( !m_swarm_scasti );
+	m_swarm_scasti	= nipmem_new casti_swarm_scasti_t();
+	bt_err		= m_swarm_scasti->start(this);
 	if( bt_err.failed() )	return bt_err;
 
 	// start the casti_swarm_udata_t
@@ -528,8 +528,8 @@ void	casti_swarm_t::bt_ezswarm_leave_share()				throw()
 	nipmem_zdelete	m_swarm_spos;
 	// delete the casti_swarm_udata_t
 	nipmem_zdelete	m_swarm_udata;
-	// delete the casti_swarm_httpi_t
-	nipmem_zdelete	m_swarm_httpi;
+	// delete the casti_swarm_scasti_t
+	nipmem_zdelete	m_swarm_scasti;
 	// delete the bt_cast_mdata_dopublish_t
 	nipmem_zdelete	m_mdata_dopublish;
 }

@@ -14,7 +14,7 @@
 
 // list of include for the internal field
 #include "neoip_casti_swarm_udata_profile.hpp"
-#include "neoip_casti_swarm_httpi_profile.hpp"
+#include "neoip_casti_swarm_scasti_profile.hpp"
 
 NEOIP_NAMESPACE_BEGIN
 
@@ -49,7 +49,7 @@ public:
 	PROFILE_VAR_PLAIN( delay_t		, xmit_udata_max_delay);
 	PROFILE_VAR_PLAIN( size_t		, xmit_udata_max_piece);
 	PROFILE_VAR_SPROF( casti_swarm_udata_profile_t	, udata);
-	PROFILE_VAR_SPROF( casti_swarm_httpi_profile_t	, httpi);
+	PROFILE_VAR_SPROF( casti_swarm_scasti_profile_t	, httpi);
 
 	/*************** #undef to ease the declaration	***********************/
 #	undef PROFILE_VAR_PLAIN

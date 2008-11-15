@@ -89,7 +89,7 @@ nunit_res_t	rtmp_cam_full_testclass_t::general(const nunit_testclass_ftor_t &tes
 
 	// start the rtmp_cam_resp_t
 	cam_resp	= nipmem_new rtmp_cam_resp_t();
-	rtmp_err	= cam_resp->start(cam_listener, "rtmp://192.168.0.10/live", this, NULL);
+	rtmp_err	= cam_resp->start(cam_listener, "rtmp://127.0.0.1/live", this, NULL);
 	if( rtmp_err.failed() )	return nunit_err_t(nunit_err_t::ERROR, rtmp_err.to_string() );
 
 #if 1	// handle the flv file writing
@@ -147,7 +147,7 @@ bool	rtmp_cam_full_testclass_t::neoip_rtmp_cam_full_cb(void *cb_userptr, rtmp_ca
 				, const rtmp_event_t &rtmp_event)	throw()
 {
 	// log to debug
-	KLOG_ERR("enter event=" << rtmp_event);
+	KLOG_DBG("enter event=" << rtmp_event);
 
 	// if rtmp_event.is_fatal(), delete the rtmp_cam_full_t
 	if( rtmp_event.is_fatal() ){

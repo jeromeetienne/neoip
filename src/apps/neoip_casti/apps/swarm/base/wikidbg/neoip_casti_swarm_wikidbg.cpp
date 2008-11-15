@@ -184,8 +184,8 @@ httpd_err_t casti_swarm_wikidbg_t::page(const std::string &keyword, void *object
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
-			oss << h.s_td() << h.s_b() << "casti_swarm_httpi_t"	<< h.e_b() << h.e_td();
-			oss << h.s_td() << ": " << wikidbg_html("oneword_pageurl", casti_swarm->swarm_httpi())
+			oss << h.s_td() << h.s_b() << "casti_swarm_scasti_t"	<< h.e_b() << h.e_td();
+			oss << h.s_td() << ": " << wikidbg_html("oneword_pageurl", casti_swarm->swarm_scasti())
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
