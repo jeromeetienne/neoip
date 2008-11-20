@@ -9,6 +9,7 @@
 /* system include */
 #include <list>
 /* local include */
+#include "neoip_rtmp_resp_wikidbg.hpp"
 #include "neoip_rtmp_resp_cb.hpp"
 #include "neoip_rtmp_err.hpp"
 #include "neoip_socket_resp_cb.hpp"
@@ -24,7 +25,9 @@ class	rtmp_resp_cnx_t;
 
 /** \brief Accept the http connections and then spawn rtmp_resp_cnx_t to handle them
  */
-class rtmp_resp_t : NEOIP_COPY_CTOR_DENY, private socket_resp_cb_t {
+class rtmp_resp_t : NEOIP_COPY_CTOR_DENY, private socket_resp_cb_t
+			, private wikidbg_obj_t<rtmp_resp_t, rtmp_resp_wikidbg_init>
+			{
 public:	/////////////////////// constant declaration ///////////////////////////
 	//! the size of the padding during the handshake
 	static const size_t	HANDSHAKE_PADLEN;
@@ -57,6 +60,7 @@ public:
 	const socket_addr_t  &	listen_addr()					const throw();
 
 	/*************** list of friend class	*******************************/
+	friend class	rtmp_resp_wikidbg_t;
 	friend class	rtmp_resp_cnx_t;
 };
 

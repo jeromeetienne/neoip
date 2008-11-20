@@ -18,7 +18,7 @@
 
 NEOIP_NAMESPACE_BEGIN
 
-/** \brief to handle the profile for bt_httpi_t
+/** \brief to handle the profile for bt_scasti_vapi_t
  */
 class bt_scasti_mod_raw_profile_t : NEOIP_COPY_CTOR_ALLOW {
 public:	/////////////////////// constant declaration ///////////////////////////

@@ -4,8 +4,8 @@
 */
 
 
-#ifndef __NEOIP_CASTI_SWARM_SCASTI_PROFILE_HPP__ 
-#define __NEOIP_CASTI_SWARM_SCASTI_PROFILE_HPP__ 
+#ifndef __NEOIP_CASTI_SWARM_SCASTI_PROFILE_HPP__
+#define __NEOIP_CASTI_SWARM_SCASTI_PROFILE_HPP__
 /* system include */
 /* local include */
 #include "neoip_bt_err.hpp"
@@ -22,7 +22,7 @@ NEOIP_NAMESPACE_BEGIN
  */
 class casti_swarm_scasti_profile_t : NEOIP_COPY_CTOR_ALLOW {
 public:	/////////////////////// constant declaration ///////////////////////////
-	//! the rate_estim_t argument for the recv_rate of bt_cast_httpi_t
+	//! the rate_estim_t argument for the recv_rate of bt_scasti_http_t
 	static const rate_estim_arg_t	RATE_ESTIM_ARG;
 public:
 	/*************** ctor/dtor	***************************************/

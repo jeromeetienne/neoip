@@ -4,8 +4,8 @@
 */
 
 
-#ifndef __NEOIP_CASTI_SWARM_PROFILE_HPP__ 
-#define __NEOIP_CASTI_SWARM_PROFILE_HPP__ 
+#ifndef __NEOIP_CASTI_SWARM_PROFILE_HPP__
+#define __NEOIP_CASTI_SWARM_PROFILE_HPP__
 /* system include */
 /* local include */
 #include "neoip_bt_err.hpp"
@@ -45,11 +45,11 @@ public:
 
 	/*************** declaration of profile fields	***********************/
 	PROFILE_VAR_PLAIN( size_t		, pieceq_maxlen);
-	PROFILE_VAR_SPROF( rate_estim_arg_t	, httpi_rate_estim_arg);
+	PROFILE_VAR_SPROF( rate_estim_arg_t	, scasti_rate_estim_arg);
 	PROFILE_VAR_PLAIN( delay_t		, xmit_udata_max_delay);
 	PROFILE_VAR_PLAIN( size_t		, xmit_udata_max_piece);
 	PROFILE_VAR_SPROF( casti_swarm_udata_profile_t	, udata);
-	PROFILE_VAR_SPROF( casti_swarm_scasti_profile_t	, httpi);
+	PROFILE_VAR_SPROF( casti_swarm_scasti_profile_t	, scasti);
 
 	/*************** #undef to ease the declaration	***********************/
 #	undef PROFILE_VAR_PLAIN

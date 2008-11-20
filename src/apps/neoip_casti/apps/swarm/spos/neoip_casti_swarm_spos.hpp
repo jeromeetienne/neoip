@@ -1,11 +1,11 @@
 /*! \file
     \brief Header of the \ref casti_swarm_spos_t
-    
+
 */
 
 
-#ifndef __NEOIP_CASTI_SWARM_SPOS_HPP__ 
-#define __NEOIP_CASTI_SWARM_SPOS_HPP__ 
+#ifndef __NEOIP_CASTI_SWARM_SPOS_HPP__
+#define __NEOIP_CASTI_SWARM_SPOS_HPP__
 /* system include */
 /* local include */
 #include "neoip_casti_swarm_spos_wikidbg.hpp"
@@ -20,7 +20,7 @@ NEOIP_NAMESPACE_BEGIN
 class	casti_swarm_t;
 class	bt_ezswarm_t;
 class	bt_err_t;
-class	bt_httpi_t;
+class	bt_scasti_vapi_t;
 
 /** \brief Handle the bt_cast_spos_arr_t for the casti_swarm_t
  */
@@ -31,8 +31,8 @@ private:
 	bt_cast_spos_arr_t	m_cast_spos_arr;
 
 	/*************** internal function	*******************************/
-	bt_ezswarm_t *	bt_ezswarm()	const throw();
-	bt_httpi_t *	bt_httpi()	const throw();
+	bt_ezswarm_t *		bt_ezswarm()	const throw();
+	bt_scasti_vapi_t *	scasti_vapi()	const throw();
 public:
 	/*************** ctor/dtor	***************************************/
 	casti_swarm_spos_t()	throw();
@@ -43,7 +43,7 @@ public:
 
 	/*************** Query function	***************************************/
 	const bt_cast_spos_arr_t & cast_spos_arr()	const throw()	{ return m_cast_spos_arr;	}
-	
+
 	/*************** Action function	*******************************/
 	void		notify_pieceq_changed()			throw();
 	void		gather()				throw();

@@ -65,20 +65,20 @@ bt_err_t	casti_ctrl_cline_t::start(casti_apps_t *m_casti_apps)		throw()
 	bt_err_t		bt_err;
 	// copy the parameter
 	this->m_casti_apps	= m_casti_apps;
-	
-	// if cmdline option httpi_uri is not present, do nothing 
-	if( !arg_option.contain_key("httpi_uri") )	return bt_err_t::OK;
-	
+
+	// if cmdline option scasti_uri is not present, do nothing
+	if( !arg_option.contain_key("scasti_uri") )	return bt_err_t::OK;
+
 	// check the validity of the parameters
 	casti_swarm_arg_t	swarm_arg;
 	swarm_arg	= build_swarm_arg();
 	bt_err		= swarm_arg.check();
 	KLOG_ERR("bt_err=" << bt_err);
 	if( bt_err.failed() )	return bt_err;
-	
+
 	// start the relaunch_swarm
 	refresh_timeout.start(delay_t(0), this, NULL);
-	
+
 	// return no error
 	return bt_err_t::OK;
 }
@@ -99,12 +99,12 @@ casti_swarm_arg_t	casti_ctrl_cline_t::build_swarm_arg()	throw()
 	// populate the casti_swarm_arg_t witht the arg_option
 	swarm_arg.cast_name	(arg_option.get_first_value("cast_name"));
 	swarm_arg.cast_privtext	(arg_option.get_first_value("cast_privtext"));
-	swarm_arg.httpi_uri	(arg_option.get_first_value("httpi_uri"));
+	swarm_arg.scasti_uri	(arg_option.get_first_value("scasti_uri"));
 	if( arg_option.contain_key("mdata_srv_uri") )
 		swarm_arg.mdata_srv_uri		(arg_option.get_first_value("mdata_srv_uri"));
 	if( arg_option.contain_key("scasti_mod") )
 		swarm_arg.scasti_mod		(arg_option.get_first_value("scasti_mod"));
-	if( arg_option.contain_key("httpi_peersrc_uri") )
+	if( arg_option.contain_key("http_peersrc_uri") )
 		swarm_arg.http_peersrc_uri	(arg_option.get_first_value("http_peersrc_uri"));
 	// return the resulting object
 	return swarm_arg;
@@ -118,22 +118,22 @@ casti_swarm_arg_t	casti_ctrl_cline_t::build_swarm_arg()	throw()
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief callback called when the timeout_t expire
- * 
+ *
  */
 bool	casti_ctrl_cline_t::neoip_timeout_expire_cb(void *userptr, timeout_t &cb_timeout)	throw()
 {
 	casti_swarm_arg_t	swarm_arg	= build_swarm_arg();
 	casti_swarm_t *		casti_swarm;
 	bt_err_t		bt_err;
-	// log to debug 
+	// log to debug
 	KLOG_DBG("enter");
-	
+
 	// sanity check - the swarm_arg MUST BE check().succeed()
 	DBG_ASSERT( swarm_arg.check().succeed() );
-	
+
 	// start the relaunch_swarm
 	refresh_timeout.start(m_casti_apps->profile().relaunch_swarm_period(), this, NULL);
-	
+
 	// try to get the casti_swarm for this cast_name
 	casti_swarm	= m_casti_apps->swarm_by(swarm_arg.mdata_srv_uri(), swarm_arg.cast_name()
 						, swarm_arg.cast_privtext());
@@ -182,8 +182,8 @@ clineopt_arr_t	casti_ctrl_cline_t::clineopt_arr()	throw()
 				.option_mode(clineopt_mode_t::OPTIONAL)
 				.help_string("specify the mdata_srv_uri where to publish the broadcast metadata");
 	clineopt_arr	+= clineopt;
-	// add the --httpi_uri cmdline option
-	clineopt	= clineopt_t("httpi_uri", clineopt_mode_t::REQUIRED)
+	// add the --scasti_uri cmdline option
+	clineopt	= clineopt_t("scasti_uri", clineopt_mode_t::REQUIRED)
 				.option_mode(clineopt_mode_t::OPTIONAL)
 				.help_string("specify the uri of the http stream to be broadcasted."
 					"\n\t\trequired to access swarm by cmdline");

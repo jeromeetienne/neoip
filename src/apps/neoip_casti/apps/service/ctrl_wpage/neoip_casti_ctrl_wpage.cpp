@@ -8,9 +8,9 @@
 - TODO to improve this documentation
 
 - There is no timeout for the request because the casti_swarm_t will autodelete
-  itself as soon as the connection to the httpi_uri disconnect.
+  itself as soon as the connection to the scasti_uri disconnect.
   - so closing/crashing the browser will automatically disconnect the http_uri_t
-  - and so stop the casti_swarm_t 
+  - and so stop the casti_swarm_t
 
 */
 
@@ -72,7 +72,7 @@ bt_err_t	casti_ctrl_wpage_t::start(casti_apps_t *m_casti_apps)		throw()
 	http_listener_t *http_listener	= m_casti_apps->http_listener();
 	// copy the parameter
 	this->m_casti_apps	= m_casti_apps;
-	
+
 	// sanity check - http_listener MUST NOT be NULL
 	DBG_ASSERT( http_listener );
 
@@ -104,10 +104,10 @@ bt_err_t	casti_ctrl_wpage_t::start(casti_apps_t *m_casti_apps)		throw()
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief callback notified by \ref xmlrpc_resp_t when to notify an event
- * 
- * - WARNING: it is not allowed to destroy the xmlrpc_listener_t on which 
+ *
+ * - WARNING: it is not allowed to destroy the xmlrpc_listener_t on which
  *   whic xmlrpc_resp_t is listening on *DURING* the callback.
- * 
+ *
  * @return true if the xmlrpc_resp_t is still valid after the callback
  */
 bool	casti_ctrl_wpage_t::neoip_xmlrpc_resp_cb(void *cb_userptr, xmlrpc_resp_t &cb_xmlrpc_resp
@@ -122,7 +122,7 @@ bool	casti_ctrl_wpage_t::neoip_xmlrpc_resp_cb(void *cb_userptr, xmlrpc_resp_t &c
 	}else	DBG_ASSERT( 0 );
 	// log to debug
 	if( xmlrpc_err_out.failed() )	KLOG_ERR("xmlrpc_err_out=" << xmlrpc_err_out);
-	// return tokeep	
+	// return tokeep
 	return true;
 }
 
@@ -141,7 +141,7 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 	casti_swarm_arg_t swarm_arg	= m_casti_apps->swarm_arg_default();
 	std::string	cast_name;
 	std::string	cast_privtext;
-	http_uri_t	httpi_uri;
+	http_uri_t	scasti_uri;
 	std::string	scasti_mod_str;
 	http_uri_t	mdata_srv_uri;
 	http_uri_t	http_peersrc_uri;
@@ -153,33 +153,32 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, mdata_srv_uri);
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, cast_name);
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, cast_privtext);
-	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, httpi_uri);
+	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, scasti_uri);
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, scasti_mod_str);
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, http_peersrc_uri);
 	NEOIP_XMLRPC_RESP_PARSE_END	(xmlrpc_parse, xmlrpc_err);
 	// if there is a error in the xmlrpc_parse_t, return now
 	if( xmlrpc_err.failed() )	return xmlrpc_err;
-	
+
 	// to populate the casti_swarm_arg_t with the xmlrpc call parameters
 	if( !mdata_srv_uri.is_null())	swarm_arg.mdata_srv_uri		(mdata_srv_uri);
 	if( !cast_name.empty() )	swarm_arg.cast_name		(cast_name);
 	if( !cast_privtext.empty() )	swarm_arg.cast_privtext		(cast_privtext);
-	if( !httpi_uri.is_null())	swarm_arg.httpi_uri		(httpi_uri);
+	if( !scasti_uri.is_null())	swarm_arg.scasti_uri		(scasti_uri);
 	if( !scasti_mod_str.empty() )	swarm_arg.scasti_mod		(scasti_mod_str);
 	if( !http_peersrc_uri.is_null())swarm_arg.http_peersrc_uri	(http_peersrc_uri);
-
 
 	// check the resulting casti_swarm_arg_t
 	bt_err		= swarm_arg.check();
 	if( bt_err.failed() )	return xmlrpc_err_t(xmlrpc_err_t::ERROR, bt_err.reason());
-	
+
 	// try to get the casti_swarm for this mdata_srv_uri/cast_name
 	casti_swarm_t *	casti_swarm	= m_casti_apps->swarm_by(mdata_srv_uri, cast_name, cast_privtext);
 
 	// if there is a previous casti_swarm_t which is currently stopping, delete it
 	// - the new one takes precedence
 	if( casti_swarm && casti_swarm->state().is_stopping() )	nipmem_zdelete casti_swarm;
-	
+
 	// if casti_swarm doesnt yet exist, launch it now
 	if( !casti_swarm ){
 		casti_swarm	= nipmem_new casti_swarm_t();
@@ -220,13 +219,13 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_release_stream(xmlrpc_parse_t &xmlr
 
 	// try to get the casti_swarm for this mdata_srv_uri/cast_name
 	casti_swarm_t *	casti_swarm	= m_casti_apps->swarm_by(mdata_srv_uri, cast_name, cast_privtext);
-	
+
 	// if no casti_swarm matches those parameters, return an error
 	if( !casti_swarm )	return xmlrpc_err_t(xmlrpc_err_t::ERROR, "no matching stream");
-	
+
 	// do a casti_swarm->gracefull_shutdown()
 	casti_swarm->gracefull_shutdown("User Released the stream");
-	
+
 	// build the xmlrpc response for no error
 	NEOIP_XMLRPC_RESP_BUILD(xmlrpc_build, uint32_t(0) );
 

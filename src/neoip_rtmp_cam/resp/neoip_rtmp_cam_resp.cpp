@@ -49,6 +49,8 @@ rtmp_err_t	rtmp_cam_resp_t::start(rtmp_cam_listener_t *m_cam_listener
 {
 	// sanity check - m_listen_uri MUST be http_scheme_t::RTMP
 	DBG_ASSERT( m_listen_uri.scheme().is_rtmp() );
+	// log to debug
+	KLOG_ERR("enter listen_uri=" << m_listen_uri);
 	// copy the parameter
 	this->m_cam_listener	= m_cam_listener;
 	this->m_listen_uri	= m_listen_uri;
@@ -68,10 +70,10 @@ rtmp_err_t	rtmp_cam_resp_t::start(rtmp_cam_listener_t *m_cam_listener
 
 /** \brief return true if this http_resp_t may handle this http_reqhd_t, false otherwise
  */
-bool	rtmp_cam_resp_t::may_handle(const http_uri_t &req_uri)		const throw()
+bool	rtmp_cam_resp_t::may_handle(const http_uri_t &p_req_uri)		const throw()
 {
-	// if m_listen_uri is != from req_uri, then it is not possible to handle it
-	if( m_listen_uri != req_uri) 	return false;
+	// if m_listen_uri is != from req_uri without query part), then it is not possible to handle it
+	if( m_listen_uri != http_uri_t(p_req_uri).clear_query()) 	return false;
 	// return true if all the previous tests passed
 	return true;
 }

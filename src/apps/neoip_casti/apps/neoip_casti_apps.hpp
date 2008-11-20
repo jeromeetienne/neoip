@@ -31,6 +31,7 @@ class	bt_cast_id_t;
 class	clineopt_arr_t;
 class	http_listener_t;
 class	apps_httpdetect_t;
+class	rtmp_cam_listener_t;
 
 /** \brief Handle the casti capability
  */
@@ -46,7 +47,6 @@ private:
 
 	apps_httpdetect_t *	m_apps_httpdetect;	//!< to detect this apps from the web
 
-
 	http_uri_t		m_dfl_http_peersrc_uri;	//!< default http_peersrc_uri
 	http_uri_t		m_dfl_mdata_srv_uri;	//!< default mdata_srv_uri
 
@@ -56,13 +56,17 @@ private:
 					, casti_inetreach_httpd_t &cb_inetreach_httpd
 					, const ipport_addr_t &new_ipport_pview)	throw();
 
+	/*************** rtmp_cam_listener_t	*******************************/
+	rtmp_cam_listener_t *	m_rtmp_cam_listener;	//!< the listener for bt_scasti_rtmp_t
+	bt_err_t		launch_rtmp_cam_listener(const strvar_db_t &casti_conf)	throw();
+
 	/*************** http_listener_t	*******************************/
 	http_listener_t *	m_http_listener;	//!< the http_listener_t to receive external http
 	bt_err_t		launch_http_listener(const strvar_db_t &casti_conf)	throw();
 
 	/*************** bt_ezsession_t	***************************************/
 	bt_ezsession_t *	m_bt_ezsession;
-	bt_err_t		launch_ezsession(const strvar_db_t &oload_conf)	throw();
+	bt_err_t		launch_ezsession(const strvar_db_t &casti_conf)	throw();
 
 	/*************** bt_cast_mdata_server_t	*******************************/
 	bt_cast_mdata_server_t *m_mdata_server;
@@ -86,6 +90,7 @@ public:
 
 	/*************** Query function	***************************************/
 	http_listener_t *	http_listener()		const throw()	{ return m_http_listener;	}
+	rtmp_cam_listener_t *	rtmp_cam_listener()	const throw()	{ return m_rtmp_cam_listener;	}
 	casti_inetreach_httpd_t* inetreach_httpd()	const throw()	{ return m_inetreach_httpd;	}
 	bt_cast_mdata_server_t*	mdata_server()		const throw()	{ return m_mdata_server;	}
 	bt_ezsession_t *	bt_ezsession()		const throw()	{ return m_bt_ezsession;	}

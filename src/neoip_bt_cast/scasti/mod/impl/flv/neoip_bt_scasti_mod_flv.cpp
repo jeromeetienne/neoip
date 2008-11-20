@@ -1,9 +1,9 @@
 /*! \file
     \brief Class to handle the bt_scasti_mod_flv_t
-    
+
 \par Brief Description
 bt_scasti_mod_flv_t is a bt_scasti_mod_vapi_t which parse FLV flash movie files.
-- It provides a prefix_header valid for FLV file with bt_scasti_mod_vapi_t::prefix_header() 
+- It provides a prefix_header valid for FLV file with bt_scasti_mod_vapi_t::prefix_header()
 - It extract the keyframe positions to export them with bt_scasti_mod_vapi_t::cast_spos_pop()
 - the parsing is ensure by flv_parse_t
 
@@ -14,18 +14,18 @@ bt_scasti_mod_flv_t is a bt_scasti_mod_vapi_t which parse FLV flash movie files.
     prefix_header which contains only the flv_tophd_t received
   - if one flv_tophd_t and the first flv_tagtype_t::META has been received
     build a prefix_header which contains both
-- the prefix_header uses the flv_tophd_t from the input stream and the first 
+- the prefix_header uses the flv_tophd_t from the input stream and the first
   flv_taghd_t which is a flv_tagtype_t::META
 - the flv_tagtype_t::META body may provides interesting information about the stream
   - e.g. the resolution of the image which is used by the flash plugin player
-  - or one can imagine stuff like the license of the stream or any other metainfo 
-  
+  - or one can imagine stuff like the license of the stream or any other metainfo
+
 */
 
 /* system include */
 /* local include */
 #include "neoip_bt_scasti_mod_flv.hpp"
-#include "neoip_bt_httpi.hpp"
+#include "neoip_bt_scasti_vapi.hpp"
 #include "neoip_bt_scasti_event.hpp"
 #include "neoip_flv.hpp"
 #include "neoip_nipmem_alloc.hpp"
@@ -60,16 +60,16 @@ bt_scasti_mod_flv_t::~bt_scasti_mod_flv_t()		throw()
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//			Setup function 
+//			Setup function
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief Start the operation
  */
-bt_err_t	bt_scasti_mod_flv_t::start(bt_httpi_t *p_bt_httpi)	throw()
+bt_err_t	bt_scasti_mod_flv_t::start(bt_scasti_vapi_t *p_scasti_vapi)	throw()
 {
 	// copy the parameters
-	this->m_bt_httpi= p_bt_httpi;
+	this->m_scasti_vapi	= p_scasti_vapi;
 
 	// initialize the flv_parse_t
 	flv_err_t	flv_err;
@@ -96,7 +96,7 @@ void	bt_scasti_mod_flv_t::notify_data(const datum_t &data)	throw()
 
 /** \brief pop up a allowed start position - or null bt_cast_spos_t if none is available
  */
-bt_cast_spos_t	bt_scasti_mod_flv_t::cast_spos_pop()		throw()	
+bt_cast_spos_t	bt_scasti_mod_flv_t::cast_spos_pop()		throw()
 {
 	// if no cast_spos_arr is queueed, return a null bt_cast_spos_t
 	if( m_cast_spos_arr.empty() )	return bt_cast_spos_t();
@@ -118,10 +118,10 @@ datum_t		bt_scasti_mod_flv_t::prefix_header()	const throw()
 		return	datum_t(FLV_HEADER, sizeof(FLV_HEADER)-1);
 	}
 
-	// if no flv_taghd_t of flv_tagtype_t::META, return a  
+	// if no flv_taghd_t of flv_tagtype_t::META, return a
 	if( m_meta_taghd.is_null() ){
 		bytearray_t	bytearray;
-		// append the  
+		// append the
 		bytearray << m_flv_tophd;
 		bytearray << uint32_t(0x09);
 		// return the result
@@ -129,7 +129,7 @@ datum_t		bt_scasti_mod_flv_t::prefix_header()	const throw()
 	}
 
 
-	// sanity check - at this point, all data for a 'full prefix_header' has been received 
+	// sanity check - at this point, all data for a 'full prefix_header' has been received
 	DBG_ASSERT( !m_flv_tophd.is_null() );
 	DBG_ASSERT( !m_meta_taghd.is_null() );
 	DBG_ASSERT( !m_meta_tagdata.is_null() );
@@ -143,13 +143,13 @@ datum_t		bt_scasti_mod_flv_t::prefix_header()	const throw()
 	// append the body of the flv_tagtype_t::META
 	bytearray.append(m_meta_tagdata);
 	// append a 'prevtag_size' at the end of the prefix_header
-	// - minus sizeof(uint32_t) because it doesnt count the 'prevtag_size' 
+	// - minus sizeof(uint32_t) because it doesnt count the 'prevtag_size'
 	//   of the flv_taghd_t
 	bytearray << uint32_t(m_meta_tagdata.size() + flv_taghd_t::TOTAL_LENGTH - sizeof(uint32_t));
 
 	// log to debug
 	KLOG_DBG("prefix_header=" << bytearray.to_datum());
-	
+
 	// return the result
 	return bytearray.to_datum();
 }
@@ -177,7 +177,7 @@ bool	bt_scasti_mod_flv_t::neoip_flv_parse_cb(void *cb_userptr, flv_parse_t &cb_f
 		// get the error from the flv_parse_event_t
 		bt_err_t	bt_err	= bt_err_from_flv(parse_event.get_error());
 		bt_scasti_event_t event	= bt_scasti_event_t::build_error(bt_err);
-		return m_bt_httpi->mod_vapi_notify_callback(event);
+		return m_scasti_vapi->mod_vapi_notify_callback(event);
 	}
 
 	// parse for the start position
@@ -218,7 +218,7 @@ bool	bt_scasti_mod_flv_t::parse_for_cast_spos(const flv_parse_event_t &parse_eve
 
 	// notify the caller - that the bt_scasti_event_t::MOD_UPDATED
 	bt_scasti_event_t scasti_event	= bt_scasti_event_t::build_mod_updated();
-	bool	tokeep	= m_bt_httpi->mod_vapi_notify_callback(scasti_event);
+	bool	tokeep	= m_scasti_vapi->mod_vapi_notify_callback(scasti_event);
 	if( !tokeep )	return false;
 
 	// return a tokeep
@@ -234,7 +234,7 @@ bool	bt_scasti_mod_flv_t::parse_for_prefix_header(const flv_parse_event_t &parse
 		m_flv_tophd	= parse_event.get_tophd();
 		return true;
 	}
-	
+
 	// sanity check - at this point, the flv_parse_event_t MUST BE a flv_parse_event_t::TAG
 	DBG_ASSERT( parse_event.is_tag() );
 	// get the parameters from the event
@@ -248,15 +248,15 @@ bool	bt_scasti_mod_flv_t::parse_for_prefix_header(const flv_parse_event_t &parse
 		KLOG_ERR("Received multiple flv_tagtype_t::META on this stream. discarding new ones");
 		return true;
 	}
-	
+
 	// NOTE: at this point, the just received event contains the first flv_tagtype_t::META
 
 	// copy the data into the local variables
 	m_meta_taghd	= recved_taghd;
 	m_meta_tagdata	= recved_tagdata;
-	// as m_meta_taghd will always be the first tag delivered, zero its prevtag_size 
+	// as m_meta_taghd will always be the first tag delivered, zero its prevtag_size
 	m_meta_taghd.prevtag_size	( 0 );
-	
+
 	// log to debug
 	KLOG_DBG("meta_taghd=" << m_meta_taghd);
 	KLOG_DBG("meta_tagdata=" << m_meta_tagdata);

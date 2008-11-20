@@ -8,6 +8,7 @@
 #define __NEOIP_RTMP_RESP_CNX_HPP__
 /* system include */
 /* local include */
+#include "neoip_rtmp_resp_cnx_wikidbg.hpp"
 #include "neoip_rtmp_resp_cnx_state.hpp"
 #include "neoip_rtmp_err.hpp"
 #include "neoip_socket_full_cb.hpp"
@@ -26,7 +27,8 @@ class	pkt_t;
  * - read the data from the responded connection until the infohash is known and
  *   then send it to the proper bt_swarm_t
  */
-class rtmp_resp_cnx_t : NEOIP_COPY_CTOR_DENY, private socket_full_cb_t {
+class rtmp_resp_cnx_t : NEOIP_COPY_CTOR_DENY, private socket_full_cb_t
+			, private wikidbg_obj_t<rtmp_resp_cnx_t, rtmp_resp_cnx_wikidbg_init> {
 
 private:
 	rtmp_resp_t *		rtmp_resp;	//!< backpointer to the linked rtmp_resp_t
@@ -51,6 +53,9 @@ public:
 
 	/*************** setup function	***************************************/
 	rtmp_err_t	start(rtmp_resp_t *rtmp_resp, socket_full_t *socket_full)	throw();
+
+	/*************** list of friend class	*******************************/
+	friend class	rtmp_resp_cnx_wikidbg_t;
 };
 
 NEOIP_NAMESPACE_END

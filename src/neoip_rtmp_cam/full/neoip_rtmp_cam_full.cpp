@@ -195,11 +195,13 @@ bool	rtmp_cam_full_t::handle_invoke_connect(const rtmp_pkthd_t &rtmp_pkthd
 	// get the connect_uri from the connect parameter
 	// TODO this ASSERT is may cause useless crash
 	DBG_ASSERT(param1.type().is_map());
-	http_uri_t	connect_uri	= param1.map()["tcUrl"].str().get();
+	m_connect_uri	= param1.map()["tcUrl"].str().get();
+
+	KLOG_ERR("connect param1=" << param1);
 
 	// build and notify a rtmp_event_t::CONNECTED
 	rtmp_event_t	rtmp_event;
-	rtmp_event	= rtmp_event_t::build_connected(connect_uri);
+	rtmp_event	= rtmp_event_t::build_connected(m_connect_uri);
 	bool	tokeep	= notify_callback(rtmp_event);
 	if( !tokeep )	return false;
 

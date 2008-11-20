@@ -486,7 +486,8 @@ flv_err_t	flv2xml_apps_t::parse_tagtype_meta(const flv_taghd_t &flv_taghd
 	if( flv_err.failed() )	return flv_err;
 
 	// log to debug
-	KLOG_INFO("METADATA event_type=" << type_dvar << " event_data=" << data_dvar);
+	KLOG_STDOUT("METADATA event_type=" << type_dvar << " event_data=" << data_dvar);
+	DBG_ASSERT(0);
 
 	// if flv_tagtype_t::META MUST NOT be displayed, return now
 	if( !output_tag_meta )	return flv_err_t::OK;

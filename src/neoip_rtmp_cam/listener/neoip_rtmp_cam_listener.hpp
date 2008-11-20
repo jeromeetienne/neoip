@@ -10,6 +10,7 @@
 /* system include */
 #include <list>
 /* local include */
+#include "neoip_rtmp_cam_listener_wikidbg.hpp"
 #include "neoip_rtmp_resp_cb.hpp"
 #include "neoip_rtmp_cam_full_cb.hpp"
 #include "neoip_rtmp_err.hpp"
@@ -26,7 +27,9 @@ class	http_uri_t;
 
 /** \brief Accept the http connections and then spawn rtmp_cam_listener_cnx_t to handle them
  */
-class rtmp_cam_listener_t : NEOIP_COPY_CTOR_DENY, private rtmp_resp_cb_t, private rtmp_cam_full_cb_t {
+class rtmp_cam_listener_t : NEOIP_COPY_CTOR_DENY, private rtmp_resp_cb_t, private rtmp_cam_full_cb_t
+			, private wikidbg_obj_t<rtmp_cam_listener_t, rtmp_cam_listener_wikidbg_init>
+			{
 private:
 	/*************** rtmp_resp_t	***************************************/
 	rtmp_resp_t *	rtmp_resp;
@@ -59,6 +62,7 @@ public:
 
 
 	/*************** list of friend class	*******************************/
+	friend class	rtmp_cam_listener_wikidbg_t;
 	friend class	rtmp_cam_resp_t;
 };
 

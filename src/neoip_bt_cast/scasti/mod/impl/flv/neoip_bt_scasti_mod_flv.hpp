@@ -1,11 +1,11 @@
 /*! \file
     \brief Header of the bt_scasti_mod_flv_t
-    
+
 */
 
 
-#ifndef __NEOIP_BT_SCASTI_MOD_FLV_HPP__ 
-#define __NEOIP_BT_SCASTI_MOD_FLV_HPP__ 
+#ifndef __NEOIP_BT_SCASTI_MOD_FLV_HPP__
+#define __NEOIP_BT_SCASTI_MOD_FLV_HPP__
 /* system include */
 #include <list>
 /* local include */
@@ -24,7 +24,7 @@
 NEOIP_NAMESPACE_BEGIN
 
 // list of forward declaration
-class	bt_httpi_t;
+class	bt_scasti_vapi_t;
 class	flv_parse_t;
 
 /** \brief Handle the module 'flv' to deliver flv
@@ -32,17 +32,17 @@ class	flv_parse_t;
 class bt_scasti_mod_flv_t : public bt_scasti_mod_vapi_t, NEOIP_COPY_CTOR_DENY
 					, private flv_parse_cb_t {
 private:
-	bt_httpi_t *		m_bt_httpi;	//!< backpointer on the bt_httpi_t
+	bt_scasti_vapi_t *	m_scasti_vapi;	//!< backpointer on the bt_scasti_vapi_t
 	bt_scasti_mod_type_t	m_type;		//!< the type of this bt_scasti_mod_vapi_t
 	bt_cast_spos_arr_t	m_cast_spos_arr;//!< the queued cast_spos database
-	
+
 	/*************** stuff for prefix_header	***********************/
 	flv_tophd_t		m_flv_tophd;	//!< the flv_tophd_t received from the stream
 	flv_taghd_t		m_meta_taghd;	//!< first flv_taghd_t from stream
 	datum_t			m_meta_tagdata;	//!< flv_tagtype_t::META data from stream
-	
+
 	/*************** flv_parse_t	***************************************/
-	flv_parse_t *	flv_parse;	
+	flv_parse_t *	flv_parse;
 	bool		neoip_flv_parse_cb(void *cb_userptr, flv_parse_t &cb_flv_parse
 					, const flv_parse_event_t &parse_event)		throw();
 	bool		parse_for_cast_spos(const flv_parse_event_t &parse_event)	throw();
@@ -53,7 +53,7 @@ public:
 	~bt_scasti_mod_flv_t()		throw();
 
 	/*************** Setup function	***************************************/
-	bt_err_t	start(bt_httpi_t *m_bt_httpi)		throw();
+	bt_err_t	start(bt_scasti_vapi_t *m_casti_vapi)		throw();
 
 	/*************** bt_scasti_mod_vapi_t	*******************************/
 	const bt_scasti_mod_type_t & type()	const throw()	{ return m_type;	}

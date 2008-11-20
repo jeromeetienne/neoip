@@ -1,6 +1,6 @@
 /*! \file
     \brief Definition of the \ref casti_swarm_spos_t
-    
+
 \par Brief Description
 casti_swarm_spos_t handle all the start position stuff for the casti_swarm_t.
 - this information is obtained by the bt_scasti_mod_vapi_t
@@ -14,7 +14,7 @@ casti_swarm_spos_t handle all the start position stuff for the casti_swarm_t.
 
 #include "neoip_bt_cast_pidx.hpp"
 
-#include "neoip_bt_httpi.hpp"
+#include "neoip_bt_scasti_vapi.hpp"
 #include "neoip_bt_scasti_mod_vapi.hpp"
 
 #include "neoip_bt_ezswarm.hpp"
@@ -41,7 +41,7 @@ casti_swarm_spos_t::casti_swarm_spos_t()	throw()
 	KLOG_DBG("enter");
 	// zero some field
 	m_casti_swarm	= NULL;
-	
+
 }
 
 /** \brief Destructor
@@ -84,11 +84,11 @@ bt_ezswarm_t *	casti_swarm_spos_t::bt_ezswarm()	const throw()
 	return m_casti_swarm->bt_ezswarm();
 }
 
-/** \brief Return a pointer on the bt_httpi_t of casti_swarm_t
+/** \brief Return a pointer on the bt_scasti_vapi_t of casti_swarm_t
  */
-bt_httpi_t *	casti_swarm_spos_t::bt_httpi()	const throw()
+bt_scasti_vapi_t *	casti_swarm_spos_t::scasti_vapi()	const throw()
 {
-	return m_casti_swarm->bt_httpi();
+	return m_casti_swarm->scasti_vapi();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ bt_httpi_t *	casti_swarm_spos_t::bt_httpi()	const throw()
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief update the bt_cast_spos_arr_t when the pieceq boundary are changed
- * 
+ *
  * - TODO put this function in the bt_cast_spos_arr_t
  * - remove all obsoletes bt_cast_spos_t (aka the ones *before* AND *nomore* in the pieceq)
  * - NOTE: as cast_spos_arr may contains byte_offset which are after the pieceq
@@ -136,8 +136,8 @@ void	casti_swarm_spos_t::notify_pieceq_changed()		throw()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-/** \brief gather the new bt_cast_spos_t from the bt_scasti_mod_vapi_t 
- * 
+/** \brief gather the new bt_cast_spos_t from the bt_scasti_mod_vapi_t
+ *
  * - NOTE: this will appends the bt_cast_spos_t of pieces not yet fully available
  *   - aka bt_cast_spos_arr_t may contains bt_cast_spos_t of pieces not yet fully availlable
  */
@@ -145,7 +145,7 @@ void	casti_swarm_spos_t::gather()		throw()
 {
 	bt_swarm_t *		bt_swarm	= bt_ezswarm()->share()->bt_swarm();
 	const bt_mfile_t &	bt_mfile	= bt_swarm->get_mfile();
-	bt_scasti_mod_vapi_t * 	mod_vapi	= bt_httpi()->mod_vapi();
+	bt_scasti_mod_vapi_t * 	mod_vapi	= scasti_vapi()->mod_vapi();
 	// Append all new bt_scasti_mod_vapi_t::cast_spos to the cast_spos_arr
 	// - NOTE: this will appends the bt_cast_spos_t of pieces not yet fully available
 	while( 1 ){
@@ -156,18 +156,18 @@ void	casti_swarm_spos_t::gather()		throw()
 		// log to debug
 		KLOG_DBG("add cast_spos=" << cast_spos << " to the cast_spos_arr");
 		// handle the warparound the bt_mfile.totfile_size()
-		// - thus m_cast_pos_arr contains only wrapped up byte_offset 
+		// - thus m_cast_pos_arr contains only wrapped up byte_offset
 		cast_spos.byte_offset	( cast_spos.byte_offset() % bt_mfile.totfile_size() );
 		// append the cast_spos to the cast_spos_arr
-		m_cast_spos_arr	+= cast_spos; 
+		m_cast_spos_arr	+= cast_spos;
 	}
 
 	// NOTE: no need to delete obsolete bt_cast_spos_t as new one are not
 	//       obsolete but definition.
-	
+
 	// if it is the first bt_cast_spos_t, start publishing
 	if( !cast_spos_arr().empty() && !m_casti_swarm->is_published() )
-		m_casti_swarm->start_publishing(); 
+		m_casti_swarm->start_publishing();
 }
 
 NEOIP_NAMESPACE_END;

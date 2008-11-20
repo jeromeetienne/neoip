@@ -375,24 +375,28 @@ NEOIP_BT_CAST_OBJS =									\
 	$(NEOIP_BT_CAST_DIR)/httpo/base/event/neoip_bt_httpo_event.o			\
 	$(NEOIP_BT_CAST_DIR)/httpo/listener/neoip_bt_httpo_listener.o			\
 	$(NEOIP_BT_CAST_DIR)/httpo/listener/wikidbg/neoip_bt_httpo_listener_wikidbg.o	\
-	$(NEOIP_BT_CAST_DIR)/httpo/resp/neoip_bt_httpo_resp.o			\
-	$(NEOIP_BT_CAST_DIR)/httpo/resp/wikidbg/neoip_bt_httpo_resp_wikidbg.o	\
-	$(NEOIP_BT_CAST_DIR)/httpo/full/neoip_bt_httpo_full.o			\
-	$(NEOIP_BT_CAST_DIR)/httpo/full/base/arg/neoip_bt_httpo_full_arg.o	\
-	$(NEOIP_BT_CAST_DIR)/httpo/full/base/profile/neoip_bt_httpo_full_profile.o	\
-	$(NEOIP_BT_CAST_DIR)/httpo/full/base/wikidbg/neoip_bt_httpo_full_wikidbg.o	\
-	$(NEOIP_BT_CAST_DIR)/scasti/neoip_bt_httpi.o				\
-	$(NEOIP_BT_CAST_DIR)/scasti/base/event/neoip_bt_scasti_event.o		\
-	$(NEOIP_BT_CAST_DIR)/scasti/base/profile/neoip_bt_httpi_profile.o	\
-	$(NEOIP_BT_CAST_DIR)/scasti/base/nunit/neoip_bt_httpi_nunit.o		\
-	$(NEOIP_BT_CAST_DIR)/scasti/base/wikidbg/neoip_bt_httpi_wikidbg.o	\
-	$(NEOIP_BT_CAST_DIR)/scasti/mod/base/type/neoip_bt_scasti_mod_type.o	\
-	$(NEOIP_BT_CAST_DIR)/scasti/mod/impl/raw/neoip_bt_scasti_mod_raw.o	\
+	$(NEOIP_BT_CAST_DIR)/httpo/resp/neoip_bt_httpo_resp.o					\
+	$(NEOIP_BT_CAST_DIR)/httpo/resp/wikidbg/neoip_bt_httpo_resp_wikidbg.o			\
+	$(NEOIP_BT_CAST_DIR)/httpo/full/neoip_bt_httpo_full.o					\
+	$(NEOIP_BT_CAST_DIR)/httpo/full/base/arg/neoip_bt_httpo_full_arg.o			\
+	$(NEOIP_BT_CAST_DIR)/httpo/full/base/profile/neoip_bt_httpo_full_profile.o		\
+	$(NEOIP_BT_CAST_DIR)/httpo/full/base/wikidbg/neoip_bt_httpo_full_wikidbg.o		\
+	$(NEOIP_BT_CAST_DIR)/scasti/impl/http/neoip_bt_scasti_http.o				\
+	$(NEOIP_BT_CAST_DIR)/scasti/impl/http/base/profile/neoip_bt_scasti_http_profile.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/impl/http/base/wikidbg/neoip_bt_scasti_http_wikidbg.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/impl/http/base/nunit/neoip_bt_scasti_http_nunit.o		\
+	$(NEOIP_BT_CAST_DIR)/scasti/impl/rtmp/neoip_bt_scasti_rtmp.o				\
+	$(NEOIP_BT_CAST_DIR)/scasti/impl/rtmp/base/profile/neoip_bt_scasti_rtmp_profile.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/impl/rtmp/base/wikidbg/neoip_bt_scasti_rtmp_wikidbg.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/base/event/neoip_bt_scasti_event.o				\
+	$(NEOIP_BT_CAST_DIR)/scasti/mod/base/profile/neoip_bt_scasti_mod_profile.o		\
+	$(NEOIP_BT_CAST_DIR)/scasti/mod/base/type/neoip_bt_scasti_mod_type.o			\
+	$(NEOIP_BT_CAST_DIR)/scasti/mod/impl/raw/neoip_bt_scasti_mod_raw.o			\
 	$(NEOIP_BT_CAST_DIR)/scasti/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.o	\
-	$(NEOIP_BT_CAST_DIR)/scasti/mod/impl/flv/neoip_bt_scasti_mod_flv.o	\
-	$(NEOIP_BT_CAST_DIR)/mdata/neoip_bt_cast_mdata.o			\
-	$(NEOIP_BT_CAST_DIR)/mdata/server/neoip_bt_cast_mdata_server.o			\
-	$(NEOIP_BT_CAST_DIR)/mdata/server/wikidbg/neoip_bt_cast_mdata_server_wikidbg.o	\
+	$(NEOIP_BT_CAST_DIR)/scasti/mod/impl/flv/neoip_bt_scasti_mod_flv.o			\
+	$(NEOIP_BT_CAST_DIR)/mdata/neoip_bt_cast_mdata.o					\
+	$(NEOIP_BT_CAST_DIR)/mdata/server/neoip_bt_cast_mdata_server.o				\
+	$(NEOIP_BT_CAST_DIR)/mdata/server/wikidbg/neoip_bt_cast_mdata_server_wikidbg.o		\
 	$(NEOIP_BT_CAST_DIR)/mdata/client/neoip_bt_cast_mdata_client.o				\
 	$(NEOIP_BT_CAST_DIR)/mdata/dopublish/neoip_bt_cast_mdata_dopublish.o			\
 	$(NEOIP_BT_CAST_DIR)/mdata/dopublish/base/wikidbg/neoip_bt_cast_mdata_dopublish_wikidbg.o	\
@@ -454,8 +458,10 @@ NEOIP_RTMP_OBJS =							\
 	$(NEOIP_RTMP_DIR)/build/neoip_rtmp_build.o			\
 	$(NEOIP_RTMP_DIR)/build/nunit/neoip_rtmp_build_nunit.o		\
 	$(NEOIP_RTMP_DIR)/parse/neoip_rtmp_parse.o			\
-	$(NEOIP_RTMP_DIR)/parse/chanctx/neoip_rtmp_parse_chanctx.o	\
-	$(NEOIP_RTMP_DIR)/parse/base/profile/neoip_rtmp_parse_profile.o	\
+	$(NEOIP_RTMP_DIR)/parse/chanctx/neoip_rtmp_parse_chanctx.o			\
+	$(NEOIP_RTMP_DIR)/parse/chanctx/wikidbg/neoip_rtmp_parse_chanctx_wikidbg.o	\
+	$(NEOIP_RTMP_DIR)/parse/base/wikidbg/neoip_rtmp_parse_wikidbg.o			\
+	$(NEOIP_RTMP_DIR)/parse/base/profile/neoip_rtmp_parse_profile.o			\
 	$(NEOIP_RTMP_DIR)/parse/base/nunit/neoip_rtmp_parse_nunit.o
 
 NEOIP_RTMP_NET_DIR=neoip_rtmp_net
@@ -463,19 +469,23 @@ NEOIP_RTMP_NET_OBJS =								\
 	$(NEOIP_RTMP_NET_DIR)/base/nunit_gsuite/neoip_rtmp_net_nunit_gsuite.o	\
 	$(NEOIP_RTMP_NET_DIR)/resp/neoip_rtmp_resp.o				\
 	$(NEOIP_RTMP_NET_DIR)/resp/base/nunit/neoip_rtmp_resp_nunit.o		\
+	$(NEOIP_RTMP_NET_DIR)/resp/base/wikidbg/neoip_rtmp_resp_wikidbg.o	\
 	$(NEOIP_RTMP_NET_DIR)/resp/cnx/neoip_rtmp_resp_cnx.o			\
-	$(NEOIP_RTMP_NET_DIR)/resp/cnx/state/neoip_rtmp_resp_cnx_state.o	\
-	$(NEOIP_RTMP_NET_DIR)/full/neoip_rtmp_full.o				\
-	$(NEOIP_RTMP_NET_DIR)/full/helper/full_webcam/neoip_rtmp_full_webcam.o	\
-	$(NEOIP_RTMP_NET_DIR)/full/helper/full_webcam/nunit/neoip_rtmp_full_webcam_nunit.o
+	$(NEOIP_RTMP_NET_DIR)/resp/cnx/base/state/neoip_rtmp_resp_cnx_state.o	\
+	$(NEOIP_RTMP_NET_DIR)/resp/cnx/base/wikidbg/neoip_rtmp_resp_cnx_wikidbg.o	\
+	$(NEOIP_RTMP_NET_DIR)/full/wikidbg/neoip_rtmp_full_wikidbg.o		\
+	$(NEOIP_RTMP_NET_DIR)/full/neoip_rtmp_full.o
 
 NEOIP_RTMP_CAM_DIR=neoip_rtmp_cam
 NEOIP_RTMP_CAM_OBJS =								\
 	$(NEOIP_RTMP_CAM_DIR)/base/nunit_gsuite/neoip_rtmp_cam_nunit_gsuite.o	\
-	$(NEOIP_RTMP_CAM_DIR)/full/nunit/neoip_rtmp_cam_full_nunit.o		\
+	$(NEOIP_RTMP_CAM_DIR)/full/base/nunit/neoip_rtmp_cam_full_nunit.o	\
+	$(NEOIP_RTMP_CAM_DIR)/full/base/wikidbg/neoip_rtmp_cam_full_wikidbg.o	\
 	$(NEOIP_RTMP_CAM_DIR)/full/neoip_rtmp_cam_full.o			\
+	$(NEOIP_RTMP_CAM_DIR)/resp/wikidbg/neoip_rtmp_cam_resp_wikidbg.o	\
 	$(NEOIP_RTMP_CAM_DIR)/resp/neoip_rtmp_cam_resp.o			\
-	$(NEOIP_RTMP_CAM_DIR)/listener/neoip_rtmp_cam_listener.o
+	$(NEOIP_RTMP_CAM_DIR)/listener/neoip_rtmp_cam_listener.o		\
+	$(NEOIP_RTMP_CAM_DIR)/listener/wikidbg/neoip_rtmp_cam_listener_wikidbg.o
 
 NEOIP_KAD_DIR=neoip_kad
 NEOIP_KAD_OBJS =								\

@@ -8,6 +8,7 @@
 #define __NEOIP_RTMP_FULL_HPP__
 /* system include */
 /* local include */
+#include "neoip_rtmp_full_wikidbg.hpp"
 #include "neoip_rtmp_full_cb.hpp"
 #include "neoip_rtmp_err.hpp"
 #include "neoip_rtmp_parse_cb.hpp"
@@ -25,7 +26,9 @@ class	rtmp_event_t;
 
 /** \brief class definition for rtmp_full_t
  */
-class rtmp_full_t : NEOIP_COPY_CTOR_DENY, private socket_full_cb_t, private rtmp_parse_cb_t {
+class rtmp_full_t : NEOIP_COPY_CTOR_DENY, private socket_full_cb_t, private rtmp_parse_cb_t
+			, private wikidbg_obj_t<rtmp_full_t, rtmp_full_wikidbg_init>
+			{
 private:
 	/************** socket_full_t	***************************************/
 	socket_full_t *	socket_full;
@@ -55,8 +58,9 @@ public:
 	rtmp_err_t	send(const pkt_t &pkt) 		throw()		{ return send(pkt.void_ptr(), pkt.length());	}
 	rtmp_err_t	send(const datum_t &datum) 	throw()		{ return send(datum.void_ptr(), datum.length());}
 
-
 	/*************** List of friend class	*******************************/
+	friend class	rtmp_full_wikidbg_t;
+	friend class	bt_scasti_rtmp_t;	// TODO to fix - ugly kludge to get socket_full in rtmp_full_t
 };
 
 NEOIP_NAMESPACE_END

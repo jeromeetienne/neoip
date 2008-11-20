@@ -9,6 +9,7 @@
 /* system include */
 #include <list>
 /* local include */
+#include "neoip_rtmp_parse_wikidbg.hpp"
 #include "neoip_rtmp_parse_cb.hpp"
 #include "neoip_rtmp_parse_profile.hpp"
 #include "neoip_bytearray.hpp"
@@ -25,7 +26,8 @@ class	rtmp_err_t;
 
 /** \brief class definition for rtmp_parse
  */
-class rtmp_parse_t : NEOIP_COPY_CTOR_DENY, private zerotimer_cb_t {
+class rtmp_parse_t : NEOIP_COPY_CTOR_DENY, private zerotimer_cb_t
+			, private wikidbg_obj_t<rtmp_parse_t, rtmp_parse_wikidbg_init> {
 private:
 	bytearray_t		m_buffer;	//!< the buffer bytearray_t
 	rtmp_parse_profile_t	m_profile;	//!< the profile to use for this rtmp_parse_t
@@ -67,6 +69,7 @@ public:
 	void		notify_data(const datum_t &new_data)		throw();
 
 	/*************** List of friend class	*******************************/
+	friend class	rtmp_parse_wikidbg_t;
 	friend class	rtmp_parse_chanctx_t;
 };
 

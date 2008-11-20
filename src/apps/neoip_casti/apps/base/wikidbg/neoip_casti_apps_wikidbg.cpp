@@ -32,7 +32,7 @@ public:
 
 /** \brief define all the handled keyword and their attached callbacks
  */
-void	casti_apps_wikidbg_init(wikidbg_keyword_db_t &keyword_db)	throw() 
+void	casti_apps_wikidbg_init(wikidbg_keyword_db_t &keyword_db)	throw()
 {
 	// add the keywords
 	keyword_db.insert_html("oneword"	, casti_apps_wikidbg_t::oneword);
@@ -78,7 +78,7 @@ std::string casti_apps_wikidbg_t::oneword_pageurl(const std::string &keyword, vo
 	oss << h.s_link(wikidbg_url("page", casti_apps), wikidbg_html("page_title_attr", casti_apps));
 	oss << wikidbg_html("oneword", casti_apps);
 	oss << h.e_link();
-	
+
 	// return the built string
 	return oss.str();
 }
@@ -120,7 +120,7 @@ httpd_err_t casti_apps_wikidbg_t::page(const std::string &keyword, void *object_
 
 	// put the title
 	oss << h.pagetitle("casti_apps_t Page");
-	
+
 	oss << h.br();
 	oss << h.s_table_packed_noborder();
 		oss << h.s_tr();
@@ -149,6 +149,11 @@ httpd_err_t casti_apps_wikidbg_t::page(const std::string &keyword, void *object_
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
+			oss << h.s_td() << h.s_b() << "rtmp_cam_listener"	<< h.e_b() << h.e_td();
+			oss << h.s_td() << ": " << wikidbg_html("oneword_pageurl", casti_apps->rtmp_cam_listener())
+					<< h.e_td();
+			oss << h.e_tr();
+		oss << h.s_tr();
 			oss << h.s_td() << h.s_b() << "inetreach_httpd"		<< h.e_b() << h.e_td();
 			oss << h.s_td() << ": " << wikidbg_html("oneword_pageurl", casti_apps->m_inetreach_httpd)
 					<< h.e_td();
@@ -173,7 +178,7 @@ httpd_err_t casti_apps_wikidbg_t::page(const std::string &keyword, void *object_
 			oss << h.s_td() << ": " << wikidbg_html("oneword_pageurl", casti_apps->m_apps_httpdetect)
 					<< h.e_td();
 			oss << h.e_tr();
-	oss << h.e_table();	
+	oss << h.e_table();
 	oss << h.br();
 
 	// display the table of all the current casti_swarm_t
@@ -186,12 +191,12 @@ httpd_err_t casti_apps_wikidbg_t::page(const std::string &keyword, void *object_
 	for( iter = swarm_db.begin(); iter != swarm_db.end(); iter++ ){
 		casti_swarm_t *	casti_swarm	= *iter;
 		// if it is the first element, add the tableheader
-		if( iter == swarm_db.begin() )	oss << wikidbg_html("tableheader", casti_swarm);	
+		if( iter == swarm_db.begin() )	oss << wikidbg_html("tableheader", casti_swarm);
 		// display this row
 		oss << wikidbg_html("tablerow", casti_swarm);
 	}
 	oss << h.e_table();
-	
+
 	// return no error
 	return httpd_err_t::OK;
 }

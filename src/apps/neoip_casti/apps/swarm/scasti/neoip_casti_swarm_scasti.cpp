@@ -2,7 +2,7 @@
     \brief Definition of the \ref casti_swarm_scasti_t
 
 \par Brief Description
-casti_swarm_scasti_t handle all the httpi stuff for the casti_swarm_t
+casti_swarm_scasti_t handle all the scasti stuff for the casti_swarm_t
 
 */
 
@@ -14,9 +14,12 @@ casti_swarm_scasti_t handle all the httpi stuff for the casti_swarm_t
 #include "neoip_casti_swarm_spos.hpp"
 #include "neoip_casti_swarm_udata.hpp"
 
+#include "neoip_casti_apps.hpp"
+
 #include "neoip_bt_cast_pidx.hpp"
 
-#include "neoip_bt_httpi.hpp"
+#include "neoip_bt_scasti_http.hpp"
+#include "neoip_bt_scasti_rtmp.hpp"
 #include "neoip_bt_scasti_event.hpp"
 #include "neoip_bt_scasti_mod_vapi.hpp"
 
@@ -47,7 +50,7 @@ casti_swarm_scasti_t::casti_swarm_scasti_t()	throw()
 	KLOG_DBG("enter");
 	// zero some field
 	m_casti_swarm	= NULL;
-	m_bt_httpi	= NULL;
+	m_scasti_vapi	= NULL;
 
 }
 
@@ -57,8 +60,8 @@ casti_swarm_scasti_t::~casti_swarm_scasti_t()	throw()
 {
 	// log to debug
 	KLOG_DBG("enter");
-	// delete the bt_httpi_t
-	nipmem_zdelete	m_bt_httpi;
+	// delete the bt_scasti_vapi_t
+	nipmem_zdelete	m_scasti_vapi;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,15 +92,41 @@ bt_err_t casti_swarm_scasti_t::start(casti_swarm_t *m_casti_swarm)		throw()
 	// copy the parameter
 	this->m_casti_swarm	= m_casti_swarm;
 
-	// init the bt_httpi_t recv_rate estimator
+	// init the bt_scasti_vapi_t recv_rate estimator
 	m_rate_estim	= rate_estim_t<size_t>(profile().rate_estim_arg());
 
-	// start the bt_httpi_t
+	// start the bt_scasti_vapi_t
 	bt_err_t	bt_err;
-	m_bt_httpi	= nipmem_new bt_httpi_t();
-	bt_err		= bt_httpi()->start(casti_swarm()->httpi_uri(), bt_ezswarm()->io_vapi()
-						, casti_swarm()->scasti_mod(), this, NULL);
+	bt_err		= launch_scasti_vapi();
 	if( bt_err.failed() )	return bt_err;
+
+	// return no error
+	return bt_err_t::OK;
+}
+
+/** \brief launch the bt_scasti_vapi
+ *
+ */
+bt_err_t	casti_swarm_scasti_t::launch_scasti_vapi()	throw()
+{
+	bt_err_t	bt_err;
+	if( casti_swarm()->scasti_uri().scheme() == http_scheme_t::RTMP ){
+		bt_scasti_rtmp_t *	scasti_rtmp;
+		scasti_rtmp	= nipmem_new bt_scasti_rtmp_t();
+		bt_err		= scasti_rtmp->start(casti_swarm()->scasti_uri()
+						, bt_ezswarm()->io_vapi(), casti_swarm()->scasti_mod()
+						, casti_swarm()->casti_apps->rtmp_cam_listener()
+						, this, NULL);
+		m_scasti_vapi	= scasti_rtmp;
+		if( bt_err.failed() )	return bt_err;
+	}else{
+		bt_scasti_http_t *	scasti_http;
+		scasti_http	= nipmem_new bt_scasti_http_t();
+		bt_err		= scasti_http->start(casti_swarm()->scasti_uri(), bt_ezswarm()->io_vapi()
+							, casti_swarm()->scasti_mod(), this, NULL);
+		m_scasti_vapi	= scasti_http;
+		if( bt_err.failed() )	return bt_err;
+	}
 	// return no error
 	return bt_err_t::OK;
 }
@@ -131,11 +160,11 @@ casti_swarm_spos_t*	casti_swarm_scasti_t::swarm_spos()	const throw()
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//			bt_httpi_t callback
+//			bt_scasti_vapi_t callback
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-/** \brief callback notified by \ref bt_httpi_t to provide event
+/** \brief callback notified by \ref bt_scasti_vapi_t to provide event
  */
 bool	casti_swarm_scasti_t::neoip_bt_scasti_cb(void *cb_userptr, bt_scasti_vapi_t &cb_scasti_vapi
 				, const bt_scasti_event_t &scasti_event)	throw()
@@ -149,10 +178,10 @@ bool	casti_swarm_scasti_t::neoip_bt_scasti_cb(void *cb_userptr, bt_scasti_vapi_t
 
 	// in case of error, start a gracefull shutdown of the casti_swarm_t
 	if( scasti_event.is_fatal() ){
-		// delete bt_httpi_t now
+		// delete bt_scasti_vapi_t now
 		// - in case casti_swarm_t->gracefull_shutdown() dont delete this object
 		// - NOTE: based on the regularity rules "if an obj notifies error, delete it"
-		nipmem_zdelete	m_bt_httpi;
+		nipmem_zdelete	m_scasti_vapi;
 		// do casti_swarm()->gracefull_shutdown()
 		casti_swarm()->gracefull_shutdown(scasti_event.to_string());
 		// return dontkeep
@@ -172,19 +201,19 @@ bool	casti_swarm_scasti_t::neoip_bt_scasti_cb(void *cb_userptr, bt_scasti_vapi_t
 
 /** \brief Handle a bt_scasti_event_t::CHUNK_AVAIL
  *
- * @return a tokeep for the bt_httpi_t
+ * @return a tokeep for the bt_scasti_vapi_t
  */
 bool	casti_swarm_scasti_t::handle_chunk_avail(const file_size_t &chunk_len)		throw()
 {
 	bt_swarm_t *	bt_swarm	= bt_ezswarm()->share()->bt_swarm();
 	const bt_mfile_t &bt_mfile	= bt_swarm->get_mfile();
 
-	// update the httpi_recv_rate
+	// update the scasti_rate_estim
 	m_rate_estim.update(chunk_len.to_size_t());
 
-	// update the bt_peerpick_casti_t cnx_minrate with the current httpi_rate_estim
+	// update the bt_peerpick_casti_t cnx_minrate with the current scasti_rate_estim
 	// - NOTE: this bt_peerpick_vapi_t ensures that every connected peers is allocated
-	//   at least the bandwidth to load at the bt_httpi_t throughput.
+	//   at least the bandwidth to load at the bt_scasti_vapi_t throughput.
 	// - this prevents to have multiple peer to cancel each other and none getting the
 	//   data at the proper rates.
 	bt_peerpick_vapi_t *    peerpick_vapi   = bt_swarm_helper_t::peerpick_vapi(bt_swarm);
@@ -193,16 +222,16 @@ bool	casti_swarm_scasti_t::handle_chunk_avail(const file_size_t &chunk_len)		thr
 	peerpick_casti->cnx_minrate( rate_average() );
 
 
-	// compute the old_httpi_pidx - i.e. the piece_idx BEFORE this bt_io_write_t
+	// compute the old_scasti_pidx - i.e. the piece_idx BEFORE this bt_io_write_t
 	// TODO BUG BUG here the totfile position MAY be outside the bt_mfile!!!!
-	size_t		old_httpi_pidx	= bt_unit_t::totfile_to_pieceidx(bt_httpi()->cur_offset(), bt_mfile);
-	// compute the new_httpi_pidx - i.e. the piece_idx AFTER this bt_io_write_t
-	size_t		new_httpi_pidx	= bt_unit_t::totfile_to_pieceidx(bt_httpi()->cur_offset() + chunk_len, bt_mfile);
+	size_t		old_scasti_pidx	= bt_unit_t::totfile_to_pieceidx(scasti_vapi()->cur_offset(), bt_mfile);
+	// compute the new_scasti_pidx - i.e. the piece_idx AFTER this bt_io_write_t
+	size_t		new_scasti_pidx	= bt_unit_t::totfile_to_pieceidx(scasti_vapi()->cur_offset() + chunk_len, bt_mfile);
 
 // TODO pass under a specific function
 // - use the bt_cast_pidx_t in it to simplify it
 	// notify all the pieceidx newly available after this bt_scasti_event_t::CHUNK_AVAIL
-	for(size_t pieceidx = old_httpi_pidx; pieceidx < new_httpi_pidx; pieceidx++){
+	for(size_t pieceidx = old_scasti_pidx; pieceidx < new_scasti_pidx; pieceidx++){
 		// TODO this breaks the "no nested notification" rules
 		// - this will make a notification to bt_ezswarm_cb_t
 		// - what about having a zerotimer to deliver this event ? would avoid the
@@ -212,10 +241,10 @@ bool	casti_swarm_scasti_t::handle_chunk_avail(const file_size_t &chunk_len)		thr
 		bt_swarm->declare_piece_newly_avail(pieceidx % bt_mfile.nb_piece());
 	}
 
-	// update the pieceq_beg from the new_httpi_pidx
-	// - TODO BUG httpi_pidx points on partial piece, and pieceq_end MUST be
+	// update the pieceq_beg from the new_scasti_pidx
+	// - TODO BUG scasti_pidx points on partial piece, and pieceq_end MUST be
 	//   available so fully available
-	casti_swarm()->pieceq_end	= new_httpi_pidx % bt_mfile.nb_piece();
+	casti_swarm()->pieceq_end	= new_scasti_pidx % bt_mfile.nb_piece();
 	// sanity check - the new pieceq_end MUST be available
 	// - TODO there is a bug here i think... i think the pieceq_end contains piece
 	//   which are not yet fully avail
@@ -225,7 +254,7 @@ bool	casti_swarm_scasti_t::handle_chunk_avail(const file_size_t &chunk_len)		thr
 // TODO pass under a specific function
 // - use the bt_cast_pidx_t in it to simplify it
 	// delete the piece which is no more in the queue
-	for(size_t pieceidx = old_httpi_pidx; pieceidx < new_httpi_pidx; pieceidx++){
+	for(size_t pieceidx = old_scasti_pidx; pieceidx < new_scasti_pidx; pieceidx++){
 		size_t	pieceq_maxlen	= casti_swarm()->profile().pieceq_maxlen();
 		// compute the pieceidx at the begining of the queue
 		// - TODO not sure how it is coded
@@ -234,7 +263,7 @@ bool	casti_swarm_scasti_t::handle_chunk_avail(const file_size_t &chunk_len)		thr
 					- pieceq_maxlen) % bt_mfile.nb_piece();
 		// if this piece is not available, goto the next
 		// - this may happen when the piece_queue is not yet full
-		//   aka at the begining of the bt_httpi_t
+		//   aka at the begining of the bt_scasti_vapi_t
 		if( bt_swarm->local_pavail().is_unavail(pieceidx_2del) )	continue;
 		// notify the bt_swarm_t that this piece is no more available
 		bt_swarm->declare_piece_nomore_avail(pieceidx_2del);
@@ -260,7 +289,7 @@ bool	casti_swarm_scasti_t::handle_chunk_avail(const file_size_t &chunk_len)		thr
 
 /** \brief Handle a bt_scasti_event_t::CHUNK_AVAIL
  *
- * @return a tokeep for the bt_httpi_t
+ * @return a tokeep for the bt_scasti_vapi_t
  */
 bool	casti_swarm_scasti_t::handle_mod_updated()				throw()
 {

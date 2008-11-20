@@ -31,7 +31,7 @@ public:
 
 /** \brief define all the handled keyword and their attached callbacks
  */
-void	casti_swarm_scasti_wikidbg_init(wikidbg_keyword_db_t &keyword_db)	throw() 
+void	casti_swarm_scasti_wikidbg_init(wikidbg_keyword_db_t &keyword_db)	throw()
 {
 	// add the keywords
 	keyword_db.insert_html("oneword"	, casti_swarm_scasti_wikidbg_t::oneword);
@@ -76,7 +76,7 @@ std::string casti_swarm_scasti_wikidbg_t::oneword_pageurl(const std::string &key
 	oss << h.s_link(wikidbg_url("page", swarm_scasti), wikidbg_html("page_title_attr", swarm_scasti));
 	oss << wikidbg_html("oneword", swarm_scasti);
 	oss << h.e_link();
-	
+
 	// return the built string
 	return oss.str();
 }
@@ -117,7 +117,7 @@ httpd_err_t casti_swarm_scasti_wikidbg_t::page(const std::string &keyword, void 
 
 	// put the title
 	oss << h.pagetitle("casti_swarm_scasti_t Page");
-	
+
 	oss << h.br();
 	oss << h.s_table_packed_noborder();
 		oss << h.s_tr();
@@ -126,8 +126,8 @@ httpd_err_t casti_swarm_scasti_wikidbg_t::page(const std::string &keyword, void 
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
-			oss << h.s_td() << h.s_b() << "bt_httpi_t"		<< h.e_b() << h.e_td();
-			oss << h.s_td() << ": " << wikidbg_html("oneword_pageurl", swarm_scasti->bt_httpi())
+			oss << h.s_td() << h.s_b() << "bt_scasti_vapi_t"	<< h.e_b() << h.e_td();
+			oss << h.s_td() << ": " << wikidbg_html("oneword_pageurl", swarm_scasti->scasti_vapi())
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
@@ -135,7 +135,7 @@ httpd_err_t casti_swarm_scasti_wikidbg_t::page(const std::string &keyword, void 
 			oss << h.s_td() << ": " << swarm_scasti->rate_average()
 					<< h.e_td();
 			oss << h.e_tr();
-	oss << h.e_table();	
+	oss << h.e_table();
 	oss << h.br();
 
 	// return no error

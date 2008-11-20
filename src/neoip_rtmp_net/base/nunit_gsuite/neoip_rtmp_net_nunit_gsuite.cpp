@@ -9,8 +9,6 @@
 #include "neoip_nunit.hpp"
 
 #include "neoip_rtmp_resp_nunit.hpp"
-#include "neoip_rtmp_full_webcam_nunit.hpp"
-
 NEOIP_NAMESPACE_BEGIN;
 
 
@@ -31,15 +29,6 @@ static void rtmp_net_gsuite_fct(nunit_suite_t &nunit_suite)
 	rtmp_resp_testclass->append("general"	, &rtmp_resp_testclass_t::general);
 	// add the testclass to the nunit_suite
 	rtmp_net_suite->append(rtmp_resp_testclass);
-
-/********************* rtmp_full_webcam_t	*******************************/
-	// init the testclass for the rtmp_full_webcam_t
-	nunit_testclass_t<rtmp_full_webcam_testclass_t> *	rtmp_full_webcam_testclass;
-	rtmp_full_webcam_testclass	= nipmem_new nunit_testclass_t<rtmp_full_webcam_testclass_t>("full_webcam", nipmem_new rtmp_full_webcam_testclass_t());
-	// add some test functions
-	rtmp_full_webcam_testclass->append("general"	, &rtmp_full_webcam_testclass_t::general);
-	// add the testclass to the nunit_suite
-	rtmp_net_suite->append(rtmp_full_webcam_testclass);
 
 	// add the rtmp_net_suite to the nunit_suite
 	nunit_suite.append(rtmp_net_suite);

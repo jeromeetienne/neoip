@@ -10,7 +10,7 @@ any kind of data. this is just a place holder for bt_scasti_mod_vapi_t.
 /* system include */
 /* local include */
 #include "neoip_bt_scasti_mod_raw.hpp"
-#include "neoip_bt_httpi.hpp"
+#include "neoip_bt_scasti_vapi.hpp"
 #include "neoip_bt_scasti_event.hpp"
 #include "neoip_nipmem_alloc.hpp"
 #include "neoip_log.hpp"
@@ -39,7 +39,7 @@ bt_scasti_mod_raw_t::~bt_scasti_mod_raw_t()		throw()
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-//			Setup function 
+//			Setup function
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -49,7 +49,7 @@ bt_scasti_mod_raw_t::~bt_scasti_mod_raw_t()		throw()
 bt_scasti_mod_raw_t &	bt_scasti_mod_raw_t::profile(const bt_scasti_mod_raw_profile_t &p_profile)	throw()
 {
 	// sanity check - the profile MUST be checked OK
-	DBG_ASSERT( p_profile.check() == bt_err_t::OK );	
+	DBG_ASSERT( p_profile.check() == bt_err_t::OK );
 	// copy the parameter
 	this->m_profile	= p_profile;
 	// return the object iself
@@ -58,10 +58,10 @@ bt_scasti_mod_raw_t &	bt_scasti_mod_raw_t::profile(const bt_scasti_mod_raw_profi
 
 /** \brief Start the operation
  */
-bt_err_t	bt_scasti_mod_raw_t::start(bt_httpi_t *p_bt_httpi)	throw()
+bt_err_t	bt_scasti_mod_raw_t::start(bt_scasti_vapi_t *p_scasti_vapi)	throw()
 {
 	// copy the parameters
-	this->m_bt_httpi	= p_bt_httpi;
+	this->m_scasti_vapi	= p_scasti_vapi;
 
 	// put a bt_cast_spos_t
 	m_last_spos_offset	= 0;
@@ -88,7 +88,7 @@ void	bt_scasti_mod_raw_t::notify_data(const datum_t &data)	throw()
 	// log to debug
 	KLOG_DBG("enter");
 	// compute the offset *after* this data
-	file_size_t	post_offset	= bt_httpi()->cur_offset() + data.size();
+	file_size_t	post_offset	= scasti_vapi()->cur_offset() + data.size();
 
 	// put all bt_cast_spos_t contained in the stream from m_last_spos_offset to post_offset
 	// - NOTE: unlikely to put several but handle it just in case
@@ -99,7 +99,7 @@ void	bt_scasti_mod_raw_t::notify_data(const datum_t &data)	throw()
 
 /** \brief pop up a allowed start position - or null bt_cast_spos_t if none is available
  */
-bt_cast_spos_t	bt_scasti_mod_raw_t::cast_spos_pop()		throw()	
+bt_cast_spos_t	bt_scasti_mod_raw_t::cast_spos_pop()		throw()
 {
 	// if no cast_spos_arr is queueed, return a null bt_cast_spos_t
 	if( m_cast_spos_arr.empty() )	return bt_cast_spos_t();
@@ -127,7 +127,7 @@ void	bt_scasti_mod_raw_t::cast_spos_queue(const file_size_t &byte_offset)	throw(
 	// update the m_last_spos_offset
 	m_last_spos_offset	= byte_offset;
 	// restart the spos_timeout
-	spos_timeout.start(m_profile.spos_maxdelay(), this, NULL );		
+	spos_timeout.start(m_profile.spos_maxdelay(), this, NULL );
 	// launch the zerotimer if not already running
 	if( event_zerotimer.empty() )	event_zerotimer.append(this, NULL);
 }
@@ -138,7 +138,7 @@ bool	bt_scasti_mod_raw_t::neoip_zerotimer_expire_cb(zerotimer_t &cb_zerotimer, v
 {
 	// notify the caller - that the bt_scasti_event_t::MOD_UPDATED
 	bt_scasti_event_t scasti_event	= bt_scasti_event_t::build_mod_updated();
-	bool	tokeep	= m_bt_httpi->mod_vapi_notify_callback(scasti_event);
+	bool	tokeep	= m_scasti_vapi->mod_vapi_notify_callback(scasti_event);
 	if( !tokeep )	return false;
 
 	// return a tokeep
@@ -157,10 +157,10 @@ bool	bt_scasti_mod_raw_t::neoip_timeout_expire_cb(void *userptr, timeout_t &cb_t
 {
 	// log to debug
 	KLOG_ERR("enter");
-	
-	// queue the current offset of bt_httpi_t in the cast_spos_arr
-	cast_spos_queue( bt_httpi()->cur_offset() );
-	
+
+	// queue the current offset of bt_scasti_vapi_t in the cast_spos_arr
+	cast_spos_queue( scasti_vapi()->cur_offset() );
+
 	// return tokeep
 	return true;
 }

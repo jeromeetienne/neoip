@@ -8,6 +8,7 @@
 #define __NEOIP_RTMP_PARSE_CHANCTX_HPP__
 /* system include */
 /* local include */
+#include "neoip_rtmp_parse_chanctx_wikidbg.hpp"
 #include "neoip_rtmp_pkthd.hpp"
 #include "neoip_rtmp_err.hpp"
 #include "neoip_bytearray.hpp"
@@ -21,7 +22,8 @@ class	rtmp_parse_t;
 
 /** \brief class definition for rtmp_parse_chanctx_t
  */
-class rtmp_parse_chanctx_t : NEOIP_COPY_CTOR_DENY{
+class rtmp_parse_chanctx_t : NEOIP_COPY_CTOR_DENY
+			, private wikidbg_obj_t<rtmp_parse_chanctx_t, rtmp_parse_chanctx_wikidbg_init> {
 
 private:
 	rtmp_parse_t *	m_rtmp_parse;	//!< backpointer to the linked rtmp_parse_t
@@ -44,6 +46,9 @@ public:
 	/*************** Action function	*******************************/
 	bool 			notify_chunk(const rtmp_pkthd_t &chunk_pkthd
 						, const datum_t &chunk_data)	throw();
+
+	/*************** List of friend class	*******************************/
+	friend class	rtmp_parse_chanctx_wikidbg_t;
 };
 
 NEOIP_NAMESPACE_END

@@ -149,8 +149,8 @@ httpd_err_t casti_swarm_wikidbg_t::page(const std::string &keyword, void *object
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
-			oss << h.s_td() << h.s_b() << "httpi_uri"		<< h.e_b() << h.e_td();
-			oss << h.s_td() << ": " << casti_swarm->httpi_uri()
+			oss << h.s_td() << h.s_b() << "scasti_uri"		<< h.e_b() << h.e_td();
+			oss << h.s_td() << ": " << casti_swarm->scasti_uri()
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();

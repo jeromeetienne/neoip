@@ -57,6 +57,8 @@
 
 #include "neoip_apps_httpdetect.hpp"
 
+#include "neoip_rtmp_cam_listener.hpp"
+
 #include "neoip_bt_cast_id.hpp"
 #include "neoip_bt_cast_mdata_server.hpp"
 #include "neoip_bt_cast_mdata.hpp"
@@ -96,6 +98,7 @@ casti_apps_t::casti_apps_t()	throw()
 	// zero some field
 	m_http_listener		= NULL;
 	m_inetreach_httpd	= NULL;
+	m_rtmp_cam_listener	= NULL;
 	m_apps_httpdetect	= NULL;
 	m_ctrl_cline		= NULL;
 	m_ctrl_wpage		= NULL;
@@ -129,6 +132,8 @@ casti_apps_t::~casti_apps_t()	throw()
 	nipmem_zdelete	m_apps_httpdetect;
 	// delete the casti_inetreach_httpd_t if needed
 	nipmem_zdelete	m_inetreach_httpd;
+	// delete the m_rtmp_cam_listener if needed
+	nipmem_zdelete	m_rtmp_cam_listener;
 	// delete the http_listener if needed
 	nipmem_zdelete	m_http_listener;
 }
@@ -165,6 +170,10 @@ bt_err_t	casti_apps_t::start()						throw()
 	bt_err		= launch_http_listener(casti_conf);
 	if( bt_err.failed() )		return bt_err;
 
+	// start the bt_rtmp_cam_listener_t
+	bt_err		= launch_rtmp_cam_listener(casti_conf);
+	if( bt_err.failed() )		return bt_err;
+
 	// start the inetreach_httpd
 	m_inetreach_httpd= nipmem_new casti_inetreach_httpd_t();
 	bt_err		= m_inetreach_httpd->start(this, NULL);
@@ -177,6 +186,7 @@ bt_err_t	casti_apps_t::start()						throw()
 	libsess_err	= m_apps_httpdetect->start(http_listener(), NEOIP_APPS_CANON_NAME
 							, NEOIP_APPS_VERSION);
 	if( libsess_err.failed() )	return bt_err_t(bt_err_t::ERROR, libsess_err.to_string());
+
 
 	// start the m_ctrl_cline
 	m_ctrl_cline	= nipmem_new casti_ctrl_cline_t();
@@ -265,6 +275,42 @@ bt_err_t	casti_apps_t::launch_http_listener(const strvar_db_t &casti_conf)	throw
 	return bt_err_t::OK;
 }
 
+
+/** \brief Constructor the rtmp_cam_listener_t
+ */
+bt_err_t	casti_apps_t::launch_rtmp_cam_listener(const strvar_db_t &casti_conf)	throw()
+{
+	bt_err_t	bt_err;
+	// log to debug
+	KLOG_WARN("enter");
+
+	// get the listen_ipport from the casti_conf
+	std::string	port_min_str	= casti_conf.get_first_value("rtmp_cam_listener_port_min", "1935");
+	std::string	port_max_str	= casti_conf.get_first_value("rtmp_cam_listener_port_max", "1935");
+	ip_addr_t	listener_addr	= casti_conf.get_first_value("rtmp_cam_listener_addr", "127.0.0.1");
+	uint16_t	listener_portmin= string_t::to_uint16(port_min_str);
+	uint16_t	listener_portmax= string_t::to_uint16(port_max_str);
+	// try to find a free one within the configured range
+	ipport_addr_t	listener_ipport	= ipport_addr_helper_t::find_avail_listen_addr(listener_addr
+						, listener_portmin, listener_portmax);
+	if( listener_ipport.is_null() )	return bt_err_t(bt_err_t::ERROR, "no free port for rtmp_cam_listener");
+
+	// build the resp_arg for the http_listener_t
+	socket_resp_arg_t	resp_arg;
+	resp_arg	= socket_resp_arg_t().profile(socket_profile_t(socket_domain_t::TCP))
+					.domain(socket_domain_t::TCP).type(socket_type_t::STREAM)
+					.listen_addr("tcp://" + listener_ipport.to_string());
+	// start the rtmp_cam_listener_t
+	rtmp_err_t	rtmp_err;
+	m_rtmp_cam_listener	= nipmem_new rtmp_cam_listener_t();
+	rtmp_err	= m_rtmp_cam_listener->start(resp_arg);
+	if( rtmp_err.failed() )	return bt_err_t(bt_err_t::ERROR, rtmp_err.to_string() );
+
+	// return no error
+	return bt_err_t::OK;
+}
+
+
 /** \brief Launch the bt_ezsession_t
  */
 bt_err_t	casti_apps_t::launch_ezsession(const strvar_db_t &oload_conf)	throw()
@@ -308,10 +354,10 @@ bt_err_t	casti_apps_t::launch_ezsession(const strvar_db_t &oload_conf)	throw()
 								.append(bt_jamrc4_type_t::DOJAM)
 							);
 
-// TODO about special case in bt_httpi_t and bt_io_cache_t
+// TODO about special case in bt_scasti_vapi_t and bt_io_cache_t
 // - bt_io_cache_write_t will read a full block (e.g. 16kbyte) from the disk
 //   if the write is less than 16kbyte
-// - but bt_httpi_t write data as they are received (may be 2k or 50k or another size)
+// - but bt_scasti_vapi_t write data as they are received (may be 2k or 50k or another size)
 // - this cause bt_io_cache_write_t to fails because it tries to write from a block
 //   (in this case a file because the bt_io_cache_t subio_vapi is bt_io_pfile_t)
 //   which doesnt exists, and so reject the write and return 'no such file or directory'

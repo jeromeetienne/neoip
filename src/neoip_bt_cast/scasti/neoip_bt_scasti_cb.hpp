@@ -16,7 +16,6 @@ NEOIP_NAMESPACE_BEGIN
 // forward declaration
 class	bt_scasti_vapi_t;
 class	bt_scasti_event_t;
-class	bt_httpi_t;	//TODO to removea
 
 /** \brief the callback class for bt_scasti_t
  */

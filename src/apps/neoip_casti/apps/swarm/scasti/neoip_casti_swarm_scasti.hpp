@@ -25,7 +25,7 @@ class	bt_ezswarm_t;
 class	casti_swarm_udata_t;
 class	casti_swarm_spos_t;
 
-/** \brief Handle the httpi_arr for the casti_swarm_t
+/** \brief Handle the bt_scasti_vapi_t for the casti_swarm_t
  */
 class casti_swarm_scasti_t : NEOIP_COPY_CTOR_DENY, private bt_scasti_cb_t
 		, private wikidbg_obj_t<casti_swarm_scasti_t, casti_swarm_scasti_wikidbg_init> {
@@ -39,13 +39,14 @@ private:
 	casti_swarm_udata_t *	swarm_udata()		const throw();
 	casti_swarm_spos_t*	swarm_spos()		const throw();
 
-	/*************** bt_httpi_t	***************************************/
-	bt_httpi_t *	m_bt_httpi;
-	bool 		neoip_bt_scasti_cb(void *cb_userptr, bt_scasti_vapi_t &cb_scasti_vapi
+	/*************** bt_scasti_vapi_t	*******************************/
+	bt_err_t		launch_scasti_vapi()					throw();
+	bt_scasti_vapi_t *	m_scasti_vapi;
+	bool 			neoip_bt_scasti_cb(void *cb_userptr, bt_scasti_vapi_t &cb_scasti_vapi
 					, const bt_scasti_event_t &scasti_event)	throw();
-	bool		handle_chunk_avail(const file_size_t &chunk_len)	throw();
-	bool		handle_chunk_avail2(const file_size_t &chunk_len)	throw();
-	bool		handle_mod_updated()					throw();
+	bool			handle_chunk_avail(const file_size_t &chunk_len)	throw();
+	bool			handle_chunk_avail2(const file_size_t &chunk_len)	throw();
+	bool			handle_mod_updated()					throw();
 public:
 	/*************** ctor/dtor	***************************************/
 	casti_swarm_scasti_t()	throw();
@@ -58,7 +59,7 @@ public:
 	/*************** Query function	***************************************/
 	const casti_swarm_scasti_profile_t & profile()	const throw()	{ return m_profile;		}
 	casti_swarm_t *	casti_swarm()	const throw()	{ return m_casti_swarm;		}
-	bt_httpi_t *	bt_httpi()	const throw()	{ return m_bt_httpi;		}
+	bt_scasti_vapi_t *scasti_vapi()	const throw()	{ return m_scasti_vapi;		}
 	double		rate_average()	const throw()	{ return m_rate_estim.average();}
 
 

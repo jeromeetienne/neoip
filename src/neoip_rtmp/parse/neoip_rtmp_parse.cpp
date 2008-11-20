@@ -9,6 +9,7 @@ rtmp_parse_t is done to parse RTMP flash protocol.
   - http://www.gnashdev.org/files/rtmp-decoded.pdf
     http://wiki.gnashdev.org/RTMP_Messages_Decoded
   - http://www.acmewebworks.com/Downloads/openCS/TheAMF.pdf
+    - good to see how chanctx are interleaved and a bit of packet header compression
 - a wireshark parser to study RTMP packet by sniffing networks
   - http://wiki.wireshark.org/RTMPT
 

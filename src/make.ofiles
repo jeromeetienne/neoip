@@ -303,14 +303,18 @@ OBJECTS = \
 	neoip_bt_cast/mdata/unpublish/neoip_bt_cast_mdata_unpublish.o \
 	neoip_bt_cast/mdata/unpublish/wikidbg/neoip_bt_cast_mdata_unpublish_wikidbg.o \
 	neoip_bt_cast/scasti/base/event/neoip_bt_scasti_event.o \
-	neoip_bt_cast/scasti/base/nunit/neoip_bt_httpi_nunit.o \
-	neoip_bt_cast/scasti/base/profile/neoip_bt_httpi_profile.o \
-	neoip_bt_cast/scasti/base/wikidbg/neoip_bt_httpi_wikidbg.o \
+	neoip_bt_cast/scasti/impl/http/base/nunit/neoip_bt_scasti_http_nunit.o \
+	neoip_bt_cast/scasti/impl/http/base/profile/neoip_bt_scasti_http_profile.o \
+	neoip_bt_cast/scasti/impl/http/base/wikidbg/neoip_bt_scasti_http_wikidbg.o \
+	neoip_bt_cast/scasti/impl/http/neoip_bt_scasti_http.o \
+	neoip_bt_cast/scasti/impl/rtmp/base/profile/neoip_bt_scasti_rtmp_profile.o \
+	neoip_bt_cast/scasti/impl/rtmp/base/wikidbg/neoip_bt_scasti_rtmp_wikidbg.o \
+	neoip_bt_cast/scasti/impl/rtmp/neoip_bt_scasti_rtmp.o \
+	neoip_bt_cast/scasti/mod/base/profile/neoip_bt_scasti_mod_profile.o \
 	neoip_bt_cast/scasti/mod/base/type/neoip_bt_scasti_mod_type.o \
 	neoip_bt_cast/scasti/mod/impl/flv/neoip_bt_scasti_mod_flv.o \
 	neoip_bt_cast/scasti/mod/impl/raw/neoip_bt_scasti_mod_raw.o \
 	neoip_bt_cast/scasti/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.o \
-	neoip_bt_cast/scasti/neoip_bt_httpi.o \
 	neoip_bt_cast/service/prefetch/base/wikidbg/neoip_bt_cast_prefetch_wikidbg.o \
 	neoip_bt_cast/service/prefetch/cnx/neoip_bt_cast_prefetch_cnx.o \
 	neoip_bt_cast/service/prefetch/cnx/wikidbg/neoip_bt_cast_prefetch_cnx_wikidbg.o \
@@ -1279,20 +1283,26 @@ OBJECTS = \
 	neoip_rtmp/build/nunit/neoip_rtmp_build_nunit.o \
 	neoip_rtmp/parse/base/nunit/neoip_rtmp_parse_nunit.o \
 	neoip_rtmp/parse/base/profile/neoip_rtmp_parse_profile.o \
+	neoip_rtmp/parse/base/wikidbg/neoip_rtmp_parse_wikidbg.o \
 	neoip_rtmp/parse/chanctx/neoip_rtmp_parse_chanctx.o \
+	neoip_rtmp/parse/chanctx/wikidbg/neoip_rtmp_parse_chanctx_wikidbg.o \
 	neoip_rtmp/parse/neoip_rtmp_parse.o \
 	neoip_rtmp_cam/base/nunit_gsuite/neoip_rtmp_cam_nunit_gsuite.o \
+	neoip_rtmp_cam/full/base/nunit/neoip_rtmp_cam_full_nunit.o \
+	neoip_rtmp_cam/full/base/wikidbg/neoip_rtmp_cam_full_wikidbg.o \
 	neoip_rtmp_cam/full/neoip_rtmp_cam_full.o \
-	neoip_rtmp_cam/full/nunit/neoip_rtmp_cam_full_nunit.o \
 	neoip_rtmp_cam/listener/neoip_rtmp_cam_listener.o \
+	neoip_rtmp_cam/listener/wikidbg/neoip_rtmp_cam_listener_wikidbg.o \
 	neoip_rtmp_cam/resp/neoip_rtmp_cam_resp.o \
+	neoip_rtmp_cam/resp/wikidbg/neoip_rtmp_cam_resp_wikidbg.o \
 	neoip_rtmp_net/base/nunit_gsuite/neoip_rtmp_net_nunit_gsuite.o \
-	neoip_rtmp_net/full/helper/full_webcam/neoip_rtmp_full_webcam.o \
-	neoip_rtmp_net/full/helper/full_webcam/nunit/neoip_rtmp_full_webcam_nunit.o \
 	neoip_rtmp_net/full/neoip_rtmp_full.o \
+	neoip_rtmp_net/full/wikidbg/neoip_rtmp_full_wikidbg.o \
 	neoip_rtmp_net/resp/base/nunit/neoip_rtmp_resp_nunit.o \
+	neoip_rtmp_net/resp/base/wikidbg/neoip_rtmp_resp_wikidbg.o \
+	neoip_rtmp_net/resp/cnx/base/state/neoip_rtmp_resp_cnx_state.o \
+	neoip_rtmp_net/resp/cnx/base/wikidbg/neoip_rtmp_resp_cnx_wikidbg.o \
 	neoip_rtmp_net/resp/cnx/neoip_rtmp_resp_cnx.o \
-	neoip_rtmp_net/resp/cnx/state/neoip_rtmp_resp_cnx_state.o \
 	neoip_rtmp_net/resp/neoip_rtmp_resp.o \
 	neoip_slay/_glue/base/domain/neoip_slay_domain.o \
 	neoip_slay/_glue/base/err/neoip_slay_err.o \
@@ -1778,14 +1788,18 @@ LINTS = \
 	neoip_bt_cast/mdata/unpublish/neoip_bt_cast_mdata_unpublish.lint \
 	neoip_bt_cast/mdata/unpublish/wikidbg/neoip_bt_cast_mdata_unpublish_wikidbg.lint \
 	neoip_bt_cast/scasti/base/event/neoip_bt_scasti_event.lint \
-	neoip_bt_cast/scasti/base/nunit/neoip_bt_httpi_nunit.lint \
-	neoip_bt_cast/scasti/base/profile/neoip_bt_httpi_profile.lint \
-	neoip_bt_cast/scasti/base/wikidbg/neoip_bt_httpi_wikidbg.lint \
+	neoip_bt_cast/scasti/impl/http/base/nunit/neoip_bt_scasti_http_nunit.lint \
+	neoip_bt_cast/scasti/impl/http/base/profile/neoip_bt_scasti_http_profile.lint \
+	neoip_bt_cast/scasti/impl/http/base/wikidbg/neoip_bt_scasti_http_wikidbg.lint \
+	neoip_bt_cast/scasti/impl/http/neoip_bt_scasti_http.lint \
+	neoip_bt_cast/scasti/impl/rtmp/base/profile/neoip_bt_scasti_rtmp_profile.lint \
+	neoip_bt_cast/scasti/impl/rtmp/base/wikidbg/neoip_bt_scasti_rtmp_wikidbg.lint \
+	neoip_bt_cast/scasti/impl/rtmp/neoip_bt_scasti_rtmp.lint \
+	neoip_bt_cast/scasti/mod/base/profile/neoip_bt_scasti_mod_profile.lint \
 	neoip_bt_cast/scasti/mod/base/type/neoip_bt_scasti_mod_type.lint \
 	neoip_bt_cast/scasti/mod/impl/flv/neoip_bt_scasti_mod_flv.lint \
 	neoip_bt_cast/scasti/mod/impl/raw/neoip_bt_scasti_mod_raw.lint \
 	neoip_bt_cast/scasti/mod/impl/raw/profile/neoip_bt_scasti_mod_raw_profile.lint \
-	neoip_bt_cast/scasti/neoip_bt_httpi.lint \
 	neoip_bt_cast/service/prefetch/base/wikidbg/neoip_bt_cast_prefetch_wikidbg.lint \
 	neoip_bt_cast/service/prefetch/cnx/neoip_bt_cast_prefetch_cnx.lint \
 	neoip_bt_cast/service/prefetch/cnx/wikidbg/neoip_bt_cast_prefetch_cnx_wikidbg.lint \
@@ -2754,20 +2768,26 @@ LINTS = \
 	neoip_rtmp/build/nunit/neoip_rtmp_build_nunit.lint \
 	neoip_rtmp/parse/base/nunit/neoip_rtmp_parse_nunit.lint \
 	neoip_rtmp/parse/base/profile/neoip_rtmp_parse_profile.lint \
+	neoip_rtmp/parse/base/wikidbg/neoip_rtmp_parse_wikidbg.lint \
 	neoip_rtmp/parse/chanctx/neoip_rtmp_parse_chanctx.lint \
+	neoip_rtmp/parse/chanctx/wikidbg/neoip_rtmp_parse_chanctx_wikidbg.lint \
 	neoip_rtmp/parse/neoip_rtmp_parse.lint \
 	neoip_rtmp_cam/base/nunit_gsuite/neoip_rtmp_cam_nunit_gsuite.lint \
+	neoip_rtmp_cam/full/base/nunit/neoip_rtmp_cam_full_nunit.lint \
+	neoip_rtmp_cam/full/base/wikidbg/neoip_rtmp_cam_full_wikidbg.lint \
 	neoip_rtmp_cam/full/neoip_rtmp_cam_full.lint \
-	neoip_rtmp_cam/full/nunit/neoip_rtmp_cam_full_nunit.lint \
 	neoip_rtmp_cam/listener/neoip_rtmp_cam_listener.lint \
+	neoip_rtmp_cam/listener/wikidbg/neoip_rtmp_cam_listener_wikidbg.lint \
 	neoip_rtmp_cam/resp/neoip_rtmp_cam_resp.lint \
+	neoip_rtmp_cam/resp/wikidbg/neoip_rtmp_cam_resp_wikidbg.lint \
 	neoip_rtmp_net/base/nunit_gsuite/neoip_rtmp_net_nunit_gsuite.lint \
-	neoip_rtmp_net/full/helper/full_webcam/neoip_rtmp_full_webcam.lint \
-	neoip_rtmp_net/full/helper/full_webcam/nunit/neoip_rtmp_full_webcam_nunit.lint \
 	neoip_rtmp_net/full/neoip_rtmp_full.lint \
+	neoip_rtmp_net/full/wikidbg/neoip_rtmp_full_wikidbg.lint \
 	neoip_rtmp_net/resp/base/nunit/neoip_rtmp_resp_nunit.lint \
+	neoip_rtmp_net/resp/base/wikidbg/neoip_rtmp_resp_wikidbg.lint \
+	neoip_rtmp_net/resp/cnx/base/state/neoip_rtmp_resp_cnx_state.lint \
+	neoip_rtmp_net/resp/cnx/base/wikidbg/neoip_rtmp_resp_cnx_wikidbg.lint \
 	neoip_rtmp_net/resp/cnx/neoip_rtmp_resp_cnx.lint \
-	neoip_rtmp_net/resp/cnx/state/neoip_rtmp_resp_cnx_state.lint \
 	neoip_rtmp_net/resp/neoip_rtmp_resp.lint \
 	neoip_slay/_glue/base/domain/neoip_slay_domain.lint \
 	neoip_slay/_glue/base/err/neoip_slay_err.lint \
@@ -3242,9 +3262,14 @@ INCLUDEPATH = \
 	-Ineoip_bt_cast/mdata/unpublish \
 	-Ineoip_bt_cast/mdata/unpublish/wikidbg \
 	-Ineoip_bt_cast/scasti/base/event \
-	-Ineoip_bt_cast/scasti/base/nunit \
-	-Ineoip_bt_cast/scasti/base/profile \
-	-Ineoip_bt_cast/scasti/base/wikidbg \
+	-Ineoip_bt_cast/scasti/impl/http/base/nunit \
+	-Ineoip_bt_cast/scasti/impl/http/base/profile \
+	-Ineoip_bt_cast/scasti/impl/http/base/wikidbg \
+	-Ineoip_bt_cast/scasti/impl/http \
+	-Ineoip_bt_cast/scasti/impl/rtmp/base/profile \
+	-Ineoip_bt_cast/scasti/impl/rtmp/base/wikidbg \
+	-Ineoip_bt_cast/scasti/impl/rtmp \
+	-Ineoip_bt_cast/scasti/mod/base/profile \
 	-Ineoip_bt_cast/scasti/mod/base/type \
 	-Ineoip_bt_cast/scasti/mod/impl/flv \
 	-Ineoip_bt_cast/scasti/mod/impl/raw \
@@ -4263,21 +4288,28 @@ INCLUDEPATH = \
 	-Ineoip_rtmp \
 	-Ineoip_rtmp/parse/base/nunit \
 	-Ineoip_rtmp/parse/base/profile \
+	-Ineoip_rtmp/parse/base/wikidbg \
 	-Ineoip_rtmp/parse/chanctx \
+	-Ineoip_rtmp/parse/chanctx/wikidbg \
 	-Ineoip_rtmp/parse \
 	-Ineoip_rtmp_cam/base/nunit_gsuite \
+	-Ineoip_rtmp_cam/full/base/nunit \
+	-Ineoip_rtmp_cam/full/base/wikidbg \
 	-Ineoip_rtmp_cam/full \
-	-Ineoip_rtmp_cam/full/nunit \
 	-Ineoip_rtmp_cam/listener \
+	-Ineoip_rtmp_cam/listener/wikidbg \
 	-Ineoip_rtmp_cam \
 	-Ineoip_rtmp_cam/resp \
+	-Ineoip_rtmp_cam/resp/wikidbg \
 	-Ineoip_rtmp_net/base/nunit_gsuite \
-	-Ineoip_rtmp_net/full/helper/full_webcam \
-	-Ineoip_rtmp_net/full/helper/full_webcam/nunit \
 	-Ineoip_rtmp_net/full \
+	-Ineoip_rtmp_net/full/wikidbg \
+	-Ineoip_rtmp_net \
 	-Ineoip_rtmp_net/resp/base/nunit \
+	-Ineoip_rtmp_net/resp/base/wikidbg \
+	-Ineoip_rtmp_net/resp/cnx/base/state \
+	-Ineoip_rtmp_net/resp/cnx/base/wikidbg \
 	-Ineoip_rtmp_net/resp/cnx \
-	-Ineoip_rtmp_net/resp/cnx/state \
 	-Ineoip_rtmp_net/resp \
 	-Ineoip_slay/_glue/base/domain \
 	-Ineoip_slay/_glue/base/err \

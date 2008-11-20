@@ -66,6 +66,9 @@ rtmp_err_t	rtmp_cam_listener_t::start(const socket_resp_arg_t &resp_arg)	throw()
 	rtmp_err	= rtmp_resp->start(resp_arg, this, NULL);
 	if( rtmp_err.failed() )	return rtmp_err;
 
+	// init the static link http - to ease access while debugging
+	wikidbg_obj_add_static_page("/rtmp_cam_listener_" + OSTREAMSTR(this));
+
 	// return no error
 	return rtmp_err_t::OK;
 }
@@ -84,6 +87,8 @@ rtmp_cam_resp_t *	rtmp_cam_listener_t::find_resp(const http_uri_t &connect_uri)	
 	// go thru the whole resp_db
 	for(iter = cam_resp_db.begin(); iter != cam_resp_db.end(); iter++){
 		rtmp_cam_resp_t *	cam_resp	= *iter;
+		// log to debug
+		KLOG_ERR("cam_resp->listen_uri=" << cam_resp->listen_uri() << " connect_uri=" << connect_uri);
 		// if this rtmp_cam_resp_t match the connect_uri, return it
 		if( cam_resp->may_handle(connect_uri) )	return cam_resp;
 	}
@@ -166,8 +171,6 @@ bool	rtmp_cam_listener_t::handle_event_connected(rtmp_cam_full_t *cam_full
 	// sanity check - rtmp_event_t MUST be is_connected()
 	DBG_ASSERT( rtmp_event.is_connected() );
 
-	KLOG_ERR("received a connect for " << rtmp_event.get_connected_uri());
-
 	// get the connect_uri
 	http_uri_t	connect_uri;
 	connect_uri	= rtmp_event.get_connected_uri();
@@ -176,10 +179,12 @@ bool	rtmp_cam_listener_t::handle_event_connected(rtmp_cam_full_t *cam_full
 	cam_resp	= find_resp(connect_uri);
 	// if none matches, delete rtmp_cam_full_t and return dontkeep
 	if( cam_resp == NULL ){
+		KLOG_ERR("NO MATCH for a received connect on " << rtmp_event.get_connected_uri());
 		full_unlink(cam_full);
 		nipmem_zdelete cam_full;
 		return false;
 	}
+	KLOG_ERR("MATCH for a received connect on " << rtmp_event.get_connected_uri());
 
 	// backup the object_slotid of the rtmp_cam_full_t - to be able to return its tokeep value
 	slot_id_t	cam_full_slotid	= cam_full->get_object_slotid();

@@ -52,7 +52,7 @@ void	amf0_build_t::to_amf0(const dvar_t &dvar, bytearray_t &amf0_data)	throw()
 		amf0_data << uint16_t(0);
 		amf0_data << amf0_type_t(amf0_type_t::ENDOFOBJECT);
 		break;}
-	default:	KLOG_ERR("dvar_type_t:" << dvar.type().get_value() << " cant be converter to amf0");
+	default:	KLOG_ERR("dvar_type_t:" << dvar.type() << " cant be converter to amf0");
 			DBG_ASSERT( 0 );
 	}
 }

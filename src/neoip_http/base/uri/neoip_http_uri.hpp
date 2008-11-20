@@ -1,11 +1,11 @@
 /*! \file
     \brief Header of the \ref http_uri_t
-    
+
 */
 
 
-#ifndef __NEOIP_HTTP_URI_HPP__ 
-#define __NEOIP_HTTP_URI_HPP__ 
+#ifndef __NEOIP_HTTP_URI_HPP__
+#define __NEOIP_HTTP_URI_HPP__
 /* system include */
 #include <string>
 /* local include */
@@ -41,7 +41,7 @@ public:
 	http_uri_t()				throw()	{}
 	http_uri_t(const std::string &str)	throw()	{ ctor_from_str(str);			}
 	http_uri_t(const char *str)		throw()	{ ctor_from_str(std::string(str));	}
-	
+
 	/*************** Query function	***************************************/
 	bool			is_null()	const throw()	{ return uri_host.empty();	}
 	const http_scheme_t &	scheme()	const throw()	{ return uri_scheme;		}
@@ -55,7 +55,8 @@ public:
 	/*************** action function	*******************************/
 	http_uri_t &		clear_hostport()	throw();
 	http_uri_t &		clear_pathquery()	throw();
-	
+	http_uri_t &		clear_query()		throw();
+
 	/*************** uri scramble stuff	*******************************/
 	bool			is_scrambled()		const throw();
 	http_uri_t		unscramble()		const throw();

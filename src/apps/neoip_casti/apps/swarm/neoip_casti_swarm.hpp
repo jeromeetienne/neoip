@@ -33,9 +33,9 @@ class	casti_swarm_spos_t;
 class	casti_swarm_scasti_t;
 class	bt_cast_mdata_t;
 class	bt_cast_udata_t;
+class	bt_scasti_vapi_t;
 class	bt_mfile_t;
 class	bt_ezswarm_state_t;
-class	bt_httpi_t;		//TODO to remove
 
 /** \brief Handle the swarm part for the bt_oload_stat_t
  */
@@ -54,7 +54,7 @@ private:
 	std::string		m_cast_name;	//!< the cast_name for this swarm
 	std::string		m_cast_privtext;//!< the cast_privtext for this swarm
 	http_uri_t		m_mdata_srv_uri;//!< the http_uri_t for the mdata_server
-	http_uri_t		m_httpi_uri;	//!< source http_uri_t for this casti_swarm_t
+	http_uri_t		m_scasti_uri;	//!< source http_uri_t for this casti_swarm_t
 	bt_scasti_mod_type_t	m_scasti_mod;	//!< the bt_scasti_mod_type_t for this casti_swarm_t
 	http_uri_t		m_http_peersrc_uri;//!< http_uri_t for the bt_peersrc_http_t
 
@@ -65,12 +65,12 @@ private:
 	/*************** Sub service	***************************************/
 	casti_swarm_udata_t *	m_swarm_udata;	//!< pointer on the udata handler
 	casti_swarm_spos_t*	m_swarm_spos;	//!< pointer on the bt_cast_spos_arr_t handler
-	casti_swarm_scasti_t *	m_swarm_scasti;	//!< pointer on the bt_httpi handler
+	casti_swarm_scasti_t *	m_swarm_scasti;	//!< pointer on the bt_scasti_vapi_t handler
 
 	/*************** Internal function	*******************************/
 	bool			autodelete(const bt_err_t &bt_err)	throw()	{ return autodelete(bt_err.to_string());	}
 	bool			autodelete(const std::string &reason = "")	throw();
-	bt_httpi_t *		bt_httpi()					const throw();
+	bt_scasti_vapi_t *	scasti_vapi()					const throw();
 
 	/*************** bt_ezswarm_t	***************************************/
 	bt_ezswarm_t *		m_bt_ezswarm;
@@ -107,12 +107,12 @@ public:
 	const std::string &		cast_privtext()	const throw()	{ return m_cast_privtext;}
 	const http_uri_t &		http_peersrc_uri()const throw()	{ return m_http_peersrc_uri;}
 	bt_cast_id_t			cast_id()	const throw()	{ return m_cast_id;	}
-	const http_uri_t &		httpi_uri()	const throw()	{ return m_httpi_uri;	}
+	const http_uri_t &		scasti_uri()	const throw()	{ return m_scasti_uri;	}
 	const bt_scasti_mod_type_t &	scasti_mod()	const throw()	{ return m_scasti_mod;	}
 	bt_ezswarm_t *			bt_ezswarm()	const throw()	{ return m_bt_ezswarm;	}
 	casti_swarm_udata_t *		swarm_udata()	const throw()	{ return m_swarm_udata;	}
 	casti_swarm_spos_t *		swarm_spos()	const throw()	{ return m_swarm_spos;	}
-	casti_swarm_scasti_t *		swarm_scasti()	const throw()	{ return m_swarm_scasti;	}
+	casti_swarm_scasti_t *		swarm_scasti()	const throw()	{ return m_swarm_scasti;}
 	const casti_swarm_profile_t &	profile()	const throw()	{ return m_profile;	}
 	bool				is_published()	const throw();
 	std::string			cast_privhash()	const throw();
