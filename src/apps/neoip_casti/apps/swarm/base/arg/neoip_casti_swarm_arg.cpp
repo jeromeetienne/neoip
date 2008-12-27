@@ -38,9 +38,31 @@ bt_err_t	casti_swarm_arg_t::check()	const throw()
 		return bt_err_t(bt_err_t::ERROR, "Invalid scasti_uri");
 	if( !scasti_mod_present() || scasti_mod().is_null() )
 		return bt_err_t(bt_err_t::ERROR, "Invalid scasti_mod");
+
 	// test the optional fields
 	if( http_peersrc_uri_present() && http_peersrc_uri().is_null() )
 		return bt_err_t(bt_err_t::ERROR, "Invalid http_peersrc_uri");
+
+	// IIF scasti_uri().scheme() == http_scheme_t::RTMP, check the uri format as 'security' mechanism
+	// - as bt_scasti_rtmp_t is a server, the uri must have some authentication
+	// - this authentication is handled by the presence of the cast_privtext in path
+	// - TODO this is rather bad stuff as the password is send in clear over the network
+	if( scasti_uri().scheme() == http_scheme_t::RTMP ){
+		// rebuilt a canonical scasti_uri
+		// - the format is scasti_uri = rtmp://anyhost/$mdata_src_uri/$cast_privtext/$cast_name
+		std::string	rebuilt_str;
+		rebuilt_str	 = "rtmp://0.0.0.0/";
+		rebuilt_str	+= string_t::escape_not_in(mdata_srv_uri().to_string(), http_uri_t::UNRESERVED_CHARSET);
+		rebuilt_str	+= "/";
+		rebuilt_str	+= string_t::escape_not_in(cast_privtext()	, http_uri_t::UNRESERVED_CHARSET);
+		rebuilt_str	+= "/";
+		rebuilt_str	+= string_t::escape_not_in(cast_name()		, http_uri_t::UNRESERVED_CHARSET);
+		http_uri_t	rebuilt_uri(rebuilt_str);
+		// scasti_uri is valid IIF their the pathquery part of the uri is equal
+		// - the hostport part is ignored as it depends how the client reaches neoip-casti
+		if( rebuilt_uri.pathquery_str() != scasti_uri().pathquery_str() )
+			return bt_err_t(bt_err_t::ERROR, "Non canonical scasti_uri");
+	}
 	// return no error;
 	return bt_err_t::OK;
 }

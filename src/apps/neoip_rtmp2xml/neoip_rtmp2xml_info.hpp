@@ -4,8 +4,8 @@
 */
 
 
-#ifndef __NEOIP_NUNITAPPS_INFO_HPP__
-#define __NEOIP_NUNITAPPS_INFO_HPP__
+#ifndef __NEOIP_RTMP2XML_INFO_HPP__
+#define __NEOIP_RTMP2XML_INFO_HPP__
 
 /* system include */
 /* local include */
@@ -18,8 +18,8 @@ NEOIP_NAMESPACE_BEGIN;
  * - summary		= "super apps in one line"
  * - description	= "many lines to explain super-apps"
  * - type		= apps_type_t "sys_boot" usr_boot etc...
- * - canon name 	= "neoip_nunitapps"
- * - human name		= "NeoIP nunitapps"
+ * - canon name 	= "neoip_get"
+ * - human name		= "NeoIP get"
  *
  * - all those field will be passed to lib_apps_t
  * - additionnaly they will be parsed in the packager to fill the package
@@ -31,10 +31,10 @@ NEOIP_NAMESPACE_BEGIN;
  *
  */
 
-#define NEOIP_APPS_CANON_NAME	"neoip_nunitapps"
-#define NEOIP_APPS_HUMAN_NAME	"NeoIP nunitapps"
-#include			"neoip_nunitapps_info_version.hpp"
-#define NEOIP_APPS_SUMMARY	"daemon to use from neoip technology"
+#define NEOIP_APPS_CANON_NAME	"neoip_rtmp2xml"
+#define NEOIP_APPS_HUMAN_NAME	"NeoIP rtmp2xml"
+#include			"neoip_rtmp2xml_info_version.hpp"
+#define NEOIP_APPS_SUMMARY	"command line tool to filter .flv file"
 #define NEOIP_APPS_TYPE		"USR_TEMP"
 #define NEOIP_APPS_LONGDESC		\
 		"sloaaaaaa one\n"	\
@@ -45,7 +45,7 @@ NEOIP_NAMESPACE_BEGIN;
 
 NEOIP_NAMESPACE_END
 
-#endif	/* __NEOIP_NUNITAPPS_INFO_HPP__  */
+#endif	/* __NEOIP_RTMP2XML_INFO_HPP__  */
 
 
 
