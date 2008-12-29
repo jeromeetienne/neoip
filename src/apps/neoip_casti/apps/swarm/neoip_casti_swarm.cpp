@@ -551,19 +551,19 @@ bool	casti_swarm_t::neoip_bt_cast_mdata_dopublish_cb(void *cb_userptr
 	// log to debug
 	KLOG_ERR("enter");
 	// copy the casti_swarm_t bt_cast_mdata_t
-	*cast_mdata_out	= current_mdata();
+	if( cast_mdata_out )	*cast_mdata_out	= current_mdata();
 
 	// get the port_lview_out/port_pview_out from the casti_inetreach_httpd_t
 	casti_inetreach_httpd_t*inetreach_httpd	= casti_apps->inetreach_httpd();
-	*port_lview_out	= inetreach_httpd->listen_ipport_lview().port();
-	*port_pview_out	= inetreach_httpd->listen_ipport_pview().port();
+	if( port_lview_out )	*port_lview_out	= inetreach_httpd->listen_ipport_lview().port();
+	if( port_pview_out )	*port_pview_out	= inetreach_httpd->listen_ipport_pview().port();
 
 	// get the casti_uri_pathquery_out from the bt_cast_mdata_server_t
 	// - NOTE: a lot of alias to get the casti_uri_pathquery
 	bt_cast_mdata_server_t*	mdata_server	= casti_apps->mdata_server();
 	xmlrpc_listener_t *	xmlrpc_listener	= mdata_server->xmlrpc_listener();
 	const http_uri_t &	xmlrpc_uri	= xmlrpc_listener->xmlrpc_uri();
-	*casti_uri_pathquery_out	= xmlrpc_uri.pathquery_str();
+	if( casti_uri_pathquery_out )	*casti_uri_pathquery_out	= xmlrpc_uri.pathquery_str();
 
 	// return tokeep
 	return true;

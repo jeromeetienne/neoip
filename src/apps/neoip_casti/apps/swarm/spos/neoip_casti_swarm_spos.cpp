@@ -145,6 +145,8 @@ void	casti_swarm_spos_t::gather()		throw()
 {
 	bt_swarm_t *		bt_swarm	= bt_ezswarm()->share()->bt_swarm();
 	const bt_mfile_t &	bt_mfile	= bt_swarm->get_mfile();
+	size_t			pieceq_beg	= m_casti_swarm->pieceq_beg;
+	size_t			pieceq_end	= m_casti_swarm->pieceq_end;
 	bt_scasti_mod_vapi_t * 	mod_vapi	= scasti_vapi()->mod_vapi();
 	// Append all new bt_scasti_mod_vapi_t::cast_spos to the cast_spos_arr
 	// - NOTE: this will appends the bt_cast_spos_t of pieces not yet fully available
@@ -165,8 +167,8 @@ void	casti_swarm_spos_t::gather()		throw()
 	// NOTE: no need to delete obsolete bt_cast_spos_t as new one are not
 	//       obsolete but definition.
 
-	// if it is the first bt_cast_spos_t, start publishing
-	if( !cast_spos_arr().empty() && !m_casti_swarm->is_published() )
+	// if it is the first bt_cast_spos_t within the pieceq range, start publishing
+	if( !m_casti_swarm->is_published() && !cast_spos_arr().within_pieceq(pieceq_beg, pieceq_end, bt_mfile).empty() )
 		m_casti_swarm->start_publishing();
 }
 
