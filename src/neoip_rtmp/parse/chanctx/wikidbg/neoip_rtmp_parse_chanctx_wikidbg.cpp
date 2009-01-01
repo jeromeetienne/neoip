@@ -143,7 +143,7 @@ httpd_err_t rtmp_parse_chanctx_wikidbg_t::page(const std::string &keyword, void 
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
-			oss << h.s_td() << h.s_b() << "m_recved_data"		<< h.e_b() << h.e_td();
+			oss << h.s_td() << h.s_b() << "m_body_buffer"		<< h.e_b() << h.e_td();
 			oss << h.s_td() << ": " << h.pre(rtmp_parse_chanctx->m_body_buffer.to_string())
 					<< h.e_td();
 			oss << h.e_tr();
@@ -169,8 +169,9 @@ std::string rtmp_parse_chanctx_wikidbg_t::tableheader(const std::string &keyword
 	html_builder_t		h;
 
 	oss << h.s_tr();
-	oss << h.s_th() << h.s_b() << "object"		<< h.e_b() << h.e_th();
-	oss << h.s_th() << h.s_b() << "channel_id"	<< h.e_b() << h.e_th();
+	oss << h.s_th() << h.s_b() << "object"			<< h.e_b() << h.e_th();
+	oss << h.s_th() << h.s_b() << "channel_id"		<< h.e_b() << h.e_th();
+	oss << h.s_th() << h.s_b() << "body_buffer length"	<< h.e_b() << h.e_th();
 	oss << h.e_tr();
 
 	// return the built string
@@ -194,6 +195,7 @@ std::string rtmp_parse_chanctx_wikidbg_t::tablerow(const std::string &keyword, v
 	oss << h.s_tr();
 	oss << h.s_td() << wikidbg_html("oneword_pageurl", rtmp_parse_chanctx)	<< h.e_td();
 	oss << h.s_td() << int(rtmp_parse_chanctx->m_channel_id)		<< h.e_td();
+	oss << h.s_td() << rtmp_parse_chanctx->m_body_buffer.length()		<< h.e_td();
 	oss << h.e_tr();
 
 	// return the built string
