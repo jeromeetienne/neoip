@@ -60,7 +60,6 @@ public:
 
 	/*************** List of friend class	*******************************/
 	friend class	rtmp_full_wikidbg_t;
-	friend class	bt_scasti_rtmp_t;	// TODO to fix - ugly kludge to get socket_full in rtmp_full_t
 };
 
 NEOIP_NAMESPACE_END

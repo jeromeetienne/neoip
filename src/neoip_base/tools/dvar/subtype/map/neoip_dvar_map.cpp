@@ -112,7 +112,7 @@ std::string	dvar_map_t::to_string()	const throw()
 	for(iter = map.begin(); iter != map.end(); iter++ ){
 		const std::string &	key	= iter->first;
 		const dvar_t		dvar	= iter->second;
-		oss << "[\"" << key << "\"=" << dvar << "]";
+		oss << "\"" << key << "\" :" << dvar << ", ";
 	}
 	// put the end of the map
 	oss << "}";

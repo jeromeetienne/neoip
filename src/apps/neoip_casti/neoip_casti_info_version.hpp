@@ -1,1 +1,1 @@
-#define	NEOIP_APPS_VERSION "0.0.1"
+#define	NEOIP_APPS_VERSION "0.0.2"

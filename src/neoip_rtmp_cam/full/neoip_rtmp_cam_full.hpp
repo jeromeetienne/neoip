@@ -33,6 +33,11 @@ class rtmp_cam_full_t : NEOIP_COPY_CTOR_DENY, private rtmp_full_cb_t, public obj
 private:
 	http_uri_t	m_connect_uri;	//!< the uri connected from flash player
 
+	/************** internal function	********************************/
+	datum_t		build_rtmp_serverbw(uint32_t rate)			throw();
+	datum_t		build_rtmp_clientbw(uint32_t rate)			throw();
+	datum_t		build_rtmp_onBWDone(const rtmp_pkthd_t &rtmp_pkthd)	throw();
+
 	/************** rtmp_full__t	****************************************/
 	rtmp_full_t *	rtmp_full;
 	bool		neoip_rtmp_full_cb(void *cb_userptr, rtmp_full_t &cb_rtmp_full
@@ -43,6 +48,8 @@ private:
 	bool		handle_invoke_connect(const rtmp_pkthd_t &rtmp_pkthd
 						, bytearray_t &amf0_body)	throw();
 	bool		handle_invoke_createStream(const rtmp_pkthd_t &rtmp_pkthd
+						, bytearray_t &amf0_body)	throw();
+	bool		handle_invoke_publish(const rtmp_pkthd_t &rtmp_pkthd
 						, bytearray_t &amf0_body)	throw();
 	bool		handle_ping(const rtmp_event_t &rtmp_event)		throw();
 
@@ -72,7 +79,6 @@ public:
 
 	/*************** List of friend class	*******************************/
 	friend class	rtmp_cam_full_wikidbg_t;
-	friend class	bt_scasti_rtmp_t;	// TODO to fix - ugly kludge to get socket_full in rtmp_full_t
 };
 
 NEOIP_NAMESPACE_END

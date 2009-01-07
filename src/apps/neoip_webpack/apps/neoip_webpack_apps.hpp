@@ -39,7 +39,6 @@ public:
 	
 	/*************** Query function	***************************************/
 	static clineopt_arr_t	clineopt_arr()		throw();
-
 };
 
 NEOIP_NAMESPACE_END

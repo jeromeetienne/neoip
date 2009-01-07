@@ -72,8 +72,22 @@ rtmp_err_t	rtmp_cam_resp_t::start(rtmp_cam_listener_t *m_cam_listener
  */
 bool	rtmp_cam_resp_t::may_handle(const http_uri_t &p_req_uri)		const throw()
 {
-	// if m_listen_uri is != from req_uri without query part), then it is not possible to handle it
-	if( m_listen_uri != http_uri_t(p_req_uri).clear_query()) 	return false;
+	// copy p_req_uri to be able to modify it
+	http_uri_t	req_uri	 = p_req_uri;
+	// clear the query part as it is never part of the comparison
+	req_uri.clear_query();
+
+	// compare the uri http_scheme_t
+	if( req_uri.scheme() != m_listen_uri.scheme() )		return false;
+	// compare the uri host port if listen_uri.host() is not "0.0.0.0"
+	if( m_listen_uri.host() != "0.0.0.0" ){
+		// compare the uri host
+		if( req_uri.host() != m_listen_uri.host() )	return false;
+		// compare the uri port
+		if( req_uri.port() != m_listen_uri.port() )	return false;
+	}
+	// compare the path - depends on the http_resp_mode_t
+	if( req_uri.path() != m_listen_uri.path() )		return false;
 	// return true if all the previous tests passed
 	return true;
 }

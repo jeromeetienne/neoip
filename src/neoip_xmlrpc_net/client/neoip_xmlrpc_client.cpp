@@ -52,12 +52,12 @@ xmlrpc_err_t xmlrpc_client_t::start(const http_uri_t &m_server_uri, const datum_
 				, xmlrpc_client_cb_t *callback, void * userptr)	throw()
 {
 	// log to debug
-	KLOG_DBG("enter");
+	KLOG_ERR("enter server_uri=" << m_server_uri);
 	// copy the parameter
 	this->m_server_uri	= m_server_uri;
 	this->callback		= callback;
 	this->userptr		= userptr;
-	
+
 
 	// build the http_reqhd_t to use for the http_sclient_t
 	http_reqhd_t	http_reqhd;
@@ -83,7 +83,7 @@ xmlrpc_err_t xmlrpc_client_t::start(const http_uri_t &m_server_uri, const datum_
 /** \brief callback notified by \ref http_client_t to provide event
  */
 bool	xmlrpc_client_t::neoip_http_sclient_cb(void *cb_userptr, http_sclient_t &cb_sclient
-				, const http_sclient_res_t &cb_sclient_res)	throw() 
+				, const http_sclient_res_t &cb_sclient_res)	throw()
 {
 	http_sclient_res_t	sclient_res	= cb_sclient_res;
 	// log to debug
@@ -132,7 +132,7 @@ bool	xmlrpc_client_t::notify_callback(const xmlrpc_err_t &xmlrpc_err
 	TOKEEP_CHECK_BACKUP_DFL(*callback);
 	// notify the caller
 	bool tokeep = callback->neoip_xmlrpc_client_cb(userptr, *this, xmlrpc_err, xmlrpc_resp);
-	// sanity check - tokeep MUST be false if the local object has been deleted, true otherwise 
+	// sanity check - tokeep MUST be false if the local object has been deleted, true otherwise
 	TOKEEP_CHECK_MATCH_DFL(tokeep);
 	// return the tokeep
 	return tokeep;

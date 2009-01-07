@@ -166,8 +166,104 @@ bt_err_t	bt_scasti_rtmp_t::mod_vapi_ctor(const bt_scasti_mod_type_t &mod_type
  */
 bool	bt_scasti_rtmp_t::mod_vapi_notify_callback(const bt_scasti_event_t &event)	throw()
 {
+	// TODO to remove
 	// just forward the bt_scasti_event_t to the caller
 	return notify_callback(event);
+}
+
+
+
+/** \brief callback notified by \ref bt_scasti_mod_vapi_t
+ */
+bool	bt_scasti_rtmp_t::neoip_bt_scasti_mod_cb(void *cb_userptr, bt_scasti_mod_vapi_t &cb_mod_vapi
+				, const bt_scasti_event_t &scasti_event)	throw()
+{
+	// just forward the bt_scasti_event_t to the caller
+	return notify_callback(scasti_event);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			flv building
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief push the flv_header in m_buffer
+ */
+void	bt_scasti_rtmp_t::push_flv_header()	throw()
+{
+	// sanity check - prev_timestamp MUST be null
+	DBG_ASSERT( prev_timestamp.is_null() );
+	// log to debug
+	KLOG_ERR("push flv header");
+	// init the local data to rebuild the flv
+	prev_tagsize	= 0;
+	prev_timestamp	= delay_t::from_sec(0);
+
+	// build the flv_tophd_t
+	m_buffer	<< flv_tophd_t().version(1).flag(flv_tophd_flag_t::VIDEO | flv_tophd_flag_t::AUDIO);
+
+
+	// get the values for metadata from rtmp_cam_full_t->connect_uri();
+	const http_uri_t &	connect_uri	= rtmp_cam_full->connect_uri();
+	const strvar_db_t &	uri_var		= connect_uri.var();
+	uint32_t		video_w		= string_t::to_uint32(uri_var.get_first_value("video_w"	, "320"));
+	uint32_t		video_h		= string_t::to_uint32(uri_var.get_first_value("video_h"	, "240"));
+	uint32_t		video_fps	= string_t::to_uint32(uri_var.get_first_value("video_fps", "15"));
+	// build the amf0 metadata for the flv
+	bytearray_t	amf0_resp;
+	amf0_build_t::to_amf0(dvar_str_t("onMetaData")	, amf0_resp);
+	amf0_build_t::to_amf0(dvar_map_t()
+			.insert("width"		, dvar_dbl_t(video_w)	)
+			.insert("height"	, dvar_dbl_t(video_h)	)
+			.insert("framerate"	, dvar_dbl_t(video_fps)	)
+							, amf0_resp);
+	datum_t		rtmp_pktbd	= amf0_resp.to_datum();
+
+	// build the flv_taghd_t
+	flv_taghd_t	flv_taghd;
+	flv_taghd.prevtag_size	( prev_tagsize );
+	flv_taghd.type		( flv_tagtype_t::META );
+	flv_taghd.body_length	( rtmp_pktbd.length() );
+	flv_taghd.padding	( 0 );
+	flv_taghd.timestamp	( prev_timestamp );
+	// push the flv_taghd_t in the pkt_t
+	m_buffer	<< flv_taghd;
+	// push the rtmp_pktbd
+	m_buffer.append(rtmp_pktbd);
+	// update prev_tagsize/prev_timestamp
+	prev_tagsize	+= rtmp_pktbd.length() + 11;
+	prev_timestamp	+= delay_t::from_msec(1);
+}
+
+/** \brief push the flv audio/video in m_buffer
+ */
+void	bt_scasti_rtmp_t::push_flv_avideo(const rtmp_event_t &rtmp_event)	throw()
+{
+	// sanity check - at this point, rtmp_event_t MUST be a rtmp_event_t:PACKET
+	DBG_ASSERT( rtmp_event.is_packet() );
+	// get the packet from the rtmp_event_t
+	datum_t		rtmp_pktbd;
+	rtmp_pkthd_t	rtmp_pkthd	= rtmp_event.get_packet(&rtmp_pktbd);
+	DBG_ASSERT( rtmp_pkthd.type() == rtmp_type_t::AUDIO || rtmp_pkthd.type() == rtmp_type_t::VIDEO );
+	// build the flv_taghd_t
+	flv_taghd_t	flv_taghd;
+	flv_taghd.prevtag_size	( prev_tagsize );
+	if( rtmp_pkthd.type() == rtmp_type_t::VIDEO )		flv_taghd.type(flv_tagtype_t::VIDEO);
+	else if( rtmp_pkthd.type() == rtmp_type_t::AUDIO )	flv_taghd.type(flv_tagtype_t::AUDIO);
+	else	DBG_ASSERT(0);
+	flv_taghd.body_length	( rtmp_pktbd.length() );
+	flv_taghd.padding	( 0 );
+	flv_taghd.timestamp	( prev_timestamp );
+	// push the flv_taghd_t in the pkt_t
+	m_buffer	<< flv_taghd;
+
+	// push the rtmp_pktbd
+	m_buffer.append(rtmp_pktbd);
+
+	// update prev_tagsize/prev_timestamp
+	prev_tagsize	+= rtmp_pktbd.length() + 11;
+	prev_timestamp	+= rtmp_pkthd.timestamp();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +293,6 @@ bool	bt_scasti_rtmp_t::neoip_rtmp_cam_resp_cb(void *cb_userptr, rtmp_cam_resp_t 
 	return false;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //			rtmp_cam_full_t callback
@@ -220,100 +315,41 @@ bool	bt_scasti_rtmp_t::neoip_rtmp_cam_full_cb(void *cb_userptr, rtmp_cam_full_t 
 	// sanity check - at this point, rtmp_event_t MUST be a rtmp_event_t:PACKET
 	DBG_ASSERT( rtmp_event.is_packet() );
 
+	// push flv header IIF first rtmp_event_t::PACKET
+	if( prev_timestamp.is_null() )	push_flv_header();
 
+	// push the packet for this event
+	push_flv_avideo(rtmp_event);
 
-	pkt_t	pkt;
-	// push flv_tophd_t IIF first rtmp_event_t::PACKET
-	if( prev_timestamp.is_null() ){
-		// log to debug
-		KLOG_ERR("push flv header");
-		// init the local data to rebuild the flv
-		prev_tagsize	= 0;
-		prev_timestamp	= delay_t::from_sec(0);
-		// build the flv_tophd_t
-		pkt	<< flv_tophd_t().version(1).flag(flv_tophd_flag_t::VIDEO | flv_tophd_flag_t::AUDIO);
-
-
-// TODO put that in another function
-// - split this in separate function
-{
-	// get the values for metadata from rtmp_cam_full_t->connect_uri();
-	const http_uri_t &	connect_uri	= rtmp_cam_full->connect_uri();
-	const strvar_db_t &	uri_var		= connect_uri.var();
-	uint32_t		video_w		= string_t::to_uint32(uri_var.get_first_value("video_w"	, "320"));
-	uint32_t		video_h		= string_t::to_uint32(uri_var.get_first_value("video_h"	, "240"));
-	uint32_t		video_fps	= string_t::to_uint32(uri_var.get_first_value("video_fps", "15"));
-	// build the amf0 metadata for the flv
-	bytearray_t	amf0_resp;
-	amf0_build_t::to_amf0(dvar_str_t("onMetaData")	, amf0_resp);
-	amf0_build_t::to_amf0(dvar_map_t()
-			.insert("width"		, dvar_dbl_t(video_w)	)
-			.insert("height"	, dvar_dbl_t(video_h)	)
-			.insert("framerate"	, dvar_dbl_t(video_fps)	)
-							, amf0_resp);
-	datum_t		rtmp_pktbd	= amf0_resp.to_datum();
-
-	// build the flv_taghd_t
-	flv_taghd_t	flv_taghd;
-	flv_taghd.prevtag_size	( prev_tagsize );
-	flv_taghd.type		( flv_tagtype_t::META );
-	flv_taghd.body_length	( rtmp_pktbd.length() );
-	flv_taghd.padding	( 0 );
-	flv_taghd.timestamp	( prev_timestamp );
-	// push the flv_taghd_t in the pkt_t
-	pkt	<< flv_taghd;
-	// push the rtmp_pktbd
-	pkt.append(rtmp_pktbd);
-	// update prev_tagsize/prev_timestamp
-	prev_tagsize	+= rtmp_pktbd.length() + 11;
-	prev_timestamp	+= delay_t::from_msec(1);
-}
+	// check that m_buffer is < profile.rcvdata_maxlen()
+	if( m_buffer.length() >= profile.rcvdata_maxlen() ){
+		bt_err_t bt_err(bt_err_t::ERROR, "received data greater than "+ OSTREAMSTR(profile.rcvdata_maxlen()));
+		return notify_callback_failed(bt_err);
 	}
 
-	// get the packet from the rtmp_event_t
-	datum_t		rtmp_pktbd;
-	rtmp_pkthd_t	rtmp_pkthd	= rtmp_event.get_packet(&rtmp_pktbd);
-	DBG_ASSERT( rtmp_pkthd.type() == rtmp_type_t::AUDIO || rtmp_pkthd.type() == rtmp_type_t::VIDEO );
-	// build the flv_taghd_t
-	flv_taghd_t	flv_taghd;
-	flv_taghd.prevtag_size	( prev_tagsize );
-	if( rtmp_pkthd.type() == rtmp_type_t::VIDEO )		flv_taghd.type(flv_tagtype_t::VIDEO);
-	else if( rtmp_pkthd.type() == rtmp_type_t::AUDIO )	flv_taghd.type(flv_tagtype_t::AUDIO);
-	else	DBG_ASSERT(0);
-	flv_taghd.body_length	( rtmp_pktbd.length() );
-	flv_taghd.padding	( 0 );
-	flv_taghd.timestamp	( prev_timestamp );
-	// push the flv_taghd_t in the pkt_t
-	pkt	<< flv_taghd;
-
-	// push the rtmp_pktbd
-	pkt.append(rtmp_pktbd);
-
-	// handle it as if it cames from the socket_full_t
-	bool	tokeep 	= handle_recved_data(pkt);
-	if( !tokeep )	return false;
-
-	// update prev_tagsize/prev_timestamp
-	prev_tagsize	+= rtmp_pktbd.length() + 11;
-	prev_timestamp	+= rtmp_pkthd.timestamp();
+	// launch a bt_io_write_t if needed
+	launch_write_if_needed();
 
 	// return tokeep
 	return true;
 }
 
-
-
 /** \brief Handle the received packet
  *
  * @return a tokeep for the socket_full_t
  */
-bool	bt_scasti_rtmp_t::handle_recved_data(pkt_t &pkt)	throw()
+void	bt_scasti_rtmp_t::launch_write_if_needed()	throw()
 {
 	// log to debug
 	KLOG_DBG("enter pkt=" << pkt);
 
+	// if bt_io_write_t is in progress, return now
+	if( bt_io_write )	return;
+	// if m_buffer.empty(), return now
+	if( m_buffer.empty() )	return;
+
 	// notify the data to the bt_scasti_mod_vapi_t
-	m_mod_vapi->notify_data(pkt.to_datum(datum_t::NOCOPY));
+	m_mod_vapi->notify_data(m_buffer.to_datum(datum_t::NOCOPY));
 
 	// sanity check - no bt_io_write_t MUST be inprogress
 	DBG_ASSERT( bt_io_write == NULL );
@@ -321,17 +357,11 @@ bool	bt_scasti_rtmp_t::handle_recved_data(pkt_t &pkt)	throw()
 	// launcht the bt_io_write_t
 	// - a bt_io_write_t NEVER fails on launch
 	// - bt_io_vapi_t will handle the circularidx if needed
-	file_range_t	file_range(cur_offset(), cur_offset() + pkt.length()-1);
-	bt_io_write	= m_io_vapi->write_ctor(file_range, pkt.to_datum(datum_t::NOCOPY)
+	file_range_t	file_range(cur_offset(), cur_offset() + m_buffer.length()-1);
+	bt_io_write	= m_io_vapi->write_ctor(file_range, m_buffer.to_datum(datum_t::NOCOPY)
 							, this, NULL);
-
-	// stop the socket_full_t from reading - BUT only while writing the data on disk
-	socket_full_t *	socket_full;
-	socket_full	= rtmp_cam_full->rtmp_full->socket_full;
-	socket_full->rcvdata_maxlen(0);
-
-	// return tokeep
-	return true;
+	// empty m_buffer as it is now in the bt_io_write_t
+	m_buffer.tail_free(m_buffer.length());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -365,10 +395,8 @@ bool	bt_scasti_rtmp_t::neoip_bt_io_write_cb(void *cb_userptr, bt_io_write_t &cb_
 	// autodelete this sched_block and return dontkeep
 	nipmem_zdelete	bt_io_write;
 
-	// start reading from the socket_full_t again
-	socket_full_t *	socket_full;
-	socket_full	= rtmp_cam_full->rtmp_full->socket_full;
-	socket_full->rcvdata_maxlen(profile.rcvdata_maxlen());
+	// launch a bt_io_write_t if needed
+	launch_write_if_needed();
 
 	// return dontkeep - as the bt_io_write_t as just been deleted
 	return false;

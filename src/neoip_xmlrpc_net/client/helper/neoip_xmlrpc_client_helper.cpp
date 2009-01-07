@@ -1,6 +1,6 @@
 /*! \file
     \brief Definition of the \ref xmlrpc_client_helper_t class
-    
+
 */
 
 /* system include */
@@ -19,7 +19,7 @@ NEOIP_NAMESPACE_BEGIN
 ////////////////////////////////////////////////////////////////////////////////
 
 /** \brief Return an error if there is an error at network or xmlrpc level
- * 
+ *
  * - dedicated to be used when testing for error in xmlrpc_client_cb_t
  */
 xmlrpc_err_t	xmlrpc_client_helper_t::has_succeed(const xmlrpc_err_t &cb_xmlrpc_err
@@ -30,13 +30,13 @@ xmlrpc_err_t	xmlrpc_client_helper_t::has_succeed(const xmlrpc_err_t &cb_xmlrpc_e
 	KLOG_DBG("enter xmlrpc_err=" << cb_xmlrpc_err << " xmlrpc_resp=" << xmlrpc_resp.to_stdstring());
 	// handle the error case
 	if( cb_xmlrpc_err.failed() )	return cb_xmlrpc_err;
-	
+
 	// set the document for xmlrpc_parse_t
 	xmlrpc_parse_t	xmlrpc_parse;
 	xmlrpc_parse.set_document(xmlrpc_resp);
 	// if it is impossible to parse the xml, return an error
 	if( xmlrpc_parse.is_null() )	return xmlrpc_err_t(xmlrpc_err_t::ERROR, "unable to parse the xml");
-	
+
 	// handle the fault case
 	if( xmlrpc_parse.is_fault_resp() ){
 		int32_t		fault_code;

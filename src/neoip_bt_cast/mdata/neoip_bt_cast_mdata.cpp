@@ -1,7 +1,7 @@
 /*! \file
     \brief Definition of the \ref bt_cast_mdata_t
 
-- TODO add a delay between the initial bt_httpo_full_t initial position and 
+- TODO add a delay between the initial bt_httpo_full_t initial position and
   the end of the pieceq
   - it will be tunable via casti
     - thus all casto will have the same initialposition
@@ -10,10 +10,10 @@
 bt_cast_mdata_t contains the meta data about the cast.
 
 \par About boot_nonce
-boot_nonce is a statically unique number in a uint32_t. It is chosen by 
-the bt_cast_mdata_t sender to identity an instance of a stream. the 
-bt_cast_mdata_t and the following bt_cast_udata_t MUST ALL have the same 
-boot_nonce. 
+boot_nonce is a statically unique number in a uint32_t. It is chosen by
+the bt_cast_mdata_t sender to identity an instance of a stream. the
+bt_cast_mdata_t and the following bt_cast_udata_t MUST ALL have the same
+boot_nonce.
 - if a received bt_cast_udata_t::boot_nonce is different from the first
   bt_cast_mdata_t::boot_nonce, this means casti_swarm_t rebooted in between
   so the receiver should shut down his own swarm
@@ -241,7 +241,7 @@ serial_t& operator >> (serial_t & serial, bt_cast_mdata_t &cast_mdata)		throw(se
 xmlrpc_build_t &operator << (xmlrpc_build_t& xmlrpc_build, const bt_cast_mdata_t &cast_mdata)	throw()
 {
 	// Start the struct
-	xmlrpc_build << xmlrpc_build_t::STRUCT_BEG;	
+	xmlrpc_build << xmlrpc_build_t::STRUCT_BEG;
 	// define the macro
 	#define CMD(var_type, var_name)						\
 		xmlrpc_build	<< xmlrpc_build_t::MEMBER_BEG( #var_name );	\
