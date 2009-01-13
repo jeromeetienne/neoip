@@ -1,4 +1,2 @@
-# remove the log file from the git update
-*.log
-
-*.http_url
+# ignore everything in this directory as it is a build directory
+*
