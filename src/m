@@ -45,7 +45,8 @@ elif [ "$BASE_DIR" = "build_win32" ]; then
 elif [ "$BASE_DIR" = "build_macos" ]; then
 	CXX_VAL="ccache g++-4.2"
 fi
-exec make -j2 -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
+exec make -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
+#exec make -j2 -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
 
 # Distributed build using distcc
 #export DISTCC_HOSTS="jmehost2"

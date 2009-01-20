@@ -14,6 +14,7 @@ Currently the location is :
 
 
 /* system include */
+#include <cstdlib>
 #ifndef _WIN32
 #	include <execinfo.h>
 #endif

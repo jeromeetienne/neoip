@@ -79,6 +79,7 @@
 */
 
 /* system include */
+#include <cstdlib>
 /* local include */
 #include "neoip_xmlrpc_parse.hpp"
 #include "neoip_log.hpp"

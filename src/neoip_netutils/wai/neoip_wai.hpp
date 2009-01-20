@@ -14,6 +14,7 @@
 /* system include */
 #include <list>
 #include <iostream>
+#include <limits>
 /* local include */
 #include "neoip_serial.hpp"
 #include "neoip_assert.hpp"

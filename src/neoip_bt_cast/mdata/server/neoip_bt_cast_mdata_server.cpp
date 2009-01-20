@@ -105,6 +105,8 @@ bool	bt_cast_mdata_server_t::neoip_xmlrpc_resp_cb(void *cb_userptr, xmlrpc_resp_
 		xmlrpc_err_out	= xmlrpc_call_get_cast_mdata(xmlrpc_parse, xmlrpc_build);
 	}else	DBG_ASSERT( 0 );
 
+	//KLOG_ERR("xmlrpc_build=" << xmlrpc_build.to_stdstring());
+
 	// log to debug
 	if( xmlrpc_err_out.failed() )	KLOG_ERR("xmlrpc_err_out=" << xmlrpc_err_out);
 	// return tokeep	

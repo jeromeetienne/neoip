@@ -4,6 +4,7 @@
 */
 
 /* system include */
+#include <cstdlib>
 /* local include */
 #include "neoip_skey_auth_type.hpp"
 #include "neoip_log.hpp"

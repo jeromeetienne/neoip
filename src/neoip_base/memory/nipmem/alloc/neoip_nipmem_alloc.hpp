@@ -10,7 +10,8 @@
 #ifndef __NEOIP_NIPMEM_ALLOC_HPP__ 
 #define __NEOIP_NIPMEM_ALLOC_HPP__ 
 /* system include */
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstring>
 #ifdef _WIN32
 #	include <malloc.h>
 #endif

@@ -454,6 +454,7 @@ NEOIP_RTMP_OBJS =							\
 	$(NEOIP_RTMP_DIR)/base/pkthd/neoip_rtmp_pkthd.o			\
 	$(NEOIP_RTMP_DIR)/base/err/neoip_rtmp_err.o			\
 	$(NEOIP_RTMP_DIR)/base/type/neoip_rtmp_type.o			\
+	$(NEOIP_RTMP_DIR)/base/ping_type/neoip_rtmp_ping_type.o		\
 	$(NEOIP_RTMP_DIR)/base/event/neoip_rtmp_event.o			\
 	$(NEOIP_RTMP_DIR)/build/neoip_rtmp_build.o			\
 	$(NEOIP_RTMP_DIR)/build/nunit/neoip_rtmp_build_nunit.o		\
@@ -1742,6 +1743,16 @@ APP_FLV2XML_LINK= $(addprefix -l, $(APP_FLV2XML_LIB))
 APP_FLV2XML_DEPS_DYNA= $(APP_FLV2XML_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_FLV2XML_LIB)))
 APP_FLV2XML_DEPS_STAT= $(APP_FLV2XML_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_FLV2XML_LIB)))
 
+######################## Build the neoip_rtmp2xml  ###############################
+APP_RTMP2XML_DIR=apps/neoip_rtmp2xml
+APP_RTMP2XML_OBJS= 									\
+	$(APP_RTMP2XML_DIR)/neoip_rtmp2xml_main.o					\
+	$(APP_RTMP2XML_DIR)/apps/neoip_rtmp2xml_apps.o
+APP_RTMP2XML_LIB=	$(APP_ALL_LIB)
+APP_RTMP2XML_LINK= $(addprefix -l, $(APP_RTMP2XML_LIB))
+APP_RTMP2XML_DEPS_DYNA= $(APP_RTMP2XML_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_RTMP2XML_LIB)))
+APP_RTMP2XML_DEPS_STAT= $(APP_RTMP2XML_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_RTMP2XML_LIB)))
+
 
 
 # jme- some experiment to automatize the makefile a lot more that the current full-manual version
@@ -1788,7 +1799,7 @@ else ifeq ($(NEOIP_TARGET), macos)
 	LINKLIB 	+= -levent
 	INCLUDEOPT	+=
 else
-	LINKLIB 	+= -L$(SRC_DIR) -levent
+	LINKLIB 	+= -L$(SRC_DIR) -levent -lrt
 	INCLUDEOPT	+= -I$(SRC_DIR)/libevent
 endif
 ################ for libneoip_crypto based on gnutls
@@ -1919,7 +1930,7 @@ DBG_OPT		+= -DNO_DBG_TRACE=1
 # jme- for stuff i dont really get about precompiled header (not important as they are not compatible with distcc)
 # DBG_OPT += -fpch-preprocess
 
-
+# NOTE: to launch it from shell do "(export RELEASE_BUILD=1; ./m)" in a build_TARGETOS/ directory
 #RELEASE_BUILD=1
 ifeq ($(RELEASE_BUILD),1)
 	DBG_OPT += -O2
@@ -2342,6 +2353,12 @@ neoip-flv2xml$(EXE_EXT): $(APP_FLV2XML_DEPS_DYNA)
 neoip-flv2xml-bin-static$(EXE_EXT): $(APP_FLV2XML_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_FLV2XML_OBJS) $(APP_FLV2XML_LINK) -Wl,--end-group $(LINKLIB)
 
+neoip-rtmp2xml$(EXE_EXT): $(APP_RTMP2XML_DEPS_DYNA)
+	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_RTMP2XML_OBJS) $(APP_RTMP2XML_LINK) $(LINKLIB)
+
+neoip-rtmp2xml-bin-static$(EXE_EXT): $(APP_RTMP2XML_DEPS_STAT)
+	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_RTMP2XML_OBJS) $(APP_RTMP2XML_LINK) -Wl,--end-group $(LINKLIB)
+
 
 # make target to strip all static libraries
 # - usefull to make them smaller and especially link faster
@@ -2368,6 +2385,18 @@ distclean: clean_config_debug_dir clean_include_dir clean_pkg
 	cd ../build_linux && make -f ../src/Makefile.static clean clean_build_dir
 	cd ../build_win32 && make -f ../src/Makefile.static clean clean_build_dir
 	cd ../build_macos && make -f ../src/Makefile.static clean clean_build_dir
+
+###############################################
+#     experimentation to backup via duplicity #
+###############################################
+
+backup:	backup_full
+
+backup_incremental:	distclean
+	cd ../../ && duplicity yavipin scp://dedixl//home/jerome/tmp/.bla
+
+backup_full:	distclean
+	cd ../../ && duplicity full yavipin scp://dedixl//home/jerome/tmp/.bla
 
 #######################################
 # to precompile the .hpp (unclear it is of any use with distcc)

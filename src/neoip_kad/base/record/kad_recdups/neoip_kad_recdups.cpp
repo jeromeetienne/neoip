@@ -5,6 +5,8 @@
 
 /* system include */
 #include <iomanip>
+#include <algorithm>
+
 /* local include */
 #include "neoip_kad_recdups.hpp"
 #include "neoip_rand.hpp"

@@ -9,6 +9,7 @@
 /* system include */
 #include <string>
 #include <vector>
+#include <limits>
 /* local include */
 #include "neoip_datum.hpp"
 #include "neoip_namespace.hpp"

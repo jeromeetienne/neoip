@@ -30,8 +30,8 @@ private:
 	struct _xmlNode*curr_node;	//!< the cursor node used while parseing the tree
 
 	/*************** Internal function	*******************************/
-	void		internal_ctor(xml_parse_doc_t *parse_doc, struct _xmlNode* root_node
-							, struct _xmlNode* root_node)	throw();
+	void		internal_ctor(xml_parse_doc_t *parse_doc, struct _xmlNode* root_node1
+							, struct _xmlNode* root_node2)	throw();
 	void		internal_dtor()							throw();
 	struct _xmlNode*get_path_node(const file_path_t &node_path)			const throw();
 	struct _xmlNode*get_firstsib_node(struct _xmlNode * start_node

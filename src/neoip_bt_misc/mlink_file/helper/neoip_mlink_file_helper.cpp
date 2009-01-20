@@ -10,6 +10,7 @@
 */
 
 /* system include */
+#include <limits>
 /* local include */
 #include "neoip_mlink_file_helper.hpp"
 #include "neoip_mlink_file.hpp"

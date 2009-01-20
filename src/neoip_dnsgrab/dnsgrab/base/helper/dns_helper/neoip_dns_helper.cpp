@@ -6,6 +6,7 @@
 /* system include */
 #include <locale.h>
 #include <idna.h>
+#include <cstdlib>
 /* local include */
 #include "neoip_dns_helper.hpp"
 #include "neoip_log.hpp"

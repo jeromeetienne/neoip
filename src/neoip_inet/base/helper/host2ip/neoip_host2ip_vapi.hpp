@@ -4,9 +4,10 @@
 */
 
 
-#ifndef __NEOIP_HOST2IP_VAPI_HPP__ 
+#ifndef __NEOIP_HOST2IP_VAPI_HPP__
 #define __NEOIP_HOST2IP_VAPI_HPP__ 
 /* system include */
+#include <string>
 /* local include */
 #include "neoip_namespace.hpp"
 

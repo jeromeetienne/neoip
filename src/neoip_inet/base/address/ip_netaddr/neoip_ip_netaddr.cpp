@@ -9,6 +9,7 @@
 */
 
 /* system include */
+#include <cstdlib>
 /* local include */
 #include "neoip_ip_netaddr.hpp"
 #include "neoip_string.hpp"

@@ -8,7 +8,8 @@
 #define __NEOIP_ERRNO_HPP__ 
 /* system include */
 #include <string>
-#include <errno.h>
+#include <cstring>
+#include <cerrno>
 /* local include */
 #include "neoip_namespace.hpp"
 

@@ -13,6 +13,7 @@
 #define __NEOIP_ITEM_ARR_HPP__ 
 /* system include */
 #include <vector>
+#include <algorithm>
 /* local include */
 #include "neoip_serial.hpp"
 #include "neoip_xmlrpc.hpp"		// for xmlrpc serialization

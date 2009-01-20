@@ -6,6 +6,7 @@
 /* system include */
 #include <string>
 #include <iostream>
+#include <algorithm>
 #include <iomanip>
 #include <math.h>
 /* local include */

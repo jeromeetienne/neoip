@@ -82,6 +82,8 @@ OBJECTS = \
 	apps/neoip_router/apps/helper/neoip_router_apps_helper.o \
 	apps/neoip_router/apps/neoip_router_apps.o \
 	apps/neoip_router/neoip_router_main.o \
+	apps/neoip_rtmp2xml/apps/neoip_rtmp2xml_apps.o \
+	apps/neoip_rtmp2xml/neoip_rtmp2xml_main.o \
 	apps/neoip_upnp/apps/neoip_upnp_apps.o \
 	apps/neoip_upnp/neoip_upnp_main.o \
 	apps/neoip_webpack/apps/neoip_webpack_apps.o \
@@ -1277,6 +1279,7 @@ OBJECTS = \
 	neoip_rtmp/base/err/neoip_rtmp_err.o \
 	neoip_rtmp/base/event/neoip_rtmp_event.o \
 	neoip_rtmp/base/nunit_gsuite/neoip_rtmp_nunit_gsuite.o \
+	neoip_rtmp/base/ping_type/neoip_rtmp_ping_type.o \
 	neoip_rtmp/base/pkthd/neoip_rtmp_pkthd.o \
 	neoip_rtmp/base/type/neoip_rtmp_type.o \
 	neoip_rtmp/build/neoip_rtmp_build.o \
@@ -1567,6 +1570,8 @@ LINTS = \
 	apps/neoip_router/apps/helper/neoip_router_apps_helper.lint \
 	apps/neoip_router/apps/neoip_router_apps.lint \
 	apps/neoip_router/neoip_router_main.lint \
+	apps/neoip_rtmp2xml/apps/neoip_rtmp2xml_apps.lint \
+	apps/neoip_rtmp2xml/neoip_rtmp2xml_main.lint \
 	apps/neoip_upnp/apps/neoip_upnp_apps.lint \
 	apps/neoip_upnp/neoip_upnp_main.lint \
 	apps/neoip_webpack/apps/neoip_webpack_apps.lint \
@@ -2762,6 +2767,7 @@ LINTS = \
 	neoip_rtmp/base/err/neoip_rtmp_err.lint \
 	neoip_rtmp/base/event/neoip_rtmp_event.lint \
 	neoip_rtmp/base/nunit_gsuite/neoip_rtmp_nunit_gsuite.lint \
+	neoip_rtmp/base/ping_type/neoip_rtmp_ping_type.lint \
 	neoip_rtmp/base/pkthd/neoip_rtmp_pkthd.lint \
 	neoip_rtmp/base/type/neoip_rtmp_type.lint \
 	neoip_rtmp/build/neoip_rtmp_build.lint \
@@ -3053,6 +3059,8 @@ INCLUDEPATH = \
 	-Iapps/neoip_router/apps/helper \
 	-Iapps/neoip_router/apps \
 	-Iapps/neoip_router \
+	-Iapps/neoip_rtmp2xml/apps \
+	-Iapps/neoip_rtmp2xml \
 	-Iapps/neoip_upnp/apps \
 	-Iapps/neoip_upnp \
 	-Iapps/neoip_webpack/apps \
@@ -4281,6 +4289,7 @@ INCLUDEPATH = \
 	-Ineoip_rtmp/base/err \
 	-Ineoip_rtmp/base/event \
 	-Ineoip_rtmp/base/nunit_gsuite \
+	-Ineoip_rtmp/base/ping_type \
 	-Ineoip_rtmp/base/pkthd \
 	-Ineoip_rtmp/base/type \
 	-Ineoip_rtmp/build \

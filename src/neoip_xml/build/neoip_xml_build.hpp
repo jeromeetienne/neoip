@@ -38,7 +38,7 @@ public:
 
 	/*************** action function	*******************************/
 	xml_build_t &	element_beg(const std::string &name)					throw();
-	xml_build_t &	element_att(const std::string &value, const std::string &value)		throw();
+	xml_build_t &	element_att(const std::string &value1, const std::string &value2)	throw();
 	xml_build_t &	element_val(const std::string &value)					throw();
 	xml_build_t &	element_end()								throw();
 	

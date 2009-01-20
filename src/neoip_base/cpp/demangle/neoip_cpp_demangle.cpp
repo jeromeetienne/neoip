@@ -16,6 +16,7 @@ it return the original symbols
 /* system include */
 #include <string>
 #include <cxxabi.h>
+#include <cstdlib>
 /* local include */
 #include "neoip_cpp_demangle.hpp"
 

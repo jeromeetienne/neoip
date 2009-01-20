@@ -8,6 +8,7 @@
 */
 
 /* system include */
+#include <algorithm>
 /* local include */
 #include "neoip_httpd_cnx.hpp"
 #include "neoip_tcp_full.hpp"

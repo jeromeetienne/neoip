@@ -5,6 +5,7 @@
 
 /* system include */
 #include <glib.h>
+#include <algorithm>
 /* local include */
 #include "neoip_file_dir.hpp"
 #include "neoip_log.hpp"

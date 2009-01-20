@@ -5,6 +5,7 @@
 
 /* system include */
 #include <iostream>
+#include <cstdlib>
 
 /* local include */
 #include "neoip_version.hpp"

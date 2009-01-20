@@ -8,6 +8,7 @@
 
 /* system include */
 #include <stdlib.h>
+#include <limits.h>
 #include <iostream>
 #include <fstream>
 #include <iomanip>

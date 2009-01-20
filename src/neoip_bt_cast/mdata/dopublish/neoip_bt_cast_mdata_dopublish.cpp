@@ -309,7 +309,7 @@ bool	bt_cast_mdata_dopublish_t::probe_set_client_cb(void *cb_userptr, xmlrpc_cli
 	}
 	// if xmlrpc_client_t failed, log the event
 	if( xmlrpc_err.failed() ){
-		KLOG_ERR("probe_set failed due to " << xmlrpc_err);
+		KLOG_ERR("probe_set failed due to " << xmlrpc_err << " xmlrpc_resp=" << xmlrpc_resp);
 		// m_publish_type default to "push"
 		m_publish_type	= "push";
 		// start m_perodic_timeout_t
@@ -428,7 +428,7 @@ bool	bt_cast_mdata_dopublish_t::periodic_set_client_cb(void *cb_userptr, xmlrpc_
 	// test if the xmlrpc_client_t succeed
 	xmlrpc_err	= xmlrpc_client_helper_t::has_succeed(cb_xmlrpc_err, xmlrpc_resp);
 	// if xmlrpc_client_t failed, log the event
-	if( xmlrpc_err.failed() )	KLOG_ERR("publishing failed due to " << xmlrpc_err);
+	if( xmlrpc_err.failed() )	KLOG_ERR("publishing failed due to " << xmlrpc_err << " in xmlrpc_resp="<< xmlrpc_resp);
 
 
 	// parse the xmlrpc response to get the m_cast_privhash
@@ -486,6 +486,7 @@ bool bt_cast_mdata_dopublish_t::notify_callback(bt_cast_mdata_t *cast_mdata_out
 	// return the tokeep
 	return tokeep;
 }
+
 NEOIP_NAMESPACE_END;
 
 

@@ -72,9 +72,8 @@ bt_err_t bt_cast_mdata_unpublish_t::start(const http_uri_t &mdata_srv_uri
 	xmlrpc_build << xmlrpc_build_t::CALL_END;
 	// get the datum_t containing the just built xmlrpc call
 	datum_t		xmlrpc_call;
-	xmlrpc_call	= xmlrpc_build.to_datum();
+	xmlrpc_call	= xmlrpc_build.to_datum();	
 
-KLOG_ERR("mdata_srv_uri="<<mdata_srv_uri << " xmlrpc_call=" << xmlrpc_call);
 	// start the xmlrpc_sclient_t
 	xmlrpc_err_t	xmlrpc_err;
 	m_xmlrpc_client	= nipmem_new xmlrpc_client_t();
