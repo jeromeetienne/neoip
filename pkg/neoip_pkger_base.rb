@@ -115,7 +115,7 @@ end
 #   the #{apps_name}_main.o compile time
 def get_apps_version(pkg_type, apps_name)
 	canon_name	= get_canon_name(apps_name)
-	apps_version	= `grep -e '^#define.*APPS_VERSION' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info.hpp | cut -d'"' -f 2 | tr -d "\n"`
+	apps_version	= `grep -e '^#define.*APPS_VERSION' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info_version.hpp | cut -d'"' -f 2 | tr -d "\n"`
 	apps_compiletime= File.stat("#{get_exec_dir(pkg_type)}/apps/#{canon_name}/#{canon_name}_main.o").mtime
 	return apps_version + "-" + apps_compiletime.strftime("%Y%m%d%H%M")
 end
