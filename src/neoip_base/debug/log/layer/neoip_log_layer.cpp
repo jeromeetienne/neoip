@@ -10,6 +10,8 @@
 #endif
 /* local include */
 #include "neoip_log_layer.hpp"
+#include "neoip_date.hpp"
+#include "neoip_date_helper.hpp"
 #include "neoip_strvar_db.hpp"
 #include "neoip_lib_session.hpp"
 #include "neoip_lib_apps.hpp"
@@ -59,6 +61,7 @@ log_layer_t::log_layer_t(const log_level_t &default_level)		throw()
 	output_syslog	( false	);
 	output_file	( false	);
 	disp_log_src	( true	);
+	disp_log_time	( false	);
 }
 
 /** \brief Destructor
@@ -166,6 +169,11 @@ void	log_layer_t::set_config_varfile(const strvar_db_t &strvar_db)		throw()
 			disp_log_src	( string_t::convert_to_bool(val) );
 			continue;
 		}
+		// if key = "disp_log_time", get the disp_log_src accordingly
+		if( key == "disp_log_time" ){
+			disp_log_time	( string_t::convert_to_bool(val) );
+			continue;
+		}
 		// get the log_level_t from the val
 		log_level_t		level	= log_level_t::from_string_nocase(val);
 		// sanity check - the log_level_t MUST NOT be null
@@ -261,6 +269,13 @@ void	log_layer_t::disp_log_src(bool new_val)				throw()
 	m_disp_log_src	= new_val;
 }
 
+/** \brief Set the disp_log_time vairable
+ */
+void	log_layer_t::disp_log_time(bool new_val)				throw()
+{
+	m_disp_log_time	= new_val;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //			log function
@@ -276,6 +291,13 @@ void 	log_layer_t::do_log(const char *filename, int lineno, const char *fct_name
 	std::ostringstream	oss;
 	// the category level is supposed to be checked in the macro for CPU efficiency purpose
 	DBG_ASSERT( log_level <= find_category_level(category_name) );
+
+	if( disp_log_time() ){
+		// get the date for the 'present'
+		date_t		date	= date_t::present();
+		// convert it to a canonical_string
+		oss << date_helper_t::to_canonical_string(date) << "|";
+	}
 
 	// if disp_log_src is set, prepend the log source
 	if( disp_log_src() ){

@@ -34,6 +34,7 @@ private:
 	bool		m_output_tty;		//!< true if the log MUST be done on tty
 	bool		m_output_syslog;	//!< true if the log MUST be done on syslog
 	bool		m_disp_log_src;		//!< true if the source of the log MUST be logged
+	bool		m_disp_log_time;	//!< true if the time of the log MUST be logged
 	bool		syslog_started;		//!< true if the syslog have been started
 	category_db_t	category_pattern;	//!< the list of category pattern 
 	category_db_t	category_cache;		//!< the list of category cache
@@ -55,6 +56,7 @@ public:
 	bool		output_syslog()		const throw()	{ return m_output_syslog;	}
 	bool		output_file()		const throw()	{ return m_output_file;		}
 	bool		disp_log_src()		const throw()	{ return m_disp_log_src;	}
+	bool		disp_log_time()		const throw()	{ return m_disp_log_time;	}
 
 	/*************** action function	*******************************/
 	void		set_default_level(const log_level_t &default_level)	throw();
@@ -67,6 +69,7 @@ public:
 	void		output_syslog(bool new_val)				throw();
 	void		output_file(bool new_val)				throw();
 	void		disp_log_src(bool new_val)				throw();
+	void		disp_log_time(bool new_val)				throw();
 };
 
 NEOIP_NAMESPACE_END
