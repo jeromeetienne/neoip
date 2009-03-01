@@ -11,7 +11,7 @@
 NEOIP_NAMESPACE_BEGIN;
 
 // definition of \ref bt_scasti_rtmp_profile_t constant
-const size_t	bt_scasti_rtmp_profile_t::RCVDATA_MAXLEN		= 32*1024;
+const size_t	bt_scasti_rtmp_profile_t::RCVDATA_MAXLEN	= 80*1024;	// i have seen up to 64kbyte in the wild
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
