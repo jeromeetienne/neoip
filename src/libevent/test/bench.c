@@ -40,9 +40,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#ifdef WIN32
+#include <windows.h>
+#else
 #include <sys/socket.h>
 #include <sys/signal.h>
 #include <sys/resource.h>
+#endif
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -51,6 +55,7 @@
 #include <errno.h>
 
 #include <event.h>
+#include <evutil.h>
 
 
 static int count, writes, fired;
@@ -60,7 +65,7 @@ static struct event *events;
 
 
 
-void
+static void
 read_cb(int fd, short which, void *arg)
 {
 	int idx = (int) arg, widx = idx + 1;
@@ -76,7 +81,7 @@ read_cb(int fd, short which, void *arg)
 	}
 }
 
-struct timeval *
+static struct timeval *
 run_once(void)
 {
 	int *cp, i, space;
@@ -109,7 +114,7 @@ run_once(void)
 	if (xcount != count) fprintf(stderr, "Xcount: %d, Rcount: %d\n", xcount, count);
 	}
 
-	timersub(&te, &ts, &te);
+	evutil_timersub(&te, &ts, &te);
 
 	return (&te);
 }
@@ -117,11 +122,12 @@ run_once(void)
 int
 main (int argc, char **argv)
 {
+#ifndef WIN32
 	struct rlimit rl;
+#endif
 	int i, c;
 	struct timeval *tv;
 	int *cp;
-	extern char *optarg;
 
 	num_pipes = 100;
 	num_active = 1;
@@ -143,11 +149,13 @@ main (int argc, char **argv)
 		}
 	}
 
+#ifndef WIN32
 	rl.rlim_cur = rl.rlim_max = num_pipes * 2 + 50;
 	if (setrlimit(RLIMIT_NOFILE, &rl) == -1) {
 		perror("setrlimit");
 		exit(1);
 	}
+#endif
 
 	events = calloc(num_pipes, sizeof(struct event));
 	pipes = calloc(num_pipes * 2, sizeof(int));
@@ -162,7 +170,7 @@ main (int argc, char **argv)
 #ifdef USE_PIPES
 		if (pipe(cp) == -1) {
 #else
-		if (socketpair(AF_UNIX, SOCK_STREAM, 0, cp) == -1) {
+		if (evutil_socketpair(AF_UNIX, SOCK_STREAM, 0, cp) == -1) {
 #endif
 			perror("pipe");
 			exit(1);

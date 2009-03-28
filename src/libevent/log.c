@@ -45,16 +45,13 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #undef WIN32_LEAN_AND_MEAN
-#include "misc.h"
 #endif
 #include <sys/types.h>
-#include <sys/tree.h>
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #else
 #include <sys/_time.h>
 #endif
-#include <assert.h>	// jme-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -63,41 +60,11 @@
 #include "event.h"
 
 #include "log.h"
+#include "evutil.h"
 
 static void _warn_helper(int severity, int log_errno, const char *fmt,
                          va_list ap);
 static void event_log(int severity, const char *msg);
-
-static int
-event_vsnprintf(char *str, size_t size, const char *format, va_list args)
-{
-	int r;
-	if (size == 0)
-		return -1;
-#ifdef WIN32
-	r = _vsnprintf(str, size, format, args);
-#else
-	r = vsnprintf(str, size, format, args);
-#endif
-	str[size-1] = '\0';
-	if (r < 0 || ((size_t)r) >= size) {
-		/* different platforms behave differently on overflow;
-		 * handle both kinds. */
-		return -1;
-	}
-	return r;
-}
-
-static int
-event_snprintf(char *str, size_t size, const char *format, ...)
-{
-    va_list ap;
-    int r;
-    va_start(ap, format);
-    r = event_vsnprintf(str, size, format, ap);
-    va_end(ap);
-    return r;
-}
 
 void
 event_err(int eval, const char *fmt, ...)
@@ -107,7 +74,6 @@ event_err(int eval, const char *fmt, ...)
 	va_start(ap, fmt);
 	_warn_helper(_EVENT_LOG_ERR, errno, fmt, ap);
 	va_end(ap);
-/* jme- */	assert( 0 );
 	exit(eval);
 }
 
@@ -129,7 +95,6 @@ event_errx(int eval, const char *fmt, ...)
 	va_start(ap, fmt);
 	_warn_helper(_EVENT_LOG_ERR, -1, fmt, ap);
 	va_end(ap);
-/* jme- */	assert( 0 );
 	exit(eval);
 }
 
@@ -170,14 +135,14 @@ _warn_helper(int severity, int log_errno, const char *fmt, va_list ap)
 	size_t len;
 
 	if (fmt != NULL)
-		event_vsnprintf(buf, sizeof(buf), fmt, ap);
+		evutil_vsnprintf(buf, sizeof(buf), fmt, ap);
 	else
 		buf[0] = '\0';
 
 	if (log_errno >= 0) {
 		len = strlen(buf);
 		if (len < sizeof(buf) - 3) {
-			event_snprintf(buf + len, sizeof(buf) - len, ": %s",
+			evutil_snprintf(buf + len, sizeof(buf) - len, ": %s",
 			    strerror(log_errno));
 		}
 	}

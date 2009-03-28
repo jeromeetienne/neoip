@@ -34,6 +34,8 @@ extern "C" {
 void http_suite(void);
 void http_basic_test(void);
 
+void rpc_suite(void);
+
 void dns_suite(void);
 	
 #ifdef __cplusplus

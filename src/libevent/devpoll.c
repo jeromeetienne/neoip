@@ -47,10 +47,9 @@
 #include <assert.h>
 
 #include "event.h"
+#include "event-internal.h"
 #include "evsignal.h"
 #include "log.h"
-
-extern volatile sig_atomic_t evsignal_caught;
 
 /* due to limitations in the devpoll interface, we need to keep track of
  * all file descriptors outself.
@@ -66,26 +65,24 @@ struct devpollop {
 	struct pollfd *events;
 	int nevents;
 	int dpfd;
-	sigset_t evsigmask;
 	struct pollfd *changes;
 	int nchanges;
 };
 
-void *devpoll_init	(void);
-int devpoll_add	(void *, struct event *);
-int devpoll_del	(void *, struct event *);
-int devpoll_recalc	(struct event_base *, void *, int);
-int devpoll_dispatch	(struct event_base *, void *, struct timeval *);
-void devpoll_dealloc	(void *);
+static void *devpoll_init	(struct event_base *);
+static int devpoll_add	(void *, struct event *);
+static int devpoll_del	(void *, struct event *);
+static int devpoll_dispatch	(struct event_base *, void *, struct timeval *);
+static void devpoll_dealloc	(struct event_base *, void *);
 
 struct eventop devpollops = {
 	"devpoll",
 	devpoll_init,
 	devpoll_add,
 	devpoll_del,
-	devpoll_recalc,
 	devpoll_dispatch,
-	devpoll_dealloc
+	devpoll_dealloc,
+	1 /* need reinit */
 };
 
 #define NEVENT	32000
@@ -126,8 +123,8 @@ devpoll_queue(struct devpollop *devpollop, int fd, int events) {
 	return(0);
 }
 
-void *
-devpoll_init(void)
+static void *
+devpoll_init(struct event_base *base)
 {
 	int dpfd, nfiles = NEVENT;
 	struct rlimit rl;
@@ -142,7 +139,7 @@ devpoll_init(void)
 
 	if (getrlimit(RLIMIT_NOFILE, &rl) == 0 &&
 	    rl.rlim_cur != RLIM_INFINITY)
-		nfiles = rl.rlim_cur - 1;
+		nfiles = rl.rlim_cur;
 
 	/* Initialize the kernel queue */
 	if ((dpfd = open("/dev/poll", O_RDWR)) == -1) {
@@ -180,22 +177,22 @@ devpoll_init(void)
 		return (NULL);
 	}
 
-	evsignal_init(&devpollop->evsigmask);
+	evsignal_init(base);
 
 	return (devpollop);
 }
 
-int
+static int
 devpoll_recalc(struct event_base *base, void *arg, int max)
 {
 	struct devpollop *devpollop = arg;
 
-	if (max > devpollop->nfds) {
+	if (max >= devpollop->nfds) {
 		struct evdevpoll *fds;
 		int nfds;
 
 		nfds = devpollop->nfds;
-		while (nfds < max)
+		while (nfds <= max)
 			nfds <<= 1;
 
 		fds = realloc(devpollop->fds, nfds * sizeof(struct evdevpoll));
@@ -209,25 +206,23 @@ devpoll_recalc(struct event_base *base, void *arg, int max)
 		devpollop->nfds = nfds;
 	}
 
-	return (evsignal_recalc(&devpollop->evsigmask));
+	return (0);
 }
 
-int
+static int
 devpoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 {
 	struct devpollop *devpollop = arg;
 	struct pollfd *events = devpollop->events;
 	struct dvpoll dvp;
 	struct evdevpoll *evdp;
-	int i, res, timeout;
-
-	if (evsignal_deliver(&devpollop->evsigmask) == -1)
-		return (-1);
+	int i, res, timeout = -1;
 
 	if (devpollop->nchanges)
 		devpoll_commit(devpollop);
 
-	timeout = tv->tv_sec * 1000 + (tv->tv_usec + 999) / 1000;
+	if (tv != NULL)
+		timeout = tv->tv_sec * 1000 + (tv->tv_usec + 999) / 1000;
 
 	dvp.dp_fds = devpollop->events;
 	dvp.dp_nfds = devpollop->nevents;
@@ -235,19 +230,17 @@ devpoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 
 	res = ioctl(devpollop->dpfd, DP_POLL, &dvp);
 
-	if (evsignal_recalc(&devpollop->evsigmask) == -1)
-		return (-1);
-
 	if (res == -1) {
 		if (errno != EINTR) {
 			event_warn("ioctl: DP_POLL");
 			return (-1);
 		}
 
-		evsignal_process();
+		evsignal_process(base);
 		return (0);
-	} else if (evsignal_caught)
-		evsignal_process();
+	} else if (base->sig.evsignal_caught) {
+		evsignal_process(base);
+	}
 
 	event_debug(("%s: devpoll_wait reports %d", __func__, res));
 
@@ -293,7 +286,7 @@ devpoll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 }
 
 
-int
+static int
 devpoll_add(void *arg, struct event *ev)
 {
 	struct devpollop *devpollop = arg;
@@ -301,7 +294,7 @@ devpoll_add(void *arg, struct event *ev)
 	int fd, events;
 
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_add(&devpollop->evsigmask, ev));
+		return (evsignal_add(ev));
 
 	fd = ev->ev_fd;
 	if (fd >= devpollop->nfds) {
@@ -347,7 +340,7 @@ devpoll_add(void *arg, struct event *ev)
 	return (0);
 }
 
-int
+static int
 devpoll_del(void *arg, struct event *ev)
 {
 	struct devpollop *devpollop = arg;
@@ -356,7 +349,7 @@ devpoll_del(void *arg, struct event *ev)
 	int needwritedelete = 1, needreaddelete = 1;
 
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_del(&devpollop->evsigmask, ev));
+		return (evsignal_del(ev));
 
 	fd = ev->ev_fd;
 	if (fd >= devpollop->nfds)
@@ -404,11 +397,12 @@ devpoll_del(void *arg, struct event *ev)
 	return (0);
 }
 
-void
-devpoll_dealloc(void *arg)
+static void
+devpoll_dealloc(struct event_base *base, void *arg)
 {
 	struct devpollop *devpollop = arg;
 
+	evsignal_dealloc(base);
 	if (devpollop->fds)
 		free(devpollop->fds);
 	if (devpollop->events)

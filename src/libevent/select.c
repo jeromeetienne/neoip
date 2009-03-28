@@ -36,8 +36,10 @@
 #else
 #include <sys/_time.h>
 #endif
+#ifdef HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif
 #include <sys/queue.h>
-#include <sys/tree.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,8 +59,6 @@
 #define        howmany(x, y)   (((x)+((y)-1))/(y))
 #endif
 
-extern volatile sig_atomic_t evsignal_caught;
-
 struct selectop {
 	int event_fds;		/* Highest fd in fd set */
 	int event_fdsz;
@@ -68,30 +68,28 @@ struct selectop {
 	fd_set *event_writeset_out;
 	struct event **event_r_by_fd;
 	struct event **event_w_by_fd;
-	sigset_t evsigmask;
 };
 
-void *select_init	(void);
-int select_add		(void *, struct event *);
-int select_del		(void *, struct event *);
-int select_recalc	(struct event_base *, void *, int);
-int select_dispatch	(struct event_base *, void *, struct timeval *);
-void select_dealloc     (void *);
+static void *select_init	(struct event_base *);
+static int select_add		(void *, struct event *);
+static int select_del		(void *, struct event *);
+static int select_dispatch	(struct event_base *, void *, struct timeval *);
+static void select_dealloc     (struct event_base *, void *);
 
 const struct eventop selectops = {
 	"select",
 	select_init,
 	select_add,
 	select_del,
-	select_recalc,
 	select_dispatch,
-	select_dealloc
+	select_dealloc,
+	0
 };
 
 static int select_resize(struct selectop *sop, int fdsz);
 
-void *
-select_init(void)
+static void *
+select_init(struct event_base *base)
 {
 	struct selectop *sop;
 
@@ -104,7 +102,7 @@ select_init(void)
 
 	select_resize(sop, howmany(32 + 1, NFDBITS)*sizeof(fd_mask));
 
-	evsignal_init(&sop->evsigmask);
+	evsignal_init(base);
 
 	return (sop);
 }
@@ -114,7 +112,7 @@ static void
 check_selectop(struct selectop *sop)
 {
 	int i;
-	for (i=0;i<=sop->event_fds;++i) {
+	for (i = 0; i <= sop->event_fds; ++i) {
 		if (FD_ISSET(i, sop->event_readset_in)) {
 			assert(sop->event_r_by_fd[i]);
 			assert(sop->event_r_by_fd[i]->ev_events & EV_READ);
@@ -133,25 +131,10 @@ check_selectop(struct selectop *sop)
 
 }
 #else
-#define check_selectop(sop) do {;} while (0)
+#define check_selectop(sop) do { (void) sop; } while (0)
 #endif
 
-/*
- * Called with the highest fd that we know about.  If it is 0, completely
- * recalculate everything.
- */
-
-int
-select_recalc(struct event_base *base, void *arg, int max)
-{
-	struct selectop *sop = arg;
-
-	check_selectop(sop);
-
-	return (evsignal_recalc(&sop->evsigmask));
-}
-
-int
+static int
 select_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 {
 	int res, i;
@@ -164,15 +147,10 @@ select_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 	memcpy(sop->event_writeset_out, sop->event_writeset_in,
 	       sop->event_fdsz);
 
-	if (evsignal_deliver(&sop->evsigmask) == -1)
-		return (-1);
-
 	res = select(sop->event_fds + 1, sop->event_readset_out,
 	    sop->event_writeset_out, NULL, tv);
 
 	check_selectop(sop);
-	if (evsignal_recalc(&sop->evsigmask) == -1)
-		return (-1);
 
 	if (res == -1) {
 		if (errno != EINTR) {
@@ -180,10 +158,11 @@ select_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 			return (-1);
 		}
 
-		evsignal_process();
+		evsignal_process(base);
 		return (0);
-	} else if (evsignal_caught)
-		evsignal_process();
+	} else if (base->sig.evsignal_caught) {
+		evsignal_process(base);
+	}
 
 	event_debug(("%s: select reports %d", __func__, res));
 
@@ -200,13 +179,9 @@ select_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 			res |= EV_WRITE;
 		}
 		if (r_ev && (res & r_ev->ev_events)) {
-			if (!(r_ev->ev_events & EV_PERSIST))
-				event_del(r_ev);
 			event_active(r_ev, res & r_ev->ev_events, 1);
 		}
 		if (w_ev && w_ev != r_ev && (res & w_ev->ev_events)) {
-			if (!(w_ev->ev_events & EV_PERSIST))
-				event_del(w_ev);
 			event_active(w_ev, res & w_ev->ev_events, 1);
 		}
 	}
@@ -275,13 +250,13 @@ select_resize(struct selectop *sop, int fdsz)
 }
 
 
-int
+static int
 select_add(void *arg, struct event *ev)
 {
 	struct selectop *sop = arg;
 
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_add(&sop->evsigmask, ev));
+		return (evsignal_add(ev));
 
 	check_selectop(sop);
 	/*
@@ -325,14 +300,14 @@ select_add(void *arg, struct event *ev)
  * Nothing to be done here.
  */
 
-int
+static int
 select_del(void *arg, struct event *ev)
 {
 	struct selectop *sop = arg;
 
 	check_selectop(sop);
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_del(&sop->evsigmask, ev));
+		return (evsignal_del(ev));
 
 	if (sop->event_fds < ev->ev_fd) {
 		check_selectop(sop);
@@ -353,11 +328,12 @@ select_del(void *arg, struct event *ev)
 	return (0);
 }
 
-void
-select_dealloc(void *arg)
+static void
+select_dealloc(struct event_base *base, void *arg)
 {
 	struct selectop *sop = arg;
 
+	evsignal_dealloc(base);
 	if (sop->event_readset_in)
 		free(sop->event_readset_in);
 	if (sop->event_writeset_in)

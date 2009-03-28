@@ -2,11 +2,20 @@
  * Compile with:
  * cc -I/usr/local/include -o time-test time-test.c -L/usr/local/lib -levent
  */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
+
+#ifdef WIN32
+#include <winsock2.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,15 +25,16 @@
 #include <errno.h>
 
 #include <event.h>
+#include <evutil.h>
 
 int pair[2];
 int test_okay = 1;
 int called = 0;
 
-void
+static void
 write_cb(int fd, short event, void *arg)
 {
-	char *test = "test string";
+	const char *test = "test string";
 	int len;
 
 	len = write(fd, test, strlen(test) + 1);
@@ -47,10 +57,12 @@ main (int argc, char **argv)
 {
 	struct event ev;
 
+#ifndef WIN32
 	if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 		return (1);
+#endif
 
-	if (socketpair(AF_UNIX, SOCK_STREAM, 0, pair) == -1)
+	if (evutil_socketpair(AF_UNIX, SOCK_STREAM, 0, pair) == -1)
 		return (1);
 
 	/* Initalize the event library */

@@ -37,7 +37,6 @@
 #include <sys/_time.h>
 #endif
 #include <sys/queue.h>
-#include <sys/tree.h>
 #include <poll.h>
 #include <signal.h>
 #include <stdio.h>
@@ -54,8 +53,6 @@
 #include "evsignal.h"
 #include "log.h"
 
-extern volatile sig_atomic_t evsignal_caught;
-
 struct pollop {
 	int event_count;		/* Highest number alloc */
 	int nfds;                       /* Size of event_* */
@@ -66,28 +63,26 @@ struct pollop {
 	int *idxplus1_by_fd; /* Index into event_set by fd; we add 1 so
 			      * that 0 (which is easy to memset) can mean
 			      * "no entry." */
-	sigset_t evsigmask;
 };
 
-void *poll_init	(void);
-int poll_add		(void *, struct event *);
-int poll_del		(void *, struct event *);
-int poll_recalc		(struct event_base *, void *, int);
-int poll_dispatch	(struct event_base *, void *, struct timeval *);
-void poll_dealloc	(void *);
+static void *poll_init	(struct event_base *);
+static int poll_add		(void *, struct event *);
+static int poll_del		(void *, struct event *);
+static int poll_dispatch	(struct event_base *, void *, struct timeval *);
+static void poll_dealloc	(struct event_base *, void *);
 
 const struct eventop pollops = {
 	"poll",
 	poll_init,
 	poll_add,
 	poll_del,
-	poll_recalc,
 	poll_dispatch,
-	poll_dealloc
+	poll_dealloc,
+    0
 };
 
-void *
-poll_init(void)
+static void *
+poll_init(struct event_base *base)
 {
 	struct pollop *pollop;
 
@@ -98,22 +93,9 @@ poll_init(void)
 	if (!(pollop = calloc(1, sizeof(struct pollop))))
 		return (NULL);
 
-	evsignal_init(&pollop->evsigmask);
+	evsignal_init(base);
 
 	return (pollop);
-}
-
-/*
- * Called with the highest fd that we know about.  If it is 0, completely
- * recalculate everything.
- */
-
-int
-poll_recalc(struct event_base *base, void *arg, int max)
-{
-	struct pollop *pop = arg;
-
-	return (evsignal_recalc(&pop->evsigmask));
 }
 
 #ifdef CHECK_INVARIANTS
@@ -150,22 +132,19 @@ poll_check_ok(struct pollop *pop)
 #define poll_check_ok(pop)
 #endif
 
-int
+static int
 poll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 {
-	int res, i, sec, nfds;
+	int res, i, msec = -1, nfds;
 	struct pollop *pop = arg;
 
-	if (evsignal_deliver(&pop->evsigmask) == -1)
-		return (-1);
-
 	poll_check_ok(pop);
-	sec = tv->tv_sec * 1000 + (tv->tv_usec + 999) / 1000;
-	nfds = pop->nfds;
-	res = poll(pop->event_set, nfds, sec);
 
-	if (evsignal_recalc(&pop->evsigmask) == -1)
-		return (-1);
+	if (tv != NULL)
+		msec = tv->tv_sec * 1000 + (tv->tv_usec + 999) / 1000;
+
+	nfds = pop->nfds;
+	res = poll(pop->event_set, nfds, msec);
 
 	if (res == -1) {
 		if (errno != EINTR) {
@@ -173,10 +152,11 @@ poll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 			return (-1);
 		}
 
-		evsignal_process();
+		evsignal_process(base);
 		return (0);
-	} else if (evsignal_caught)
-		evsignal_process();
+	} else if (base->sig.evsignal_caught) {
+		evsignal_process(base);
+	}
 
 	event_debug(("%s: poll reports %d", __func__, res));
 
@@ -206,13 +186,9 @@ poll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 			continue;
 
 		if (r_ev && (res & r_ev->ev_events)) {
-			if (!(r_ev->ev_events & EV_PERSIST))
-				event_del(r_ev);
 			event_active(r_ev, res & r_ev->ev_events, 1);
 		}
 		if (w_ev && w_ev != r_ev && (res & w_ev->ev_events)) {
-			if (!(w_ev->ev_events & EV_PERSIST))
-				event_del(w_ev);
 			event_active(w_ev, res & w_ev->ev_events, 1);
 		}
 	}
@@ -220,7 +196,7 @@ poll_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 	return (0);
 }
 
-int
+static int
 poll_add(void *arg, struct event *ev)
 {
 	struct pollop *pop = arg;
@@ -228,35 +204,54 @@ poll_add(void *arg, struct event *ev)
 	int i;
 
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_add(&pop->evsigmask, ev));
+		return (evsignal_add(ev));
 	if (!(ev->ev_events & (EV_READ|EV_WRITE)))
 		return (0);
 
 	poll_check_ok(pop);
 	if (pop->nfds + 1 >= pop->event_count) {
+		struct pollfd *tmp_event_set;
+		struct event **tmp_event_r_back;
+		struct event **tmp_event_w_back;
+		int tmp_event_count;
+
 		if (pop->event_count < 32)
-			pop->event_count = 32;
+			tmp_event_count = 32;
 		else
-			pop->event_count *= 2;
+			tmp_event_count = pop->event_count * 2;
 
 		/* We need more file descriptors */
-		pop->event_set = realloc(pop->event_set,
-				 pop->event_count * sizeof(struct pollfd));
-		if (pop->event_set == NULL) {
+		tmp_event_set = realloc(pop->event_set,
+				 tmp_event_count * sizeof(struct pollfd));
+		if (tmp_event_set == NULL) {
 			event_warn("realloc");
 			return (-1);
 		}
-		pop->event_r_back = realloc(pop->event_r_back,
-			    pop->event_count * sizeof(struct event *));
-		pop->event_w_back = realloc(pop->event_w_back,
-			    pop->event_count * sizeof(struct event *));
-		if (pop->event_r_back == NULL ||
-		    pop->event_w_back == NULL) {
+		pop->event_set = tmp_event_set;
+
+		tmp_event_r_back = realloc(pop->event_r_back,
+			    tmp_event_count * sizeof(struct event *));
+		if (tmp_event_r_back == NULL) {
+			/* event_set overallocated; that's okay. */
 			event_warn("realloc");
 			return (-1);
 		}
+		pop->event_r_back = tmp_event_r_back;
+
+		tmp_event_w_back = realloc(pop->event_w_back,
+			    tmp_event_count * sizeof(struct event *));
+		if (tmp_event_w_back == NULL) {
+			/* event_set and event_r_back overallocated; that's
+			 * okay. */
+			event_warn("realloc");
+			return (-1);
+		}
+		pop->event_w_back = tmp_event_w_back;
+
+		pop->event_count = tmp_event_count;
 	}
 	if (ev->ev_fd >= pop->fd_count) {
+		int *tmp_idxplus1_by_fd;
 		int new_count;
 		if (pop->fd_count < 32)
 			new_count = 32;
@@ -264,12 +259,13 @@ poll_add(void *arg, struct event *ev)
 			new_count = pop->fd_count * 2;
 		while (new_count <= ev->ev_fd)
 			new_count *= 2;
-		pop->idxplus1_by_fd =
-			realloc(pop->idxplus1_by_fd, new_count*sizeof(int));
-		if (pop->idxplus1_by_fd == NULL) {
+		tmp_idxplus1_by_fd =
+			realloc(pop->idxplus1_by_fd, new_count * sizeof(int));
+		if (tmp_idxplus1_by_fd == NULL) {
 			event_warn("realloc");
 			return (-1);
 		}
+		pop->idxplus1_by_fd = tmp_idxplus1_by_fd;
 		memset(pop->idxplus1_by_fd + pop->fd_count,
 		       0, sizeof(int)*(new_count - pop->fd_count));
 		pop->fd_count = new_count;
@@ -305,7 +301,7 @@ poll_add(void *arg, struct event *ev)
  * Nothing to be done here.
  */
 
-int
+static int
 poll_del(void *arg, struct event *ev)
 {
 	struct pollop *pop = arg;
@@ -313,7 +309,7 @@ poll_del(void *arg, struct event *ev)
 	int i;
 
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_del(&pop->evsigmask, ev));
+		return (evsignal_del(ev));
 
 	if (!(ev->ev_events & (EV_READ|EV_WRITE)))
 		return (0);
@@ -358,11 +354,12 @@ poll_del(void *arg, struct event *ev)
 	return (0);
 }
 
-void
-poll_dealloc(void *arg)
+static void
+poll_dealloc(struct event_base *base, void *arg)
 {
 	struct pollop *pop = arg;
 
+	evsignal_dealloc(base);
 	if (pop->event_set)
 		free(pop->event_set);
 	if (pop->event_r_back)

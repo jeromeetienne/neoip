@@ -13,9 +13,8 @@
 #ifndef WIN32
 #include <sys/queue.h>
 #include <unistd.h>
-#else
-#include <time.h>
 #endif
+#include <time.h>
 #ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
 #endif
@@ -26,10 +25,11 @@
 #include <errno.h>
 
 #include <event.h>
+#include <evutil.h>
 
 int lasttime;
 
-void
+static void
 timeout_cb(int fd, short event, void *arg)
 {
 	struct timeval tv;
@@ -40,7 +40,7 @@ timeout_cb(int fd, short event, void *arg)
 	    newtime - lasttime);
 	lasttime = newtime;
 
-	timerclear(&tv);
+	evutil_timerclear(&tv);
 	tv.tv_sec = 2;
 	event_add(timeout, &tv);
 }
@@ -57,7 +57,7 @@ main (int argc, char **argv)
 	/* Initalize one event */
 	evtimer_set(&timeout, timeout_cb, &timeout);
 
-	timerclear(&tv);
+	evutil_timerclear(&tv);
 	tv.tv_sec = 2;
 	event_add(&timeout, &tv);
 

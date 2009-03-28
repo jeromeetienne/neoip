@@ -12,20 +12,20 @@
  * 3. The name of the author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
- * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY SUN MICROSYSTEMS, INC. ``AS IS'' AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL SUN MICROSYSTEMS, INC. BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
 /*
- * Copyright (c) 2006 Sun Microsystems. All rights reserved.
+ * Copyright (c) 2007 Sun Microsystems. All rights reserved.
  * Use is subject to license terms.
  */
 
@@ -47,22 +47,16 @@
  * necessary when large fd's come in. reassociate() takes care of maintaining
  * the proper file-descriptor/event-port associations.
  *
- * As in the select(2) implementation, signals are handled by evsignal, and
- * evport_recalc does almost nothing.
+ * As in the select(2) implementation, signals are handled by evsignal.
  */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#else
-#include <sys/_time.h>
-#endif
 #include <assert.h>
 #include <sys/queue.h>
-#include <sys/tree.h>
 #include <errno.h>
 #include <poll.h>
 #include <port.h>
@@ -80,8 +74,6 @@
 #include "event-internal.h"
 #include "log.h"
 #include "evsignal.h"
-
-extern volatile sig_atomic_t evsignal_caught;
 
 
 /*
@@ -117,26 +109,26 @@ struct fd_info {
 
 struct evport_data {
 	int 		ed_port;	/* event port for system events  */
-	sigset_t 	ed_sigmask;	/* for evsignal 		 */
 	int		ed_nevents;	/* number of allocated fdi's 	 */
 	struct fd_info *ed_fds;		/* allocated fdi table 		 */
 	/* fdi's that we need to reassoc */
-	struct fd_info *ed_pending[EVENTS_PER_GETN];
+	int ed_pending[EVENTS_PER_GETN]; /* fd's with pending events */
 };
 
-static void*	evport_init	(void);
+static void*	evport_init	(struct event_base *);
 static int 	evport_add	(void *, struct event *);
 static int 	evport_del	(void *, struct event *);
-static int 	evport_recalc	(struct event_base *, void *, int);
 static int 	evport_dispatch	(struct event_base *, void *, struct timeval *);
+static void	evport_dealloc	(struct event_base *, void *);
 
 const struct eventop evportops = {
 	"event ports",
 	evport_init,
 	evport_add,
 	evport_del,
-	evport_recalc,
-	evport_dispatch
+	evport_dispatch,
+	evport_dealloc,
+	1 /* need reinit */
 };
 
 /*
@@ -144,9 +136,10 @@ const struct eventop evportops = {
  */
 
 static void*
-evport_init(void)
+evport_init(struct event_base *base)
 {
 	struct evport_data *evpd;
+	int i;
 	/*
 	 * Disable event ports when this environment variable is set 
 	 */
@@ -171,9 +164,10 @@ evport_init(void)
 		return (NULL);
 	}
 	evpd->ed_nevents = DEFAULT_NFDS;
-	memset(&evpd->ed_pending, 0, EVENTS_PER_GETN * sizeof(struct fd_info*));
+	for (i = 0; i < EVENTS_PER_GETN; i++)
+		evpd->ed_pending[i] = -1;
 
-	evsignal_init(&evpd->ed_sigmask);
+	evsignal_init(base);
 
 	return (evpd);
 }
@@ -271,14 +265,9 @@ reassociate(struct evport_data *epdp, struct fd_info *fdip, int fd)
 	int sysevents = FDI_TO_SYSEVENTS(fdip);
 
 	if (sysevents != 0) {
-		if ((-1 == port_associate(epdp->ed_port, PORT_SOURCE_FD,
-		    fd, sysevents, NULL))) {
-			perror("port_associate");
-			return (-1);
-		}
-	} else {
-		if (-1 == port_dissociate(epdp->ed_port, PORT_SOURCE_FD, fd)) {
-			perror("port_dissociate");
+		if (port_associate(epdp->ed_port, PORT_SOURCE_FD,
+				   fd, sysevents, NULL) == -1) {
+			event_warn("port_associate");
 			return (-1);
 		}
 	}
@@ -310,9 +299,16 @@ evport_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 
 	/*
 	 * We have to convert a struct timeval to a struct timespec
-	 * (only difference is nanoseconds vs. microseconds)
+	 * (only difference is nanoseconds vs. microseconds). If no time-based
+	 * events are active, we should wait for I/O (and tv == NULL).
 	 */
-	struct timespec ts = {tv->tv_sec, tv->tv_usec * 1000};
+	struct timespec ts;
+	struct timespec *ts_p = NULL;
+	if (tv != NULL) {
+		ts.tv_sec = tv->tv_sec;
+		ts.tv_nsec = tv->tv_usec * 1000;
+		ts_p = &ts;
+	}
 
 	/*
 	 * Before doing anything else, we need to reassociate the events we hit
@@ -320,35 +316,33 @@ evport_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 	 * loop below.
 	 */
 	for (i = 0; i < EVENTS_PER_GETN; ++i) {
-		struct fd_info *fdi = epdp->ed_pending[i];
+		struct fd_info *fdi = NULL;
+		if (epdp->ed_pending[i] != -1) {
+			fdi = &(epdp->ed_fds[epdp->ed_pending[i]]);
+		}
 
 		if (fdi != NULL && FDI_HAS_EVENTS(fdi)) {
 			int fd = FDI_HAS_READ(fdi) ? fdi->fdi_revt->ev_fd : 
 			    fdi->fdi_wevt->ev_fd;
 			reassociate(epdp, fdi, fd);
-			epdp->ed_pending[i] = NULL;
+			epdp->ed_pending[i] = -1;
 		}
 	}
 
-	
-
-	if (evsignal_deliver(&epdp->ed_sigmask) == -1)
-		return (-1);
-
 	if ((res = port_getn(epdp->ed_port, pevtlist, EVENTS_PER_GETN, 
-		    &nevents, &ts)) == -1) {
-		if (errno == EINTR) {
-			evsignal_process();
+		    (unsigned int *) &nevents, ts_p)) == -1) {
+		if (errno == EINTR || errno == EAGAIN) {
+			evsignal_process(base);
 			return (0);
 		} else if (errno == ETIME) {
 			if (nevents == 0)
 				return (0);
 		} else {
-			perror("port_getn");
+			event_warn("port_getn");
 			return (-1);
 		}
-	} else if (evsignal_caught) {
-		evsignal_process();
+	} else if (base->sig.evsignal_caught) {
+		evsignal_process(base);
 	}
 	
 	event_debug(("%s: port_getn reports %d events", __func__, nevents));
@@ -361,6 +355,7 @@ evport_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 
 		check_evportop(epdp);
 		check_event(pevt);
+		epdp->ed_pending[i] = fd;
 
 		/*
 		 * Figure out what kind of event it was 
@@ -376,57 +371,23 @@ evport_dispatch(struct event_base *base, void *arg, struct timeval *tv)
 		fdi = &(epdp->ed_fds[fd]);
 
 		/*
-		 * We now check for each of the possible events (READ or WRITE).
-		 * If the event is not persistent, then we delete it. Then, we
-		 * activate the event (which will cause its callback to be
-		 * executed).
+		 * We now check for each of the possible events (READ
+		 * or WRITE).  Then, we activate the event (which will
+		 * cause its callback to be executed).
 		 */
 
 		if ((res & EV_READ) && ((ev = fdi->fdi_revt) != NULL)) {
-			if (!(ev->ev_events & EV_PERSIST))
-				event_del(ev);
 			event_active(ev, res, 1);
 		}
 
 		if ((res & EV_WRITE) && ((ev = fdi->fdi_wevt) != NULL)) {
-			if (!(ev->ev_events & EV_PERSIST))
-				event_del(ev);
 			event_active(ev, res, 1);
-		}
-
-		/*
-		 * If there are still events (they haven't been deleted), then
-		 * we must reassociate the port, since the event port interface
-		 * dissociates them automatically. 
-		 *
-		 * But we can't do it right away, because the event hasn't
-		 * handled this event yet, so of course there's still data
-		 * waiting!
-		 */
-		if(FDI_HAS_EVENTS(fdi)) {
-			epdp->ed_pending[i] = fdi;
 		}
 	} /* end of all events gotten */
 
 	check_evportop(epdp);
 
-	if (evsignal_recalc(&epdp->ed_sigmask) == -1)
-		return (-1);
-
 	return (0);
-}
-
-
-/*
- * Copied from the version in select.c
- */
-
-static int
-evport_recalc(struct event_base *base, void *arg, int max)
-{
-	struct evport_data *evpd = arg;
-	check_evportop(evpd);
-	return (evsignal_recalc(&evpd->ed_sigmask));
 }
 
 
@@ -448,7 +409,7 @@ evport_add(void *arg, struct event *ev)
 	 * Delegate, if it's not ours to handle.
 	 */
 	if (ev->ev_events & EV_SIGNAL)
-		return (evsignal_add(&evpd->ed_sigmask, ev));
+		return (evsignal_add(ev));
 
 	/*
 	 * If necessary, grow the file descriptor info table
@@ -482,6 +443,8 @@ evport_del(void *arg, struct event *ev)
 {
 	struct evport_data *evpd = arg;
 	struct fd_info *fdi;
+	int i;
+	int associated = 1;
 
 	check_evportop(evpd);
 
@@ -489,13 +452,19 @@ evport_del(void *arg, struct event *ev)
 	 * Delegate, if it's not ours to handle
 	 */
 	if (ev->ev_events & EV_SIGNAL) {
-		return (evsignal_del(&evpd->ed_sigmask, ev));
+		return (evsignal_del(ev));
 	}
 
 	if (evpd->ed_nevents < ev->ev_fd) {
 		return (-1);
 	}
 
+	for (i = 0; i < EVENTS_PER_GETN; ++i) {
+		if (evpd->ed_pending[i] == ev->ev_fd) {
+			associated = 0;
+			break;
+		}
+	}
 
 	fdi = &evpd->ed_fds[ev->ev_fd];
 	if (ev->ev_events & EV_READ)
@@ -503,7 +472,42 @@ evport_del(void *arg, struct event *ev)
 	if (ev->ev_events & EV_WRITE)
 		fdi->fdi_wevt = NULL;
 
-	return reassociate(evpd, fdi, ev->ev_fd);
+	if (associated) {
+		if (!FDI_HAS_EVENTS(fdi) &&
+		    port_dissociate(evpd->ed_port, PORT_SOURCE_FD,
+		    ev->ev_fd) == -1) {	 
+			/*
+			 * Ignre EBADFD error the fd could have been closed
+			 * before event_del() was called.
+			 */
+			if (errno != EBADFD) {
+				event_warn("port_dissociate");
+				return (-1);
+			}
+		} else {
+			if (FDI_HAS_EVENTS(fdi)) {
+				return (reassociate(evpd, fdi, ev->ev_fd));
+			}
+		}
+	} else {
+		if (fdi->fdi_revt == NULL && fdi->fdi_wevt == NULL) {
+			evpd->ed_pending[i] = -1;
+		}
+	}
+	return 0;
 }
 
 
+static void
+evport_dealloc(struct event_base *base, void *arg)
+{
+	struct evport_data *evpd = arg;
+
+	evsignal_dealloc(base);
+
+	close(evpd->ed_port);
+
+	if (evpd->ed_fds)
+		free(evpd->ed_fds);
+	free(evpd);
+}

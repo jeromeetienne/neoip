@@ -6,7 +6,7 @@ setup () {
 	 EVENT_NOPOLL=yes; export EVENT_NOPOLL
 	 EVENT_NOSELECT=yes; export EVENT_NOSELECT
 	 EVENT_NOEPOLL=yes; export EVENT_NOEPOLL
-	 EVENT_NORTSIG=yes; export EVENT_NORTSIG
+	 EVENT_NOEVPORT=yes; export EVENT_NOEVPORT
 }
 
 test () {
@@ -76,15 +76,15 @@ echo "SELECT"
 test
 
 setup
-unset EVENT_NORTSIG
-export EVENT_NORTSIG
-echo "RTSIG"
-test
-
-setup
 unset EVENT_NOEPOLL
 export EVENT_NOEPOLL
 echo "EPOLL"
+test
+
+setup
+unset EVENT_NOEVPORT
+export EVENT_NOEVPORT
+echo "EVPORT"
 test
 
 

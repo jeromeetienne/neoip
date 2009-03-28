@@ -2,9 +2,9 @@ dnl configure.in for libevent
 dnl Dug Song <dugsong@monkey.org>
 AC_INIT(event.c)
 
-AM_INIT_AUTOMAKE(libevent,1.2)
+AM_INIT_AUTOMAKE(libevent,1.4.8-stable)
 AM_CONFIG_HEADER(config.h)
-AM_MAINTAINER_MODE
+dnl AM_MAINTAINER_MODE
 
 dnl Initialize prefix.
 if test "$prefix" = "NONE"; then
@@ -21,6 +21,9 @@ if test "$GCC" = yes ; then
         CFLAGS="$CFLAGS -Wall"
 fi
 
+AC_ARG_ENABLE(gcc-warnings,
+     AS_HELP_STRING(--enable-gcc-warnings, enable verbose warnings with GCC))
+
 AC_PROG_LIBTOOL
 
 dnl   Uncomment "AC_DISABLE_SHARED" to make shared librraries not get
@@ -29,17 +32,15 @@ dnl   the command line with --enable-shared and --disable-shared.
 dnl AC_DISABLE_SHARED
 AC_SUBST(LIBTOOL_DEPS)
 
-dnl Check for optional stuff
-AC_ARG_WITH(rtsig,
-  [  --with-rtsig		compile with support for real time signals (experimental)],
-  [usertsig=yes], [usertsig=no])
-
 dnl Checks for libraries.
 AC_CHECK_LIB(socket, socket)
+AC_CHECK_LIB(resolv, inet_aton)
+AC_CHECK_LIB(rt, clock_gettime)
+AC_CHECK_LIB(nsl, inet_ntoa)
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h stdarg.h inttypes.h stdint.h poll.h signal.h unistd.h sys/epoll.h sys/time.h sys/queue.h sys/event.h sys/ioctl.h sys/devpoll.h port.h)
+AC_CHECK_HEADERS(fcntl.h stdarg.h inttypes.h stdint.h poll.h signal.h unistd.h sys/epoll.h sys/time.h sys/queue.h sys/event.h sys/param.h sys/ioctl.h sys/select.h sys/devpoll.h port.h netinet/in6.h sys/socket.h)
 if test "x$ac_cv_header_sys_queue_h" = "xyes"; then
 	AC_MSG_CHECKING(for TAILQ_FOREACH in sys/queue.h)
 	AC_EGREP_CPP(yes,
@@ -116,9 +117,9 @@ dnl - (this is how we check for a windows version of GCC)
 AC_MSG_CHECKING(for WIN32)
 AC_TRY_COMPILE(,
 	[
-	#ifndef WIN32
-	#error
-	#endif
+#ifndef WIN32
+die horribly
+#endif
 	],
 	bwin32=true; AC_MSG_RESULT(yes),
 	bwin32=false; AC_MSG_RESULT(no),
@@ -132,8 +133,9 @@ AC_C_INLINE
 AC_HEADER_TIME
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(gettimeofday vasprintf fcntl clock_gettime strtok_r)
-AC_REPLACE_FUNCS(strlcpy)
+AC_CHECK_FUNCS(gettimeofday vasprintf fcntl clock_gettime strtok_r strsep getaddrinfo getnameinfo strlcpy inet_ntop signal sigaction strtoll)
+
+AC_CHECK_SIZEOF(long)
 
 if test "x$ac_cv_func_clock_gettime" = "xyes"; then
    AC_DEFINE(DNS_USE_CPU_CLOCK_FOR_ID, 1, [Define if clock_gettime is available in libc])
@@ -162,58 +164,10 @@ if test "x$haveselect" = "xyes" ; then
 fi
 
 havepoll=no
-havertsig=no
 AC_CHECK_FUNCS(poll, [havepoll=yes], )
 if test "x$havepoll" = "xyes" ; then
 	AC_LIBOBJ(poll)
 	needsignal=yes
-
-	if test "x$usertsig" = "xyes" ; then
-		AC_CHECK_FUNCS(sigtimedwait, [havertsig=yes], )
-	fi
-fi
-if test "x$havertsig" = "xyes" ; then
-	AC_MSG_CHECKING(for F_SETSIG in fcntl.h)
-	AC_EGREP_CPP(yes,
-[
-#define _GNU_SOURCE
-#include <fcntl.h>
-#ifdef F_SETSIG
-yes
-#endif
-],	[ AC_MSG_RESULT(yes) ], [ AC_MSG_RESULT(no); havertsig=no])
-fi
-if test "x$havertsig" = "xyes" ; then
-	AC_DEFINE(HAVE_RTSIG, 1, [Define if your system supports POSIX realtime signals])
-	AC_LIBOBJ(rtsig)
-	AC_MSG_CHECKING(for working rtsig on pipes)
-	AC_TRY_RUN(
-[
-#define _GNU_SOURCE
-#include <fcntl.h>
-#include <signal.h>
-#include <unistd.h>
-
-int sigio()
-{
-	exit(0);
-}
-
-int main()
-{
-	int fd[2];
-
-	pipe(fd);
-	signal(SIGIO, sigio);
-	fcntl(fd[0], F_SETOWN, getpid());
-	fcntl(fd[0], F_SETSIG, SIGIO);
-	fcntl(fd[0], F_SETFL, fcntl(fd[0], F_GETFL) | O_ASYNC);
-	write(fd[1], "", 1);
-	return 1;
-}
-],	[ AC_MSG_RESULT(yes)
-	  AC_DEFINE(HAVE_WORKING_RTSIG, 1, [Define if realtime signals work on pipes])],
-	AC_MSG_RESULT(no))
 fi
 
 haveepoll=no
@@ -331,16 +285,42 @@ if test "x$haveeventports" = "xyes" ; then
 	AC_LIBOBJ(evport)
 	needsignal=yes
 fi
+if test "x$bwin32" = "xtrue"; then
+	needsignal=yes
+fi
+if test "x$bwin32" = "xtrue"; then
+	needsignal=yes
+fi
 if test "x$needsignal" = "xyes" ; then
 	AC_LIBOBJ(signal)
 fi
 
 AC_TYPE_PID_T
 AC_TYPE_SIZE_T
-AC_CHECK_TYPE(u_int64_t, unsigned long long)
-AC_CHECK_TYPE(u_int32_t, unsigned int)
-AC_CHECK_TYPE(u_int16_t, unsigned short)
-AC_CHECK_TYPE(u_int8_t, unsigned char)
+AC_CHECK_TYPES([uint64_t, uint32_t, uint16_t, uint8_t], , ,
+[#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#elif defined(HAVE_INTTYPES_H)
+#include <inttypes.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif])
+AC_CHECK_SIZEOF(long long)
+AC_CHECK_SIZEOF(long)   
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(short)
+AC_CHECK_TYPES([struct in6_addr], , ,
+[#ifdef WIN32
+#include <winsock2.h>
+#else
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_NETINET_IN6_H
+#include <netinet/in6.h>
+#endif])
 
 AC_MSG_CHECKING([for socklen_t])
 AC_TRY_COMPILE([
@@ -355,12 +335,12 @@ AC_TRY_COMPILE([
 
 AC_MSG_CHECKING([whether our compiler supports __func__])
 AC_TRY_COMPILE([],
- [void foo() { const char *cp = __func__; }],
+ [ const char *cp = __func__; ],
  AC_MSG_RESULT([yes]),
  AC_MSG_RESULT([no])
  AC_MSG_CHECKING([whether our compiler supports __FUNCTION__])
  AC_TRY_COMPILE([],
-   [void foo() { const char *cp = __FUNCTION__; }],
+   [ const char *cp = __FUNCTION__; ],
    AC_MSG_RESULT([yes])
    AC_DEFINE(__func__, __FUNCTION__,
          [Define to appropriate substitue if compiler doesnt have __func__]),
@@ -368,5 +348,38 @@ AC_TRY_COMPILE([],
    AC_DEFINE(__func__, __FILE__,
          [Define to appropriate substitue if compiler doesnt have __func__])))
 
+
+# Add some more warnings which we use in development but not in the
+# released versions.  (Some relevant gcc versions can't handle these.)
+if test x$enable_gcc_warnings = xyes; then
+
+  AC_COMPILE_IFELSE(AC_LANG_PROGRAM([], [
+#if !defined(__GNUC__) || (__GNUC__ < 4)
+#error
+#endif]), have_gcc4=yes, have_gcc4=no)
+
+  AC_COMPILE_IFELSE(AC_LANG_PROGRAM([], [
+#if !defined(__GNUC__) || (__GNUC__ < 4) || (__GNUC__ == 4 && __GNUC_MINOR__ < 2)
+#error
+#endif]), have_gcc42=yes, have_gcc42=no)
+
+  CFLAGS="$CFLAGS -W -Wfloat-equal -Wundef -Wpointer-arith -Wstrict-prototypes -Wmissing-prototypes -Wwrite-strings -Wredundant-decls -Wchar-subscripts -Wcomment -Wformat=2 -Wwrite-strings -Wmissing-declarations -Wredundant-decls -Wnested-externs -Wbad-function-cast -Wswitch-enum -Werror"
+  CFLAGS="$CFLAGS -Wno-unused-parameter -Wno-sign-compare -Wstrict-aliasing"
+
+  if test x$have_gcc4 = xyes ; then 
+    # These warnings break gcc 3.3.5 and work on gcc 4.0.2
+    CFLAGS="$CFLAGS -Winit-self -Wmissing-field-initializers -Wdeclaration-after-statement"
+    #CFLAGS="$CFLAGS -Wold-style-definition"
+  fi
+
+  if test x$have_gcc42 = xyes ; then 
+    # These warnings break gcc 4.0.2 and work on gcc 4.2
+    CFLAGS="$CFLAGS -Waddress -Wnormalized=id -Woverride-init"
+  fi
+
+##This will break the world on some 64-bit architectures
+# CFLAGS="$CFLAGS -Winline"
+
+fi
 
 AC_OUTPUT(Makefile test/Makefile sample/Makefile)

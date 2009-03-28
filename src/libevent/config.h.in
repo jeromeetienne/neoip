@@ -1,83 +1,4 @@
 /* config.h.in.  Generated from configure.in by autoheader.  */
-/* Define if kqueue works correctly with pipes */
-#undef HAVE_WORKING_KQUEUE
-
-/* Define to `unsigned long long' if <sys/types.h> doesn't define.  */
-#undef u_int64_t
-
-/* Define to `unsigned int' if <sys/types.h> doesn't define.  */
-#undef u_int32_t
-
-/* Define to `unsigned short' if <sys/types.h> doesn't define.  */
-#undef u_int16_t
-
-/* Define to `unsigned char' if <sys/types.h> doesn't define.  */
-#undef u_int8_t
-
-/* Define if timeradd is defined in <sys/time.h> */
-#undef HAVE_TIMERADD
-#ifndef HAVE_TIMERADD
-#undef timersub
-#define timeradd(tvp, uvp, vvp)						\
-	do {								\
-		(vvp)->tv_sec = (tvp)->tv_sec + (uvp)->tv_sec;		\
-		(vvp)->tv_usec = (tvp)->tv_usec + (uvp)->tv_usec;       \
-		if ((vvp)->tv_usec >= 1000000) {			\
-			(vvp)->tv_sec++;				\
-			(vvp)->tv_usec -= 1000000;			\
-		}							\
-	} while (0)
-#define	timersub(tvp, uvp, vvp)						\
-	do {								\
-		(vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;		\
-		(vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec;	\
-		if ((vvp)->tv_usec < 0) {				\
-			(vvp)->tv_sec--;				\
-			(vvp)->tv_usec += 1000000;			\
-		}							\
-	} while (0)
-#endif /* !HAVE_TIMERADD */
-
-#undef HAVE_TIMERCLEAR
-#ifndef HAVE_TIMERCLEAR
-#define	timerclear(tvp)	(tvp)->tv_sec = (tvp)->tv_usec = 0
-#endif
-
-#undef HAVE_TIMERCMP
-#ifndef HAVE_TIMERCMP
-#undef timercmp
-#define	timercmp(tvp, uvp, cmp)						\
-	(((tvp)->tv_sec == (uvp)->tv_sec) ?				\
-	 ((tvp)->tv_usec cmp (uvp)->tv_usec) :				\
-	 ((tvp)->tv_sec cmp (uvp)->tv_sec))
-#endif
-
-#undef HAVE_TIMERISSET
-#ifndef HAVE_TIMERISSET
-#undef timerisset
-#define	timerisset(tvp)	((tvp)->tv_sec || (tvp)->tv_usec)
-#endif
-
-/* Define if TAILQ_FOREACH is defined in <sys/queue.h> */
-#undef HAVE_TAILQFOREACH
-#ifndef HAVE_TAILQFOREACH
-#define	TAILQ_FIRST(head)		((head)->tqh_first)
-#define	TAILQ_END(head)			NULL
-#define	TAILQ_NEXT(elm, field)		((elm)->field.tqe_next)
-#define TAILQ_FOREACH(var, head, field)					\
-	for((var) = TAILQ_FIRST(head);					\
-	    (var) != TAILQ_END(head);					\
-	    (var) = TAILQ_NEXT(var, field))
-#define	TAILQ_INSERT_BEFORE(listelm, elm, field) do {			\
-	(elm)->field.tqe_prev = (listelm)->field.tqe_prev;		\
-	(elm)->field.tqe_next = (listelm);				\
-	*(listelm)->field.tqe_prev = (elm);				\
-	(listelm)->field.tqe_prev = &(elm)->field.tqe_next;		\
-} while (0)
-#endif /* TAILQ_FOREACH */
-
-/* Define to __FUNCTION__ or __file__ if your compiler doesn't have __func__ */
-#undef __func__
 
 /* Define if clock_gettime is available in libc */
 #undef DNS_USE_CPU_CLOCK_FOR_ID
@@ -109,8 +30,17 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
+/* Define to 1 if you have the `getaddrinfo' function. */
+#undef HAVE_GETADDRINFO
+
+/* Define to 1 if you have the `getnameinfo' function. */
+#undef HAVE_GETNAMEINFO
+
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the `inet_ntop' function. */
+#undef HAVE_INET_NTOP
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
@@ -118,11 +48,23 @@
 /* Define to 1 if you have the `kqueue' function. */
 #undef HAVE_KQUEUE
 
+/* Define to 1 if you have the `nsl' library (-lnsl). */
+#undef HAVE_LIBNSL
+
+/* Define to 1 if you have the `resolv' library (-lresolv). */
+#undef HAVE_LIBRESOLV
+
+/* Define to 1 if you have the `rt' library (-lrt). */
+#undef HAVE_LIBRT
+
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <netinet/in6.h> header file. */
+#undef HAVE_NETINET_IN6_H
 
 /* Define to 1 if you have the `poll' function. */
 #undef HAVE_POLL
@@ -136,20 +78,20 @@
 /* Define to 1 if you have the <port.h> header file. */
 #undef HAVE_PORT_H
 
-/* Define if your system supports POSIX realtime signals */
-#undef HAVE_RTSIG
-
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
 
 /* Define if F_SETFD is defined in <fcntl.h> */
 #undef HAVE_SETFD
 
+/* Define to 1 if you have the `sigaction' function. */
+#undef HAVE_SIGACTION
+
+/* Define to 1 if you have the `signal' function. */
+#undef HAVE_SIGNAL
+
 /* Define to 1 if you have the <signal.h> header file. */
 #undef HAVE_SIGNAL_H
-
-/* Define to 1 if you have the `sigtimedwait' function. */
-#undef HAVE_SIGTIMEDWAIT
 
 /* Define to 1 if you have the <stdarg.h> header file. */
 #undef HAVE_STDARG_H
@@ -169,8 +111,17 @@
 /* Define to 1 if you have the `strlcpy' function. */
 #undef HAVE_STRLCPY
 
+/* Define to 1 if you have the `strsep' function. */
+#undef HAVE_STRSEP
+
 /* Define to 1 if you have the `strtok_r' function. */
 #undef HAVE_STRTOK_R
+
+/* Define to 1 if you have the `strtoll' function. */
+#undef HAVE_STRTOLL
+
+/* Define to 1 if the system has the type `struct in6_addr'. */
+#undef HAVE_STRUCT_IN6_ADDR
 
 /* Define to 1 if you have the <sys/devpoll.h> header file. */
 #undef HAVE_SYS_DEVPOLL_H
@@ -184,8 +135,17 @@
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
 
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
 /* Define to 1 if you have the <sys/queue.h> header file. */
 #undef HAVE_SYS_QUEUE_H
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#undef HAVE_SYS_SELECT_H
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#undef HAVE_SYS_SOCKET_H
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
@@ -211,6 +171,18 @@
 /* Define if timerisset is defined in <sys/time.h> */
 #undef HAVE_TIMERISSET
 
+/* Define to 1 if the system has the type `uint16_t'. */
+#undef HAVE_UINT16_T
+
+/* Define to 1 if the system has the type `uint32_t'. */
+#undef HAVE_UINT32_T
+
+/* Define to 1 if the system has the type `uint64_t'. */
+#undef HAVE_UINT64_T
+
+/* Define to 1 if the system has the type `uint8_t'. */
+#undef HAVE_UINT8_T
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
@@ -219,9 +191,6 @@
 
 /* Define if kqueue works correctly with pipes */
 #undef HAVE_WORKING_KQUEUE
-
-/* Define if realtime signals work on pipes */
-#undef HAVE_WORKING_RTSIG
 
 /* Name of package */
 #undef PACKAGE
@@ -240,6 +209,18 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* The size of `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of `long long', as computed by sizeof. */
+#undef SIZEOF_LONG_LONG
+
+/* The size of `short', as computed by sizeof. */
+#undef SIZEOF_SHORT
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
@@ -265,20 +246,8 @@
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t
 
 /* Define to unsigned int if you dont have it */
 #undef socklen_t
-
-/* Define to `unsigned short' if <sys/types.h> does not define. */
-#undef u_int16_t
-
-/* Define to `unsigned int' if <sys/types.h> does not define. */
-#undef u_int32_t
-
-/* Define to `unsigned long long' if <sys/types.h> does not define. */
-#undef u_int64_t
-
-/* Define to `unsigned char' if <sys/types.h> does not define. */
-#undef u_int8_t
