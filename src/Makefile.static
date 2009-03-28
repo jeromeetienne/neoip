@@ -2390,13 +2390,11 @@ distclean: clean_config_debug_dir clean_include_dir clean_pkg
 #     experimentation to backup via duplicity #
 ###############################################
 
-backup:	backup_full
-
-backup_incremental:	distclean
-	cd ../../ && duplicity yavipin scp://dedixl//home/jerome/tmp/.bla
-
-backup_full:	distclean
-	cd ../../ && duplicity full yavipin scp://dedixl//home/jerome/tmp/.bla
+BACKUP_FNAME	= $(shell echo neoip.sos.`date +%Y%m%d`.tgz)
+backup:
+	cd ../../ && tar cvzf $(BACKUP_FNAME) yavipin
+	cat ../../$(BACKUP_FNAME) | mcrypt > /tmp/$(BACKUP_FNAME).nc
+	scp /tmp/$(BACKUP_FNAME).nc dedixl:workspace
 
 #######################################
 # to precompile the .hpp (unclear it is of any use with distcc)
