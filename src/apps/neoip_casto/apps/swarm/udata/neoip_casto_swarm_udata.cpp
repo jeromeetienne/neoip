@@ -150,11 +150,14 @@ bool	casto_swarm_udata_t::neoip_bt_utmsg_bcast_handler_cb(void *cb_userptr
 		return casto_swarm()->autodelete(reason);
 	}
 
+	// log to debug
+	KLOG_ERR("cast_mdata=" << m_cast_mdata);
+	KLOG_ERR("cast_udata=" << cast_udata);
+
+
 	// update the cast_mdata with the received bt_cast_udata_t
 	m_cast_mdata.updated_with(cast_udata, bt_mfile);
 
-	// log to debug
-	KLOG_ERR("cast_udata=" << cast_udata);
 
 	// syncronize all the unstarted bt_httpo_full_t with the new bt_cast_mdata_t
 	swarm_httpo->httpo_full_resync_if_needed();

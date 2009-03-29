@@ -77,16 +77,27 @@ bt_cast_mdata_t::bt_cast_mdata_t()		throw()
 bool	bt_cast_mdata_t::is_null()	const throw()
 {
 	// test if all the mandatory fields have acceptable values
+KLOG_ERR("test passed");	
 	if( cast_id().is_null() )						return true;
+KLOG_ERR("test passed");	
 	if( cast_name().empty() )						return true;
+KLOG_ERR("test passed");	
 	if( boot_nonce() == 0 )							return true;
+KLOG_ERR("test passed");	
 	if( slide_curs_nbpiece_hint() == std::numeric_limits<size_t>::max() )	return true;
+KLOG_ERR("test passed");	
 	if( pieceq_beg() == std::numeric_limits<size_t>::max() )		return true;
+KLOG_ERR("test passed");	
 	if( pieceq_end() == std::numeric_limits<size_t>::max() )		return true;
+KLOG_ERR("test passed");	
 	if( pieceq_maxlen() == std::numeric_limits<size_t>::max() )		return true;
+KLOG_ERR("test passed");	
 	if( casti_date().is_null() )						return true;
+KLOG_ERR("test passed");	
 	if( recv_udata_maxdelay().is_null() )					return true;
+KLOG_ERR("test passed");	
 	if( cast_spos_arr().empty() )						return true;
+KLOG_ERR("test passed");	
 	// if this point is reached, the object is NOT null
 	return false;
 }
