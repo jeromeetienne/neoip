@@ -157,6 +157,9 @@ bool	casto_swarm_udata_t::neoip_bt_utmsg_bcast_handler_cb(void *cb_userptr
 
 	// update the cast_mdata with the received bt_cast_udata_t
 	m_cast_mdata.updated_with(cast_udata, bt_mfile);
+	// if the resulting m_cast_mdata.is_null(), delete the casto_swarm
+	if( m_cast_mdata.is_null() )
+		return casto_swarm()->autodelete("cast_mdata is null post udata update");
 
 
 	// syncronize all the unstarted bt_httpo_full_t with the new bt_cast_mdata_t

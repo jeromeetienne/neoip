@@ -400,6 +400,7 @@ bool	btrelay_swarm_t::neoip_bt_utmsg_bcast_handler_cb(void *cb_userptr
 
 	// update the cast_mdata with the received bt_cast_udata_t
 	m_cast_mdata.updated_with(cast_udata, bt_mfile);
+	DBG_ASSERT( !m_cast_mdata.is_null() );
 
 	// log to debug
 	KLOG_ERR("cast_udata=" << cast_udata);

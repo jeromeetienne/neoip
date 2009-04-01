@@ -158,8 +158,6 @@ void	bt_cast_mdata_t::updated_with(const bt_cast_udata_t &cast_udata
 		DBGNET_ASSERT( cast_pidx.index(pieceidx).is_in(pieceq_beg(), pieceq_end()) );
 	}
 #endif
-	// sanity check - the result MUST NOT be null
-	DBG_ASSERT( !is_null() );
 }
 
 /** \brief Return true if the bt_cast_udata_t is compatible with the bt_cast_mdata_t
