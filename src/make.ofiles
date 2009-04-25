@@ -134,7 +134,6 @@ OBJECTS = \
 	apps/obsolete/old_neoip_router/onet.o \
 	apps/obsolete/old_neoip_router/rawip.o \
 	apps/obsolete/old_neoip_router/vdev.o \
-	libevent/WIN32-Code/misc.o \
 	libevent/WIN32-Code/win32.o \
 	libevent/buffer.o \
 	libevent/devpoll.o \
@@ -145,11 +144,12 @@ OBJECTS = \
 	libevent/event.o \
 	libevent/event_tagging.o \
 	libevent/evport.o \
+	libevent/evrpc.o \
+	libevent/evutil.o \
 	libevent/http.o \
 	libevent/kqueue.o \
 	libevent/log.o \
 	libevent/poll.o \
-	libevent/rtsig.o \
 	libevent/sample/event-test.o \
 	libevent/sample/signal-test.o \
 	libevent/sample/time-test.o \
@@ -161,6 +161,7 @@ OBJECTS = \
 	libevent/test/regress.gen.o \
 	libevent/test/regress_dns.o \
 	libevent/test/regress_http.o \
+	libevent/test/regress_rpc.o \
 	libevent/test/test-eof.o \
 	libevent/test/test-init.o \
 	libevent/test/test-time.o \
@@ -1622,7 +1623,6 @@ LINTS = \
 	apps/obsolete/old_neoip_router/onet.lint \
 	apps/obsolete/old_neoip_router/rawip.lint \
 	apps/obsolete/old_neoip_router/vdev.lint \
-	libevent/WIN32-Code/misc.lint \
 	libevent/WIN32-Code/win32.lint \
 	libevent/buffer.lint \
 	libevent/devpoll.lint \
@@ -1633,11 +1633,12 @@ LINTS = \
 	libevent/event.lint \
 	libevent/event_tagging.lint \
 	libevent/evport.lint \
+	libevent/evrpc.lint \
+	libevent/evutil.lint \
 	libevent/http.lint \
 	libevent/kqueue.lint \
 	libevent/log.lint \
 	libevent/poll.lint \
-	libevent/rtsig.lint \
 	libevent/sample/event-test.lint \
 	libevent/sample/signal-test.lint \
 	libevent/sample/time-test.lint \
@@ -1649,6 +1650,7 @@ LINTS = \
 	libevent/test/regress.gen.lint \
 	libevent/test/regress_dns.lint \
 	libevent/test/regress_http.lint \
+	libevent/test/regress_rpc.lint \
 	libevent/test/test-eof.lint \
 	libevent/test/test-init.lint \
 	libevent/test/test-time.lint \

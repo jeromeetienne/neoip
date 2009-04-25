@@ -1924,13 +1924,25 @@ DBG_OPT		+= -DNO_DBG_TRACE=1
 # DBG_OPT	+= -DNO_NIPMEM_TRACKING=1
 
 
+# remove the warning for unknown variables
+# - because of all the stuff i disable, some variable are unused
+DBG_OPT += -Wno-unused
+
+
 # jme- to make the template instance unique at link-time. i dont really get what it is or how to use it tho
 #      would make the code smaller. i tried and it created compilation error at link time
 # DBG_OPT += -frepo
 # jme- for stuff i dont really get about precompiled header (not important as they are not compatible with distcc)
 # DBG_OPT += -fpch-preprocess
 
-# NOTE: to launch it from shell do "(export RELEASE_BUILD=1; ./m)" in a build_TARGETOS/ directory
+# NOTE: to launch it from shell do "./m DEBUG_BUILD=1" in a build_TARGETOS/ directory
+#DEBUG_BUILD=1
+ifeq ($(DEBUG_BUILD),1)
+	DBG_OPT += -O0
+	DBG_OPT += -g
+endif
+
+# NOTE: to launch it from shell do "./m RELEASE_BUILD=1" in a build_TARGETOS/ directory
 #RELEASE_BUILD=1
 ifeq ($(RELEASE_BUILD),1)
 	DBG_OPT += -O2
@@ -1944,10 +1956,6 @@ ifeq ($(RELEASE_BUILD),1)
 	DBG_OPT += -DNO_NIPMEM_SMASHING=1
 	DBG_OPT += -DNO_NIPMEM_TRACKING=1
 	DBG_OPT += -DNO_WIKIDBG_OBJ=1
-
-	# remove the warning for unknown variables
-	# - because of all the stuff i disable, some variable are unused
-	DBG_OPT += -Wno-unused
 endif
 
 
@@ -2456,7 +2464,7 @@ include $(SRC_DIR)/make.dep
 endif
 
 #######################################
-# to make a slow dependancies computation (slow but surely accurate)
+# to make a slow dependancies computation (slow but sueay accurate)
 ######
 # only GCC. 
 depend slowdep:

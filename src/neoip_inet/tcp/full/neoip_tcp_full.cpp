@@ -108,7 +108,10 @@ tcp_full_t::~tcp_full_t()				throw()
 {
 	// if there still are some data to write, try to xmit
 	// - TODO this doesnt handle the xmit_limit. code it it for regularity	
-	if( xmitbuf.length() )	write(fdwatch->get_fd(), xmitbuf.void_ptr(), xmitbuf.length());
+	if( xmitbuf.length() ){
+		// assigned this variable to avoid a compiler warning
+		ssize_t	len 	= write(fdwatch->get_fd(), xmitbuf.void_ptr(), xmitbuf.length());
+	}
 	
 	// delete the fdwatch_t if needed
 	nipmem_zdelete	fdwatch;
