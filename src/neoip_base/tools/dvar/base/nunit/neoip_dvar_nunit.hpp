@@ -18,15 +18,16 @@ NEOIP_NAMESPACE_BEGIN;
 class dvar_testclass_t : public nunit_testclass_api_t {
 private:
 public:
-	nunit_res_t	general(const nunit_testclass_ftor_t &testclass_ftor)	throw();
-	nunit_res_t	integer(const nunit_testclass_ftor_t &testclass_ftor)	throw();
-	nunit_res_t	dbl(const nunit_testclass_ftor_t &testclass_ftor)	throw();
-	nunit_res_t	string(const nunit_testclass_ftor_t &testclass_ftor)	throw();
-	nunit_res_t	boolean(const nunit_testclass_ftor_t &testclass_ftor)	throw();
-	nunit_res_t	nil(const nunit_testclass_ftor_t &testclass_ftor)	throw();
-	nunit_res_t	array(const nunit_testclass_ftor_t &testclass_ftor)	throw();
-	nunit_res_t	map(const nunit_testclass_ftor_t &testclass_ftor)	throw();
-	nunit_res_t	to_xml(const nunit_testclass_ftor_t &testclass_ftor)	throw();
+	nunit_res_t	general(const nunit_testclass_ftor_t &testclass_ftor)		throw();
+	nunit_res_t	integer(const nunit_testclass_ftor_t &testclass_ftor)		throw();
+	nunit_res_t	dbl(const nunit_testclass_ftor_t &testclass_ftor)		throw();
+	nunit_res_t	string(const nunit_testclass_ftor_t &testclass_ftor)		throw();
+	nunit_res_t	boolean(const nunit_testclass_ftor_t &testclass_ftor)		throw();
+	nunit_res_t	nil(const nunit_testclass_ftor_t &testclass_ftor)		throw();
+	nunit_res_t	array(const nunit_testclass_ftor_t &testclass_ftor)		throw();
+	nunit_res_t	map(const nunit_testclass_ftor_t &testclass_ftor)		throw();
+	nunit_res_t	to_xml(const nunit_testclass_ftor_t &testclass_ftor)		throw();
+	nunit_res_t	to_http_query(const nunit_testclass_ftor_t &testclass_ftor)	throw();
 };
 
 

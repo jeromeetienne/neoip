@@ -21,8 +21,12 @@ class	dvar_t;
 class dvar_helper_t {
 private:
 public:
-	static void		to_xml(const dvar_t &dvar, std::ostringstream &oss)	throw();
-	static std::string	to_xml(const dvar_t &dvar)				throw();
+	static void		to_xml(const dvar_t &dvar, std::ostringstream &oss)		throw();
+	static std::string	to_xml(const dvar_t &dvar)					throw();
+	static void		to_http_query(const dvar_t &dvar, std::ostringstream &oss
+							, const std::string &key_prefix
+							, const std::string &key_suffix)	throw();
+	static std::string	to_http_query(const dvar_t &dvar)				throw();
 };
 
 NEOIP_NAMESPACE_END

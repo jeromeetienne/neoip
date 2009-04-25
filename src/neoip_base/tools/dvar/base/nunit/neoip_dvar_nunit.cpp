@@ -322,5 +322,40 @@ nunit_res_t	dvar_testclass_t::to_xml(const nunit_testclass_ftor_t &testclass_fto
 	return NUNIT_RES_OK;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief function to test a dvar_t
+ */
+nunit_res_t	dvar_testclass_t::to_http_query(const nunit_testclass_ftor_t &testclass_ftor) throw()
+{
+	// log to debug
+	KLOG_ERR("enter");
+
+	dvar_t	dvar_main	= dvar_map_t();
+	dvar_t	dvar_arr1	= dvar_arr_t().append(dvar_int_t(42)).append(dvar_int_t(98));
+	dvar_t	dvar_arr2	= dvar_arr_t().append(dvar_int_t(42)).append(dvar_int_t(99));
+	dvar_t	dvar_map1	= dvar_map_t().insert("aaaa", dvar_int_t(42)).insert("bbbb", dvar_int_t(42));
+	dvar_main.map().insert("super_array1", dvar_arr1);
+	dvar_main.map().insert("super_array2", dvar_arr2);
+	dvar_main.map().insert("singleint", dvar_int_t(42));
+	dvar_main.map().insert("singlestttrring", dvar_str_t("slota"));
+	dvar_main.map().insert("megamap", dvar_map1);
+
+	// NOTE: this is not a real nunit, aka it will succeed everytime
+	// - this is more a testbed
+	KLOG_ERR("dvar=" << dvar_main);
+	KLOG_ERR("dvar.to_http_query=" << dvar_helper_t::to_http_query(dvar_main));
+
+	// return no error
+	return NUNIT_RES_OK;
+}
+
+
+
+
 NEOIP_NAMESPACE_END
 
