@@ -485,10 +485,6 @@ flv_err_t	flv2xml_apps_t::parse_tagtype_meta(const flv_taghd_t &flv_taghd
 	flv_err	= amf0_parse_t::amf_to_dvar(bytearray, data_dvar);
 	if( flv_err.failed() )	return flv_err;
 
-	// log to debug
-	KLOG_STDOUT("METADATA event_type=" << type_dvar << " event_data=" << data_dvar);
-	DBG_ASSERT(0);
-
 	// if flv_tagtype_t::META MUST NOT be displayed, return now
 	if( !output_tag_meta )	return flv_err_t::OK;
 	// display the event
