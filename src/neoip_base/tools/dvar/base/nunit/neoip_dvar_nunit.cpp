@@ -334,7 +334,7 @@ nunit_res_t	dvar_testclass_t::to_http_query(const nunit_testclass_ftor_t &testcl
 {
 	// log to debug
 	KLOG_ERR("enter");
-
+	
 	dvar_t	dvar_main	= dvar_map_t();
 	dvar_t	dvar_arr1	= dvar_arr_t().append(dvar_int_t(42)).append(dvar_int_t(98));
 	dvar_t	dvar_arr2	= dvar_arr_t().append(dvar_int_t(42)).append(dvar_int_t(99));
@@ -355,6 +355,18 @@ nunit_res_t	dvar_testclass_t::to_http_query(const nunit_testclass_ftor_t &testcl
 }
 
 
+/** \brief function to test a dvar_t
+ */
+nunit_res_t	dvar_testclass_t::from_http_query(const nunit_testclass_ftor_t &testclass_ftor) throw()
+{
+	// log to debug
+	KLOG_ERR("enter");
+	
+	dvar_t	dvar_from	= dvar_helper_t::from_http_query("bonjour[0]=bla&bonjour[1]=slota");
+	//dvar_t	dvar_from	= dvar_helper_t::from_http_query("foo=slota&prout[bla[gribit]]=prit&prout[blo]=prot");
+	KLOG_ERR("dvar=" << dvar_from);
+	return NUNIT_RES_OK;
+}
 
 
 NEOIP_NAMESPACE_END

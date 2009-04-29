@@ -273,6 +273,7 @@ static void base_gsuite_fct(nunit_suite_t &nunit_suite)
 	dvar_testclass->append("map"		, &dvar_testclass_t::map);
 	dvar_testclass->append("to_xml"		, &dvar_testclass_t::to_xml);
 	dvar_testclass->append("to_http_query"	, &dvar_testclass_t::to_http_query);
+	dvar_testclass->append("from_http_query", &dvar_testclass_t::from_http_query);
 	// add the testclass to the nunit_suite
 	base_suite->append(dvar_testclass);
 

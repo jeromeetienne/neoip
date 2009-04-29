@@ -62,8 +62,10 @@ std::string	dvar_arr_t::to_string()	const throw()
 	// put the begining of the array
 	oss << "[";
 	// put each element of the array
-	for(size_t i = 0; i < array.size(); i++ )
-		oss << "[" << array[i] << "]";
+	for(size_t i = 0; i < array.size(); i++ ){
+		if( i > 0 )	oss	<< ", ";
+		oss << array[i];
+	}
 	// put the end of the array
 	oss << "]";
 	// return the just built string

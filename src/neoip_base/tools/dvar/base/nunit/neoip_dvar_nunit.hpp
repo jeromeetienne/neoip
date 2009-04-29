@@ -28,6 +28,7 @@ public:
 	nunit_res_t	map(const nunit_testclass_ftor_t &testclass_ftor)		throw();
 	nunit_res_t	to_xml(const nunit_testclass_ftor_t &testclass_ftor)		throw();
 	nunit_res_t	to_http_query(const nunit_testclass_ftor_t &testclass_ftor)	throw();
+	nunit_res_t	from_http_query(const nunit_testclass_ftor_t &testclass_ftor)	throw();
 };
 
 
