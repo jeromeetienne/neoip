@@ -166,6 +166,7 @@ bt_err_t casti_swarm_t::start(casti_swarm_arg_t &swarm_arg)	throw()
 	this->m_scasti_uri	= swarm_arg.scasti_uri();
 	this->m_scasti_mod	= swarm_arg.scasti_mod();
 	this->m_http_peersrc_uri= swarm_arg.http_peersrc_uri();
+	this->m_web2srv_str	= swarm_arg.web2srv_str();
 	// link this object to the bt_casti_apps_t
 	casti_apps->swarm_dolink(this);
 
@@ -273,7 +274,8 @@ void	casti_swarm_t::start_publishing()		throw()
 	// start the bt_cast_mdata_dopublish_t
 	bt_err_t	bt_err;
 	m_mdata_dopublish= nipmem_new bt_cast_mdata_dopublish_t();
-	bt_err		= m_mdata_dopublish->start(mdata_srv_uri(), cast_privtext(), this, NULL);
+	bt_err		= m_mdata_dopublish->start(mdata_srv_uri(), cast_privtext()
+						, m_web2srv_str, this, NULL);
 	DBG_ASSERT( bt_err.succeed() );
 }
 
@@ -294,7 +296,8 @@ void	casti_swarm_t::notify_republish_required()	throw()
 	// start the bt_cast_mdata_dopublish_t
 	bt_err_t	bt_err;
 	m_mdata_dopublish= nipmem_new bt_cast_mdata_dopublish_t();
-	bt_err		= m_mdata_dopublish->start(mdata_srv_uri(), cast_privtext(), this, NULL);
+	bt_err		= m_mdata_dopublish->start(mdata_srv_uri(), cast_privtext()
+						, m_web2srv_str, this, NULL);
 	DBG_ASSERT( bt_err.succeed() );
 }
 

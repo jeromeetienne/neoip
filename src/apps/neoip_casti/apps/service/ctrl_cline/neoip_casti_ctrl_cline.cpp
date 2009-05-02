@@ -106,6 +106,8 @@ casti_swarm_arg_t	casti_ctrl_cline_t::build_swarm_arg()	throw()
 		swarm_arg.scasti_mod		(arg_option.get_first_value("scasti_mod"));
 	if( arg_option.contain_key("http_peersrc_uri") )
 		swarm_arg.http_peersrc_uri	(arg_option.get_first_value("http_peersrc_uri"));
+	if( arg_option.contain_key("web2srv_str") )
+		swarm_arg.http_peersrc_uri	(arg_option.get_first_value("web2srv_str"));
 	// return the resulting object
 	return swarm_arg;
 }
@@ -198,6 +200,11 @@ clineopt_arr_t	casti_ctrl_cline_t::clineopt_arr()	throw()
 				.option_mode(clineopt_mode_t::OPTIONAL)
 				.help_string("specify the uri of a peersrc");
 	clineopt_arr	+= clineopt;
+	// add the --web2srv_str cmdline option
+	clineopt	= clineopt_t("web2srv_str", clineopt_mode_t::REQUIRED)
+				.option_mode(clineopt_mode_t::OPTIONAL)
+				.help_string("specify the string which gonna be send directly to cast_mdata_srv");
+	clineopt_arr	+= clineopt;	
 	// return the just built clineopt_arr_t
 	return clineopt_arr;
 }

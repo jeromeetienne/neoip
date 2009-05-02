@@ -32,8 +32,9 @@ private:
 	bt_cast_mdata_dopublish_profile_t m_profile;//!< the profile for this object
 	std::string	m_publish_type;		//!< the publish_type "push" or "pull"
 	http_uri_t	m_mdata_srv_uri;	//!< the xmlrpc server http_uri_t
-	std::string	m_cast_privtext;		//!< the cast_privtext for this publish
-	std::string	m_cast_privhash;		//!< the cast_privhash for this publish
+	std::string	m_web2srv_str;		//!< the web2srv_str sent to the server 
+	std::string	m_cast_privtext;	//!< the cast_privtext for this publish
+	std::string	m_cast_privhash;	//!< the cast_privhash for this publish
 	bool		m_published;		//!< true if at least on bt_cast_mdata_t is published
 
 	/*************** Internal function	*******************************/
@@ -84,6 +85,7 @@ public:
 	/*************** Setup function	***************************************/
 	bt_cast_mdata_dopublish_t& profile(const bt_cast_mdata_dopublish_profile_t &profile)		throw();
 	bt_err_t	start(const http_uri_t &m_mdata_srv_uri, const std::string &m_cast_privtext
+					, const std::string &m_web2srv_str
 					, bt_cast_mdata_dopublish_cb_t *callback
 					, void *userptr)	throw();
 

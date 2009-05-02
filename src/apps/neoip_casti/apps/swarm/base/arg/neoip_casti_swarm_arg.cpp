@@ -19,6 +19,7 @@ NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, std::string		, cast_privtext)
 NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, http_uri_t		, scasti_uri)
 NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, bt_scasti_mod_type_t	, scasti_mod)
 NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, http_uri_t		, http_peersrc_uri)
+NEOIP_ARGPACK_DEF_ITEM(casti_swarm_arg_t	, std::string		, web2srv_str)
 NEOIP_ARGPACK_DEF_CLASS_END(casti_swarm_arg_t)
 
 /** \brief Check if the object is valid

@@ -145,6 +145,7 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 	std::string	scasti_mod_str;
 	http_uri_t	mdata_srv_uri;
 	http_uri_t	http_peersrc_uri;
+	std::string	web2srv_str;
 	bt_err_t	bt_err;
 	// log to debug
 	KLOG_ERR("enter");
@@ -156,6 +157,7 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, scasti_uri);
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, scasti_mod_str);
 	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, http_peersrc_uri);
+	NEOIP_XMLRPC_RESP_PARSE_ARG	(xmlrpc_parse, web2srv_str);
 	NEOIP_XMLRPC_RESP_PARSE_END	(xmlrpc_parse, xmlrpc_err);
 	// if there is a error in the xmlrpc_parse_t, return now
 	if( xmlrpc_err.failed() )	return xmlrpc_err;
@@ -167,6 +169,7 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 	if( !scasti_uri.is_null())	swarm_arg.scasti_uri		(scasti_uri);
 	if( !scasti_mod_str.empty() )	swarm_arg.scasti_mod		(scasti_mod_str);
 	if( !http_peersrc_uri.is_null())swarm_arg.http_peersrc_uri	(http_peersrc_uri);
+	if( !web2srv_str.empty())	swarm_arg.web2srv_str		(web2srv_str);
 
 	// check the resulting casti_swarm_arg_t
 	bt_err		= swarm_arg.check();
@@ -188,6 +191,10 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 			return xmlrpc_err_t(xmlrpc_err_t::ERROR, "Cant start stream due to " + bt_err.to_string());
 		}
 	}
+	
+// TODO make a web2srv_str update in casti_swarm_t here
+// - in casti_swarm_t, if the new one is != from the old one
+//   trigger a publication immediatly
 
 	// build the xmlrpc response with the cast_privhash
 	NEOIP_XMLRPC_RESP_BUILD(xmlrpc_build, casti_swarm->cast_privhash() );

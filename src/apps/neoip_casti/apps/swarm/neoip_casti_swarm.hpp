@@ -57,6 +57,7 @@ private:
 	http_uri_t		m_scasti_uri;	//!< source http_uri_t for this casti_swarm_t
 	bt_scasti_mod_type_t	m_scasti_mod;	//!< the bt_scasti_mod_type_t for this casti_swarm_t
 	http_uri_t		m_http_peersrc_uri;//!< http_uri_t for the bt_peersrc_http_t
+	std::string		m_web2srv_str;	//!< the web2srv_str for this swarm
 
 	size_t			pieceq_beg;
 	size_t			pieceq_end;

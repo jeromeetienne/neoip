@@ -164,6 +164,11 @@ httpd_err_t casti_swarm_wikidbg_t::page(const std::string &keyword, void *object
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
+			oss << h.s_td() << h.s_b() << "web2srv_str"	<< h.e_b() << h.e_td();
+			oss << h.s_td() << ": " << casti_swarm->m_web2srv_str
+					<< h.e_td();
+			oss << h.e_tr();
+		oss << h.s_tr();
 			oss << h.s_td() << h.s_b() << "casti_apps"		<< h.e_b() << h.e_td();
 			oss << h.s_td() << ": " << wikidbg_html("oneword_pageurl", casti_swarm->casti_apps)
 					<< h.e_td();

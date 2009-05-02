@@ -115,6 +115,7 @@ bt_cast_mdata_dopublish_t &	bt_cast_mdata_dopublish_t::profile(const bt_cast_mda
  */
 bt_err_t bt_cast_mdata_dopublish_t::start(const http_uri_t &m_mdata_srv_uri
 			, const std::string &m_cast_privtext
+			, const std::string &m_web2srv_str
 			, bt_cast_mdata_dopublish_cb_t *callback, void *userptr)	throw()
 {
 	// log to debug
@@ -208,6 +209,7 @@ datum_t bt_cast_mdata_dopublish_t::build_call_set_mdata(const std::string &type)
 	xmlrpc_build_t	xmlrpc_build;
 	if( type == "pull" ){
 		xmlrpc_build << xmlrpc_build_t::CALL_BEG("set_cast_mdata_pull");
+		xmlrpc_build << xmlrpc_build_t::PARAM_BEG << m_web2srv_str		<< xmlrpc_build_t::PARAM_END;
 		xmlrpc_build << xmlrpc_build_t::PARAM_BEG << cast_mdata.cast_name()	<< xmlrpc_build_t::PARAM_END;
 		xmlrpc_build << xmlrpc_build_t::PARAM_BEG << m_cast_privtext		<< xmlrpc_build_t::PARAM_END;
 		xmlrpc_build << xmlrpc_build_t::PARAM_BEG << cast_mdata.cast_id()	<< xmlrpc_build_t::PARAM_END;
@@ -217,6 +219,7 @@ datum_t bt_cast_mdata_dopublish_t::build_call_set_mdata(const std::string &type)
 		xmlrpc_build << xmlrpc_build_t::CALL_END;
 	}else{
 		xmlrpc_build << xmlrpc_build_t::CALL_BEG("set_cast_mdata_push");
+		xmlrpc_build << xmlrpc_build_t::PARAM_BEG << m_web2srv_str		<< xmlrpc_build_t::PARAM_END;
 		xmlrpc_build << xmlrpc_build_t::PARAM_BEG << cast_mdata.cast_name()	<< xmlrpc_build_t::PARAM_END;
 		xmlrpc_build << xmlrpc_build_t::PARAM_BEG << m_cast_privtext		<< xmlrpc_build_t::PARAM_END;
 		xmlrpc_build << xmlrpc_build_t::PARAM_BEG << cast_mdata			<< xmlrpc_build_t::PARAM_END;
