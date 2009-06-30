@@ -190,12 +190,11 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 			nipmem_zdelete	casti_swarm;
 			return xmlrpc_err_t(xmlrpc_err_t::ERROR, "Cant start stream due to " + bt_err.to_string());
 		}
+	}else{
+		// if casti_swarm already exists, update web2srv_str
+		casti_swarm->web2srv_str(web2srv_str);
 	}
 	
-// TODO make a web2srv_str update in casti_swarm_t here
-// - in casti_swarm_t, if the new one is != from the old one
-//   trigger a publication immediatly
-
 	// build the xmlrpc response with the cast_privhash
 	NEOIP_XMLRPC_RESP_BUILD(xmlrpc_build, casti_swarm->cast_privhash() );
 

@@ -244,6 +244,22 @@ std::string	casti_swarm_t::cast_privhash()	const throw()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+
+/** \brief update web2srv_str
+ *
+ * - if the value changes, a bt_cast_mdata_t publication is immediatly triggered
+*/
+void	casti_swarm_t::web2srv_str(const std::string &new_value)		throw()
+{
+	// if the value stays the same, return now
+	if( m_web2srv_str == new_value )	return;
+	// update the value
+	m_web2srv_str	= new_value;
+	// if m_data_dopublish is not init, return now
+	if( !m_mdata_dopublish )		return;
+	m_mdata_dopublish->web2srv_str(m_web2srv_str);
+}
+
 /** \brief do a gracefull_shutdown of this casti_swarm_t
  *
  * @return tokeep for the casti_swarm_t

@@ -90,9 +90,12 @@ public:
 					, void *userptr)	throw();
 
 	/*************** Query function	***************************************/
-	bool			published()	const throw()	{ return m_published;	}
+	bool			published()	const throw()	{ return m_published;		}
 	const std::string &	cast_privhash()	const throw()	{ return m_cast_privhash;	}
 
+	/*************** Action function	*******************************/
+	void		web2srv_str(const std::string &web2srv_str)		throw();
+	
 	/*************** List of friend class	*******************************/
 	friend class	bt_cast_mdata_dopublish_wikidbg_t;
 };

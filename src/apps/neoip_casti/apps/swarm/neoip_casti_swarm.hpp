@@ -122,6 +122,7 @@ public:
 	bt_cast_udata_t			current_udata()	const throw();
 
 	/*************** Action function	*******************************/
+	void		web2srv_str(const std::string &web2srv_str)		throw();
 	bool		gracefull_shutdown(const std::string &reason)		throw();
 	void		start_publishing()		throw();
 	void		notify_republish_required()	throw();

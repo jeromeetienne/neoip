@@ -135,6 +135,11 @@ httpd_err_t bt_cast_mdata_dopublish_wikidbg_t::page(const std::string &keyword, 
 					<< h.e_td();
 			oss << h.e_tr();
 		oss << h.s_tr();
+			oss << h.s_td() << h.s_b() << "web2srv_str"		<< h.e_b() << h.e_td();
+			oss << h.s_td() << ": " << mdata_dopublish->m_web2srv_str
+					<< h.e_td();
+			oss << h.e_tr();
+		oss << h.s_tr();
 			oss << h.s_td() << h.s_b() << "published"		<< h.e_b() << h.e_td();
 			oss << h.s_td() << ": " << mdata_dopublish->published()
 					<< h.e_td();

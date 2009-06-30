@@ -123,6 +123,7 @@ bt_err_t bt_cast_mdata_dopublish_t::start(const http_uri_t &m_mdata_srv_uri
 	// copy the parameter
 	this->m_mdata_srv_uri	= m_mdata_srv_uri;
 	this->m_cast_privtext	= m_cast_privtext;
+	this->m_web2srv_str	= m_web2srv_str;
 	this->callback		= callback;
 	this->userptr		= userptr;
 
@@ -138,6 +139,33 @@ bt_err_t bt_cast_mdata_dopublish_t::start(const http_uri_t &m_mdata_srv_uri
 	return bt_err_t::OK;
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			Action function
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * \brief update web2srv_str
+ *
+ * - if the value changes, a bt_cast_mdata_t publication is triggered asap
+*/
+void	bt_cast_mdata_dopublish_t::web2srv_str(const std::string &new_value)		throw()
+{
+	// if the value stays the same, return now
+	if( m_web2srv_str == new_value )	return;
+	// update the value
+	m_web2srv_str	= new_value;
+	
+	// if the m_periodic_timeout is running, stop it now to trigger republication
+	// and to get faster refresh
+	if( m_periodic_timeout.is_running() ){
+		m_periodic_timeout.stop();
+		m_periodic_timeout.start(delay_t::from_sec(0), this, NULL);
+	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -451,8 +479,6 @@ bool	bt_cast_mdata_dopublish_t::periodic_set_client_cb(void *cb_userptr, xmlrpc_
 
 	// mark that the m_published according to the success of the xmlrpc_client_t
 	m_published	= xmlrpc_err.succeed() ? true : false;
-
-
 
 	// delete the xmlrpc_client_t
 	nipmem_zdelete	m_periodic_set;
