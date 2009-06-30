@@ -273,6 +273,8 @@ dvar_t	dvar_helper_t::http_query_convert_map2arr(const dvar_t &dvar)	throw()
 	}
 	// sanity check - this point MUST never be reached
 	DBG_ASSERT(false);
+	// NOTE: just a gcc workaround. to allow compilation in -O2
+	return dvar_t();
 }
 
 /** \brief Helper on top of the other to_dvar
