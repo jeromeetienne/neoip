@@ -7,6 +7,7 @@
 #ifndef __NEOIP_SERIAL_STAT_HPP__ 
 #define __NEOIP_SERIAL_STAT_HPP__ 
 /* system include */
+#include <stdint.h>
 /* local include */
 #include "neoip_copy_ctor_checker.hpp"
 #include "neoip_namespace.hpp"

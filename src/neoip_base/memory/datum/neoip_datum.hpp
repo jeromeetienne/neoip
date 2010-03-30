@@ -8,6 +8,7 @@
 #define __NEOIP_DATUM_HPP__ 
 /* system include */
 #include <iostream>
+#include <stdint.h>
 /* local include */
 #include "neoip_datum_flag.hpp"
 #include "neoip_serial_except.hpp"

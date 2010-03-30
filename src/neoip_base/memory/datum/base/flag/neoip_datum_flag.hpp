@@ -8,6 +8,7 @@
 #define __NEOIP_DATUM_FLAG_HPP__ 
 /* system include */
 #include <iostream>
+#include <stdint.h>
 /* local include */
 #include "neoip_copy_ctor_checker.hpp"
 #include "neoip_namespace.hpp"

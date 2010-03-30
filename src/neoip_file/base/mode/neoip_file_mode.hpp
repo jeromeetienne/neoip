@@ -7,6 +7,7 @@
 #ifndef __NEOIP_FILE_MODE_HPP__ 
 #define __NEOIP_FILE_MODE_HPP__ 
 /* system include */
+#include <stdint.h>
 /* local include */
 #include "neoip_copy_ctor_checker.hpp"
 #include "neoip_namespace.hpp"

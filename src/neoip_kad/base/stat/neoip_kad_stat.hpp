@@ -7,6 +7,7 @@
 #ifndef __NEOIP_KAD_STAT_HPP__ 
 #define __NEOIP_KAD_STAT_HPP__ 
 /* system include */
+#include <stdint.h>
 /* local include */
 #include "neoip_namespace.hpp"
 
