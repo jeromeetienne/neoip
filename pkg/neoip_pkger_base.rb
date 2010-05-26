@@ -524,7 +524,7 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 	# - .deb = 3162192
 	
 	# build the package itself
-	puts ("Doing 'sudo epm' to build the epm_package. if it asks for a password, give sudo password.")
+	puts("Doing 'sudo epm' to build the epm_package. if it asks for a password, give sudo password.")
 	epm_format	= pkg_type.split('_')[0];
 	system("sudo epm -n --output-dir . -f #{epm_format} #{apps_name} #{apps_name}.epm_list")
 
