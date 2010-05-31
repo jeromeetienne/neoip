@@ -25,8 +25,8 @@ fi
 # remote compilation via ssh+nfs on jmehost2
 # - pro: jmehost2 doesnt have overheat issue like jmehost1
 # - pro: jmehost1 got the free cpu/ram during compilation, so more confortable to code
-#exec ssh jmehost2 "cd $PWD && make -j2 -f ~/workspace/yavipin/src/Makefile.static $TARGET_OPT $*"
-#exec ssh jmehost3 "cd $PWD && make -j2 -f ~/workspace/yavipin/src/Makefile.static $TARGET_OPT $*"
+#exec ssh jmehost2 "cd $PWD && make -j2 -f ../src/Makefile.static $TARGET_OPT $*"
+#exec ssh jmehost3 "cd $PWD && make -j2 -f ../src/Makefile.static $TARGET_OPT $*"
 
 # Distributed build using distcc - using jmehost2 and jmehost3
 # - i dunno why jmehost3 is never saturated.
