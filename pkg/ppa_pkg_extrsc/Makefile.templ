@@ -3,13 +3,11 @@
 
 all: build
 
-DESTDIR="/tmp/slota"
-
-ROOT_DIR	= /home/jerome/workspace/yavipin
+ROOT_DIR	= ./yavipin
 BUILD_DIR	= $(ROOT_DIR)/build_linux
 PKG_DIR		= $(ROOT_DIR)/pkg
 
-build: $(BUILD_DIR)/@APPS_NAME@-bin-static
+build:
 	(cd $(BUILD_DIR) && ./m @APPS_NAME@-bin-static)
 
 clean:

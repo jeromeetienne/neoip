@@ -119,7 +119,7 @@ def get_apps_version(pkg_type, apps_name)
 	canon_name	= get_canon_name(apps_name)
 	apps_version	= `grep -e '^#define.*APPS_VERSION' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info_version.hpp | cut -d'"' -f 2 | tr -d "\n"`
 	#apps_compiletime= File.stat("#{get_exec_dir(pkg_type)}/apps/#{canon_name}/#{canon_name}_main.o").mtime
-	apps_compiletime= File.stat("#{get_exec_dir(pkg_type)}").mtime
+	apps_compiletime= File.stat(get_build_dir(apps_name)).ctime
 	return apps_version + "-" + apps_compiletime.strftime("%Y%m%d%H%M")
 end
 
@@ -163,10 +163,7 @@ def patch_templ_file(src_fname, dst_fname, variables)
 	# read the src file
 	content	= File.read(src_fname)
 	# patch each variables in it
-	variables.each { |key, val|
-		puts "key=#{key}"
-		content.gsub!("@#{key}@", val)
-	}
+	variables.each { |key, val|	content.gsub!("@#{key}@", val)	}
 	# write the destination
 	File.open(dst_fname, "w") { |fd| fd.write(content) }
 end
@@ -242,6 +239,11 @@ def apps_mkdir_linux(pkg_type, apps_name)
 	apps_summary	= get_apps_summary(apps_name)
 	apps_description= get_apps_description(apps_name)
 	apps_type	= get_apps_type(apps_name)
+
+
+	# build the application
+	cmdline	= "cd #{exec_dir} && ./m #{apps_name}-bin-static"
+	system(cmdline)
 
 	# copy the executable
 	FileUtils.cp "#{exec_dir}/#{apps_name}-bin-static", "#{build_dir}"
@@ -582,6 +584,10 @@ end
 ################################################################################
 
 # mkpkg for ppa_install
+# - debuild  -uc -us -b <- from above debian/, build a binary package without signing it
+# - debuild  -k'jerome etienne' -b <- from above debian/, build a source package and sign it with "jerome etienne" gpg key
+# - dpkg-source -x neoip-get_0.0.1*.dsc <- "decompress" the source pacakge described in the .dsc
+# - dput -U ppa:jerome-etienne/neoip #{apps_name}_#{apps_version}_source.changes <- upload a source package to a ppa
 def apps_mkpkg_ppa_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
@@ -592,25 +598,24 @@ def apps_mkpkg_ppa_install(pkg_type, apps_name)
 	apps_description= get_apps_description(apps_name)
 	apps_type	= get_apps_type(apps_name)
 	
-
-	tmp_dir		= "/tmp/neoip_pkger_base_#{canon_name}.#{$$}"
-	tmp_dir		= "/tmp/neoip_pkger_base_#{canon_name}"
-puts "tmp_dir=#{tmp_dir}"
+	# determine some path
+	tmp_dir		= "/tmp/neoip_pkger_base_#{apps_name}_#{apps_version}"
+	tmp_dir		= "/tmp/neoip_pkger_base_#{pkg_type}_#{apps_name}"
 	debian_rootdir	= "#{tmp_dir}/debian_rootdir"
 	debian_confdir	= "#{debian_rootdir}/debian"
 	
-FileUtils.rm_rf(tmp_dir)
-
+	# build the directory
 	FileUtils.mkdir_p(debian_rootdir)
 	
 	# do the initial dh_make
-	cmdline	= "cd #{debian_rootdir} && (yes | dh_make -e jerome.etienne@gmail.com -p #{apps_name}_#{apps_version} -s -n)"
+	cmdline	= "cd #{debian_rootdir} && (yes | DEBFULLNAME='Jerome Etienne' DEBEMAIL='jerome.etienne@gmail.com' dh_make -e jerome.etienne@gmail.com -p #{apps_name}_#{apps_version} -s -n)"
 	system(cmdline)
 
 	# do the dummy changelog
-	cmdline	= "cd #{debian_confdir} && dch -v #{apps_version} -m Another build"
+	# - "--force-bad-version" is needed as dh_make create the same 
+	cmdline	= "cd #{debian_rootdir} && dch --newversion #{apps_version} --maintmaint --force-bad-version --distribution `lsb_release -c -s` Another build"
 	system(cmdline)
-
+	
 	# determine all the templ_vars
 	templ_vars	= {
 		:APPS_NAME		=> apps_name,
@@ -622,7 +627,8 @@ FileUtils.rm_rf(tmp_dir)
 	# read the template
 	patch_templ_file("ppa_pkg_extrsc/control.templ"	, "#{debian_confdir}/control"	, templ_vars)
 	patch_templ_file("ppa_pkg_extrsc/Makefile.templ", "#{debian_rootdir}/Makefile"	, templ_vars)
-	
+	patch_templ_file("ppa_pkg_extrsc/rules.templ"	, "#{debian_rootdir}/rules"	, templ_vars)
+	system("chmod +x #{debian_rootdir}/rules")
 
 	# get external rescources
 	all_manpage	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.[0-9]$/.match(x) }
@@ -635,8 +641,12 @@ FileUtils.rm_rf(tmp_dir)
 	# install manpage
 	all_manpage.each{ |basename|
 		src_fname	= "#{build_dir}/pkg_extrsc/#{basename}"
-		dst_fname	= "#{debian_confdir}/#{File.basename(src_fname, File.extname(src_fname))}.manpages"
+		dst_fname	= "#{debian_confdir}/#{basename}"
 		FileUtils.cp(src_fname, dst_fname)
+	}
+	File.open("#{debian_confdir}/#{apps_name}.manpages", "w") { |f|
+		content	= all_manpage.collect { |basename| "debian/#{basename}" }.join("\n")
+		f.write(content)
 	}
 	# install initd
 	all_initd.each	{ |basename|
@@ -644,29 +654,34 @@ FileUtils.rm_rf(tmp_dir)
 		dst_fname	= "#{debian_confdir}/#{File.basename(src_fname).gsub(/\.init\.d/, ".init")}"
 		FileUtils.cp(src_fname, dst_fname)
 	}
-	
+
 	# copy the source in it
 	# - this is space+time consuming but debuild -S use tar without the option to follow symlink
 	# - i tried "export TAR_OPTIONS=--dereference" which is honored by GNU tar (tested)
 	#   but fails with debuild... dunno why... maybe they use their own tar 
 	cmdline	= "rsync -va --exclude paper --exclude .git ../../yavipin/ #{debian_rootdir}/yavipin"
 	system(cmdline)
-	
-	# do a make clean - just in case
-	cmdline	= "cd #{debian_rootdir}/yavipin/build_linux && ./m clean"
-	system(cmdline)
 
-	# do a make clean - just in case
+	# do a make clean - reduce the size of the source package, so the upload time
+	system("cd #{debian_rootdir}/yavipin/build_linux && ./m clean")
+	system("cd #{debian_rootdir}/yavipin/build_linux && rm -f *-bin-static")
+	system("cd #{debian_rootdir}/yavipin/pkg && make clean")
+
+	# do build the source package
 	cmdline	= "cd #{debian_rootdir} && (yes | debuild -S -k'jerome etienne')"
-	system(cmdline)
-	
-	# upload the source package
-	cmdline	= "dput -U ppa:jerome-etienne/neoip #{tmp_dir}/#{apps_name}_#{apps_version}_source.changes"
 	system(cmdline)
 end
 
 # mkpkg for ppa_install
 def apps_rmpkg_ppa_install(pkg_type, apps_name)
+	# get the data specific to this apps_name
+	#apps_version	= get_apps_version(pkg_type, apps_name)
+	# determine some path
+	#tmp_dir	= "/tmp/neoip_pkger_base_#{apps_name}_#{apps_version}"
+	tmp_dir		= "/tmp/neoip_pkger_base_#{pkg_type}_#{apps_name}"
+
+	# remove the whole directory	
+	FileUtils.rm_rf(tmp_dir)
 end
 
 ################################################################################
@@ -695,7 +710,7 @@ def apps_mkpkg_tgz_install(pkg_type, apps_name)
 	# TODO maybe another script install.sh and uninstall.sh
 	# - which install/uninstall all the external resource like a .deb/.rpm
 
-	tmp_dir		= "/tmp/neoip_pkger_base_#{canon_name}"
+	tmp_dir		= "/tmp/neoip_pkger_base_#{pkg_type}_#{apps_name}"
 	install_dir	= "#{tmp_dir}/#{apps_name}_#{apps_version}"
 	
 	# if apps_type == *_BOOT
@@ -876,6 +891,22 @@ def apps_upload_rpm_install(pkg_type, apps_name)
 	# upload to jmeserv
 	scp_dest	= "dedixl.jetienne.com:public_html/download/#{build_target}"
 	system("scp #{apps_name}-#{apps_version}.rpm #{scp_dest}")
+end
+
+# upload for rpm_install
+def apps_upload_ppa_install(pkg_type, apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	# get the data specific to this apps_name
+	apps_version	= get_apps_version(pkg_type, apps_name)
+	
+	# determine some path
+	tmp_dir		= "/tmp/neoip_pkger_base_#{apps_name}_#{apps_version}"
+	tmp_dir		= "/tmp/neoip_pkger_base_#{pkg_type}_#{apps_name}"
+
+	# upload the source package
+	cmdline		= "dput -U ppa:jerome-etienne/neoip #{tmp_dir}/#{apps_name}_#{apps_version}_source.changes"
+	system(cmdline)
 end
 
 # upload for tgz_install
