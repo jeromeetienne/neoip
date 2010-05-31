@@ -1,0 +1,23 @@
+# this is the root makefile for the debian rules
+# - thus i dont have to modify the debian rules ?
+
+all: build
+
+DESTDIR="/tmp/slota"
+
+ROOT_DIR	= /home/jerome/workspace/yavipin
+BUILD_DIR	= $(ROOT_DIR)/build_linux
+PKG_DIR		= $(ROOT_DIR)/pkg
+
+build: $(BUILD_DIR)/@APPS_NAME@-bin-static
+	(cd $(BUILD_DIR) && ./m @APPS_NAME@-bin-static)
+
+clean:
+	(cd $(BUILD_DIR) && ./m clean)
+	
+install: build
+	(cd $(PKG_DIR) && ./neoip_pkger_base.rb tgz_install @APPS_NAME@ rmdir rmpkg mkdir mkpkg)
+	tar xvzf $(PKG_DIR)/@APPS_NAME@_*.tgz -C $(DESTDIR)
+	rm -rf $(DESTDIR)/usr/share/man
+	rm -rf $(DESTDIR)/etc/init.d
+	(cd $(PKG_DIR) && ./neoip_pkger_base.rb tgz_install @APPS_NAME@ rmdir rmpkg)

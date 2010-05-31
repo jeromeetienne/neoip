@@ -32,7 +32,7 @@ require "fileutils"
 # yavipin/pkg
 
 # determine all the possible pkg_type
-pkg_type_supported = ['nsis_install', 'macos_install', 'deb_install', 'rpm_install', "tgz_install"]
+pkg_type_supported = ['nsis_install', 'macos_install', 'deb_install', 'rpm_install', "tgz_install", "ppa_install"]
 
 ################################################################################
 # Build a standalone directory for the application 
@@ -46,6 +46,7 @@ def get_build_target(pkg_type)
 		"deb_install"	=> "linux",
 		"rpm_install"	=> "linux",
 		"tgz_install"	=> "linux",
+		"ppa_install"	=> "linux",
 		"nsis_install"	=> "win32",
 		"macos_install"	=> "macos",
 		}
@@ -58,6 +59,7 @@ def get_pkg_fext(pkg_type)
 		"deb_install"	=> "deb",
 		"rpm_install"	=> "rpm",
 		"tgz_install"	=> "tgz",
+		"ppa_install"	=> "PPANOCLUE",
 		"nsis_install"	=> "exe",
 		"macos_install"	=> "dmg",
 		}
@@ -116,7 +118,8 @@ end
 def get_apps_version(pkg_type, apps_name)
 	canon_name	= get_canon_name(apps_name)
 	apps_version	= `grep -e '^#define.*APPS_VERSION' #{mainsrc_dir}/apps/#{canon_name}/#{canon_name}_info_version.hpp | cut -d'"' -f 2 | tr -d "\n"`
-	apps_compiletime= File.stat("#{get_exec_dir(pkg_type)}/apps/#{canon_name}/#{canon_name}_main.o").mtime
+	#apps_compiletime= File.stat("#{get_exec_dir(pkg_type)}/apps/#{canon_name}/#{canon_name}_main.o").mtime
+	apps_compiletime= File.stat("#{get_exec_dir(pkg_type)}").mtime
 	return apps_version + "-" + apps_compiletime.strftime("%Y%m%d%H%M")
 end
 
@@ -154,6 +157,18 @@ def get_apps_description(apps_name)
 	
 	# return the info_line which is the description
 	return info_line
+end
+
+def patch_templ_file(src_fname, dst_fname, variables)
+	# read the src file
+	content	= File.read(src_fname)
+	# patch each variables in it
+	variables.each { |key, val|
+		puts "key=#{key}"
+		content.gsub!("@#{key}@", val)
+	}
+	# write the destination
+	File.open(dst_fname, "w") { |fd| fd.write(content) }
 end
 
 ################################################################################
@@ -243,6 +258,7 @@ def apps_mkdir_linux(pkg_type, apps_name)
 	all_template.each { |basename|
 		file_path	= "#{build_dir}/pkg_extrsc/#{basename}"
 		# read the template
+		# - TODO port it to patch_templ_file()
 		file_data	= File.open("#{file_path}").read
 		file_data.gsub!(/@APPS_NAME@/		, "#{apps_name}");
 		file_data.gsub!(/@APPS_TYPE@/		, "#{apps_type}");
@@ -283,6 +299,7 @@ def apps_mkdir_win32(pkg_type, apps_name)
 	all_template.each { |basename|
 		file_path	= "#{build_dir}/pkg_extrsc/#{basename}"
 		# read the template
+		# - TODO port it to patch_templ_file()
 		file_data	= File.open("#{file_path}").read
 		file_data.gsub!(/@APPS_NAME@/		, "#{apps_name}");
 		file_data.gsub!(/@APPS_TYPE@/		, "#{apps_type}");
@@ -410,7 +427,7 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 		fOut.puts("")
 		fOut.puts(`mkepmlist -u root -g root --prefix /etc/#{canon_name} #{build_dir}/config_dir_sample`)
 		
-		# if appt_type == *_BOOT
+		# if apps_type == *_BOOT
 		# - make the binary exec in ${apps_name}-bin
 		# - add a ctrl script in ${apps_name}-ctrl
 		# else (aka if apps_type == *_TEMP)
@@ -561,15 +578,111 @@ def apps_rmpkg_rpm_install(pkg_type, apps_name)
 end
 
 ################################################################################
+# mkpkg/rmpkg for ppa_install - assume the standalone directory is already built
+################################################################################
+
+# mkpkg for ppa_install
+def apps_mkpkg_ppa_install(pkg_type, apps_name)
+	# get the build_dir
+	build_dir	= get_build_dir(apps_name)
+	# get the data specific to this apps_name
+	canon_name	= get_canon_name(apps_name)
+	apps_version	= get_apps_version(pkg_type, apps_name)
+	apps_summary	= get_apps_summary(apps_name)
+	apps_description= get_apps_description(apps_name)
+	apps_type	= get_apps_type(apps_name)
+	
+
+	tmp_dir		= "/tmp/neoip_pkger_base_#{canon_name}.#{$$}"
+	tmp_dir		= "/tmp/neoip_pkger_base_#{canon_name}"
+puts "tmp_dir=#{tmp_dir}"
+	debian_rootdir	= "#{tmp_dir}/debian_rootdir"
+	debian_confdir	= "#{debian_rootdir}/debian"
+	
+FileUtils.rm_rf(tmp_dir)
+
+	FileUtils.mkdir_p(debian_rootdir)
+	
+	# do the initial dh_make
+	cmdline	= "cd #{debian_rootdir} && (yes | dh_make -e jerome.etienne@gmail.com -p #{apps_name}_#{apps_version} -s -n)"
+	system(cmdline)
+
+	# do the dummy changelog
+	cmdline	= "cd #{debian_confdir} && dch -v #{apps_version} -m Another build"
+	system(cmdline)
+
+	# determine all the templ_vars
+	templ_vars	= {
+		:APPS_NAME		=> apps_name,
+		:APPS_TYPE		=> apps_type,
+		:APPS_SUMMARY		=> apps_summary,
+		:APPS_VERSION		=> apps_version,
+		:APPS_DESCRIPTION	=> apps_description.join('\n')
+	}
+	# read the template
+	patch_templ_file("ppa_pkg_extrsc/control.templ"	, "#{debian_confdir}/control"	, templ_vars)
+	patch_templ_file("ppa_pkg_extrsc/Makefile.templ", "#{debian_rootdir}/Makefile"	, templ_vars)
+	
+
+	# get external rescources
+	all_manpage	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.[0-9]$/.match(x) }
+	all_desktop	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.desktop$/.match(x) }
+	all_initd	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.init.d$/.match(x) }
+	# sanity check
+	raise "only one man page is handled"	if all_manpage.length > 1
+	raise ".desktop is NOT handled"		if all_desktop.length > 0
+	raise "only one initd is handled"	if all_initd.length > 1
+	# install manpage
+	all_manpage.each{ |basename|
+		src_fname	= "#{build_dir}/pkg_extrsc/#{basename}"
+		dst_fname	= "#{debian_confdir}/#{File.basename(src_fname, File.extname(src_fname))}.manpages"
+		FileUtils.cp(src_fname, dst_fname)
+	}
+	# install initd
+	all_initd.each	{ |basename|
+		src_fname	= "#{build_dir}/pkg_extrsc/#{basename}"
+		dst_fname	= "#{debian_confdir}/#{File.basename(src_fname).gsub(/\.init\.d/, ".init")}"
+		FileUtils.cp(src_fname, dst_fname)
+	}
+	
+	# copy the source in it
+	# - this is space+time consuming but debuild -S use tar without the option to follow symlink
+	# - i tried "export TAR_OPTIONS=--dereference" which is honored by GNU tar (tested)
+	#   but fails with debuild... dunno why... maybe they use their own tar 
+	cmdline	= "rsync -va --exclude paper --exclude .git ../../yavipin/ #{debian_rootdir}/yavipin"
+	system(cmdline)
+	
+	# do a make clean - just in case
+	cmdline	= "cd #{debian_rootdir}/yavipin/build_linux && ./m clean"
+	system(cmdline)
+
+	# do a make clean - just in case
+	cmdline	= "cd #{debian_rootdir} && (yes | debuild -S -k'jerome etienne')"
+	system(cmdline)
+	
+	# upload the source package
+	cmdline	= "dput -U ppa:jerome-etienne/neoip #{tmp_dir}/#{apps_name}_#{apps_version}_source.changes"
+	system(cmdline)
+end
+
+# mkpkg for ppa_install
+def apps_rmpkg_ppa_install(pkg_type, apps_name)
+end
+
+################################################################################
 # mkpkg/rmpkg for tgz_install - assume the standalone directory is already built
 ################################################################################
 
 # mkpkg for tgz_install
+# NOTE: used by ppa_install too (to build the installed directories structure)
 def apps_mkpkg_tgz_install(pkg_type, apps_name)
 	# get the build_dir
 	build_dir	= get_build_dir(apps_name)
 	# get the data specific to this apps_name
-	apps_version	= get_apps_version('tgz_install', apps_name)
+	canon_name	= get_canon_name(apps_name)
+	apps_version	= get_apps_version(pkg_type, apps_name)
+	apps_summary	= get_apps_summary(apps_name)
+	apps_description= get_apps_description(apps_name)
 	apps_type	= get_apps_type(apps_name)
 
 	# TODO put an easy script to handle the start stop more easily ?
@@ -580,15 +693,65 @@ def apps_mkpkg_tgz_install(pkg_type, apps_name)
 	# - so the best would be to have something similar to the -ctrl script
 
 	# TODO maybe another script install.sh and uninstall.sh
-	# - which install/uninstall all the external resource like a .deb/.rpm 
+	# - which install/uninstall all the external resource like a .deb/.rpm
 
-	# create a symlink to ensure that the .tgz will extract in a 'normal' directory name
-	# - i.e. #{apps_name}_#{apps_version}
-	FileUtils.ln_s "#{build_dir}", "#{apps_name}_#{apps_version}"
-	# build the .tgz 
-	system("tar chzf #{apps_name}_#{apps_version}_i386.tgz #{apps_name}_#{apps_version}");
-	# remove the symlink for clean extraction dirname
-	FileUtils.rm_f "#{apps_name}_#{apps_version}"
+	tmp_dir		= "/tmp/neoip_pkger_base_#{canon_name}"
+	install_dir	= "#{tmp_dir}/#{apps_name}_#{apps_version}"
+	
+	# if apps_type == *_BOOT
+	# - make the binary exec in ${apps_name}-bin
+	# - add a ctrl script in ${apps_name}-ctrl
+	# else (aka if apps_type == *_TEMP)
+	# - make the binary exec in #{apps_name}
+	if apps_type =~ /SYS_BOOT/
+		FileUtils.mkdir_p("#{install_dir}/usr/lib/#{canon_name}")
+		FileUtils.cp("#{build_dir}/#{apps_name}-bin-static"		, "#{install_dir}/usr/lib/#{canon_name}/#{apps_name}-bin")
+		FileUtils.cp("#{build_dir}/pkg_extrsc/#{apps_name}-ctrl.sh"	, "#{install_dir}/usr/lib/#{apps_name}-ctrl")
+	elsif apps_type =~ /USR_BOOT/
+		FileUtils.mkdir_p("#{install_dir}/usr/lib/#{canon_name}")
+		FileUtils.mkdir_p("#{install_dir}/usr/bin")
+		FileUtils.cp("#{build_dir}/#{apps_name}-bin-static"		, "#{install_dir}/usr/lib/#{canon_name}/#{apps_name}-bin")
+		FileUtils.cp("#{build_dir}/pkg_extrsc/#{apps_name}-ctrl.sh"	, "#{install_dir}/usr/bin/#{apps_name}-ctrl")
+	else
+		FileUtils.mkdir_p("#{install_dir}/usr/bin")
+		FileUtils.cp("#{build_dir}/#{apps_name}-bin-static"		, "#{install_dir}/usr/bin/#{apps_name}")
+	end
+
+	# copy the config dir
+	FileUtils.mkdir_p("#{install_dir}/etc/#{canon_name}")
+	FileUtils.cp_r("#{build_dir}/config_dir_sample/.", "#{install_dir}/etc/#{canon_name}")
+	
+	# get external rescources
+	all_manpage	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.[0-9]$/.match(x) }
+	all_desktop	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.desktop$/.match(x) }
+	all_initd	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.init.d$/.match(x) }
+	# install external rescources
+	all_manpage.each{ |basename|
+		src_fname	= "#{build_dir}/pkg_extrsc/#{basename}"
+		man_section	= basename.match(/.([0-9])$/)[1]
+		dst_fname	= "#{install_dir}/usr/share/man/man#{man_section}/#{basename}"
+		FileUtils.mkdir_p(File.dirname(dst_fname))
+		FileUtils.cp(src_fname, dst_fname)
+	}
+	all_desktop.each{ |basename|
+		src_fname	= "#{build_dir}/pkg_extrsc/#{basename}"
+		dst_fname	= "#{install_dir}/usr/share/application/#{basename}"
+		FileUtils.mkdir_p(File.dirname(dst_fname))
+		FileUtils.cp(src_fname, dst_fname)
+	}
+	all_initd.each	{ |basename|
+		src_fname	= "#{build_dir}/pkg_extrsc/#{basename}"
+		dst_fname	= "#{install_dir}/etc/init.d/#{File.basename(src_fname).gsub(/\.init\.d/, '')}"
+		FileUtils.mkdir_p(File.dirname(dst_fname))
+		FileUtils.cp(src_fname, dst_fname)
+	}
+
+	# build the .tgz
+	cmdline	= "tar chzf #{Dir.pwd}/#{apps_name}_#{apps_version}_i386.tgz -C #{install_dir} ."
+	system(cmdline);
+	
+	# remove the tmp_dir
+	FileUtils.rm_rf "#{tmp_dir}"
 end
 
 # mkpkg for tgz_install
