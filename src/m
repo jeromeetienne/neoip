@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # set teh variable to build a debug version
 export DEBUG_BUILD=1
 # make the makefile
@@ -38,15 +40,22 @@ fi
 #exec ssh jmehost2 "cd $PWD && export DISTCC_HOSTS=\"jmehost3,lzo localhost\" && make -j8 -f ../src/Makefile.static CXX=\"$CXX_VAL\" $TARGET_OPT $*"
 #exec ssh jmehost3 "cd $PWD && export DISTCC_HOSTS=\"localhost jmehost2,lzo\" && make -j8 -f ../src/Makefile.static CXX=\"$CXX_VAL\" $TARGET_OPT $*"
 
+
 if [ "$BASE_DIR" = "build_linux" ]; then
-	CXX_VAL="ccache g++"
+	CXX_VAL="g++"
 elif [ "$BASE_DIR" = "build_win32" ]; then
-	CXX_VAL="ccache i586-mingw32msvc-g++"
+	CXX_VAL="i586-mingw32msvc-g++"
 elif [ "$BASE_DIR" = "build_macos" ]; then
-	CXX_VAL="ccache g++-4.2"
+	CXX_VAL="g++-4.2"
 fi
-#exec make -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
-exec ionice -c 3 nice make -j4 -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
+# add ccache if present
+[ -x "/usr/bin/ccache" ] && CXX_VAL="ccache $CXX_VAL"
+
+# determine the number of processors available
+NCPU=`cat /proc/cpuinfo | grep processor | wc -l`
+
+##exec make -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
+exec ionice -c 3 nice make -j$NCPU -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
 
 # Distributed build using distcc
 #export DISTCC_HOSTS="jmehost2"
