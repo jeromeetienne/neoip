@@ -54,8 +54,17 @@ fi
 # determine the number of processors available
 NCPU=`cat /proc/cpuinfo | grep processor | wc -l`
 
+# determine the hostname
+HOSTNAME=`hostname`
+# do a ionice+nice IIF this is one of my boxes
+if [ "$HOSTNAME" = "jmebox" ]; then
+	PRIO_PREFIX="ionice -c 3 nice"
+else
+	PRIO_PREFIX=""
+fi
+
 ##exec make -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
-exec ionice -c 3 nice make -j$NCPU -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
+exec $PRIO_PREFIX make -j$NCPU -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
 
 # Distributed build using distcc
 #export DISTCC_HOSTS="jmehost2"
