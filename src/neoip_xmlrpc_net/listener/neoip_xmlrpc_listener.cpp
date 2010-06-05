@@ -312,6 +312,10 @@ std::string xmlrpc_listener_t::parse_xmlrpc_call(const datum_t &xmlenc_datum)	th
 
 /** \brief callback notified by \ref http_resp_t when to notify an event
  * 
+ * - if obj_id=present, then use it to define the variable
+ * - if callback=present, then use it to support jsonp
+ * - if none is present, just reply the json
+ * 
  * @return true if the http_resp_t is still valid after the callback
  */
 bool	xmlrpc_listener_t::sresp_jsrest_cb(void *cb_userptr, http_sresp_t &cb_http_sresp
@@ -425,8 +429,9 @@ bool	xmlrpc_listener_t::sresp_jsrest_cb(void *cb_userptr, http_sresp_t &cb_http_
 	sresp_ctx.rephd().header_db().update("Content-Type", "application/x-javascript");
 	// build the html reply
 	std::ostringstream &	oss	= sresp_ctx.response_body();
-	if( !jsonp_cb.empty() )	js_oss	<< ")";
-	oss	<< js_oss.str() << ";\n";
+	if( !obj_id.empty() )		js_oss	<< ";";
+	else if( !jsonp_cb.empty() )	js_oss	<< ");";
+	oss	<< js_oss.str() << "\n";
 
 	// return tokeep
 	return true;
