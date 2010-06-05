@@ -319,12 +319,13 @@ bool	xmlrpc_listener_t::sresp_jsrest_cb(void *cb_userptr, http_sresp_t &cb_http_
 {
 	const strvar_db_t &	uri_var		= sresp_ctx.reqhd().uri().var();
 	const std::string &	obj_id		= uri_var.get_first_value("obj_id"); 
+	const std::string &	jsonp_cb	= uri_var.get_first_value("callback"); 
 	const std::string &	method_name	= uri_var.get_first_value("method_name"); 
 	// log to debug
 	KLOG_ERR("enter sresp_ctx=" << sresp_ctx);
 	
 	// if any mandatory field is not specified, return a "bad request"
-	if( obj_id.empty() || method_name.empty() ){
+	if( method_name.empty() ){
 		sresp_ctx.reply_error(400, "Invalid request. missing mandatory field obj_id/method_name");
 		return true;
 	}
@@ -366,12 +367,21 @@ bool	xmlrpc_listener_t::sresp_jsrest_cb(void *cb_userptr, http_sresp_t &cb_http_
 
 	// start producing the javascript to return
 	std::ostringstream	js_oss;
-#if 0	// TODO to remove - old version i dunno what window.parent was used for
-	// - likely for experiement with iframe
-	js_oss	<< "window.parent.neoip_xdomrpc_script_reply_var_" << obj_id << " = ";
-#else
-	js_oss	<< "neoip_xdomrpc_script_reply_var_" << obj_id << " = ";
-#endif
+	if( !obj_id.empty() ){
+		// jsreset
+		#if 0	// TODO to remove - old version i dunno what window.parent was used for
+			// - likely for experiement with iframe
+			js_oss	<< "window.parent.neoip_xdomrpc_script_reply_var_" << obj_id << " = ";
+		#else
+			js_oss	<< "neoip_xdomrpc_script_reply_var_" << obj_id << " = ";
+		#endif
+	}else if( !jsonp_cb.empty() ){
+		// jsonp
+		js_oss	<< jsonp_cb << "(";
+	}else {
+		// plain reset
+	}
+
 	// build the reply depending on the xmlrpc_parse_t
 	if( xmlrpc_parse.is_fault_resp() ){
 		int32_t		fault_code;
@@ -390,7 +400,7 @@ bool	xmlrpc_listener_t::sresp_jsrest_cb(void *cb_userptr, http_sresp_t &cb_http_
 		js_oss << ", ";
 		js_oss 	<< "\"returned_val\": ";
 		js_oss		<< "null";
-		js_oss << "};";
+		js_oss << "}";
 	}else{
 		// log to debug
 		KLOG_ERR("succeed");
@@ -408,14 +418,15 @@ bool	xmlrpc_listener_t::sresp_jsrest_cb(void *cb_userptr, http_sresp_t &cb_http_
 		js_oss << ", ";
 		js_oss 	<< "\"returned_val\": ";
 		js_oss		<< oss_json.str();
-		js_oss << "};";
+		js_oss << "}";
 	}
 
 	// Set the mime-type for xml
 	sresp_ctx.rephd().header_db().update("Content-Type", "application/x-javascript");
 	// build the html reply
 	std::ostringstream &	oss	= sresp_ctx.response_body();
-	oss	<< js_oss.str() << "\n";
+	if( !jsonp_cb.empty() )	js_oss	<< ")";
+	oss	<< js_oss.str() << ";\n";
 
 	// return tokeep
 	return true;
