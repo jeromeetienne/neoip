@@ -379,7 +379,7 @@ bool	xmlrpc_listener_t::sresp_jsrest_cb(void *cb_userptr, http_sresp_t &cb_http_
 		// jsonp
 		js_oss	<< jsonp_cb << "(";
 	}else {
-		// plain reset
+		// plain json
 	}
 
 	// build the reply depending on the xmlrpc_parse_t
