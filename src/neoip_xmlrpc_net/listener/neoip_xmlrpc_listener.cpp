@@ -383,12 +383,12 @@ bool	xmlrpc_listener_t::sresp_jsrest_cb(void *cb_userptr, http_sresp_t &cb_http_
 		KLOG_ERR("fault_code=" << fault_code << " fault_string=" << fault_string);
 		// complete the js_oss
 		js_oss << "{";
-		js_oss 	<< "fault: ";
-		js_oss 		<< "{code: "		<< fault_code; 
-		js_oss		<< ", string: \""	<< fault_string << "\"";
+		js_oss 	<< "\"fault\": ";
+		js_oss 		<< "{\"code\": "	<< fault_code; 
+		js_oss		<< ", \"string\": \""	<< fault_string << "\"";
 		js_oss		<< "}";
 		js_oss << ", ";
-		js_oss 	<< "returned_val: ";
+		js_oss 	<< "\"returned_val\": ";
 		js_oss		<< "null";
 		js_oss << "};";
 	}else{
@@ -403,10 +403,10 @@ bool	xmlrpc_listener_t::sresp_jsrest_cb(void *cb_userptr, http_sresp_t &cb_http_
 		} catch(xml_except_t &e) { DBG_ASSERT(0);	}
 		// complete the js_oss
 		js_oss << "{";
-		js_oss 	<< "fault: ";
+		js_oss 	<< "\"fault\": ";
 		js_oss		<< "null";
 		js_oss << ", ";
-		js_oss 	<< "returned_val: ";
+		js_oss 	<< "\"returned_val\": ";
 		js_oss		<< oss_json.str();
 		js_oss << "};";
 	}
