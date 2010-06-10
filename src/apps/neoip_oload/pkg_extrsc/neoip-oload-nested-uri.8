@@ -7,8 +7,25 @@ TODO write a better description.
 currently this page is a stub. improve it when needed. It is mainly done to centralize
 all the possible options of the nested uri for neoip-oload.
 
-explain the mod raw/flv
-mod flv only to get the funky range request for seeking in flv from flash plugin
+
+.SH URI grammar
+The nested uri is build according to the following grammar
+
+{{outter_uri}}/{{mod}}/(*{{outter_var_key}}*{{outter_var_val}}/)*/{{inner_uri}}(?@)neoip_metavar_{{minner_var_key}}=#{{minner_var_val}}
+
+
+.TP
+.I "mod"
+Determine the type of modification is done on the inner_uri data.
+The valid values are "raw" or "flv". If unspecified, it is considered equal to "raw".
+"raw" mod deliver the data unmodified.
+"flv" mod is dedicated to .flv flash video files. "flv" mod is only used to get the
+funky range request for seeking in flv from flash plugin, as flash plugin is unable
+to do actual http range request.
+A valid flv header is prepended to any response. 
+Two minner_var may be used to determine the inner_uri range to request:
+"oload_flv_rangereq_beg" and "oload_flv_rangereq_end".
+
 
 .SH list of valid metavar in the inner uri
 Sometimes this is required to modify the variables of the inner_uri. Those variables
@@ -101,8 +118,9 @@ Determine the type of the outter_uri. Usefull when guessing is impossible.
 TODO explain how it is guessed. give all possible values.
 .TP
 .I "subfile_level level"
-Usefull to select a given file when the outter_uri is a multi file mfile.
+Usefull to select a given file when the inner_uri is a multi file mfile.
 TODO explain what is this level, how to put the subfile_path inside the nested_uri
+TODO this is the number of basename at uri path end, which represent the path inside the multi file mfile.
 .TP
 .I "subfile_byteoffset value"
 The value is the begining of the range request. Part of the flv range-request trick.
