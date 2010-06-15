@@ -647,7 +647,7 @@ file_range_t	bt_httpo_full_t::range_to_read()	const throw()
 	file_size_t		chunk_beg	= current_pos();
 	file_size_t		chunk_end	= m_range_tosend.end();
 	// log to debug
-	KLOG_DBG("enter");
+	KLOG_ERR("enter chunk_beg=" << chunk_beg << " chunk_end=" << chunk_end);
 	// sanity check - bt_io_read_t MUST NOT be in progress when this function is called
 	DBG_ASSERT( bt_io_read == NULL );
 
@@ -676,11 +676,14 @@ file_range_t	bt_httpo_full_t::range_to_read()	const throw()
 		pieceidx_end	= i;
 	}
 	// clamp chunk_end to be the end of the last available pieceidx
-	chunk_end	= bt_unit_t::pieceidx_to_pieceend(pieceidx_end, bt_mfile);	
+	chunk_end	= std::min( chunk_end, bt_unit_t::pieceidx_to_pieceend(pieceidx_end, bt_mfile) );
 	// clamp the chunk_end with socket_full->xmitbuf_freelen()
 	if( chunk_end-chunk_beg+1 > socket_full->xmitbuf_freelen() )
 		chunk_end	= chunk_beg + socket_full->xmitbuf_freelen() - 1;
-				
+
+	// log to debug
+	KLOG_ERR("leave chunk_beg=" << chunk_beg << " chunk_end=" << chunk_end);
+
 	// return the file_range
 	return file_range_t(chunk_beg, chunk_end);
 }
