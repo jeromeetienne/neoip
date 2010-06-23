@@ -119,7 +119,7 @@ inet_err_t	tcp_resp_t::start(const ipport_addr_t &p_listen_addr
 	}
 
 	// put the socket in listen mode
-	if( listen(sock_fd, 0) < 0 ){
+	if( listen(sock_fd, 64) < 0 ){
 		errstr = "cant cant listen on to " + listen_addr().to_string() 
 					+ " due to " + inet_oswarp_t::sock_strerror();
 		goto close_socket;
