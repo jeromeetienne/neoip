@@ -87,8 +87,8 @@ bool	xmlrpc_client_t::neoip_http_sclient_cb(void *cb_userptr, http_sclient_t &cb
 {
 	http_sclient_res_t	sclient_res	= cb_sclient_res;
 	// log to debug
-	KLOG_DBG("enter http_sclient_res=" << sclient_res);
-	KLOG_DBG("reply_body=" << sclient_res.reply_body().to_stdstring());
+	KLOG_ERR("enter http_sclient_res=" << sclient_res);
+	KLOG_ERR("reply_body=" << sclient_res.reply_body().to_stdstring());
 
 	// if http_sclient_t failed, notify the caller
 	if( !sclient_res.is_post_ok() ){

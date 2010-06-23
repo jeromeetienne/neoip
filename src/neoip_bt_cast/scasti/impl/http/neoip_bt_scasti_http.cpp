@@ -31,6 +31,7 @@ and write it in a bt_io_pfile_t as a "circular buffer"
 #include "neoip_bt_io_vapi.hpp"
 #include "neoip_bt_io_pfile.hpp"
 #include "neoip_http_client.hpp"
+#include "neoip_http_rephd.hpp"
 #include "neoip_socket_full.hpp"
 #include "neoip_socket_event.hpp"
 #include "neoip_nipmem_alloc.hpp"
@@ -176,7 +177,6 @@ bool	bt_scasti_http_t::neoip_http_client_cb(void *cb_userptr, http_client_t &cb_
 {
 	// log to debug
 	KLOG_DBG("enter http_err=" << http_err << " http_rephd=" << http_rephd << "recved_data=" << recved_data);
-
 
 	// if the connection failed, notify the caller
 	if( http_err.failed() )	return notify_callback_failed( bt_err_from_http(http_err) );
