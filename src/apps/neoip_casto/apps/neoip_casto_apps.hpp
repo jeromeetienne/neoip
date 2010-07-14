@@ -69,7 +69,7 @@ private:
 	/*************** casto_swarm_t	***************************************/
 	std::list<casto_swarm_t *>		swarm_db;
 	void swarm_dolink(casto_swarm_t *swarm)	throw()	{ swarm_db.push_back(swarm);	}
-	void swarm_unlink(casto_swarm_t *swarm)	throw()	{ swarm_db.remove(swarm);		}
+	void swarm_unlink(casto_swarm_t *swarm)	throw()	{ swarm_db.remove(swarm);	}
 	casto_swarm_t *	swarm_by(const http_uri_t &mdata_srv_uri, const std::string &cast_name
 					, const std::string &cast_privhash)	const throw();
 public:
@@ -82,7 +82,7 @@ public:
 	
 	/*************** Query function	***************************************/
 	http_listener_t *	http_listener()		const throw()	{ return m_http_listener;	}
-	bt_httpo_listener_t *	httpo_listener()	const throw()	{ return m_httpo_listener;		}
+	bt_httpo_listener_t *	httpo_listener()	const throw()	{ return m_httpo_listener;	}
 	bt_ezsession_t *	bt_ezsession()		const throw()	{ return m_bt_ezsession;	}
 	const file_path_t &	io_pfile_dirpath()	const throw()	{ return m_io_pfile_dirpath;	}
 	const http_uri_t &	dfl_mdata_srv_uri()	const throw()	{ return m_dfl_mdata_srv_uri;}

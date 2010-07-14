@@ -146,7 +146,6 @@ bt_err_t	casto_apps_t::start()						throw()
 	bt_err		= launch_httpo(casto_conf);
 	if( bt_err.failed() )		return bt_err;
 
-
 	// Launch the apps_httpdetect_t - use directly neoip_*_info.hpp #define 
 	// - cant use libapps->canon_name() because it would be wrong for neoip-webok
 	libsess_err_t	libsess_err;

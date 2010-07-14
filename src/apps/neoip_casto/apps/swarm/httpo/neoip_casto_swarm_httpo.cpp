@@ -292,6 +292,10 @@ bt_err_t	casto_swarm_httpo_t::httpo_full_do_start(bt_httpo_full_t *httpo_full)	t
 	// - "no-store" - dont store the data - rfc2616.14.9.2
 	http_rephd.header_db().update("Cache-Control", "no-cache; no-store");
 
+	// add 'Connection: close' - rfc2616.14.10
+	// HTTP/1.1 applications that do not support persistent connections MUST include the "close" connection option in every message. 
+	http_rephd.header_db().update("Connection", "close");
+
 	// log to debug
 	KLOG_ERR("http_reqhd=" << http_reqhd << " http_rephd=" << http_rephd);
 
