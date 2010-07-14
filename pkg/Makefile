@@ -12,6 +12,9 @@ rpm_based:
 deb_based:
 	./neoip_pkger.rb deb_install neoip-webpack full
 
+ppa_based:
+	./neoip_pkger.rb ppa_install neoip-webpack full
+
 win32:
 	./neoip_pkger.rb nsis_install neoip-webpack full
 
