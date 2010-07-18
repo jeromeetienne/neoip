@@ -293,7 +293,8 @@ bt_err_t	casto_swarm_httpo_t::httpo_full_do_start(bt_httpo_full_t *httpo_full)	t
 	http_rephd.header_db().update("Cache-Control", "no-cache; no-store");
 
 	// add 'Connection: close' - rfc2616.14.10
-	// HTTP/1.1 applications that do not support persistent connections MUST include the "close" connection option in every message. 
+	// - "HTTP/1.1 applications that do not support persistent connections MUST include the "close"
+	//   connection option in every message."
 	http_rephd.header_db().update("Connection", "close");
 
 	// log to debug
