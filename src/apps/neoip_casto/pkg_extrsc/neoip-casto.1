@@ -12,7 +12,6 @@ in the neoip cast system.
 
 casto stands for neoip cast output. casti stands for neoip cast input.
 
-
 Typical usage for debugging: specifying a specific conficuration directory and nodaemon
 neoip-casto -c myconfigdirectory -d
 
@@ -29,18 +28,26 @@ WARNING: internally neoip-casto has a hardcoded url http://jmehost1:9080/cast_md
 which is used to get the bt_cast_mdata_t via xmlrpc. this is typically neoip-casti 
 while doing test which is answering to this
 
-.SH About swarm access
+.SH About swarm access and url
 neoip-casto is able to handle multiple swarm at the same time.
-each swarm is uniquely identify by the couple mdata_srv_uri and cast_name.
+each swarm is uniquely identify by the couple mdata_srv_uri and cast_privhash/cast_name.
 Each swarm is accessed by connecting an http server within neoip-casto.
-The format of this url is webdetect_uri/cast_name. It may optionnaly specify
+The format of this url is webdetect_uri/cast_privhash/cast_name. It may optionnaly specify
 the mdata_srv_uri as a url variable. if the mdata_srv_uri variable is not explicitly
 specified, it is taken from the neoip_casto.conf file.
 
-Example: the url to access the cast_name 'superstream.flv' on a webdetect uri
-http://localhost:4560 is http://localhost:4560/superstream.flv. If the mdata_srv_uri
-is http://example.org/mdata_srv, the full url is 
-http://localhost:4560/superstream.flv?mdata_srv_uri=http://example.org/mdata_srv
+Example: if cast_privhash 'slota' and a cast_name 'superstream.flv' on a webdetect uri
+http://localhost:4560, then the url to access the swarm is
+http://localhost:4560/slota/superstream.flv.
+
+.TP
+.I "mdata_srv_uri url"
+Determine the url for mdata_srv_uri, the metadata server. This server got the metadata information
+about the broadcast.
+
+If the mdata_srv_uri is http://example.org/mdata_srv, the previous example full url is 
+http://localhost:4560/slota/superstream.flv?mdata_srv_uri=http://example.org/mdata_srv
+
 
 .TP
 .I "httpo_maxrate size"
@@ -54,9 +61,6 @@ is impossible.
 .I "-d, --nodaemon"
 Dont 'daemonize' the application. aka leave it in the foreground. This
 is usefull to debugging and doing diagnostic
-.TP
-.I "-h, --help"
-display the inlined help
 .TP
 .I "-h, --help"
 display the inlined help

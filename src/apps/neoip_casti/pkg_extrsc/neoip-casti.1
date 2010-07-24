@@ -52,20 +52,25 @@ TODO to put the webdetect process in a separate page.
 neoip-casti is able to handle multiple swarm at the same time.
 each swarm is uniquely identify by the couple mdata_srv_uri and cast_name.
 .TP
-.I "cast_name"
-A string which uniquely identify a broadcast within the mdata_srv_uri.
-This parameter is required to be explicitly set.
-.TP
 .I "mdata_srv_uri"
 A http uri which points to a bt_cast_mdata_t echo server.
 This parameter is optionnal, and defaults to the value found in neoip-casti.conf.
 .TP
-.I "httpi_uri"
-A http uri which points to the input of this broadcast. aka a http stream which
-would be forwarded without modification to all neoip-casto.
+.I "cast_name"
+A string which uniquely identify a broadcast within the mdata_srv_uri.
 This parameter is required to be explicitly set.
 .TP
-.I "httpi_mod"
+.I "cast_privtext"
+A string which provide a password to access this stream in writing in mdata_srv_uri server.
+cast_privtext is then hashed in casti_privhash to limit the access in reading.
+This parameter is required to be explicitly set.
+.TP
+.I "scasti_uri"
+A uri which points to the input of this broadcast. It may be an http stream which
+would be forwarded without modification to all neoip-casto. or it may be a rtmp uri.
+This parameter is required to be explicitly set.
+.TP
+.I "scasti_mod"
 The mode is how the input stream is parsed. Current there are two modes: flv and raw.
 it defaults to raw.
 .I "flv:"
@@ -78,6 +83,11 @@ format known by neoip-casti. The mpeg ps and asf enter in this category.
 .I "http_peersrc_uri"
 An http uri which points to a source of peers.
 This parameter is optionnal, and defaults to the value found in neoip-casti.conf.
+.TP
+.I "web2srv_str"
+A string which is passed unmodified to the mdata_srv_uri server. Used to pass
+options to the server.
+This parameter is optionnal, and default to an empty string.
 
 .SH About swarm access from a webpage
 It is possible to command neoip-casti from a webpage. There is a javascript which 
