@@ -69,7 +69,7 @@ bt_err_t	bt_scasti_mod_raw_t::start(bt_scasti_vapi_t *p_scasti_vapi)	throw()
 	m_cast_spos_arr.append( bt_cast_spos_t(m_last_spos_offset, date_t::present()) );
 
 	// start the spos_timeout
-	spos_timeout.start(m_profile.spos_maxdelay(), this, NULL );
+	spos_timeout.start(delay_t::from_sec(0), this, NULL );
 
 	// return no error
 	return bt_err_t::OK;
