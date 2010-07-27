@@ -11,8 +11,8 @@
 NEOIP_NAMESPACE_BEGIN;
 
 // definition of \ref bt_scasti_mod_raw_profile_t constant
-const file_size_t	bt_scasti_mod_raw_profile_t::SPOS_MAXLEN		= 32*1024;
-const delay_t		bt_scasti_mod_raw_profile_t::SPOS_MAXDELAY	= delay_t::from_sec(5);
+const file_size_t	bt_scasti_mod_raw_profile_t::SPOS_MAXLEN	= 32*1024;
+const delay_t		bt_scasti_mod_raw_profile_t::SPOS_MAXDELAY	= delay_t::from_sec(1);
 
 //////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////

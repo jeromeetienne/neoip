@@ -286,6 +286,8 @@ void	casti_swarm_t::start_publishing()		throw()
 
 	// if m_data_dopublish is already running, return now
 	if( m_mdata_dopublish )	return;
+	// log to debug
+	KLOG_ERR("start publishing pieceq_beg="<< pieceq_beg << " pieceq_end="<< pieceq_end);
 
 	// start the bt_cast_mdata_dopublish_t
 	bt_err_t	bt_err;
