@@ -45,9 +45,10 @@ public:
 
 	/*************** declaration of profile fields	***********************/
 	PROFILE_VAR_PLAIN( size_t		, pieceq_maxlen);
-	PROFILE_VAR_SPROF( rate_estim_arg_t	, scasti_rate_estim_arg);
-	PROFILE_VAR_PLAIN( delay_t		, xmit_udata_max_delay);
-	PROFILE_VAR_PLAIN( size_t		, xmit_udata_max_piece);
+	// NOTE: disabled as it seems obsolete... nobody is using them
+	//PROFILE_VAR_SPROF( rate_estim_arg_t	, scasti_rate_estim_arg);
+	//PROFILE_VAR_PLAIN( delay_t		, xmit_udata_max_delay);
+	//PROFILE_VAR_PLAIN( size_t		, xmit_udata_max_piece);
 	PROFILE_VAR_SPROF( casti_swarm_udata_profile_t	, udata);
 	PROFILE_VAR_SPROF( casti_swarm_scasti_profile_t	, scasti);
 
