@@ -141,8 +141,12 @@ bool	casti_ctrl_cline_t::neoip_timeout_expire_cb(void *userptr, timeout_t &cb_ti
 						, swarm_arg.cast_privtext());
 
 	// if the casti_swarm already exists, do nothing
-	if( casti_swarm )	return true;
-
+	if( casti_swarm ){
+		// refresh the idle_timeout
+		casti_swarm->idle_timeout_refresh();		
+		return true;
+	}
+	
 	// launch the casti_swarm_t
 	casti_swarm	= nipmem_new casti_swarm_t();
 	bt_err		= casti_swarm->start(swarm_arg);

@@ -191,6 +191,8 @@ xmlrpc_err_t	casti_ctrl_wpage_t::xmlrpc_call_request_stream(xmlrpc_parse_t &xmlr
 			return xmlrpc_err_t(xmlrpc_err_t::ERROR, "Cant start stream due to " + bt_err.to_string());
 		}
 	}else{
+		// refresh the idle_timeout
+		casti_swarm->idle_timeout_refresh();
 		// if casti_swarm already exists, update web2srv_str
 		casti_swarm->web2srv_str(web2srv_str);
 	}

@@ -322,6 +322,16 @@ void	casti_swarm_t::notify_republish_required()	throw()
 	DBG_ASSERT( bt_err.succeed() );
 }
 
+/**
+ * Renew the idle_timeout
+ * - to be called when periodically
+*/
+void	casti_swarm_t::idle_timeout_refresh()		throw()
+{
+	// restart the idle_timeout
+	idle_timeout.start(profile().idle_timeout(), this, NULL);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //			Building of current bt_cast_mdata_t/bt_cast_udata_t

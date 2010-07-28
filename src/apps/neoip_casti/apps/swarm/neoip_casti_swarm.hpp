@@ -132,6 +132,7 @@ public:
 	bool		gracefull_shutdown(const std::string &reason)		throw();
 	void		start_publishing()		throw();
 	void		notify_republish_required()	throw();
+	void		idle_timeout_refresh()		throw();
 
 	/*************** List of friend class	*******************************/
 	friend class	casti_swarm_wikidbg_t;
