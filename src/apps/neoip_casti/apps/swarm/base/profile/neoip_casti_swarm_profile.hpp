@@ -24,7 +24,9 @@ NEOIP_NAMESPACE_BEGIN
 class casti_swarm_profile_t : NEOIP_COPY_CTOR_ALLOW {
 public:	/////////////////////// constant declaration ///////////////////////////
 	//! the maximum of piece in the pieceq
-	static const size_t		PIECEQ_MAXLEN;
+	static const size_t	PIECEQ_MAXLEN;
+	//! the amount of time between 2 renewals before closing it
+	static const delay_t	IDLE_TIMEOUT;	
 public:
 	/*************** ctor/dtor	***************************************/
 	casti_swarm_profile_t()	throw();
@@ -45,6 +47,7 @@ public:
 
 	/*************** declaration of profile fields	***********************/
 	PROFILE_VAR_PLAIN( size_t		, pieceq_maxlen);
+	PROFILE_VAR_PLAIN( delay_t		, idle_timeout);
 	// NOTE: disabled as it seems obsolete... nobody is using them
 	//PROFILE_VAR_SPROF( rate_estim_arg_t	, scasti_rate_estim_arg);
 	//PROFILE_VAR_PLAIN( delay_t		, xmit_udata_max_delay);

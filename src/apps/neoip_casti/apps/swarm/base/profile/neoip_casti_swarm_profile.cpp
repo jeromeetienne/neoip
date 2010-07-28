@@ -12,6 +12,7 @@ NEOIP_NAMESPACE_BEGIN;
 
 // definition of \ref casti_swarm_profile_t constant
 const size_t	casti_swarm_profile_t::PIECEQ_MAXLEN		= 50;
+const delay_t	casti_swarm_profile_t::IDLE_TIMEOUT		= delay_t::from_sec(10);
 // end of constants definition
 
 //////////////////////////////////////////////////////////////////////////////
@@ -25,6 +26,7 @@ const size_t	casti_swarm_profile_t::PIECEQ_MAXLEN		= 50;
 casti_swarm_profile_t::casti_swarm_profile_t()	throw()
 {
 	pieceq_maxlen	(PIECEQ_MAXLEN);
+	idle_timeout	(IDLE_TIMEOUT);	
 }
 
 /** \brief Destructor

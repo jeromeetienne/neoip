@@ -186,6 +186,9 @@ bt_err_t casti_swarm_t::start(casti_swarm_arg_t &swarm_arg)	throw()
 	bt_err		= launch_ezswarm(bt_mfile);
 	if( bt_err.failed() )	return bt_err;
 
+	// start the idle_timeout
+	idle_timeout.start(profile().idle_timeout(), this, NULL);
+
 	// return no error
 	return bt_err_t::OK;
 }
@@ -554,6 +557,22 @@ void	casti_swarm_t::bt_ezswarm_leave_share()				throw()
 	// delete the bt_cast_mdata_dopublish_t
 	nipmem_zdelete	m_mdata_dopublish;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+//			timeout_cb_t
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+/** \brief callback called when the timeout_t expire
+ */
+bool casti_swarm_t::neoip_timeout_expire_cb(void *userptr, timeout_t &cb_timeout)	throw()
+{
+	// delete the casti_swarm_t
+	std::string	reason	= "casti_swarm idle_timeout expired after " + profile().idle_timeout().to_string();
+	return autodelete(reason);
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////

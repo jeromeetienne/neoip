@@ -16,6 +16,7 @@
 #include "neoip_bt_scasti_mod_type.hpp"
 #include "neoip_bt_ezswarm_cb.hpp"
 #include "neoip_bt_err.hpp"
+#include "neoip_timeout.hpp"
 #include "neoip_http_uri.hpp"
 #include "neoip_file_size.hpp"
 #include "neoip_file_size_arr.hpp"
@@ -40,6 +41,7 @@ class	bt_ezswarm_state_t;
 /** \brief Handle the swarm part for the bt_oload_stat_t
  */
 class casti_swarm_t : NEOIP_COPY_CTOR_DENY, private bt_ezswarm_cb_t
+			, private timeout_cb_t
 			, private bt_cast_mdata_unpublish_cb_t
 			, private bt_cast_mdata_dopublish_cb_t
 			, private wikidbg_obj_t<casti_swarm_t, casti_swarm_wikidbg_init> {
@@ -72,6 +74,10 @@ private:
 	bool			autodelete(const bt_err_t &bt_err)	throw()	{ return autodelete(bt_err.to_string());	}
 	bool			autodelete(const std::string &reason = "")	throw();
 	bt_scasti_vapi_t *	scasti_vapi()					const throw();
+
+	/*************** idle_timeout	***************************************/
+	timeout_t		idle_timeout;	//!< to periodically send a packet
+	bool 			neoip_timeout_expire_cb(void *userptr, timeout_t &cb_timeout)	throw();
 
 	/*************** bt_ezswarm_t	***************************************/
 	bt_ezswarm_t *		m_bt_ezswarm;
