@@ -11,7 +11,17 @@ HOSTNAME_TO_QUERY=$1
 #   - using 'hosts' would fails if the hostname requested support IPv6 this will 
 #     resolve in ipv6 only
 #   - e.g. "getent hosts no.releases.ubuntu.com" resolve in IPv6 *only* but ok with ahostv4
-getent ahostsv4 $HOSTNAME_TO_QUERY | grep STREAM | cut -d" " -f1 | tr '\n' '/'  2>/dev/null
+#getent ahostsv4 $HOSTNAME_TO_QUERY | grep STREAM | cut -d" " -f1 | tr '\n' '/'  2>/dev/null
+
+###############################################
+# perl version
+###############################################
+#perl -le'print join ".", unpack "C4", gethostbyname shift @ARGV' $HOSTNAME_TO_QUERY
+
+###############################################
+# python version
+###############################################
+python -c "import socket; print socket.gethostbyname(\"$HOSTNAME_TO_QUERY\")" 2>/dev/null
 
 ###############################################
 # bash version relying on 'host' (with specifically asking for IPv4)
