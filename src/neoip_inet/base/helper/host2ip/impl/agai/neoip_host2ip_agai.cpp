@@ -47,7 +47,7 @@ host2ip_agai_t::~host2ip_agai_t()	throw()
 	// if the operation is pending, cancel it
 	if( pending_flag ){
 		int	gai_err	= gai_cancel(&glibc_gai_stt);
-		DBG_ASSERT( gai_err == EAI_CANCELED );
+		//DBG_ASSERT( gai_err == EAI_CANCELED );
 	}
 }
 

@@ -291,13 +291,14 @@ bool	asyncexe_t::stdout_fdwatch_cb( void *cb_userptr, const fdwatch_t &cb_fdwatc
 		int	status	= 0;
 #ifndef _WIN32
 		int	ret	= waitpid(childpid, &status, 0);
-		if( ret != childpid )	status = -1;
+		if( ret == -1 && errno == ECHILD )	status = 0;
+		else if( ret != childpid )		status = -1;
 		// extract the return status
 		status		= WEXITSTATUS(status);
 #endif
 		// log to debug
-		KLOG_DBG("childpid=" << childpid << " return status=" << status );
-		KLOG_DBG("received error. now recved_data=" << stdout_barray.to_datum() );
+		KLOG_ERR("childpid=" << childpid << " return status=" << status );
+		KLOG_ERR("received error. now recved_data=" << stdout_barray.to_datum() );
 		// else notify the caller with a success
 		return notify_callback(libsess_err_t::OK, stdout_barray, status);
 	}

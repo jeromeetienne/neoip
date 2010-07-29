@@ -84,18 +84,17 @@ nunit_res_t	host2ip_testclass_t::general(const nunit_testclass_ftor_t &testclass
 	KLOG_DBG("enter");
 	
 	// set the nb_concurrent
-	nb_concurrent	= 1;
+	nb_concurrent	= 20;
 
 	// set the hostname_db
 #if 1
 	hostname_db.push_back("localhost");
 #else
 	// set the hostname_db
-	for(size_t i = 0; i < 20; i++ ){
+	for(size_t i = 0; i < 40; i++ ){
 		hostname_db.push_back("localhost");
 		hostname_db.push_back("google.com");
-		hostname_db.push_back("jmehost2");
-		hostname_db.push_back("jmehost1");
+		hostname_db.push_back("jmebox");
 		hostname_db.push_back("kde.org");
 	}
 #endif
@@ -152,9 +151,9 @@ bool	host2ip_testclass_t::neoip_host2ip_cb(void *cb_userptr, host2ip_vapi_t &cb_
 {
 	host2ip_t *	host2ip	= dynamic_cast <host2ip_t *>(&cb_host2ip_vapi);
 	// display the result
-	KLOG_DBG("host2ip returned err=" << inet_err << " with " << ipaddr_arr.size() << " ip_addr_t"
+	KLOG_ERR("host2ip returned err=" << inet_err << " with " << ipaddr_arr.size() << " ip_addr_t"
 					<< " for hostname=" << host2ip->hostname());
-
+DBG_ASSERT(inet_err == inet_err_t::OK);
 	// remove the host2ip_t from the host2ip_db
 	host2ip_db.remove(host2ip);
 	// delete the notifier
