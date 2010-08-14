@@ -1,0 +1,6 @@
+Current - Future
+
+- neoip-casti to publish faster
+- bug fix in casti publishing timeout
+- bug in asyncexe, used by host2ip_fork
+  - caused the casti publication to fail due to dns error
