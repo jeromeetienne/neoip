@@ -6,6 +6,7 @@
 # - the supported one are currently
 #   - linux to get native compilation under linux
 #   - win32 to get cross compilation under linux to produce win32 executable
+#   - macos to get compilation on a macos
 ifndef NEOIP_TARGET
 	NEOIP_TARGET	= linux
 	#NEOIP_TARGET	= win32
@@ -1928,7 +1929,6 @@ DBG_OPT		+= -DNO_DBG_TRACE=1
 # - because of all the stuff i disable, some variable are unused
 DBG_OPT += -Wno-unused
 
-
 # jme- to make the template instance unique at link-time. i dont really get what it is or how to use it tho
 #      would make the code smaller. i tried and it created compilation error at link time
 # DBG_OPT += -frepo
@@ -1956,8 +1956,9 @@ ifeq ($(RELEASE_BUILD),1)
 	DBG_OPT += -DNO_NIPMEM_SMASHING=1
 	DBG_OPT += -DNO_NIPMEM_TRACKING=1
 	DBG_OPT += -DNO_WIKIDBG_OBJ=1
-endif
 
+	#DBG_OPT += -g
+endif
 
 
 # jme- not sure it is needed, and for sure this is macos only
