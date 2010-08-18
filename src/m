@@ -49,10 +49,16 @@ elif [ "$BASE_DIR" = "build_macos" ]; then
 	CXX_VAL="g++-4.2"
 fi
 # add ccache if present
-[ -x "/usr/bin/ccache" ] && CXX_VAL="ccache $CXX_VAL"
+which ccache >/dev/null && CXX_VAL="ccache $CXX_VAL"
 
 # determine the number of processors available
-NCPU=`cat /proc/cpuinfo | grep processor | wc -l`
+if [ "$BASE_DIR" = "build_linux" ]; then
+	NCPU=`cat /proc/cpuinfo | grep processor | wc -l`
+elif [ "$BASE_DIR" = "build_win32" ]; then
+	NCPU=`cat /proc/cpuinfo | grep processor | wc -l`
+elif [ "$BASE_DIR" = "build_macos" ]; then
+	NCPU=1
+fi
 
 # determine the hostname
 HOSTNAME=`hostname`
@@ -64,7 +70,7 @@ else
 fi
 
 ##exec make -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
-exec $PRIO_PREFIX make -j$NCPU -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
+exec $PRIO_PREFIX make -j $NCPU -f ../src/Makefile.static CXX="$CXX_VAL" $TARGET_OPT $*
 
 # Distributed build using distcc
 #export DISTCC_HOSTS="jmehost2"

@@ -321,7 +321,7 @@ void	bt_ezswarm_t::nextiter_change_state(const bt_ezswarm_state_t &new_state)	th
  */
 bool	bt_ezswarm_t::neoip_zerotimer_expire_cb(zerotimer_t &cb_zerotimer, void *userptr)	throw()
 {
-	bt_ezswarm_state_t ezswarm_state = (bt_ezswarm_state_t::errtype_enum)(int)(userptr);
+	bt_ezswarm_state_t ezswarm_state = (bt_ezswarm_state_t::errtype_enum)(intptr_t)(userptr);
 	// log to debug
 	KLOG_DBG("ezswarm_state=" << ezswarm_state);
 	// actually change the state

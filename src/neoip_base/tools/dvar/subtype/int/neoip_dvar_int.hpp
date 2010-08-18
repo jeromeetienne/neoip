@@ -45,10 +45,10 @@ public:
 	dvar_type_t	type()		const throw()	{ return dvar_type_t::INTEGER;	}
 
 	/*************** Alias to get the value	per type	***************/
-	bool		is_int32_ok()	const throw()	{ return value <= std::numeric_limits<int32_t>::max();	}
-	bool		is_uint32_ok()	const throw()	{ return value <= std::numeric_limits<uint32_t>::max();	}
-	bool		is_size_t_ok()	const throw()	{ return value <= std::numeric_limits<size_t>::max();	}
-	bool		is_int64_ok()	const throw()	{ return value <= std::numeric_limits<int64_t>::max();	}
+	bool		is_int32_ok()	const throw()	{ return value <= (int64_t)std::numeric_limits<int32_t>::max();	}
+	bool		is_uint32_ok()	const throw()	{ return value <= (int64_t)std::numeric_limits<uint32_t>::max();}
+	bool		is_size_t_ok()	const throw()	{ return value <= (int64_t)std::numeric_limits<size_t>::max();	}
+	bool		is_int64_ok()	const throw()	{ return value <= (int64_t)std::numeric_limits<int64_t>::max();	}
 	bool		is_uint64_ok()	const throw()	{ return true;						}
 	size_t		to_size_t()	const throw()	{ DBG_ASSERT( is_size_t_ok() );  return value;		}
 	int32_t		to_int32()	const throw()	{ DBG_ASSERT( is_int32_ok() );  return value;		}

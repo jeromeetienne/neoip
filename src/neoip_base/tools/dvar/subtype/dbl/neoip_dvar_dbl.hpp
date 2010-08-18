@@ -35,7 +35,7 @@ public:
 	dvar_type_t	type()		const throw()	{ return dvar_type_t::DOUBLE;	}
 
 	/*************** Alias to get the value	per type	***************/
-	bool		is_float_ok()	const throw()	{ return value <= std::numeric_limits<float>::max();	}
+	bool		is_float_ok()	const throw()	{ return value <= (double)std::numeric_limits<float>::max();	}
 	float		to_float()	const throw()	{ DBG_ASSERT( is_float_ok() );  return value;		}
 
 	/*************** Comparison function	*******************************/

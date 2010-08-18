@@ -306,7 +306,7 @@ bool	ipport_strlist_src_t::neoip_host2ip_cb(void *cb_userptr, host2ip_vapi_t &cb
 	 */
 
 	// build the ipport_addr from the first address of hostent_t and the port from userptr
-	uint16_t	port		= (uint32_t)cb_userptr;
+	uint16_t	port		= (intptr_t)cb_userptr;
 	ipport_addr_t	ipport_addr	= ipport_addr_t(result_arr[0], port);
 	// put the result at the end of tobedelivered_db
 	tobedelivered_db.push_back(ipport_addr);

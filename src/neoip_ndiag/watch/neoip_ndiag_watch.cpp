@@ -218,7 +218,7 @@ void ndiag_watch_t::event_hook_remove(int level_no, event_hook_cb_t *callback, v
  */
 bool	ndiag_watch_t::neoip_zerotimer_expire_cb(zerotimer_t &cb_zerotimer, void *userptr)	throw()
 {
-	int level_no	= (int)userptr;
+	int level_no	= (intptr_t)userptr;
 	// log to debug
 	KLOG_DBG("enter");
 	// notify the event
