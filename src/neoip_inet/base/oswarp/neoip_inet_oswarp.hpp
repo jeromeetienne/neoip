@@ -15,7 +15,7 @@
 #ifdef _WIN32
 #	include <winsock2.h>
 #	include <ws2tcpip.h>
-#	undef ERROR
+#	undef ERROR		// remove dirty define from mingw
 #	undef INFINITE
 #	undef OPTIONAL
 #else

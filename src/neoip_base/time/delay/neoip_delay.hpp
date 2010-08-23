@@ -17,10 +17,6 @@
 
 NEOIP_NAMESPACE_BEGIN
 
-#ifdef _WIN32
-#	undef	INFINITE
-#endif
-
 class delay_t : NEOIP_COPY_CTOR_ALLOW {
 public:
 	// constant to use delay_t in static ctor - use delay_t(INFINITE_VAL) instead of delay_t::INFINITE

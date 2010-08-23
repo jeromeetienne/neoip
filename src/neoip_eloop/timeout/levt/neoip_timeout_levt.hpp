@@ -9,6 +9,11 @@
 /* system include */
 #include <string>
 #include <event.h>
+#ifdef _WIN32
+#	undef ERROR		// remove dirty define from mingw
+#	undef INFINITE
+#	undef OPTIONAL
+#endif
 /* local include */
 #include "neoip_timeout_wikidbg.hpp"
 #include "neoip_timeout_cb.hpp"
