@@ -1964,7 +1964,7 @@ endif
 # jme- not sure it is needed, and for sure this is macos only
 ifeq ($(NEOIP_TARGET), macos)
 	MAIN_OPT	+= -dynamic
-	MAIN_OPT	+= -m32		// to force 32bit compilation (64bit compilation is not tested)
+	MAIN_OPT	+= -m32		# to force 32bit compilation (64bit compilation is not tested)
 	LINK_OPT	+= -m32
 endif
 ifeq ($(NEOIP_TARGET), linux)
