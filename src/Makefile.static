@@ -1966,8 +1966,8 @@ ifeq ($(NEOIP_TARGET), macos)
 	MAIN_OPT	+= -dynamic
 	MAIN_OPT	+= -m32		# to force 32bit compilation (64bit compilation is not tested)
 	LINK_OPT	+= -m32
-endif
-ifeq ($(NEOIP_TARGET), linux)
+else ifeq ($(NEOIP_TARGET), win32)
+else ifeq ($(NEOIP_TARGET), linux)
 	# on ubuntu hardy, mlock is limited to 32kbyte per user... so unreliable... so disabling it all for now
 	DBG_OPT += -DNO_NIPMEM_LOCKING=1
 endif
