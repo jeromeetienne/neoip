@@ -1932,8 +1932,15 @@ DBG_OPT += -Wno-unused
 # jme- to make the template instance unique at link-time. i dont really get what it is or how to use it tho
 #      would make the code smaller. i tried and it created compilation error at link time
 # DBG_OPT += -frepo
+# LINK_OPT+= -frepo
 # jme- for stuff i dont really get about precompiled header (not important as they are not compatible with distcc)
 # DBG_OPT += -fpch-preprocess
+
+# jme- try to enable LinkTimeOptimisation - apparently ubuntu doesnt support it
+#DBG_OPT += -flto
+#LINK_OPT+= -flto
+
+
 
 # NOTE: to launch it from shell do "./m DEBUG_BUILD=1" in a build_TARGETOS/ directory
 #DEBUG_BUILD=1
