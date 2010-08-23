@@ -57,7 +57,7 @@ if [ "$BASE_DIR" = "build_linux" ]; then
 elif [ "$BASE_DIR" = "build_win32" ]; then
 	NCPU=`cat /proc/cpuinfo | grep processor | wc -l`
 elif [ "$BASE_DIR" = "build_macos" ]; then
-	NCPU=1
+	NCPU=2
 fi
 
 # determine the hostname
