@@ -8,6 +8,7 @@
 #define __NEOIP_TIMEOUT_LEVT_HPP__ 
 /* system include */
 #include <string>
+#include <event.h>
 /* local include */
 #include "neoip_timeout_wikidbg.hpp"
 #include "neoip_timeout_cb.hpp"
@@ -50,8 +51,8 @@ private:
 	bool		external_is_started()				const throw();
 	friend void	external_callback(int fd, short event, void *userptr);
 	struct event *	external_ctx;
-	char		external_ctx_buf[84];	// trick to avoid declaring struct event here and not
-						// have #include <event.h> which contains a lot of #define
+	char		external_ctx_buf[sizeof(struct event)];	// trick to avoid declaring struct event here and not
+								// have #include <event.h> which contains a lot of #define
 
 	/*************** callback stuff	***************************************/
 	timeout_cb_t *	callback;			//!< callback to notify timeout expiration

@@ -9,6 +9,7 @@
 /* system include */
 #include <iostream>
 #include <string>
+#include <event.h>
 /* local include */
 #include "neoip_fdwatch_cb.hpp"
 #include "neoip_fdwatch_cond.hpp"
@@ -19,9 +20,6 @@
 #ifndef USE_ELOOP_LEVT
 #	error	"including a .hpp from a improper eloop implementation"
 #endif
-
-// forward declaration for libevent
-struct event;
 
 NEOIP_NAMESPACE_BEGIN;
 
@@ -42,8 +40,8 @@ private:
 	bool		external_is_started()					const throw();
 	friend void	external_neoip_fdwatch_levt_cb(int fd, short event, void *userptr);
 	struct event *	external_ctx;
-	char		external_ctx_buf[84];	// trick to avoid declaring struct event here and not
-						// have #include <event.h> which contains a lot of #define
+	char		external_ctx_buf[sizeof(struct event)];	// trick to avoid declaring struct event here and not
+								// have #include <event.h> which contains a lot of #define
 	bool		external_started;
 	
 	/*************** callback stuff	***************************************/
