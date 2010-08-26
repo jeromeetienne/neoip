@@ -175,8 +175,8 @@ def apps_mkdir_common(pkg_type, apps_name)
 
 	# copy the config directory specific to this apps
 	apps_suffix	= get_apps_suffix(apps_name)
-	if apps_name == "neoip-webpack"	# handle the special case for neoip-webpack
-		# neoip-webpack is a bundle of casti/casto/oload so copy their config dir
+	if apps_name == "neoip-webpeer"	# handle the special case for neoip-webpeer
+		# neoip-webpeer is a bundle of casti/casto/oload so copy their config dir
 		FileUtils.cp_r "#{cfgdir_sample}/casti", "#{build_dir}/config_dir_sample"	
 		FileUtils.cp_r "#{cfgdir_sample}/casto", "#{build_dir}/config_dir_sample"	
 		FileUtils.cp_r "#{cfgdir_sample}/oload", "#{build_dir}/config_dir_sample"	
@@ -430,10 +430,10 @@ def apps_mkpkg_epm_install(apps_name)
 	#   build system (debhelper? cdbs? anything else), but a simple check could
 	#   be to simply unpack your existing deb and repack it with 'dpkg-deb --build
 	#   -Zlzma <packagedir>'"
-	# - extract may be "dpkg -x ../neoip-webpack_0.0.1-200801150047_i386.deb  webpack"
+	# - extract may be "dpkg -x ../neoip-webpeer_0.0.1-200801150047_i386.deb  webpeer"
 	# - this produce a "dpkg-deb: unknown compression type `lzma'!"
 	
-	# about package size, on a webpack linux with -O0
+	# about package size, on a webpeer linux with -O0
 	# - pure7z=1705165, tar.gz=3170879(with gzip -9), tar.7z=2294475(top 7z compression)
 	# - .deb = 3162192
 	

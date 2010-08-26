@@ -6,15 +6,15 @@
 
 # make the symlink to get it started at boot time
 # - only for SYSBOOT apps
-ln -sf /Applications/neoip-webpack/pkg_extrsc/org.neoip.webpack.plist /Library/LaunchDaemons
+ln -sf /Applications/neoip-webpeer/pkg_extrsc/org.neoip.webpeer.plist /Library/LaunchDaemons
 
 # TODO what if it is already installed ?
 # - i should unload the previous one if it is loaded
 # - i should stop the previous one if it is running
 
 # Start the apps
-launchctl load /Library/LaunchDaemons/org.neoip.webpack.plist
-launchctl start org.neoip.webpack
+launchctl load /Library/LaunchDaemons/org.neoip.webpeer.plist
+launchctl start org.neoip.webpeer
 
 #exit 0
 

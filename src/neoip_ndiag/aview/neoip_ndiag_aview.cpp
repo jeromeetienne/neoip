@@ -245,7 +245,7 @@ ndiag_err_t	ndiag_aview_t::launch_upnp_bindport()	throw()
 	ipport_addr_t	ipport_pview;
 	
 #if 0	// TODO to fix
-	// - it has been disabled as neoip-webpack get a LOT of conflict in this
+	// - it has been disabled as neoip-webpeer get a LOT of conflict in this
 	//   - e.g. all bt_ezsession got the same desc_str so all obtain the same
 	//     external port... gaps
 	

@@ -245,7 +245,7 @@ bt_ezswarm_t *	bt_ezsession_t::bt_ezswarm_by_infohash(const bt_id_t &infohash)	c
  * - so i keep using nslan_peer_t of kad_listener_t if possible
  * - but if no kad_listener_t, create a nslan_listener_t and nslan_peer_t
  * 
- * - in fact in neoip-webpack, there is 3 nslan_listener_t. 
+ * - in fact in neoip-webpeer, there is 3 nslan_listener_t. 
  *   - one for each apps oload, casto, casti
  *
  * - TODO to change in a cleaner manner

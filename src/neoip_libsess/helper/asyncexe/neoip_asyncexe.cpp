@@ -60,7 +60,7 @@ asyncexe_t::~asyncexe_t()	throw()
 	nipmem_zdelete	stdout_fdwatch;
 	
 #ifndef _WIN32
-#if 1	// TODO: BUG: there is a LOT of defunct of neoip-dnsresolve while using neoip-webpack
+#if 1	// TODO: BUG: there is a LOT of defunct of neoip-dnsresolve while using neoip-webpeer
 	// - this is a very early experiment of this issue
 	// - POSSIBLE SOLUTION:
 	//   - when a waitpid is done, just after childpid is set to 0

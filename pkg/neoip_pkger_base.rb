@@ -20,11 +20,11 @@
 #     - nsis win32 i386 dev
 
 # - TODO about EEEpc xandros packaging
-#   - there is an issue in the neoip-webpack-ctrl with start-stop-daemon and the PATH
+#   - there is an issue in the neoip-webpeer-ctrl with start-stop-daemon and the PATH
 #     - just add the /sbin in PATH at the begining of the script if it is not present in PATH
 #   - there is an issue with the neoip-dnsresolv.sh with a tools which is not present
 #     - found a work around on the EEEpc install
-#   - neoip-webpack.desktop is not called
+#   - neoip-webpeer.desktop is not called
 
 require "fileutils"
 
@@ -212,8 +212,8 @@ def apps_mkdir_common(pkg_type, apps_name)
 
 	# copy the config directory specific to this apps
 	apps_suffix	= get_apps_suffix(apps_name)
-	if apps_name == "neoip-webpack"	# handle the special case for neoip-webpack
-		# neoip-webpack is a bundle of casti/casto/oload so copy their config dir
+	if apps_name == "neoip-webpeer"	# handle the special case for neoip-webpeer
+		# neoip-webpeer is a bundle of casti/casto/oload so copy their config dir
 		FileUtils.cp_r "#{cfgdir_sample}/casti", "#{build_dir}/config_dir_sample"	
 		FileUtils.cp_r "#{cfgdir_sample}/casto", "#{build_dir}/config_dir_sample"	
 		FileUtils.cp_r "#{cfgdir_sample}/oload", "#{build_dir}/config_dir_sample"	
@@ -329,7 +329,7 @@ def apps_mkdir_macos(pkg_type, apps_name)
 
 	# copy the launchd plist script
 	# - TODO should be done for SYS_BOOT ONLY
-	FileUtils.cp "macos_pkg_extrsc/org.neoip.webpack.plist", "#{build_dir}/pkg_extrsc"
+	FileUtils.cp "macos_pkg_extrsc/org.neoip.webpeer.plist", "#{build_dir}/pkg_extrsc"
 	
 	# Move the typical install directory into a subdirectory #{apps_name}
 	FileUtils.mkdir "#{build_dir}/#{apps_name}"
@@ -344,7 +344,7 @@ def apps_mkdir_macos(pkg_type, apps_name)
 	# - waiting for some users to complain :)
 
 	# copy file which are needed to build the packages
-	FileUtils.cp "macos_pkg_extrsc/neoip-webpack.packproj"	, "#{build_dir}/"
+	FileUtils.cp "macos_pkg_extrsc/neoip-webpeer.packproj"	, "#{build_dir}/"
 	FileUtils.cp "macos_pkg_extrsc/my_postflight.sh"	, "#{build_dir}/"
 	FileUtils.cp "macos_pkg_extrsc/television.jpg"		, "#{build_dir}/"
 end
@@ -420,7 +420,7 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 		fOut.puts("%copyright 2008")
 		fOut.puts("%vendor NeoIP")
 		fOut.puts("%version #{apps_version}")
-		fOut.puts("%readme \"Read http://urfastr.net/webpack\" ")
+		fOut.puts("%readme \"Read http://urfastr.net/webpeer\" ")
 		fOut.puts("%license \"http://donotusethissoft.ever\"")
 		apps_description.collect { |x| "%description #{x}" }.each { |x| 
 			fOut.puts("#{x}")
@@ -535,10 +535,10 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 	#   build system (debhelper? cdbs? anything else), but a simple check could
 	#   be to simply unpack your existing deb and repack it with 'dpkg-deb --build
 	#   -Zlzma <packagedir>'"
-	# - extract may be "dpkg -x ../neoip-webpack_0.0.1-200801150047_i386.deb  webpack"
+	# - extract may be "dpkg -x ../neoip-webpeer_0.0.1-200801150047_i386.deb  webpeer"
 	# - this produce a "dpkg-deb: unknown compression type `lzma'!"
 	
-	# about package size, on a webpack linux with -O0
+	# about package size, on a webpeer linux with -O0
 	# - pure7z=1705165, tar.gz=3170879(with gzip -9), tar.7z=2294475(top 7z compression)
 	# - .deb = 3162192
 	
@@ -924,7 +924,7 @@ end
 def apps_upload_nsis_install(pkg_type, apps_name)
 	# get the data specific to this apps_name
 	apps_version	= get_apps_version(pkg_type, apps_name)
-	# upload to http://urfastr.net/webpack/download
+	# upload to http://urfastr.net/webpeer/download
 	scp_dest	= "dedixl.jetienne.com:public_html/download/#{build_target}"
 	system("scp #{apps_name}-#{apps_version}.exe #{scp_dest}")
 end
@@ -935,7 +935,7 @@ def apps_upload_macos_install(pkg_type, apps_name)
 	apps_version	= get_apps_version(pkg_type, apps_name)
 	build_target	= get_build_target(pkg_type)
 	pkg_fext	= get_pkg_fext(pkg_type)
-	# upload to http://urfastr.net/webpack/download
+	# upload to http://urfastr.net/webpeer/download
 	scp_dest	= "dedixl.jetienne.com:public_html/download/#{build_target}"
 	system("scp #{apps_name}_#{apps_version}.#{pkg_fext} #{scp_dest}")
 end

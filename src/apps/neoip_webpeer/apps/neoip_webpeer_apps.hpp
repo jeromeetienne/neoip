@@ -1,11 +1,11 @@
 /*! \file
-    \brief Header of the \ref webpack_apps_t
+    \brief Header of the \ref webpeer_apps_t
     
 */
 
 
-#ifndef __NEOIP_WEBPACK_APPS_HPP__ 
-#define __NEOIP_WEBPACK_APPS_HPP__ 
+#ifndef __NEOIP_WEBPEER_APPS_HPP__ 
+#define __NEOIP_WEBPEER_APPS_HPP__ 
 
 /* system include */
 /* local include */
@@ -24,15 +24,15 @@ class	clineopt_arr_t;
 
 /** \brief Handle the http offload capability
  */
-class webpack_apps_t : NEOIP_COPY_CTOR_DENY {
+class webpeer_apps_t : NEOIP_COPY_CTOR_DENY {
 private:
 	lib_session_exit_ptr_t<casti_apps_t> *	casti_apps;
 	lib_session_exit_ptr_t<casto_apps_t> *	casto_apps;
 	lib_session_exit_ptr_t<oload_apps_t> *	oload_apps;
 public:
 	/*************** ctor/dtor	***************************************/
-	webpack_apps_t()		throw();
-	~webpack_apps_t()		throw();
+	webpeer_apps_t()		throw();
+	~webpeer_apps_t()		throw();
 	
 	/*************** Setup function	***************************************/
 	bt_err_t		start()			throw();
@@ -43,7 +43,7 @@ public:
 
 NEOIP_NAMESPACE_END
 
-#endif	/* __NEOIP_WEBPACK_APPS_HPP__  */
+#endif	/* __NEOIP_WEBPEER_APPS_HPP__  */
 
 
 

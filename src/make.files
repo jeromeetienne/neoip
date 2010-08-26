@@ -187,11 +187,11 @@ apps/neoip_upnp/apps/neoip_upnp_apps.hpp
 apps/neoip_upnp/neoip_upnp_info.hpp
 apps/neoip_upnp/neoip_upnp_info_version.hpp
 apps/neoip_upnp/neoip_upnp_main.cpp
-apps/neoip_webpack/apps/neoip_webpack_apps.cpp
-apps/neoip_webpack/apps/neoip_webpack_apps.hpp
-apps/neoip_webpack/neoip_webpack_info.hpp
-apps/neoip_webpack/neoip_webpack_info_version.hpp
-apps/neoip_webpack/neoip_webpack_main.cpp
+apps/neoip_webpeer/apps/neoip_webpeer_apps.cpp
+apps/neoip_webpeer/apps/neoip_webpeer_apps.hpp
+apps/neoip_webpeer/neoip_webpeer_info.hpp
+apps/neoip_webpeer/neoip_webpeer_info_version.hpp
+apps/neoip_webpeer/neoip_webpeer_main.cpp
 apps/obsolete/neoip_buddy/asyncexe/neoip_asyncexe2.cpp
 apps/obsolete/neoip_buddy/asyncexe/neoip_asyncexe2.hpp
 apps/obsolete/neoip_buddy/asyncexe/neoip_asyncexe2_cb.hpp

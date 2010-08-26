@@ -5,10 +5,10 @@
 # - TODO to doc too
 
 all:
-	./neoip_pkger.rb epm_install neoip-webpack full
+	./neoip_pkger.rb epm_install neoip-webpeer full
 	
 win32:
-	./neoip_pkger.rb nsis_install neoip-webpack full
+	./neoip_pkger.rb nsis_install neoip-webpeer full
 
 clean:
 	./neoip_pkger.rb all all clean

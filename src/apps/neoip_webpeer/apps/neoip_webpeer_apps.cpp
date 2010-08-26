@@ -1,15 +1,15 @@
 /*! \file
-    \brief Definition of the \ref webpack_apps_t
+    \brief Definition of the \ref webpeer_apps_t
 
 \par Brief Description
-webpack_apps_t is bundle all the neoip application related to the web i.e 
+webpeer_apps_t is bundle all the neoip application related to the web i.e 
 neoip-casti, neoip-casto and neoip-oload.
 
 */
 
 /* system include */
 /* local include */
-#include "neoip_webpack_apps.hpp"
+#include "neoip_webpeer_apps.hpp"
 #include "neoip_clineopt_arr.hpp"
 
 #include "neoip_log.hpp"
@@ -25,7 +25,7 @@ NEOIP_NAMESPACE_BEGIN;
 
 /** \brief Constructor
  */
-webpack_apps_t::webpack_apps_t()	throw()
+webpeer_apps_t::webpeer_apps_t()	throw()
 {
 	// log to debug
 	KLOG_DBG("enter");
@@ -37,7 +37,7 @@ webpack_apps_t::webpack_apps_t()	throw()
 
 /** \brief Destructor
  */
-webpack_apps_t::~webpack_apps_t()	throw()
+webpeer_apps_t::~webpeer_apps_t()	throw()
 {
 	// log to debug
 	KLOG_DBG("enter");
@@ -58,7 +58,7 @@ webpack_apps_t::~webpack_apps_t()	throw()
 
 /** \brief Start the operation
  */
-bt_err_t	webpack_apps_t::start()						throw()
+bt_err_t	webpeer_apps_t::start()						throw()
 {
 	bt_err_t	bt_err;
 	// log to debug
@@ -97,7 +97,7 @@ bt_err_t	webpack_apps_t::start()						throw()
 
 /** \brief Return the clineopt_arr_t for the cmdline option of the lib_session_t
  */
-clineopt_arr_t	webpack_apps_t::clineopt_arr()	throw()
+clineopt_arr_t	webpeer_apps_t::clineopt_arr()	throw()
 {
 	clineopt_arr_t	clineopt_arr;
 	clineopt_t	clineopt;

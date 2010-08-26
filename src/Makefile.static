@@ -1711,18 +1711,18 @@ APP_BSTRAPNTUDP_LINK= $(addprefix -l, $(APP_BSTRAPNTUDP_LIB))
 APP_BSTRAPNTUDP_DEPS_DYNA= $(APP_BSTRAPNTUDP_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_BSTRAPNTUDP_LIB)))
 APP_BSTRAPNTUDP_DEPS_STAT= $(APP_BSTRAPNTUDP_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_BSTRAPNTUDP_LIB)))
 
-######################## Build the neoip_webpack  ###############################
-APP_WEBPACK_DIR=apps/neoip_webpack
-APP_WEBPACK_OBJS= 						\
-	$(APP_WEBPACK_DIR)/neoip_webpack_main.o			\
-	$(APP_WEBPACK_DIR)/apps/neoip_webpack_apps.o	
-APP_WEBPACK_OBJS	+= $(filter-out $(APP_CASTI_DIR)/neoip_casti_main.o, $(APP_CASTI_OBJS))
-APP_WEBPACK_OBJS	+= $(filter-out $(APP_CASTO_DIR)/neoip_casto_main.o, $(APP_CASTO_OBJS))
-APP_WEBPACK_OBJS	+= $(filter-out $(APP_OLOAD_DIR)/neoip_oload_main.o, $(APP_OLOAD_OBJS))
-APP_WEBPACK_LIB=	$(APP_ALL_LIB)
-APP_WEBPACK_LINK= $(addprefix -l, $(APP_WEBPACK_LIB))
-APP_WEBPACK_DEPS_DYNA= $(APP_WEBPACK_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_WEBPACK_LIB)))
-APP_WEBPACK_DEPS_STAT= $(APP_WEBPACK_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_WEBPACK_LIB)))
+######################## Build the neoip_webpeer  ###############################
+APP_WEBPEER_DIR=apps/neoip_webpeer
+APP_WEBPEER_OBJS= 						\
+	$(APP_WEBPEER_DIR)/neoip_webpeer_main.o			\
+	$(APP_WEBPEER_DIR)/apps/neoip_webpeer_apps.o	
+APP_WEBPEER_OBJS	+= $(filter-out $(APP_CASTI_DIR)/neoip_casti_main.o, $(APP_CASTI_OBJS))
+APP_WEBPEER_OBJS	+= $(filter-out $(APP_CASTO_DIR)/neoip_casto_main.o, $(APP_CASTO_OBJS))
+APP_WEBPEER_OBJS	+= $(filter-out $(APP_OLOAD_DIR)/neoip_oload_main.o, $(APP_OLOAD_OBJS))
+APP_WEBPEER_LIB=	$(APP_ALL_LIB)
+APP_WEBPEER_LINK= $(addprefix -l, $(APP_WEBPEER_LIB))
+APP_WEBPEER_DEPS_DYNA= $(APP_WEBPEER_OBJS) $(addprefix lib, $(addsuffix $(SHAREDLIB_EXT), $(APP_WEBPEER_LIB)))
+APP_WEBPEER_DEPS_STAT= $(APP_WEBPEER_OBJS) $(addprefix lib, $(addsuffix $(STATICLIB_EXT), $(APP_WEBPEER_LIB)))
 
 ######################## Build the neoip_upnp  ###############################
 APP_UPNP_DIR=apps/neoip_upnp
@@ -1988,7 +1988,7 @@ CXXFLAGS=$(COMMON_CFLAGS)
 #ALL_EXE += neoip-nunitapps
 #ALL_EXE += neoip-router
 #ALL_EXE += neoip-bstrapntudp
-ALL_EXE += neoip-webpack
+ALL_EXE += neoip-webpeer
 #ALL_EXE += neoip-btcli
 
 all: $(ALL_EXE)
@@ -2342,21 +2342,21 @@ neoip-bstrapntudp$(EXE_EXT): $(APP_BSTRAPNTUDP_DEPS_DYNA)
 neoip-bstrapntudp-bin-static$(EXE_EXT): $(APP_BSTRAPNTUDP_DEPS_STAT)
 	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_BSTRAPNTUDP_OBJS) $(APP_BSTRAPNTUDP_LINK) -Wl,--end-group $(LINKLIB)
 
-neoip-webpack$(EXE_EXT): $(APP_WEBPACK_DEPS_DYNA)
-	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_WEBPACK_OBJS) $(APP_WEBPACK_LINK) $(LINKLIB)
+neoip-webpeer$(EXE_EXT): $(APP_WEBPEER_DEPS_DYNA)
+	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_WEBPEER_OBJS) $(APP_WEBPEER_LINK) $(LINKLIB)
 
-# kludge to make it easy to compile neoip-webpack-bin-static under macos
+# kludge to make it easy to compile neoip-webpeer-bin-static under macos
 # - TODO to generalize
 ifeq ($(NEOIP_TARGET), macos)
 # compilation for macos
 # - all libneoip_* are linked statically
 # - all the rest dynamically because macos reject static linking
-neoip-webpack-bin-static$(EXE_EXT): $(APP_WEBPACK_DEPS_STAT)
-	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_WEBPACK_DEPS_STAT) $(LINKLIB)
+neoip-webpeer-bin-static$(EXE_EXT): $(APP_WEBPEER_DEPS_STAT)
+	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_WEBPEER_DEPS_STAT) $(LINKLIB)
 else
 # compilation for linux/win32
-neoip-webpack-bin-static$(EXE_EXT): $(APP_WEBPACK_DEPS_STAT)
-	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_WEBPACK_OBJS) $(APP_WEBPACK_LINK) -Wl,--end-group $(LINKLIB)
+neoip-webpeer-bin-static$(EXE_EXT): $(APP_WEBPEER_DEPS_STAT)
+	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_WEBPEER_OBJS) $(APP_WEBPEER_LINK) -Wl,--end-group $(LINKLIB)
 endif
 
 neoip-upnp$(EXE_EXT): $(APP_UPNP_DEPS_DYNA)
@@ -2453,8 +2453,10 @@ clean_build_dir:
 clean_config_debug_dir:
 	(cd ../src/config_dir_debug1 && rm -f tmp/*.log)
 	(cd ../src/config_dir_debug1 && rm -rf tmp/neoip_*_pfile*)
+	(cd ../src/config_dir_debug1 && rm -rf tmp/.neoip_debug_url.*)
 	(cd ../src/config_dir_debug2 && rm -f tmp/*.log)
 	(cd ../src/config_dir_debug2 && rm -rf tmp/neoip_*_pfile*)
+	(cd ../src/config_dir_debug2 && rm -rf tmp/.neoip_debug_url.*)
 	
 #######################################
 # clean all the temporary file in ../pkg directory
