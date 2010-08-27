@@ -86,13 +86,22 @@ inet_err_t	inet_oswarp_t::set_reuseaddr(int sock_fd, bool on)		throw()
 {
 	inet_err_t	inet_err;
 	int		opt_on	= on ? 1 : 0;
-#ifndef __APPLE__
 	// set REUSEADDR - to allow the socket to bind an address already bound
 	inet_err= inet_oswarp_t::setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &opt_on, sizeof(opt_on));
 	if( inet_err.failed() )	return inet_err;
-#else
-	// set REUSEPORT - to allow the socket to bind an address already bound
-	// - this is the same as SO_REUSEPORT but for macos (and bsd ?)
+	// return noerror
+	return inet_err_t::OK;
+}
+
+/** \brief set the sock_fd into SO_REUSEPORT
+ */
+inet_err_t	inet_oswarp_t::set_reuseport(int sock_fd, bool on)		throw()
+{
+	inet_err_t	inet_err;
+	int		opt_on	= on ? 1 : 0;
+#ifdef __APPLE__
+	// set REUSEPORT - to allow the socket to bind an address multiple time
+	// - != from REUSEADDR
 	inet_err= inet_oswarp_t::setsockopt(sock_fd, SOL_SOCKET, SO_REUSEPORT, &opt_on, sizeof(opt_on));
 	if( inet_err.failed() )	return inet_err;
 #endif
