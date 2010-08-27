@@ -5,3 +5,4 @@ Current - Future
 - bug in asyncexe, used by host2ip_fork
   - caused the casti publication to fail due to dns error
 - bring macos+win32 compilation
+- fix SO_REUSEADDR/SO_REUSEPORT on macos
