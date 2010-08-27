@@ -1877,7 +1877,7 @@ endif
 
 
 ifeq ($(DEBUG_BUILD),1)
-#	DBG_OPT += -g
+	DBG_OPT += -g
 # supposed to be the same as -g but much faster to link statically
 # - testing show otherwise
 #	DBG_OPT += -gstabs+
