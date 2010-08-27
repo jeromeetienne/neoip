@@ -37,8 +37,6 @@ int main_internal(int argc, char **argv)
 {
 	// insert all the needed plugins for bt apps - MUST be done before anything else
 	bt_apps_ezplugin_t::insert_all_needed();
-	// insert all the available plugins - MUST be done before anything else
-	lib_apps_ezplugin_t::insert_all_available();
 	// standard init
 	lib_apps_t *	lib_apps	= nipmem_new lib_apps_t();
 	libsess_err_t	libsess_err	= lib_apps->start(argc, argv, casto_apps_t::clineopt_arr()
