@@ -7,3 +7,5 @@ Current - Future
 - bring macos+win32 compilation
 - rebranding webpack to webpeer
 - fix SO_REUSEADDR/SO_REUSEPORT on macos
+- fix in neoip-oload read_ahead
+  - was bugging is read_ahead > 1000 pieces... now up to 2g pieces
