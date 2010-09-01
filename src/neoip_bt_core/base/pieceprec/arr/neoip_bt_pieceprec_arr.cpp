@@ -56,6 +56,8 @@ bt_pieceprec_arr_t &	bt_pieceprec_arr_t::set_range_equal(size_t idx_beg, size_t 
 bt_pieceprec_arr_t &	bt_pieceprec_arr_t::set_range_decrease(size_t idx_beg, size_t idx_end
 							, const bt_pieceprec_t &pieceprec)	throw()
 {
+	// sanity check- piece_prec can not be below bt_pieceprec_t::LOWEST
+	DBG_ASSERT( pieceprec.value() >= bt_pieceprec_t::LOWEST + (idx_end - idx_beg));
 	return set_range(idx_beg, idx_end, pieceprec, pieceprec.value() - (idx_end - idx_beg));
 }
 

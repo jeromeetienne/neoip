@@ -540,7 +540,7 @@ bt_err_t	oload_swarm_t::httpo_full_do_start(bt_httpo_full_t *httpo_full)	throw()
 	size_t			idx_end		= std::min(nbpiece_ahead-1, bt_mfile.nb_piece()-1);
 	bt_pieceprec_arr_t	pieceprec_arr;
 	pieceprec_arr.assign(idx_end+1, bt_pieceprec_t::NOTNEEDED);
-	pieceprec_arr.set_range_decrease(0, idx_end, 1000);
+	pieceprec_arr.set_range_decrease(0, idx_end, bt_pieceprec_t::DEFAULT);
 	curs_arg.pieceprec_arr	(pieceprec_arr);
 
 	// build the bt_httpo_full_profile_t
