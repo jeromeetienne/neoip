@@ -268,7 +268,7 @@ bool	router_resp_cnx_t::recv_addr_nego_request(pkt_t &pkt)		throw(serial_except_
 	ip_addr_t		itor_iaddr_request;
 	ip_addr_t		resp_iaddr_request;
 	// log to debug
-	KLOG_DBG("enter");
+	KLOG_ERR("enter");
 	// read the packet type
 	pkt >> pkttype;
 	// read the itor_iaddr_request
@@ -325,7 +325,7 @@ bool	router_resp_cnx_t::recv_addr_nego_ack(pkt_t &pkt)		throw(serial_except_t)
 	ip_addr_t		itor_iaddr_ack;
 	ip_addr_t		resp_iaddr_ack;
 	// log to debug
-	KLOG_DBG("enter");
+	KLOG_ERR("enter");
 	// read the packet type
 	pkt >> pkttype;
 	// read the itor_iaddr_reply

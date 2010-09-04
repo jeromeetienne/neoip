@@ -10,6 +10,13 @@ libnss_neoip.so.2: libnss_neoip.o
 	 
 libnss_neoip.o: libnss_neoip.c libnss_neoip_hostent.c libnss_neoip_tools.c libnss_neoip_dir.c \
 					libnss_neoip_socket.c libnss_neoip_err.c
+
+
+install: libnss_neoip.so.2
+	cp libnss_neoip.so.2	/usr/lib
+	ldconfig
+	mkdir -p $(DESTDIR)/etc/libnss_neoip.d
+
 clean:
 	rm -f libnss_neoip.so.2
 	rm -f libnss_neoip.o

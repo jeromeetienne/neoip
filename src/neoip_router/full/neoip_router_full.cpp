@@ -275,7 +275,7 @@ bool	router_full_t::neoip_socket_full_event_cb(void *userptr
 			, socket_full_t &cb_socket_full, const socket_event_t &socket_event) throw()
 {
 	// log to debug
-	KLOG_DBG("enter event=" << socket_event);
+	KLOG_ERR("enter event=" << socket_event);
 	// sanity check - the event MUST be full_ok
 	DBG_ASSERT( socket_event.is_full_ok() );
 
@@ -336,7 +336,7 @@ void	router_full_t::handle_socket_recved_data(pkt_t &pkt)			throw()
 
 	// if profile.tunnel_stub() IS set, exit now and discard the received packet
 	if( profile.tunnel_stub() ){
-		KLOG_DBG("acting as tunnel stub so dicarding ethertype=0x" << std::hex << ethertype
+		KLOG_ERR("acting as tunnel stub so dicarding ethertype=0x" << std::hex << ethertype
 								<< std::dec << " pkt=" << pkt );
 		return;
 	}

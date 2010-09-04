@@ -40,7 +40,7 @@ const router_rident_t *	router_rident_arr_t::find_by_peerid(const router_peerid_
 {
 	// sanity check - the router_peerid_t MUST be fully_qualified
 	DBG_ASSERT( peerid.is_fully_qualified() );
-	// go thru the whole router_rident_arr_t	
+	// go thru the whole router_rident_arr_tZ
 	for(size_t i = 0; i < size(); i++){
 		const router_rident_t &	router_rident	= (*this)[i];
 		// if this router_rident_t matches this peerid, return its pointer

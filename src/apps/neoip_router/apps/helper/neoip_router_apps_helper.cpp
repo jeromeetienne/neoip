@@ -62,6 +62,9 @@ router_err_t	router_apps_helper_t::lident_create(const file_path_t &config_path
 	router_lident	= router_lident_t::generate(local_peerid, dnsname, key_len, ca_cert, ca_privkey);
 	DBG_ASSERT( !router_lident.is_null() );
 
+KLOG_ERR("router_lident=" << router_lident);
+KLOG_ERR("router_ authsigned=" << router_lident.is_authsigned());
+
 	// if router_lident.is_authsigned() or is_nonesigned(), write only *_priv and return
 	if( router_lident.is_authsigned() ){
 		DBG_ASSERT( dnsname.is_fully_qualified() );
@@ -332,7 +335,8 @@ router_err_t	router_apps_helper_t::rootca_load_for_authsign(const router_name_t 
 	// open the directory
 	file_err	= file_dir.open(dirname);
 	if( file_err.failed() )	return router_err_from_file(file_err);
-	// keep only the filename matching *.public
+
+	// keep only the filename matching *.rootca_cert
 	file_dir.filter( file_dir_t::filter_glob_nomatch("*.rootca_cert") );
 	// go thru all the matching file_path_t
 	for(size_t i = 0; i < file_dir.size(); i++){
@@ -453,6 +457,7 @@ router_err_t	router_apps_helper_t::disp_info_lident()		throw()
 		KLOG_STDOUT("Local Identity: unable to load it due to " << router_err << "\n");
 		return router_err_t(router_err_t::OK, "DONTLAUNCHAPPS");
 	}
+KLOG_ERR("router_lident="<< router_lident);
 	
 	// display the information about the router_lident_t
 	KLOG_STDOUT("Local Identity: " << router_lident.dnsfqname(profile));

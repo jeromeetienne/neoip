@@ -562,21 +562,27 @@ bool	router_peer_t::dnsname_is_dnsgrab_ok(const router_name_t &remote_name)	cons
 {
 	// sanity check - remote_name MUST be fully_qualified
 	DBG_ASSERT( remote_name.is_fully_qualified() );
-
+KLOG_ERR("sloti");
 	// if this router_name_t is not allowed by the acl, return false
 	if( acl().reject(remote_name.to_string()) )		return false;
 
+KLOG_ERR("sloti");
 	// if the remote_name matches a router_rootca_t, return true
 	// - this means it may be a valid authsigned peer
 	if( rootca_arr().find_by_dnsname(remote_name) )		return true;
 
+KLOG_ERR("sloti remote_name=" << remote_name << " selfsigned_domain=" << profile.selfsigned_domain_str());
+KLOG_ERR("slota rident_arr=" << rident_arr());
 	// if remote_name has a selfsigned_domain and has a rident, return true
 	if( remote_name.domain() == profile.selfsigned_domain_str() ){
+KLOG_ERR("sloti");
 		// if no router_rident_t matches this remote_name, return false
 		if( !rident_arr().find_by_name(remote_name, profile))	return false; 
+KLOG_ERR("sloti");
 		// else return true
 		return true;
 	}
+KLOG_ERR("sloti");
 
 	// if all previous tests passed, the dnsname is NOT handled, so return false
 	return false;
@@ -736,7 +742,7 @@ scnx_err_t	router_peer_t::scnx_auth_ftor_cb(void *userptr, const x509_cert_t &ce
 	const std::string &	subject_name	= cert.subject_name(); 
 	scnx_err_t		scnx_err;
 	// log to debug
-	KLOG_DBG("enter remote_cert=" << cert);
+	KLOG_ERR("enter remote_cert=" << cert);
 
 	// forward to the proper typesigned callback depending on the subject_name
 	if( !router_peerid_t::from_canonical_string(subject_name).is_null() ){
@@ -814,11 +820,15 @@ scnx_err_t	router_peer_t::scnx_auth_ftor_authsigned_cb(void *userptr, const x509
 	// convert the x509_cert_t subject_name into a router_name_t
 	router_name_t	remote_dnsname	= router_name_t(subject_name);
 	// try to find a router_rootca_t for the dnsname
+KLOG_ERR("SLOTA " << remote_dnsname);
+KLOG_ERR("SLOTA " << rootca_arr());
 	const router_rootca_t *	rootca	= rootca_arr().find_by_dnsname(remote_dnsname);
 	// if the router_rootca_t doesnt exists, the certificated is refused 
 	if( !rootca )					return scnx_err_t::ACL_REFUSED;
+KLOG_ERR("SLOTA");
 	// if the router_rootca_t certificate DOES NOT verify the user_cert, the certificate is refused
 	if( rootca->cert().verify_cert(cert).failed() )	return scnx_err_t::ACL_REFUSED;
+KLOG_ERR("SLOTA");
 
 	// If this is a authentication for router_itor_t, ensure the cert is the expected one
 	// - if the userptr is non-null, this mean this is an authentication for router_itor_t
@@ -833,10 +843,12 @@ scnx_err_t	router_peer_t::scnx_auth_ftor_authsigned_cb(void *userptr, const x509
 		router_itor_t *	router_itor	= itor_by_remote_peerid(remote_peerid);
 		if( userptr != router_itor )	return scnx_err_t::ACL_REFUSED;	
 	}
+KLOG_ERR("SLOTA");
 
 	// check if the router_acl_t allows this remote_dnsname
 	if( acl().reject(remote_dnsname.to_string()) )	return scnx_err_t::ACL_REFUSED;
 
+KLOG_ERR("SLOTA");
 	// if this point is reached, the certificate is allowed
 	return scnx_err_t::OK;
 }
@@ -956,7 +968,7 @@ bool 	router_peer_t::neoip_dnsgrab_cb(void *cb_userptr, dnsgrab_t &cb_dnsgrab
 						, dnsgrab_request_t &request)	throw()
 {
 	// log to debug
-	KLOG_DBG("router peername " << lident().name_db()[0] << " received a request of " << request.get_request_name() 
+	KLOG_DBG("router peername " << lident() << " received a request of " << request.get_request_name() 
 			<< " From " << request.get_addr_family()
 			<< " by " << (request.is_request_by_name() ? "name" : "address"));
 
@@ -1031,25 +1043,28 @@ bool 	router_peer_t::dnsgrab_byname_cb(dnsgrab_request_t &request)	throw()
 	DBG_ASSERT( request.get_addr_family() == "AF_INET" );
 	// sanity check - here the dnsgrab_request MUST be by_name()
 	DBG_ASSERT( request.is_request_by_name() );
-
+KLOG_ERR("slota");
 	// if request_dnsname is not is_fully_qualified, notify a not_found
 	// - NOTE: in theory, it should not happen but "be tolerant with what you receive" 
 	if( !request_dnsname.is_fully_qualified() ){
 		set_dnsreq_reply_notfound(request);
 		return true;
 	}
+KLOG_ERR("slota");
 	
 	// if the dnsgrab_request_t is NOT one for this router_peer_t, notify a not_found
 	if( !dnsname_is_dnsgrab_ok(request_dnsname) ){
 		set_dnsreq_reply_notfound(request);
 		return true;
 	}
+KLOG_ERR("slota lident().dnsfqname(profile)=" << lident().dnsfqname(profile) << " request_dnsname=" << request_dnsname);
 	
 	// if the dnsgrab_request_t is for the lident peername, reply the lident
 	if( lident().dnsfqname(profile) == request_dnsname ){
 		set_dnsreq_reply_lident(request);
 		return true;
 	}
+KLOG_ERR("slota");
 	
 	// NOTE: here the request name MAY NOT be a router_lident_t one
 	
