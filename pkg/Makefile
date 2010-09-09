@@ -7,19 +7,19 @@
 all: deb_based
 	
 rpm_based:
-	./neoip_pkger.rb rpm_install neoip-webpack full
+	./neoip_pkger.rb rpm_install neoip-webpeer full
 
 deb_based:
-	./neoip_pkger.rb deb_install neoip-webpack full
+	./neoip_pkger.rb deb_install neoip-webpeer full
 
 ppa_based:
-	./neoip_pkger.rb ppa_install neoip-webpack full
+	./neoip_pkger.rb ppa_install neoip-webpeer full
 
 win32:
-	./neoip_pkger.rb nsis_install neoip-webpack full
+	./neoip_pkger.rb nsis_install neoip-webpeer full
 
 macos:
-	./neoip_pkger.rb macos_install neoip-webpack full
+	./neoip_pkger.rb macos_install neoip-webpeer full
 
 clean:
 	./neoip_pkger.rb all all clean
