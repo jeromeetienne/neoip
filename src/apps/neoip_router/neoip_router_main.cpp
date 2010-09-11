@@ -34,6 +34,7 @@ int main_internal(int argc, char **argv)
 	// insert all the available plugins - MUST be done before anything else
 	lib_apps_ezplugin_t::insert_all_available();
 	// standard init
+	//nipmem_malloc(10000);
 	lib_apps_t *	lib_apps	= nipmem_new lib_apps_t();
 	libsess_err_t	libsess_err	= lib_apps->start(argc, argv, router_apps_t::clineopt_arr()
 						, NEOIP_APPS_CANON_NAME, NEOIP_APPS_HUMAN_NAME
@@ -55,6 +56,9 @@ int main_internal(int argc, char **argv)
 	// if the router_err reason is "DONTLAUNCHAPPS", return 0 now
 	// - NOTE: this is used for not launching the apps when the user register for example
 	if( router_err.reason() == "DONTLAUNCHAPPS" ){
+		// reassign router_err to force router_err_t to free() "DONTLAUNCHAPPS" reason
+		// - else nipmem memory leak checker complains about it
+		router_err	= router_err_t();
 		router_apps.delete_ptr();
 		nipmem_delete	lib_apps;
 		return 0;
