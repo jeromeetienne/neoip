@@ -563,6 +563,9 @@ bool	router_peer_t::dnsname_is_dnsgrab_ok(const router_name_t &remote_name)	cons
 	// sanity check - remote_name MUST be fully_qualified
 	DBG_ASSERT( remote_name.is_fully_qualified() );
 KLOG_ERR("sloti");
+	// if this router_name is for lident peername, return true
+	if( lident().dnsfqname(profile) == remote_name )	return true;
+
 	// if this router_name_t is not allowed by the acl, return false
 	if( acl().reject(remote_name.to_string()) )		return false;
 
@@ -756,7 +759,7 @@ scnx_err_t	router_peer_t::scnx_auth_ftor_cb(void *userptr, const x509_cert_t &ce
 	}
 
 	// log to debug
-	if( scnx_err.failed() )	KLOG_ERR("cert " << cert << " refused");
+	if( scnx_err.failed() )	KLOG_ERR("cert " << cert << " refused due to " << scnx_err);
 	// return the result
 	return scnx_err;
 }
