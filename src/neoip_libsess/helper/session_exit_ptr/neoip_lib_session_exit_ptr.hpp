@@ -115,6 +115,8 @@ lib_session_exit_ptr_t<T>::~lib_session_exit_ptr_t()	throw()
 template <typename T> 
 void		lib_session_exit_ptr_t<T>::delete_ptr()	throw()
 {
+	// log to debug
+	KLOG_DBG("enter ptr_value=" << ptr_value << " lib_session_exit=" << lib_session_exit << " this=" << this);
 	// delete the ptr_value itself
 	nipmem_zdelete	ptr_value;
 	// delete the lib_session_exit_t if needed
@@ -134,7 +136,7 @@ bool	lib_session_exit_ptr_t<T>::neoip_lib_session_exit_cb(void *cb_userptr
 					, lib_session_exit_t &session_exit)	throw()
 {
 	// log to debug
-	KLOG_DBG("enter");
+	KLOG_DBG("enter ptr_value=" << ptr_value << " lib_session_exit=" << lib_session_exit);
 
 	// delete the ptr_value itself
 	nipmem_zdelete	ptr_value;
