@@ -34,7 +34,6 @@ int main_internal(int argc, char **argv)
 	// insert all the available plugins - MUST be done before anything else
 	lib_apps_ezplugin_t::insert_all_available();
 	// standard init
-	//nipmem_malloc(10000);
 	lib_apps_t *	lib_apps	= nipmem_new lib_apps_t();
 	libsess_err_t	libsess_err	= lib_apps->start(argc, argv, router_apps_t::clineopt_arr()
 						, NEOIP_APPS_CANON_NAME, NEOIP_APPS_HUMAN_NAME
