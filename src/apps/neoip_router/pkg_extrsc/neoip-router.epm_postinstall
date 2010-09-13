@@ -19,8 +19,17 @@ if [ ! -e /etc/neoip_router/router/current_identity.priv ]; then
 	# build the nonesigned name
 	# - NOTE: it artificially starts with 'A0' because it is a hostname and 
 	#   dns requires to start with a letter.
+
 	local NONESIGNED_NAME=A0`dd if=/dev/urandom bs=1 count=19 2>/dev/null | od -t x1 -w19  | head -1| cut -d ' ' -f 2-| tr -d ' '`.unauthenticated
 	# make neoip-router register it
+
+# jme- how to transform this file in a ppa_install compatible ?
+# - possible to put this file in a function(), so take care of local. and then call this function
+# - remove the $$ programatically
+# - prepend #!/bin/bash
+# jme- does a prerm which remove the id if unauthenticated ?
+# - remove symlink + *.unauthenticated files
+
 	/usr/lib/neoip_router/neoip-router-bin -r $$NONESIGNED_NAME
 	
 	# restore the /dev/random now - only valid if removed before
