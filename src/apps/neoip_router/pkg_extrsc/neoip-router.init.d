@@ -4,7 +4,7 @@
 # Required-Start:    $local_fs $remote_fs
 # Required-Stop:     $local_fs $remote_fs
 # Default-Start:     2 3 4 5
-# Default-Stop:      S 0 1 6
+# Default-Stop:      0 1 6
 # Short-Description: @APPS_SUMMARY@
 # Description:       here put the APPS_LONGDESC but dunno how to handle it for now
 ### END INIT INFO
@@ -17,7 +17,7 @@
 set -e
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/bin/@APPS_NAME@-ctrl
+DAEMON=/usr/lib/@APPS_NAME@-ctrl
 
 # Gracefully exit if the package has been removed.
 test -x $DAEMON || exit 0
