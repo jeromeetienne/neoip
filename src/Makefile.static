@@ -2333,8 +2333,21 @@ neoip-casto-bin-static$(EXE_EXT): $(APP_CASTO_DEPS_STAT)
 neoip-router$(EXE_EXT): $(APP_ROUTER_DEPS_DYNA)
 	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_ROUTER_OBJS) $(APP_ROUTER_LINK) $(LINKLIB)
 
-neoip-router-bin-static$(EXE_EXT): $(APP_ROUTER_DEPS_STAT)
-	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. -Wl,--start-group $(APP_ROUTER_OBJS) $(APP_ROUTER_LINK) -Wl,--end-group $(LINKLIB)
+# jme- ugly kludge to workaround /dev/random slowness in linux
+# - gnutls forces /dev/random
+# - redirect open(/dev/random) to open(/dev/urandom)
+# - made only in static... because it is shipped in static link
+# - dynamic link is possible with LD_PRELOAD
+LD_PRELOAD_URND_DIR	:= ../src/neoip_crypto/ld_preload_urnd
+LD_PRELOAD_URND_OBJS	:= $(LD_PRELOAD_URND_DIR)/redir_open_static.o
+$(LD_PRELOAD_URND_OBJS): $(LD_PRELOAD_URND_DIR)//redir_open_static.c
+	(cd $(LD_PRELOAD_URND_DIR) && make)
+
+ld_preload_clean:
+	(cd $(LD_PRELOAD_URND_DIR) && make clean)
+
+neoip-router-bin-static$(EXE_EXT): $(APP_ROUTER_DEPS_STAT) $(LD_PRELOAD_URND_OBJS)
+	$(CXX) $(LINK_OPT) -static $(PROF_OPT) -o $@ -L. $(LD_PRELOAD_URND_OBJS) -Wl,--start-group $(APP_ROUTER_OBJS) $(APP_ROUTER_LINK) -Wl,--end-group $(LINKLIB)
 
 neoip-bstrapntudp$(EXE_EXT): $(APP_BSTRAPNTUDP_DEPS_DYNA)
 	$(CXX) $(LINK_OPT) $(PROF_OPT) -o $@ -L. $(APP_BSTRAPNTUDP_OBJS) $(APP_BSTRAPNTUDP_LINK) $(LINKLIB)
@@ -2399,7 +2412,7 @@ clean :
 
 prepare_build: mirror_build_dir build_include_dir dep
 
-distclean: clean_config_debug_dir clean_include_dir clean_pkg
+distclean: clean_config_debug_dir clean_include_dir clean_pkg ld_preload_clean
 	cd ../build_linux && make -f ../src/Makefile.static clean clean_build_dir
 	cd ../build_win32 && make -f ../src/Makefile.static clean clean_build_dir
 	cd ../build_macos && make -f ../src/Makefile.static clean clean_build_dir
