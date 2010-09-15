@@ -11,7 +11,6 @@ libnss_neoip.so.2: libnss_neoip.o
 libnss_neoip.o: libnss_neoip.c libnss_neoip_hostent.c libnss_neoip_tools.c libnss_neoip_dir.c \
 					libnss_neoip_socket.c libnss_neoip_err.c
 
-
 install: libnss_neoip.so.2
 	cp libnss_neoip.so.2	/usr/lib
 	ldconfig
@@ -20,3 +19,9 @@ install: libnss_neoip.so.2
 clean:
 	rm -f libnss_neoip.so.2
 	rm -f libnss_neoip.o
+
+echo_script_postinst:
+	cat script_postinst.sh
+
+echo_script_prerm:
+	cat script_prerm.sh
