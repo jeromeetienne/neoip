@@ -1,0 +1,9 @@
+ld_preload_urnd is standealone. not directly linked to neoip. it is
+a LD_PRELOAD trick to redir open(/dev/random) to open(/dev/urandom)
+
+It is about working around 2 bugs
+- some ubuntu limitation on /dev/random pool size
+- gnutls being forced to use /dev/random and not /dev/urandom
+
+without this trick, creating an identity may be VERY long (as in a few minutes)
+aka completly unusable.
