@@ -1,0 +1,26 @@
+# this file is a .sh_postinstall hook.
+# - i.e. it is a /bin/sh script which gonna be executed first thing after the 
+#   installation of this epm package. 
+# - it gonna run under root, as it is done inside the packager
+
+# if there are no current_identity.priv, create a nonesigned one
+if [ ! -e /etc/neoip_router/router/current_identity.priv ]; then
+	# log the event
+	echo "No current identity found. create a nonesigned one..."
+
+	# build the nonesigned name
+	# - NOTE: it artificially starts with 'A0' because it is a hostname and 
+	#   dns requires to start with a letter.
+	NONESIGNED_NAME=A0`dd if=/dev/urandom bs=1 count=19 2>/dev/null | od -t x1 -w19  | head -1| cut -d ' ' -f 2-| tr -d ' '`.unauthenticated
+
+
+# jme- how to transform this file in a ppa_install compatible ?
+# - possible to put this file in a function(), so take care of local. and then call this function
+# - remove the $$ programatically
+# - prepend #!/bin/bash
+# jme- does a prerm which remove the id if unauthenticated ?
+# - remove symlink + *.unauthenticated files
+
+	# make neoip-router register it
+	/usr/lib/neoip_router/neoip-router-bin -r $NONESIGNED_NAME
+fi
