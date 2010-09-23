@@ -8,7 +8,7 @@ BUILD_DIR	= $(ROOT_DIR)/build_linux
 PKG_DIR		= $(ROOT_DIR)/pkg
 
 build:
-	(cd $(BUILD_DIR) && ./m @APPS_NAME@-bin-static)
+	(cd $(BUILD_DIR) && ./m prepare_build && ./m @APPS_NAME@-bin-static)
 
 clean:
 	(cd $(BUILD_DIR) && ./m clean)

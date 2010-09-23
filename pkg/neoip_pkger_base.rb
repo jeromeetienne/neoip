@@ -242,6 +242,7 @@ def apps_mkdir_linux(pkg_type, apps_name)
 
 
 	# build the application
+	cmdline	= "cd #{exec_dir} && ./m prepare_build && ./m #{apps_name}-bin-static"
 	cmdline	= "cd #{exec_dir} && ./m #{apps_name}-bin-static"
 	system(cmdline)
 

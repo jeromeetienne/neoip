@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE plist PUBLIC -//Apple Computer//DTD PLIST 1.0//EN
+http://www.apple.com/DTDs/PropertyList-1.0.dtd >
+<plist version='1.0'>
+<dict>
+<key>Label</key><string>org.neoip.webpeer</string>
+<key>ProgramArguments</key>
+<array>
+        <string>/Applications/neoip-webpeer/neoip-webpeer-bin-static</string>
+        <string>-d</string>
+        <string>-c</string>
+        <string>/Applications/neoip-webpeer/config_dir_sample</string>
+</array>
+<key>WorkingDirectory</key>        
+	<string>/Applications/neoip-webpeer</string>
+<key>Debug</key><false/>
+<key>OnDemand</key><false/>
+<key>RunAtLoad</key><true/>
+</dict>
+</plist>
