@@ -38,7 +38,7 @@ apps_name_list.collect! { |apps_name|
 	elsif apps_name == "all_bt"
 		apps_name = ["neoip-oload", "neoip-casto", "neoip-casti", "neoip-get", "neoip-btcli", "neoip-btrelay"]
 	elsif apps_name == "all"
-		apps_name = ["neoip-oload", "neoip-casto", "neoip-casti", "neoip-get", "neoip-btcli", "neoip-btrelay", "neoip-router", "neoip-bstrapntudp", "neoip-upnp", "neoip-flv2xml", "neoip-webpack"]
+		apps_name = ["neoip-oload", "neoip-casto", "neoip-casti", "neoip-get", "neoip-btcli", "neoip-btrelay", "neoip-router", "neoip-bstrapntudp", "neoip-upnp", "neoip-flv2xml", "neoip-webpeer"]
 	end
 	apps_name
 }.flatten!
