@@ -19,9 +19,3 @@ install: libnss_neoip.so.2
 clean:
 	rm -f libnss_neoip.so.2
 	rm -f libnss_neoip.o
-
-echo_script_postinst:
-	cat script_postinst.sh
-
-echo_script_prerm:
-	cat script_prerm.sh
