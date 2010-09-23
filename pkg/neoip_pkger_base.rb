@@ -226,6 +226,17 @@ def apps_mkdir_common(pkg_type, apps_name)
 	if FileTest.exist?("#{mainsrc_dir}/apps/#{canon_name}/pkg_extrsc")
 		system("cp -LR #{mainsrc_dir}/apps/#{canon_name}/pkg_extrsc #{build_dir}")
 	end
+	
+	# handle special case of adding libnss_neoip in case of neoip-router
+	if apps_name == "neoip-router"
+		libnss_dir	= "#{mainsrc_dir}/neoip_dnsgrab/libnss"
+		# to include libnss sh_postinstall/sh_postremove script
+		system("cd #{libnss_dir} && make libnss_neoip.so.2")
+		system("cp #{libnss_dir}/libnss_neoip.so.2 #{build_dir}/pkg_extrsc")
+		# to include libnss sh_postinstall/sh_postremove script
+		system("cat #{libnss_dir}/script_postinstall.sh >> #{build_dir}/pkg_extrsc/#{apps_name}.sh_postinstall");
+		system("cat #{libnss_dir}/script_postremove.sh  >> #{build_dir}/pkg_extrsc/#{apps_name}.sh_postremove");
+	end
 end
 
 # do the linux-specific part of mkdir
@@ -403,12 +414,18 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 	all_initd	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.init.d$/.match(x) }
 
 	# read the postinstall_hook if any
-	if FileTest.exist?("#{build_dir}/pkg_extrsc/#{apps_name}.epm_postinstall")
-		postinstall_hook = File.open("#{build_dir}/pkg_extrsc/#{apps_name}.epm_postinstall").read
+	if FileTest.exist?("#{build_dir}/pkg_extrsc/#{apps_name}.sh_postinstall")
+		postinstall_hook = File.open("#{build_dir}/pkg_extrsc/#{apps_name}.sh_postinstall").read
+		# - NOTE: epm will do a pass on this script to replace its own variable
+		#   so any shell variable MUST have a double $
+		postinstall_hook.gsub!(/\$/, "$$");
 	end
 	# read the postremove_hook if any
-	if FileTest.exist?("#{build_dir}/pkg_extrsc/#{apps_name}.epm_postremove")
-		postremove_hook = File.open("#{build_dir}/pkg_extrsc/#{apps_name}.epm_postremove").read
+	if FileTest.exist?("#{build_dir}/pkg_extrsc/#{apps_name}.sh_postremove")
+		postremove_hook = File.open("#{build_dir}/pkg_extrsc/#{apps_name}.sh_postremove").read
+		# - NOTE: epm will do a pass on this script to replace its own variable
+		#   so any shell variable MUST have a double $
+		postremove_hook.gsub!(/\$/, "$$");
 	end
 
 # TODO neoip-router requires to get libnss-neoip
@@ -443,6 +460,12 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 			fOut.puts("f 755 root root /usr/bin/#{apps_name}-ctrl #{build_dir}/pkg_extrsc/#{apps_name}-ctrl.sh")
 		else
 			fOut.puts("f 755 root root /usr/bin/#{apps_name} #{build_dir}/#{apps_name}-bin-static")
+		end
+		
+		# handle special case of adding libnss_neoip in case of neoip-router
+		if apps_name == "neoip-router"
+			fOut.puts("f 755 root root /usr/lib/libnss_neoip.so.2 #{build_dir}/pkg_extrsc/libnss_neoip.so.2")
+			fOut.puts("d 755 root root /etc/libnss_neoip.d -")
 		end
 		
 		# add all the manpage
@@ -555,7 +578,7 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 	end
 	
 	# remove the configuration file
-	FileUtils.rm_f "#{apps_name}.epm_list"
+	#FileUtils.rm_f "#{apps_name}.epm_list"
 end
 
 # mkpkg for deb_install
@@ -732,6 +755,13 @@ def apps_mkpkg_tgz_install(pkg_type, apps_name)
 		FileUtils.mkdir_p("#{install_dir}/usr/bin")
 		FileUtils.cp("#{build_dir}/#{apps_name}-bin-static"		, "#{install_dir}/usr/bin/#{apps_name}")
 	end
+	
+			
+	# handle special case of adding libnss_neoip in case of neoip-router
+	if apps_name == "neoip-router"
+		FileUtils.mkdir_p("#{install_dir}/etc/libnss_neoip.d")
+		FileUtils.cp("#{build_dir}/pkg_extrsc/libnss_neoip.so.2"	, "#{install_dir}/usr/lib/libnss_neoip.so.2")
+	end
 
 	# copy the config dir
 	FileUtils.mkdir_p("#{install_dir}/etc/#{canon_name}")
@@ -767,7 +797,7 @@ def apps_mkpkg_tgz_install(pkg_type, apps_name)
 	system(cmdline);
 	
 	# remove the tmp_dir
-	FileUtils.rm_rf "#{tmp_dir}"
+	#FileUtils.rm_rf "#{tmp_dir}"
 end
 
 # mkpkg for tgz_install
