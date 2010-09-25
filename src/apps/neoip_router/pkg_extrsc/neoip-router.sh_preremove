@@ -1,0 +1,31 @@
+#!/bin/bash
+# this file is a .sh_premove hook.
+# - i.e. it is a /bin/sh script which gonna be executed before the package get removed
+# - it gonna run under root, as it is done inside the packager
+
+# if there are no current_identity.priv, create a nonesigned one
+neoip_router_dfl_identity_uninstall() {
+	IDENTITY_FNAME="/etc/neoip_router/router/current_identity.priv"
+	# if there is no a current identity, return now
+	[ -e $IDENTITY_FNAME ] || return 0
+	
+	# test if it is $IDENTITY_FNAME is a symlink
+	REAL_FNAME=`readlink -f $IDENTITY_FNAME`
+	local isnt_symlink="$?"
+	# if not symlink, return now
+	[ "$isnt_symlink" = "1" ] && return 0
+
+	# test if symlink point to a *.unauthenticated.nonesigned_priv
+	echo $REAL_FNAME | grep -e ".*\.unauthenticated\.nonesigned_priv" >/dev/null
+	local isnt_unauthenticated="$?"
+	# if isnt_unauthenticated, return now
+	[ "$isnt_unauthenticated" = "1" ] && return 0
+
+	# if all previous tests passed, actuall remove the files
+	rm -f $IDENTITY_FNAME
+	rm -f $REAL_FNAME
+}
+
+echo SUPER PREREMOVE
+# run the function
+neoip_router_dfl_identity_uninstall

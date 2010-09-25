@@ -234,8 +234,11 @@ def apps_mkdir_common(pkg_type, apps_name)
 		system("cd #{libnss_dir} && make libnss_neoip.so.2")
 		system("cp #{libnss_dir}/libnss_neoip.so.2 #{build_dir}/pkg_extrsc")
 		# to include libnss sh_postinstall/sh_postremove script
-		system("cat #{libnss_dir}/script_postinstall.sh >> #{build_dir}/pkg_extrsc/#{apps_name}.sh_postinstall");
-		system("cat #{libnss_dir}/script_postremove.sh  >> #{build_dir}/pkg_extrsc/#{apps_name}.sh_postremove");
+		["preinstall", "postinstall", "preremove", "postremove"].each { |script_type|
+			src_fname	= "#{libnss_dir}/script_#{script_type}.sh";
+			next unless FileTest.exist?(src_fname)
+			system("cat #{src_fname} >> #{build_dir}/pkg_extrsc/#{apps_name}.sh_#{script_type}");
+		}
 	end
 end
 
@@ -413,24 +416,18 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 	all_desktop	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.desktop$/.match(x) }
 	all_initd	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.init.d$/.match(x) }
 
-	# read the postinstall_hook if any
-	if FileTest.exist?("#{build_dir}/pkg_extrsc/#{apps_name}.sh_postinstall")
-		postinstall_hook = File.open("#{build_dir}/pkg_extrsc/#{apps_name}.sh_postinstall").read
+	# handle script_hooks
+	script_hooks	= {}
+	["preinstall", "postinstall", "preremove", "postremove"].each { |script_type|
+		script_hooks[script_type]	= "";
+		if FileTest.exist?("#{build_dir}/pkg_extrsc/#{apps_name}.sh_#{script_type}")
+			script_hooks[script_type]	= File.open("#{build_dir}/pkg_extrsc/#{apps_name}.sh_#{script_type}").read
+		end
+		# epm special escaping
 		# - NOTE: epm will do a pass on this script to replace its own variable
 		#   so any shell variable MUST have a double $
-		postinstall_hook.gsub!(/\$/, "$$");
-	end
-	# read the postremove_hook if any
-	if FileTest.exist?("#{build_dir}/pkg_extrsc/#{apps_name}.sh_postremove")
-		postremove_hook = File.open("#{build_dir}/pkg_extrsc/#{apps_name}.sh_postremove").read
-		# - NOTE: epm will do a pass on this script to replace its own variable
-		#   so any shell variable MUST have a double $
-		postremove_hook.gsub!(/\$/, "$$");
-	end
-
-# TODO neoip-router requires to get libnss-neoip
-# - how do i do that ? a special case here ?
-# - likely a config file in the pkg_extrsc directory
+		script_hooks[script_type].gsub!(/\$/, "$$");
+	}
 
 	# write the result to the .epm_list file
 	File.open("#{apps_name}.epm_list", "w") { |fOut|
@@ -438,8 +435,8 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 		fOut.puts("%copyright 2008")
 		fOut.puts("%vendor NeoIP")
 		fOut.puts("%version #{apps_version}")
-		fOut.puts("%readme \"Read http://urfastr.net/webpack\" ")
-		fOut.puts("%license \"http://donotusethissoft.ever\"")
+		fOut.puts("%readme \"Read http://jetienne.com\" ")
+		fOut.puts("%license \"GPL\"")
 		apps_description.collect { |x| "%description #{x}" }.each { |x| 
 			fOut.puts("#{x}")
 		}
@@ -496,7 +493,7 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 
 		# do the post-install
 		fOut << "%postinstall <<EOF\n"
-		fOut << "	#{postinstall_hook}\n"
+		fOut << "	#{script_hooks['postinstall']}\n"
 		if all_initd.size > 0 
 			# if there are init.d files, install it		
 			if pkg_type == "deb_install"
@@ -522,8 +519,9 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 		fOut << "	exit 0\n"
 		fOut << "EOF\n"			
 
+		# do the post-remove
 		fOut << "%postremove <<EOF\n"
-		fOut << "	#{postremove_hook}\n"
+		fOut << "	#{script_hooks['postremove']}\n"
 		if all_initd.size > 0 
 			# if there are init.d files, remove it
 			if pkg_type == "deb_install"
@@ -538,20 +536,31 @@ def apps_mkpkg_epm_common(pkg_type, apps_name)
 		end
 		fOut << "	exit 0\n"
 		fOut << "EOF\n"			
-		
-		# if the apps_type is *_BOOT, put a preinstall/preremove script to kill the daemon
-		# - NOTE: it is not possible to use the *-ctrl script as it is local to 
-		#   each users and package installation is at the system level		
+
+
+		# do the preinstall
+		fOut << "%preinstall <<EOF\n"
+		fOut << "	#{script_hooks['preinstall']}\n"
 		if apps_type =~ /.*_BOOT/
-			fOut << "%preinstall <<EOF\n"
+			# if the apps_type is *_BOOT, put a preinstall/preremove script to kill the daemon
+			# - NOTE: it is not possible to use the *-ctrl script as it is local to 
+			#   each users and package installation is at the system level		
 			fOut << "	[ \"`pidof #{apps_name}-bin`\" != \"\" ] && killall #{apps_name}-bin\n"
-			fOut << "	exit 0\n"
-			fOut << "EOF\n"
-			fOut << "%preremove <<EOF\n"
-			fOut << "	[ \"`pidof #{apps_name}-bin`\" != \"\" ] && killall #{apps_name}-bin\n"
-			fOut << "	exit 0\n"
-			fOut << "EOF\n"
 		end
+		fOut << "	exit 0\n"
+		fOut << "EOF\n"
+
+		# do the preremove
+		fOut << "%preremove <<EOF\n"
+		fOut << "	#{script_hooks['preremove']}\n"
+		if apps_type =~ /.*_BOOT/
+			# if the apps_type is *_BOOT, put a preinstall/preremove script to kill the daemon
+			# - NOTE: it is not possible to use the *-ctrl script as it is local to 
+			#   each users and package installation is at the system level		
+			fOut << "	[ \"`pidof #{apps_name}-bin`\" != \"\" ] && killall #{apps_name}-bin\n"
+		end
+		fOut << "	exit 0\n"
+		fOut << "EOF\n"
 	}
 	
 	# NOTE: epm compress using gzip. which is quite bad compared to lzma
@@ -608,6 +617,7 @@ end
 ################################################################################
 
 # mkpkg for ppa_install
+# - it use the tgz_install to get the folder hierachie and add the scripts preinstall/postinstall/etc...
 # - debuild  -uc -us -b <- from above debian/, build a binary package without signing it
 # - debuild  -k'jerome etienne' -b <- from above debian/, build a source package and sign it with "jerome etienne" gpg key
 # - dpkg-source -x neoip-get_0.0.1*.dsc <- "decompress" the source pacakge described in the .dsc
@@ -654,8 +664,24 @@ def apps_mkpkg_ppa_install(pkg_type, apps_name)
 	patch_templ_file("ppa_pkg_extrsc/rules.templ"	, "#{debian_rootdir}/rules"	, templ_vars)
 	system("chmod +x #{debian_rootdir}/rules")
 
+	# handle script_hooks
+	["preinstall", "postinstall", "preremove", "postremove"].each { |script_type|
+		dst_fname_trans	= { "preinstall" => "preinst",	"postinstall" => "postinst",
+			"preremove" => "prerm", "postremove" => "postrm"
+		}
+		src_fname	= "#{build_dir}/pkg_extrsc/#{apps_name}.sh_#{script_type}"
+		dst_fname	= "#{debian_confdir}/"+dst_fname_trans[script_type]
+		if FileTest.exist?(src_fname)
+			system("echo '#!/bin/bash'	>  #{dst_fname}")
+			system("cat #{src_fname}	>> #{dst_fname}")
+			# dh_installdeb will #DEBHELPER# with shell code automatically
+			# generated by other debhelper scripts.
+			system("echo '#DEBHELPER#'	>> #{dst_fname}")
+		end
+	}
+	
 	# get external rescources
-	all_manpage	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.[0-9]$/.match(x) }
+	all_manpage	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| (not /.*\.[0-9]$/.match(x)) or /.*\.so\.[0-9]$/.match(x) }
 	all_desktop	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.desktop$/.match(x) }
 	all_initd	= Dir.entries("#{build_dir}/pkg_extrsc").delete_if { |x| not /.*\.init.d$/.match(x) }
 	# sanity check
@@ -694,6 +720,9 @@ def apps_mkpkg_ppa_install(pkg_type, apps_name)
 	# do build the source package
 	cmdline	= "cd #{debian_rootdir} && (yes | debuild -S -k'jerome etienne')"
 	system(cmdline)
+	# debug to build binary package locally
+	cmdline	= "cd #{debian_rootdir} && (yes | debuild -uc -us -b)"
+	#system(cmdline)
 end
 
 # mkpkg for ppa_install
