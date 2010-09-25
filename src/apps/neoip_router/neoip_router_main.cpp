@@ -49,7 +49,7 @@ int main_internal(int argc, char **argv)
 	lib_session_exit_ptr_t<router_apps_t> router_apps(nipmem_new router_apps_t(), lib_session_exit_t::EXIT_ORDER_APPS);
 	router_err_t	router_err	= router_apps->start();
 	if( router_err.failed() ){
-		KLOG_ERR("Initialization error: " << router_err);
+		KLOG_STDOUT("Initialization error: " << router_err);
 		return -1;
 	}
 	// if the router_err reason is "DONTLAUNCHAPPS", return 0 now

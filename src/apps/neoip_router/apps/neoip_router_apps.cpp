@@ -198,7 +198,7 @@ router_err_t	router_apps_t::start()	throw()
 	// set the just read router_acache_t in the router_peer_t
 	router_peer->set_acache(router_acache);
 
-	// if the arg_option DOES NOTcontains the "nodaemon" key, pass daemon
+	// if the arg_option DOES NOT contains the "nodaemon" key, pass daemon
 	if( !arg_option.contain_key("nodaemon") && lib_apps_helper_t::daemonize().failed() )
 		return router_err_t(router_err_t::ERROR, "Can't daemon()");
 	
@@ -247,7 +247,7 @@ router_err_t	router_apps_t::cmdline_action_register()		throw()
 		std::string	reason = "dnsname " + dnsname.to_string() + " is invalid (only host-only and fully qualified are allowed)";
 		return router_err_t(router_err_t::ERROR, reason);
 	}
-	
+KLOG_STDOUT("slota");
 	// if dnsname to register is_authsigned_ok(), get cert/priv for the domain authority 
 	if( dnsname.is_authsigned_ok() ){
 		// try to get the ca_cert/ca_privkey for this dnsname
@@ -259,8 +259,11 @@ router_err_t	router_apps_t::cmdline_action_register()		throw()
 		DBG_ASSERT( !ca_privkey.is_null() );
 	}
 	
+KLOG_STDOUT("slota");
+KLOG_ERR("slotIIII");	
+
 	// log to debug
-	KLOG_DBG("dnsname="		<< dnsname);
+	KLOG_ERR("dnsname="		<< dnsname);
 	KLOG_DBG("x509_cert="		<< ca_cert);
 	KLOG_DBG("x509_privkey="	<< ca_privkey);
 	
@@ -269,6 +272,7 @@ router_err_t	router_apps_t::cmdline_action_register()		throw()
 						, ca_cert, ca_privkey);
 	if( router_err.failed() )	return router_err;
 
+KLOG_STDOUT("slota");
 	// exit after a successfull action
 	KLOG_STDOUT("OK\n");
 

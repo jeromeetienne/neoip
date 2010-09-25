@@ -40,7 +40,7 @@ router_err_t	router_apps_helper_t::lident_create(const file_path_t &config_path
 	DBG_ASSERT( dnsname.is_fully_qualified() || dnsname.is_host_only() );
 	// sanity check - ca_cert and ca_privkey are either both is_null() or none are 
 	DBG_ASSERT( ca_cert.is_null() == ca_privkey.is_null() );
-	
+
 	// determine the local_peerid based on the type of dnsname
 	router_peerid_t	local_peerid;
 #if 0	// TODO to remove - obsolete stuff from the pre-nonesigned era
@@ -457,7 +457,6 @@ router_err_t	router_apps_helper_t::disp_info_lident()		throw()
 		KLOG_STDOUT("Local Identity: unable to load it due to " << router_err << "\n");
 		return router_err_t(router_err_t::OK, "DONTLAUNCHAPPS");
 	}
-KLOG_ERR("router_lident="<< router_lident);
 	
 	// display the information about the router_lident_t
 	KLOG_STDOUT("Local Identity: " << router_lident.dnsfqname(profile));
