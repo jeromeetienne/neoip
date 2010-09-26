@@ -340,7 +340,7 @@ ssize_t	nudp_t::recvfromto(void *buf_ptr, int buf_len, ipport_addr_t &local_addr
 	// do the recvmsg
 	read_len	= recvmsg(fdwatch->get_fd(), &msg, 0);
 	if( read_len < 0 ){
-		KLOG_DBG("recvmsg len=" << read_len << " error=" << inet_oswarp_t::sock_strerror());
+		KLOG_ERR("recvmsg len=" << read_len << " error=" << inet_oswarp_t::sock_strerror());
 		return read_len;
 	}
 	
@@ -415,6 +415,7 @@ bool	nudp_t::neoip_fdwatch_cb( void *cb_userptr, const fdwatch_t &cb_fdwatch
 
 	// read the data (required to get the remote_addr)
 	ssize_t	readlen	= recvfromto(data, sizeof(data), local_addr, remote_addr);
+	if( readlen < 0 && inet_oswarp_t::sock_errno() == EAGAIN )	return true;
 	DBG_ASSERT( readlen >= 0 );
 
 	// log to debug
