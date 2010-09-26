@@ -339,7 +339,10 @@ ssize_t	nudp_t::recvfromto(void *buf_ptr, int buf_len, ipport_addr_t &local_addr
 	
 	// do the recvmsg
 	read_len	= recvmsg(fdwatch->get_fd(), &msg, 0);
-	if( read_len < 0 )	return read_len;
+	if( read_len < 0 ){
+		KLOG_DBG("recvmsg len=" << read_len << " error=" << inet_oswarp_t::sock_strerror());
+		return read_len;
+	}
 	
 	// get the remote addr
 	remote_addr = ipport_addr_t(addr_in);
