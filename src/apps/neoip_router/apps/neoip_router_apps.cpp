@@ -120,6 +120,8 @@ router_err_t	router_apps_t::start()	throw()
 	ip_netaddr_arr	+= avail_netaddr_str.c_str();
 
 	/*************** handle the key creation option	***********************/
+	// if the arg_option contains the "lident_prepare" key, call the proper cmdline_action function
+	if( arg_option.contain_key("lident_prepare") )	return cmdline_action_lident_prepare();
 	// if the arg_option contains the "lident_register" key, call the proper cmdline_action function
 	if( arg_option.contain_key("lident_register") )	return cmdline_action_lident_register();
 	// if the arg_option contains the "rootca_create" key, call the proper cmdline_action function
@@ -265,7 +267,7 @@ router_err_t	router_apps_t::cmdline_action_lident_register()		throw()
 	KLOG_DBG("x509_privkey="	<< ca_privkey);
 	
 	// start generating the local identity
-	router_err	= router_apps_helper_t::lident_create(config_path, dnsname, 1024
+	router_err	= router_apps_helper_t::lident_register(config_path, dnsname, 1024
 						, ca_cert, ca_privkey);
 	if( router_err.failed() )	return router_err;
 
@@ -274,6 +276,13 @@ router_err_t	router_apps_t::cmdline_action_lident_register()		throw()
 
 	// return no error, but a specific reason to avoid launching the apps
 	return router_err_t(router_err_t::OK, "DONTLAUNCHAPPS");
+}
+
+/** \brief Handle the --lident_prepare cmdline actions
+ */
+router_err_t	router_apps_t::cmdline_action_lident_prepare()		throw()
+{
+	return router_err_t(router_err_t::ERROR, "not yet implemented");
 }
 
 /** \brief Handle the --rootca_create cmdline actions
@@ -347,7 +356,13 @@ clineopt_arr_t	router_apps_t::clineopt_arr()	throw()
 {
 	clineopt_arr_t	clineopt_arr;
 	clineopt_t	clineopt;
-	// add the -- cmdline option
+	// add the --lident_register cmdline option
+	clineopt	= clineopt_t("lident_prepare", clineopt_mode_t::REQUIRED)
+				.option_mode(clineopt_mode_t::OPTIONAL)
+				.help_string("To prepare the local identity peername (authsign only)");
+	clineopt.alias_name_db().append("p");
+	clineopt_arr	+= clineopt;
+	// add the --lident_register cmdline option
 	clineopt	= clineopt_t("lident_register", clineopt_mode_t::REQUIRED)
 				.option_mode(clineopt_mode_t::OPTIONAL)
 				.help_string("To register the local identity peername");

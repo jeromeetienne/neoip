@@ -31,7 +31,7 @@ class	router_name_t;
 class router_apps_helper_t {
 public:
 	/*************** lident load/save	*******************************/
-	static router_err_t	lident_create(const file_path_t &config_path, const router_name_t &dnsname
+	static router_err_t	lident_register(const file_path_t &config_path, const router_name_t &dnsname
 						, size_t key_len, const x509_cert_t &ca_cert
 						, const x509_privkey_t &ca_privkey)			throw();
 	static router_err_t	lident_load(const file_path_t &config_path, router_lident_t &lident)	throw();

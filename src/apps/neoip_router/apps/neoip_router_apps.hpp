@@ -38,6 +38,7 @@ private:
 	router_peer_t *	router_peer;
 
 	/*************** Some cmdline actions	*******************************/
+	router_err_t	cmdline_action_lident_prepare()		throw();
 	router_err_t	cmdline_action_lident_register()	throw();
 	router_err_t	cmdline_action_rootca_create()		throw();
 	router_err_t	cmdline_action_info()			throw();
