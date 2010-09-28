@@ -88,6 +88,8 @@ OBJECTS = \
 	apps/neoip_upnp/neoip_upnp_main.o \
 	apps/neoip_webpack/apps/neoip_webpack_apps.o \
 	apps/neoip_webpack/neoip_webpack_main.o \
+	apps/neoip_webpeer/apps/neoip_webpeer_apps.o \
+	apps/neoip_webpeer/neoip_webpeer_main.o \
 	apps/obsolete/neoip_buddy/asyncexe/neoip_asyncexe2.o \
 	apps/obsolete/neoip_buddy/asyncexe/utest/neoip_asyncexe_utest.o \
 	apps/obsolete/neoip_buddy/http_fdir/neoip_http_fdir.o \
@@ -604,6 +606,9 @@ OBJECTS = \
 	neoip_crypto/dh/privkey/neoip_dh_privkey.o \
 	neoip_crypto/dh/pubkey/neoip_dh_pubkey.o \
 	neoip_crypto/dh/shsecret/neoip_dh_shsecret.o \
+	neoip_crypto/ld_preload_urnd/redir_open_dynamic.o \
+	neoip_crypto/ld_preload_urnd/redir_open_static.o \
+	neoip_crypto/ld_preload_urnd/test_static.o \
 	neoip_crypto/random_pool/neoip_random_pool.o \
 	neoip_crypto/skey/auth/base/algo/neoip_skey_auth_algo.o \
 	neoip_crypto/skey/auth/base/mode/neoip_skey_auth_mode.o \
@@ -1577,6 +1582,8 @@ LINTS = \
 	apps/neoip_upnp/neoip_upnp_main.lint \
 	apps/neoip_webpack/apps/neoip_webpack_apps.lint \
 	apps/neoip_webpack/neoip_webpack_main.lint \
+	apps/neoip_webpeer/apps/neoip_webpeer_apps.lint \
+	apps/neoip_webpeer/neoip_webpeer_main.lint \
 	apps/obsolete/neoip_buddy/asyncexe/neoip_asyncexe2.lint \
 	apps/obsolete/neoip_buddy/asyncexe/utest/neoip_asyncexe_utest.lint \
 	apps/obsolete/neoip_buddy/http_fdir/neoip_http_fdir.lint \
@@ -2093,6 +2100,9 @@ LINTS = \
 	neoip_crypto/dh/privkey/neoip_dh_privkey.lint \
 	neoip_crypto/dh/pubkey/neoip_dh_pubkey.lint \
 	neoip_crypto/dh/shsecret/neoip_dh_shsecret.lint \
+	neoip_crypto/ld_preload_urnd/redir_open_dynamic.lint \
+	neoip_crypto/ld_preload_urnd/redir_open_static.lint \
+	neoip_crypto/ld_preload_urnd/test_static.lint \
 	neoip_crypto/random_pool/neoip_random_pool.lint \
 	neoip_crypto/skey/auth/base/algo/neoip_skey_auth_algo.lint \
 	neoip_crypto/skey/auth/base/mode/neoip_skey_auth_mode.lint \
@@ -3067,6 +3077,8 @@ INCLUDEPATH = \
 	-Iapps/neoip_upnp \
 	-Iapps/neoip_webpack/apps \
 	-Iapps/neoip_webpack \
+	-Iapps/neoip_webpeer/apps \
+	-Iapps/neoip_webpeer \
 	-Iapps/obsolete/neoip_buddy/asyncexe \
 	-Iapps/obsolete/neoip_buddy/asyncexe/utest \
 	-Iapps/obsolete/neoip_buddy/http_fdir \
@@ -3586,6 +3598,7 @@ INCLUDEPATH = \
 	-Ineoip_crypto/dh/privkey \
 	-Ineoip_crypto/dh/pubkey \
 	-Ineoip_crypto/dh/shsecret \
+	-Ineoip_crypto/ld_preload_urnd \
 	-Ineoip_crypto/random_pool \
 	-Ineoip_crypto/skey/auth/base/algo \
 	-Ineoip_crypto/skey/auth/base/mode \
