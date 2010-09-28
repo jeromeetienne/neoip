@@ -186,7 +186,7 @@ router_lident_t	router_lident_t::generate(const router_peerid_t &peerid
 	// generate the private key
 	crypto_err	= privkey.generate(key_len);
 	if( crypto_err.failed() )	return router_lident_t();
-	// generate the certificate request needed to build the certificate 
+	// generate the certificate request needed to build the certificate
 	// - if it is selfsigned, the subject_name is peerid.to_canonical string()
 	// - if it is authsigned, the subject_name is dnsname.to_string()
 	// - if it is nonesigned, the subject_name is dnsname.to_string()
