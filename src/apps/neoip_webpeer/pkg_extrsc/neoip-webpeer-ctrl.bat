@@ -1,0 +1,1 @@
+../../../config_pkg_extrsc/neoip-apps-ctrl.bat
