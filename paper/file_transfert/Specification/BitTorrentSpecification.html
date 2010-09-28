@@ -1,0 +1,853 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="robots" content="index,follow">
+<meta name="description" content="BitTorrent is a peer-to-peer file sharing protocol designed by Bram Cohen.  Visit his pages at http://www.bitconjurer.org.  BitTorrent is designed to facilitate file transfers among multiple peers across unreliable networks.">
+<meta name="keywords" content="Bit Torrent Specification, Bit Torrent, wiki.theory.org">
+<meta name="language" content="en">
+<meta name="document-type" content="Public">
+<meta name="document-rating" content="General">
+<meta name="generator" content="PhpWiki">
+<meta name="PHPWIKI_VERSION" content="1.3.7debian">
+<!-- base href="http://wiki.theory.org/" -->
+<link rel="shortcut icon" href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/phpwikidata/themes/Theory/images/favicon.ico">
+<link rel="home" title="HomePage" href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/HomePage">
+<link rel="help" title="HowToUseWiki" href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/HowToUseWiki">
+<link rel="copyright" title="GNU General Public License" href="http://web.archive.org/web/20050315090729/http://www.gnu.org/copyleft/gpl.html#SEC1">
+<link rel="author" title="The PhpWiki Programming Team" href="http://web.archive.org/web/20050315090729/http://phpwiki.sourceforge.net/phpwiki/ThePhpWikiProgrammingTeam">
+<link rel="search" title="FindPage" href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/FindPage">
+<link rel="alternate" title="View Source: BitTorrentSpecification" href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification?action=viewsource&amp;version=102">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/RecentChanges?format=rss">
+
+<link rel="bookmark" title="SandBox" href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/SandBox">
+<link rel="bookmark" title="WikiWikiWeb" href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/WikiWikiWeb">
+
+
+
+<link rel="stylesheet" type="text/css" charset="iso-8859-1" href="_files/phpwiki.css">
+<link rel="stylesheet" type="text/css" charset="iso-8859-1" href="_files/phpwiki-printer.css" media="print">
+<link rel="alternate stylesheet" type="text/css" charset="iso-8859-1" href="_files/phpwiki-printer.css" title="Printer">
+<link rel="alternate stylesheet" type="text/css" charset="iso-8859-1" href="_files/phpwiki-topbottombars.css" title="Top &amp; bottom toolbars">
+<link rel="alternate stylesheet" type="text/css" charset="iso-8859-1" href="_files/phpwiki-modern.css" title="Modern"><title>wiki.theory.org - Bit Torrent Specification</title></head>
+
+
+<body background="_files/a">
+
+<div id="header">  <!-- The logo -->
+<div id="logo" align="right"><a class="wikilink" href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/HomePage" target="_top"><img src="_files/logo" id="logo-img" alt="wiki.theory.org: HomePage" align="right" border="0"></a></div>
+
+<!-- The top navigation/search bar -->
+<div class="toolbar"><!-- The top navigation/search bar -->
+<form action="http://web.archive.org/web/20050315090729/TitleSearch" target="_top" method="get" accept-charset="iso-8859-1">
+  <div id="navbuttons">
+   <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/RecentChanges" class="wiki">RecentChanges</a>   
+ | <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/FindPage" class="wiki">FindPage</a>   
+ | <input name="auto_redirect" value="1" type="hidden">
+            <input name="s" size="12" maxlength="256" title="Quick Search" onmouseover="window.status='Quick Search'; return true;" onmouseout="window.status=''; return true;" type="text">
+         
+ | <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification?action=LikePages" class="wikiaction">LikePages</a>     
+ | <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification?action=BackLinks" class="wikiaction">BackLinks</a>                      </div>
+</form>
+</div>
+
+<!-- Page title -->
+<h1><a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification?action=BackLinks" class="backlinks" title="BackLinks for BitTorrentSpecification" onmouseover='window.status="BackLinks for BitTorrentSpecification"; return true;' onmouseout="window.status='';return true;">Bit Torrent Specification</a></h1>
+</div>
+
+
+<div class="wikitext"><p class="tightenable top"><big><big><big> <b>Bittorrent Protocol Specification v1.0</b> </big></big></big></p>
+<h2>Identification</h2>
+<p class="tightenable"><a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrent" class="wiki">BitTorrent</a> is a peer-to-peer file sharing protocol designed by Bram Cohen.  Visit his pages at <a href="http://web.archive.org/web/20050315090729/http://www.bitconjurer.org/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">http://www.bitconjurer.org</span></a>.  BitTorrent is designed to facilitate file transfers among multiple peers across unreliable networks.</p>
+<h2>Purpose</h2>
+<p class="tightenable">The purpose of this specification is to document
+version 1.0 of the BitTorrent protocol specification in detail. Bram's
+protocol specification page <a href="http://web.archive.org/web/20050315090729/http://www.bitconjurer.org/BitTorrent/protocol.html" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">http://www.bitconjurer.org/BitTorrent/protocol.html</span></a>
+outlines the protocol in somewhat general terms, and lacks behaviorial
+detail in some areas. The hope is that this document will become a <b>formal</b>
+specification, written in clear, unambiguous terms, which can be used
+as a basis for discussion and implementation in the future.</p>
+<p class="tightenable">This document is intended to be maintained and
+used by the BitTorrent development community. Everyone is invited to
+contribute to this document, with the understanding that the content
+here is intended to represent the current protocol, which is already
+deployed in a number of client implementations.</p>
+<p class="tightenable">This is not the place to suggest feature requests.  For that, please go to the mailing list.</p>
+<h2>Scope</h2>
+<p class="tightenable">This document applies to the first version (i.e.
+version 1.0) of the BitTorrent protocol specification. Currently, this
+applies to the torrent file structure, peer wire protocol, and the
+Tracker HTTP/HTTPS protocol specifications. As newer revisions of each
+protocol are defined, they should be specified on their own separate
+pages, <i><b>not here</b></i>.</p>
+<h2>Related Documents</h2>
+<p class="tightenable"><a href="http://web.archive.org/web/20050315090729/http://www.bitconjurer.org/BitTorrent/protocol.html" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">http://www.bitconjurer.org/BitTorrent/protocol.html</span></a> - The official protocol specification.<br>
+<a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentWishList" class="wiki">BitTorrentWishList</a> - A wish list for developers and end users alike.<br>
+<a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentTrackerExtensions" class="wiki">BitTorrentTrackerExtensions</a> - Describes the various extensions of the Tracker protocol that are in use.</p>
+<h2>Conventions</h2>
+<p class="tightenable bottom">In this document, a number of conventions are used in an attempt to present information in a concise and unambiguous fashion.</p>
+<ul><li class="tightenable top bottom"><b>peer</b> v/s <b>client</b>: In this document, a <b>peer</b> is any BitTorrent client participating in a download.  The <b>client</b>
+is also a peer, however it is the BitTorrent client that is running on
+the local machine. Reader of this specification may choose to think of
+themselves as the <b>client</b> which connects to numerous <b>peers</b>.</li>
+<li class="tightenable top bottom"><b>piece</b> v/s <b>block</b>: In this document, a <b>piece</b> refers to a portion of the downloaded data that is described in the metainfo file, which can be verified by a SHA1 hash.  A <b>block</b> is a portion of data that a <b>client</b> may request from a <b>peer</b>.  Two or more <b>blocks</b> make up a whole <b>piece</b>, which may then be verified.</li>
+<li class="tightenable top"><b>defacto standard</b>: Large blocks of text in <i>italics</i> indicates a practice so common in various client implementations of BitTorrent that it is considered a defacto standard.</li>
+</ul>
+<p class="tightenable">In order help others to find recent changes that
+have been made to this document, please fill out the change log (last
+section). This should contain a brief (i.e. one-line) entry for each
+major change that you've made to the document.</p>
+<h2>bencoding</h2>
+<p class="tightenable">Bencoding is a way to specify and organize data
+in a terse format. It supports the following types: byte strings,
+integers, lists, and dictionaries.</p>
+<h3>byte strings</h3>
+<p class="tightenable">Byte strings are encoded as follows: <i>&lt;string length encoded in base ten ASCII&gt;</i><b>:</b><i>&lt;string data&gt;</i> <br>
+Note that there is no constant beginning delimiter, and no ending delimiter. <br>
+Example: <b>4:</b><i>spam</i> represents the string "spam"</p>
+<h3>integers</h3>
+<p class="tightenable">Integers are encoded as follows: <b>i</b><i>&lt;integer encoded in base ten ASCII&gt;</i><b>e</b> <br>
+The initial <b>i</b> and trailing <b>e</b> are beginning and ending delimiters. <br>
+You can have negative numbers such as <b>i</b><i>-3</i><b>e</b>.  You cannot prefix the number
+with a zero such as <b>i</b><i>04</i><b>e</b>.  However, <b>i</b><i>0</i><b>e</b> is valid.<br>
+Example <b>i</b><i>3</i><b>e</b> represents the integer "3"</p>
+<h3>lists</h3>
+<p class="tightenable">Lists are encoded as follows: <b>l</b><i>&lt;bencoded values&gt;</i><b>e</b> <br>
+The initial <b>l</b> and trailing <b>e</b> are beginning and ending delimiters.</p>
+<p class="tightenable">Lists may contain any bencoded type, including integers, strings, dictionaries, and other lists.</p>
+<p class="tightenable">Example: <b>l</b><i>4:spam4:eggs</i><b>e</b> represents the list of two strings: ["spam", "eggs"]</p>
+<h3>dictionaries</h3>
+<p class="tightenable">Dictionaries are encoded as follows: <b>d</b><i>&lt;bencoded string&gt;&lt;bencoded element&gt;</i><b>e</b> <br>
+The initial <b>d</b> and trailing <b>e</b> are the beginning and ending delimiters.</p>
+<p class="tightenable">Note that the keys must be bencoded strings. The
+values may be any bencoded type, including integers, strings, lists,
+and other dictionaries. Keys must be strings and appear in sorted order
+(sorted as raw strings, not alphanumerics).</p>
+<p class="tightenable">Example: <b>d</b><i>3:cow3:moo4:spam4:eggs</i><b>e</b> represents the dictionary { "cow" =&gt; "moo", "spam" =&gt; "eggs" } <br>
+Example: <b>d</b><i>4:spaml1:a1:be</i><b>e</b> represents the dictionary { "spam" =&gt; ["a", "b"] }</p>
+<h2>Metainfo File Structure</h2>
+<p class="tightenable"><b>All data in a metainfo file is bencoded</b>.  The specification for bencoding is defined above.</p>
+<p class="tightenable">The content of a metainfo file (the file ending
+in ".torrent") is a bencoded dictionary, containing the keys listed
+below. All character string values are UTF-8 encoded. Keys not marked
+'optional' are <b>required fields</b>:</p>
+<ul><li class="tightenable"><p class="tightenable top"><b>info</b>: a
+dictionary that describes the file(s) of the torrent. There are two
+possible forms: one for the case of a 'single-file' torrent with no
+directory structure, and one for the case of a 'multi-file' torrent,
+which can contain subdirectory trees.</p>
+<dl><dt class="tightenable bottom">For the case of the <b>single-file</b> mode, the <b>info</b> dictionary contains the following structure</dt>
+<dd class="tightenable top"><ul><li class="tightenable top bottom"><b>length</b>:       length of the file in bytes (integer)</li>
+<li class="tightenable top bottom"><b>md5sum</b>: (optional) a
+32-character hexadecimal string corresponding to the MD5 sum of the
+file. This is not used by BitTorrent at all, but it is included by some
+programs for greater compatibility.</li>
+<li class="tightenable top bottom"><b>name</b>:         the filename of the file.  This is purely advisory. (string)</li>
+<li class="tightenable top bottom"><b>piece length</b>: number of bytes in each piece (integer)</li>
+<li class="tightenable top bottom"><b>pieces</b>:       string consisting of the concatenation of all 20-byte SHA1 hash values, one per piece (byte string)</li>
+</ul>
+</dd>
+<dt class="tightenable bottom">For the case of the <b>multi-file</b> mode, the <b>info</b> dictionary contains the following structure</dt>
+<dd class="tightenable top bottom"><ul><li class="tightenable top bottom"><p class="tightenable top bottom"><b>files</b>:        a list of dictionaries, one for each file.
+Each dictionary in this list contains the following keys:</p>
+<ul><li class="tightenable top bottom"><b>length</b>:     length of the file in bytes (integer)</li>
+<li class="tightenable top bottom"><b>md5sum</b>: (optional) a
+32-character hexadecimal string corresponding to the MD5 sum of the
+file. This is not used by BitTorrent at all, but it is included by some
+programs for greater compatibility.</li>
+<li class="tightenable top bottom"><b>path</b>: a list containing one
+or more string elements that together represent the path and filename.
+Each element in the list corresponds to either a directory name or (in
+the case of the final element) the filename. For example, a the file
+"dir1/dir2/file.ext" would consist of three string elements: "dir1",
+"dir2", and "file.ext". This is encoded as a bencoded list of strings
+such as <b>l</b><i><b>4</b>:dir1</i><b>4</b><i>:dir2</i><b>8</b><i>:file.ext</i><b>e</b></li>
+</ul>
+</li>
+<li class="tightenable top bottom"><b>name</b>: the name of the
+top-most directory in the structure -- the directory which contains all
+of the files listed in the above <b>files</b> list.  (character string)</li>
+<li class="tightenable top bottom"><b>piece length</b>: number of bytes in each piece (integer)</li>
+<li class="tightenable top bottom"><b>pieces</b>:       string consisting of the concatenation of all 20-byte SHA1 hash values, one per piece (byte string)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li class="tightenable bottom"><b>announce</b>: The announce URL of the tracker (string)</li>
+<li class="tightenable top bottom"><b>announce-list</b>: (optional)
+this is an extention to the official specification, which is also
+backwards compatible. This key is used to implement lists of backup
+trackers. The full specification can be found at <a href="http://web.archive.org/web/20050315090729/http://home.elp.rr.com/tur/multitracker-spec.txt" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">http://home.elp.rr.com/tur/multitracker-spec.txt</span></a></li>
+<li class="tightenable top bottom"><b>creation date</b>: (optional) the creation time of the torrent, in standard Unix epoch format (integer seconds since 1-Jan-1970 00:00:00 UTC)</li>
+<li class="tightenable top bottom"><b>comment</b>: (optional) free-form textual comments of the author (string)</li>
+<li class="tightenable top"><b>created by</b>: (optional) name and version of the program used to create the .torrent (string)</li>
+</ul>
+<dl><dt class="tightenable bottom">Notes</dt>
+<dd class="tightenable top"><ul><li class="tightenable top bottom">The <b>piece length</b> specifies the nominal piece size, and is usually a power of 2.  <i>The
+piece size is typically chosen based on the total amount of file data
+in the torrent, constrained by the fact that piece sizes too large
+cause inefficiency, and too small a piece size will result in a large
+.torrent metadata file. The conventional wisdom has been to pick the
+smallest piece size that results in a .torrent file no greater than
+approx. 50 - 75 kB (presumably to ease the load on the server hosting
+the torrent files; however, if hosting storage and bandwidth are not
+tightly constrained, it would seem wise to keep the piece size to 512KB
+or less, even if that results in a larger torrent file, in order to
+have a more efficient swarm). The most common sizes are 256 kB, 512 kB,
+and 1 MB.</i> Every piece is of equal length except for the final
+piece, which is irregular. The number of pieces is thus determined by
+'ceil( total length / piece size )'. For the purposes of piece
+boundaries in the multi-file case, consider the file data as one long
+continuous stream, composed of the concatenation of each file in the
+order listed in the <b>files</b> list. The number of pieces and their
+boundaries are then determined in the same manner as the case of a
+single file. Pieces may overlap file boundaries.</li>
+<li class="tightenable top bottom">Each piece has a corresponding SHA1 hash of the data contained within that piece.  These hashes are concatenated to form the <b>pieces</b> value in the above <b>info</b> dictionary.  Note that this is <b>not</b> a list but rather a single string.  The length of the string must be a multiple of 20 bytes.</li>
+</ul>
+</dd>
+</dl>
+<h2>Tracker HTTP/HTTPS Protocol</h2>
+<p class="tightenable">The tracker is an HTTP/HTTPS service which
+responds to HTTP GET requests. The requests include metrics from
+clients that help the tracker keep overall statistics about the
+torrent. The response includes a peer list that helps the client
+participate in the torrent. The base URL consists of the "announce URL"
+as defined in the metadata (.torrent) file. The parameters are then
+added to this URL, using standard CGI methods (i.e. a '?' after the
+announce URL, followed by 'param=value' sequences separated by '&amp;')</p>
+<p class="tightenable">Note that all binary data in the URL
+(particularly info_hash and peer_id) must be properly escaped. This
+means any byte not in the set 0-9, a-z, A-Z, and $-_.+!*'(), must be
+encoded using the "%nn" format, where nn is the hexadecimal value of
+the byte. (See RFC1738 for details.)</p>
+<p class="tightenable">The parameters used in the client-&gt;tracker GET request are as follows:</p>
+<ul><li class="tightenable bottom"><b>info_hash</b>: 20-byte SHA1 hash of the <i>value</i> of the <b>info</b> key from the Metainfo file.  Note that the <i>value</i> will be a bencoded dictionary, given the definition of the <b>info</b> key above. Note: This string is always urlencoded, as opposed to <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification#peer_id" class="named-wiki" title="">peer_id</a>, which needs to be unencoded.</li>
+<li class="tightenable top bottom"><b>peer_id</b>: 20-byte string used
+as a unique ID for the client, generated by the client at startup. This
+is allowed to be any value, and may be binary data. <i>There are
+currently no guidelines for generating this peer ID. However, one may
+rightly presume that it must at least be unique for your local machine,
+thus should probably incorporate things like process ID and perhaps a
+timestamp recorded at startup. See <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification#peer_id" class="named-wiki" title="">peer_id</a> below for common client encodings of this field.</i></li>
+<li class="tightenable top bottom"><b>port</b>: The port number that
+the client is listening on. Ports reserved for BitTorrent are typically
+6881-6889. Clients may choose to give up if it cannot establish a port
+within this range.</li>
+<li class="tightenable top bottom"><b>uploaded</b>: The total amount
+uploaded (since the client sent the 'started' event to the tracker) in
+base ten ASCII. While not explicitly stated in the official
+specification, the concensus is that this should be the total number of
+bytes uploaded.</li>
+<li class="tightenable top bottom"><b>downloaded</b>: The total amount
+downloaded (since the client sent the 'started' event to the tracker)
+in base ten ASCII. While not explicitly stated in the official
+specification, the consensus is that this should be the total number of
+bytes downloaded.</li>
+<li class="tightenable top bottom"><b>left</b>: The number of bytes this client still has to download, encoded in base ten ASCII.</li>
+<li class="tightenable top bottom"><b>no_peer_id</b>: Indicates the client accepts a no_peer_id response. The peer_id key is then not required to be in the response of the tracker.</li>
+<li class="tightenable top bottom"><b>compact</b>: Indicates the client
+accepts a compact response. The peers list is replaced by a peers
+string with 6 bytes per peer. The first four bytes are the host (in
+network byte order), the last two bytes are the port (again in network
+byte order).</li>
+<li class="tightenable top bottom"><p class="tightenable top bottom"><b>event</b>: If specified, must be one of <b>started</b>, <b>completed</b>, <b>stopped</b>,
+(or empty which is the same as not being specified). If not specified,
+then this request is one performed at regular intervals.</p>
+<ul><li class="tightenable top bottom"><b>started</b>:   The first request to the tracker <b>must</b> include the event key with the <b>started</b> value.</li>
+<li class="tightenable top bottom"><b>stopped</b>:   Must be sent to the tracker if the client is shutting down gracefully.</li>
+<li class="tightenable top bottom"><b>completed</b>: Must be sent to
+the tracker when the download completes. However, must not be sent if
+the download was already 100% complete when the client started.
+Presumably, this is to allow the tracker to increment the "completed
+downloads" metric based soley on this event.</li>
+</ul>
+</li>
+<li class="tightenable top bottom"><b>ip</b>: Optional.  The true IP address of the client machine, in dotted quad format or rfc3513 defined hexed IPv6 address.  <i>Notes:
+In general this parameter is not necessary as the address of the client
+can be determined from the IP address from which the HTTP request came.
+The parameter is only needed in the case where the IP address that the
+request came in on is not the IP address of the client. This happens if
+the client is communicating to the tracker through a proxy (or a
+transparent web proxy/cache.) It also is necessary when both the client
+and the tracker are on the same local side of a NAT gateway. The reason
+for this is that otherwise the tracker would give out the internal
+(RFC1918) address of the client, which is not routeable. Therefore the
+client must explicitly state its (external, routeable) IP address to be
+given out to external peers. Various trackers treat this parameter
+differently. Some only honor it only if the IP address that the request
+came in on is in RFC1918 space. Others honor it unconditionally, while
+others ignore it completely. In case of IPv6 address (e.g.:
+2001:db8:1:2::100) it indicates only that client can communicate via
+IPv6.</i></li>
+<li class="tightenable top"><b>numwant</b>: Optional. Number of peers
+that the client would like to receive from the tracker. This value is
+permitted to be zero. If omitted, typically defaults to 50 peers.</li>
+</ul>
+<p class="tightenable">The tracker responds with "text/plain" document consisting of a bencoded dictionary with the following keys:</p>
+<ul><li class="tightenable bottom"><b>failure reason</b>: If present,
+then no other keys may be present. The value is a human-readable error
+message as to why the request failed (string).</li>
+<li class="tightenable top bottom"><b>interval</b>: Interval in seconds that the client should wait between sending regular requests to the tracker</li>
+<li class="tightenable top bottom"><b>complete</b>: number of peers with the entire file, i.e. seeders (integer)</li>
+<li class="tightenable top bottom"><b>incomplete</b>: number of non-seeder peers, aka "leechers" (integer)</li>
+<li class="tightenable top"><p class="tightenable top bottom"><b>peers</b>: The value is a list of dictionaries, each with the following keys:</p>
+<ul><li class="tightenable top bottom"><b>peer id</b>: peer's self-selected ID, as described above for the tracker request (string)</li>
+<li class="tightenable top bottom"><b>ip</b>: peer's IP address (either IPv6 or IPv4) or DNS name (string)</li>
+<li class="tightenable top bottom"><b>port</b>: peer's port number (integer)</li>
+</ul>
+</li>
+</ul>
+<p class="tightenable">As mentioned above, the list of peers is length
+50 by default. If there are fewer peers in the torrent, then the list
+will be smaller. Otherwise, the tracker randomly selects peers to
+include in the response. <i>The tracker may choose to implement a more
+intelligent mechanism for peer selection when responding to a request.
+For instance, reporting seeds to other seeders could be avoided.</i></p>
+<p class="tightenable">Clients may send a request to the tracker more
+often than the specified interval, if an event occurs (i.e. stopped or
+completed) or if the client needs to learn about more peers. <i>However,
+it is considered bad practice to "hammer" on a tracker to get multiple
+peers. If a client wants a large peer list in the response, then it
+should specify the <b>numwant</b> parameter.</i></p>
+<h2>Tracker 'scrape' Convention</h2>
+<p class="tightenable">By convention most trackers support another form
+of request, which queries the state of a given torrent (or all
+torrents) that the tracker is managing. This is referred to as the
+"scrape page" because it automates the otherwise tedious process of
+"screen scraping" the tracker's stats page.</p>
+<p class="tightenable">The scrape URL is also a HTTP GET method,
+similar to the one described above. However the base URL is different.
+To derive the scrape URL use the following steps: Begin with the
+announce URL. Find the last '/' in it. If the text immediately
+following that '/' isn't 'announce' it will be taken as a sign that
+that tracker doesn't support the scrape convention. If it does,
+substitute 'scrape' for 'announce' to find the scrape page.</p>
+<p class="tightenable">Examples: (announce URL -&gt; scrape URL)</p>
+<pre class="tightenable">  http://spam.com/announce          -&gt; http://spam.com/scrape
+  http://spam.com/x/announce        -&gt; http://spam.com/x/scrape
+  http://spam.com/announce.php      -&gt; http://spam.com/scrape.php
+  http://spam.com/a                 -&gt; (scrape not supported)
+  http://spam.com/announce?x=2%0644 -&gt; http://spam.com/scrape?x=2%0644
+  http://spam.com/announce?x=2/4    -&gt; (scrape not supported)
+  http://spam.com/x%064announce     -&gt; (scrape not supported)</pre>
+<p class="tightenable">Note especially that entity unquoting is <b>not</b> to be done.  This standard is documented by Bram in the <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrent" class="wiki">BitTorrent</a> development list archive: <a href="http://web.archive.org/web/20050315090729/http://groups.yahoo.com/group/BitTorrent/message/3275" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">http://groups.yahoo.com/group/BitTorrent/message/3275</span></a></p>
+<p class="tightenable">The scrape URL may be supplimented by the optional parameter <b>info_hash</b>,
+a 20-byte value as described above. This restricts the tracker's report
+to that particular torrent. Otherwise stats for all torrents that the
+tracker is managing are returned. Software authors are strongly
+encouraged to use the <b>info_hash</b> parameter when at all possible, to reduce the load and bandwidth of the tracker.</p>
+<dl><dt class="tightenable">The response of this HTTP GET method is a
+"text/plain" document consisting of a bencoded dictionary, containing
+the following keys</dt>
+<dd class="tightenable"><ul><li class="tightenable top bottom"><p class="tightenable top bottom"><b>files</b>: a dictionary containing one key/value pair for each torrent for which there are stats.  If <b>info_hash</b>
+was supplied and was valid, this dictionary will contain a single
+key/value. Each key consists of a 20-byte binary info_hash value. The
+value of that key is yet another nested dictionary containing the
+following:</p>
+<ul><li class="tightenable top bottom"><b>complete</b>: number of peers with the entire file, i.e. seeders (integer)</li>
+<li class="tightenable top bottom"><b>downloaded</b>: total number of
+times the tracker has registered a completion ("event=complete", i.e. a
+client finished downloading the torrent)</li>
+<li class="tightenable top bottom"><b>incomplete</b>: number of non-seeder peers, aka "leechers" (integer)</li>
+<li class="tightenable top bottom"><b>name</b>: (optional) the torrent's internal name, as specified by the "name" file in the info section of the .torrent file</li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+<p class="tightenable">Note that this response has three levels of dictionary nesting.  Here's an example:</p>
+<p class="tightenable"><tt>d5:<i>files</i>d20:....................d8:<i>complete</i>i<b>5</b>e10:<i>downloaded</i>i<b>50</b>e10:<i>incomplete</i>i<b>10</b>eeee</tt></p>
+<p class="tightenable">Where <tt>....................</tt> is the 20 byte info_hash and there are 5 seeders, 10 leechers, and 50 complete downloads.</p>
+<h2>Peer wire protocol (TCP)</h2>
+<h3>Overview</h3>
+<p class="tightenable">The peer protocol facilitates the exchange of pieces as described in the <b>metainfo</b> file.</p>
+<p class="tightenable"><i>Note here that the original specification
+also used the term "piece" when describing the peer protocol, but as a
+different term than "piece" in the metainfo file. For that reason, the
+term "block" will be used in this specification to describe the data
+that is exchanged between peers over the wire.</i></p>
+<p class="tightenable bottom">A client must maintain state information for each connection that it has with a remote peer:</p>
+<ul><li class="tightenable top bottom"><b>choked</b>: Whether or not
+the remote peer has choked this client. When a peer chokes the client,
+it is a notification that no requests will be answered until the client
+is unchoked. The client should not attempt to send requests for blocks,
+and it should consider all pending (unanswered) requests to be
+discarded by the remote peer.</li>
+<li class="tightenable top"><b>interested</b>: Whether or not the
+remote peer is interested in something this client has to offer. This
+is a notification that the remote peer will begin requesting blocks
+when the client unchokes them.</li>
+</ul>
+<p class="tightenable bottom"><i>Note that this also implies that the
+client will also need to keep track of whether or not it is interested
+in the remote peer, and if it has the remote peer choked or unchoked.
+So, the real list looks something like this:</i></p>
+<ul><li class="tightenable top bottom"><b>am_choking</b>: this client is choking the peer</li>
+<li class="tightenable top bottom"><b>am_interested</b>: this client is interested in the peer</li>
+<li class="tightenable top bottom"><b>peer_choking</b>: peer is choking this client</li>
+<li class="tightenable top"><b>peer_interested</b>: peer is interested in this client</li>
+</ul>
+<p class="tightenable bottom">Client connections start out as "choked" and "not interested".  In other words:</p>
+<ul><li class="tightenable top bottom"><b>am_choking</b> = 1</li>
+<li class="tightenable top bottom"><b>am_interested</b> = 0</li>
+<li class="tightenable top bottom"><b>peer_choking</b> = 1</li>
+<li class="tightenable top"><b>peer_interested</b> = 0</li>
+</ul>
+<p class="tightenable">A block is downloaded by the client when the
+client is interested in a peer, and that peer is not choking the
+client. A block is uploaded by a client when the client is not choking
+a peer, and that peer is interested in the client.</p>
+<p class="tightenable">It is important for the client to keep its peers
+informed as to whether or not it is interested in them. This state
+information should be kept up-to-date with each peer even when the
+client is choked. This will allow peers to know if the client will
+begin downloading when it is unchoked (and vice-versa).</p>
+<h3>Data Types</h3>
+<p class="tightenable">Unless specified otherwise, all integers in the
+peer wire protocol are encoded as four byte big-endian values. This
+includes the length prefix on all messages that come after the
+handshake.</p>
+<h3>Message flow</h3>
+<p class="tightenable">The peer wire protocol consists of an initial
+handshake. After that, peers communicate via an exchange of
+length-prefixed messages. The length-prefix is an integer as described
+above.</p>
+<h3>Handshake</h3>
+<p class="tightenable">The handshake is a required message and must be the first message transmitted by the client.</p>
+<ul><li class="tightenable"><p class="tightenable top bottom"><b>handshake</b>: &lt;pstrlen&gt;&lt;pstr&gt;&lt;reserved&gt;&lt;info_hash&gt;&lt;peer_id&gt;</p>
+<ul><li class="tightenable top bottom"><b>pstrlen</b>: string length of &lt;pstr&gt;, as a single raw byte</li>
+<li class="tightenable top bottom"><b>pstr</b>: string identifier of the protocol</li>
+<li class="tightenable top bottom"><b>reserved</b>: eight (8) reserved
+bytes. All current implementations use all zeroes. Each bit in these
+bytes can be used to change the behavior of the protocol. <i>An email
+from Bram suggests that trailing bits should be used first, so that
+leading bits may be used to change the meaning of trailing bits.</i></li>
+<li class="tightenable top bottom"><b>info_hash</b>: 20-byte SHA1 hash of the info key in the metainfo file.  This is the same info_hash that is transmitted in tracker requests.</li>
+<li class="tightenable top bottom"><b>peer_id</b>: 20-byte string used as a unique ID for the client.  This is the same peer_id that is transmitted in tracker requests.</li>
+</ul>
+</li>
+</ul>
+<p class="tightenable">In version 1.0 of the BitTorrent protocol, pstrlen=19, and pstr="BitTorrent protocol".</p>
+<p class="tightenable">The initiator of a connection is expected to
+transmit their handshake immediately. The recipient may wait for the
+initiator's handshake, if it is capable of serving multiple torrents
+simultaneously (torrents are uniquely identified by their info_hash).
+However, the recipient must respond as soon as it sees the info_hash
+part of the handshake. The tracker's NAT-checking feature does not send
+the peer_id field of the handshake.</p>
+<p class="tightenable">If a client receives a handshake with an info_hash that it is not currently serving, then the client must drop the connection.</p>
+<p class="tightenable">If the initiator of the connection receives a
+handshake in which the peer_id does not match the expected peer_id,
+then the initiator is expected to drop the connection. <i>Note that
+the initiator presumably received the peer information from the
+tracker, which includes the peer_id that was registered by the peer.
+The peer_id from the tracker and in the handshake are expected to match.</i></p>
+<p class="tightenable bottom"><a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/" name="peer_id" id="peer_id"></a></p>
+<h4>peer_id</h4>
+<p class="tightenable">There are mainly two conventions how to encode
+client and client version information into the peer_id, Azureus-style
+and Shadow's-style.</p>
+<p class="tightenable">Azureus-style uses the following encoding:
+'-', two characters for client id, four ascii digits for version number, '-', followed by random numbers.</p>
+<p class="tightenable">For example: '-AZ2060-'...</p>
+<p class="tightenable bottom">known clients that uses this encoding style are:</p>
+<ul><li class="tightenable top bottom">'AZ' - <a href="http://web.archive.org/web/20050315090729/http://azureus.sf.net/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">Azureus</span></a></li>
+<li class="tightenable top bottom">'BB' - <a href="http://web.archive.org/web/20050315090729/http://www.btvampire.com/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">BitBuddy</span></a></li>
+<li class="tightenable top bottom">'CT' - <a href="http://web.archive.org/web/20050315090729/http://ctorrent.sourceforge.net/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">CTorrent</span></a></li>
+<li class="tightenable top bottom">'MT' - <a href="http://web.archive.org/web/20050315090729/http://www.moonlighttorrent.com/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">MoonlightTorrent</span></a></li>
+<li class="tightenable top bottom">'LT' - <a href="http://web.archive.org/web/20050315090729/http://libtorrent.sf.net/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">libtorrent</span></a></li>
+<li class="tightenable top bottom">'BX' - Bittorrent X</li>
+<li class="tightenable top bottom">'TS' - <a href="http://web.archive.org/web/20050315090729/http://www.torrentstorm.com/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">Torrentstorm</span></a></li>
+<li class="tightenable top bottom">'TN' - TorrentDotNET</li>
+<li class="tightenable top bottom">'SS' - SwarmScope</li>
+<li class="tightenable top bottom">'XT' - <a href="http://web.archive.org/web/20050315090729/http://www.xantorrent.pwp.blueyonder.co.uk/xantorrent.zip" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">XanTorrent</span></a></li>
+<li class="tightenable top bottom">'BS' - <a href="http://web.archive.org/web/20050315090729/http://btslave.sourceforge.net/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">BTSlave</span></a></li>
+<li class="tightenable top bottom">'ZT' - <a href="http://web.archive.org/web/20050315090729/http://www.ziptorrent.com/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">ZipTorrent</span></a></li>
+<li class="tightenable top">'AR' - <a href="http://web.archive.org/web/20050315090729/http://dev.int64.org/arctic.html" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">Arctic</span></a></li>
+</ul>
+<p class="tightenable">Shadow's style uses the following encoding:
+one ascii alphanumeric for client identification, three ascii digits for version number, '----', followed by random numbers.</p>
+<p class="tightenable">For example: 'S587----'...</p>
+<p class="tightenable bottom">known clients that uses this encoding style are:</p>
+<ul><li class="tightenable top bottom">'S' - <a href="http://web.archive.org/web/20050315090729/http://bt.degreez.net/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">Shadow's</span> client</a></li>
+<li class="tightenable top bottom">'U' - <a href="http://web.archive.org/web/20050315090729/http://aaron2003.myftp.org/upnpclient.html" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">UPnP</span> NAT Bit Torrent</a></li>
+<li class="tightenable top bottom">'T' - <a href="http://web.archive.org/web/20050315090729/http://bittornado.com/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">BitTornado</span></a></li>
+<li class="tightenable top">'A' - <a href="http://web.archive.org/web/20050315090729/http://pingpong-abc.sourceforge.net/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">ABC</span></a></li>
+</ul>
+<p class="tightenable">Bram's client now uses this style... 'M3-4-2--'.</p>
+<p class="tightenable"><a href="http://web.archive.org/web/20050315090729/http://www.bitcomet.com/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">BitComet</span></a>
+does something different still. Its peer_id consists of four ASCII
+characters 'exbc', followed by a null byte, followed by a single ASCII
+numeric digit, followed by random characters. The digit seems to denote
+the version of the software, though it appears to have no connection
+with the real version number. The digit is incremented with each new
+BitComet release.</p>
+<p class="tightenable">Many clients are using all random numbers or 12 zeroes followed by random numbers (like older versions of <a href="http://web.archive.org/web/20050315090729/http://bitconjurer.org/BitTorrent/" class="namedurl"><span style="white-space: nowrap;"><img src="_files/http" alt="" class="linkicon" border="0">Bram's</span> client</a>).</p>
+<h3>Messages</h3>
+<p class="tightenable">All of the remaining messages in the protocol
+take the form of &lt;length prefix&gt;&lt;message
+ID&gt;&lt;payload&gt;. The length prefix is a four byte big-endian
+value. The message ID is a single decimal character. The payload is
+message dependent.</p>
+<h4><b>keep-alive</b>: &lt;len=0000&gt;</h4>
+<p class="tightenable">The <b>keep-alive</b> message is a message with
+zero bytes, specified with the length prefix set to zero. There is no
+message ID and no payload. Peers may close a connection if they receive
+no messages for a certain period of time, so a keep-alive message can
+be sent to maintain the connection. A keep-alive message is generally
+sent once every two minutes.</p>
+<h4><b>choke</b>: &lt;len=0001&gt;&lt;id=0&gt;</h4>
+<p class="tightenable">The <b>choke</b> message is fixed-length and has no payload.</p>
+<h4><b>unchoke</b>: &lt;len=0001&gt;&lt;id=1&gt;</h4>
+<p class="tightenable">The <b>unchoke</b> message is fixed-length and has no payload.</p>
+<h4><b>interested</b>: &lt;len=0001&gt;&lt;id=2&gt;</h4>
+<p class="tightenable">The <b>interested</b> message is fixed-length and has no payload.</p>
+<h4><b>not interested</b>: &lt;len=0001&gt;&lt;id=3&gt;</h4>
+<p class="tightenable">The <b>not interested</b> message is fixed-length and has no payload.</p>
+<h4><b>have</b>: &lt;len=0005&gt;&lt;id=4&gt;&lt;piece index&gt;</h4>
+<p class="tightenable">The <b>have</b> message is fixed length. The
+payload is the zero-based index of a piece that has just been
+successfully downloaded and verified via the hash.</p>
+<h4><b>bitfield</b>: &lt;len=0001+X&gt;&lt;id=5&gt;&lt;bitfield&gt;</h4>
+<p class="tightenable">The <b>bitfield</b> message may only be sent
+immediately after the handshaking sequence is completed, and before any
+other messages are sent. It is optional, and need not be sent if a
+client has no pieces.</p>
+<p class="tightenable">The <b>bitfield</b> message is variable length,
+where X is the length of the bitfield. The payload is a bitfield
+representing the pieces that have been successfully downloaded. The
+high bit in the first byte corresponds to piece index 0. Bits that are
+cleared indicated a missing piece, and set bits indicate a valid and
+available piece. Spare bits at the end are set to zero.</p>
+<p class="tightenable"><i>A bitfield of the wrong length is considered
+an error. Clients should drop the connection if they receive bitfields
+that are not of the correct size, or if the bitfield has any of the
+spare bits set.</i></p>
+<h4><b>request</b>: &lt;len=0013&gt;&lt;id=6&gt;&lt;index&gt;&lt;begin&gt;&lt;length&gt;</h4>
+<dl><dt class="tightenable bottom">The <b>request</b> message is fixed length, and is used to request a block.  The payload contains the following information</dt>
+<dd class="tightenable top"><ul><li class="tightenable top bottom">index: integer specifying the zero-based piece index</li>
+<li class="tightenable top bottom">begin: integer specifying the zero-based byte offset within the piece</li>
+<li class="tightenable top bottom">length: integer specifying the
+requested length. This value should normally be 2^14 (16384) bytes.
+Smaller values may be used but are usually not needed except in rare
+cases like a piece length not divisible by 16384.</li>
+</ul>
+</dd>
+</dl>
+<p class="tightenable">The observant reader will note that a block is
+typically smaller than a piece (which is commonly &gt;= 2^18 bytes). A
+client may close the connection if it receives a request for more than
+16384 bytes.</p>
+<h4><b>piece</b>: &lt;len=0009+X&gt;&lt;id=7&gt;&lt;index&gt;&lt;begin&gt;&lt;block&gt;</h4>
+<dl><dt class="tightenable bottom">The <b>piece</b> message is variable length, where X is the length of the block.  The payload contains the following information</dt>
+<dd class="tightenable top"><ul><li class="tightenable top bottom">index: integer specifying the zero-based piece index</li>
+<li class="tightenable top bottom">begin: integer specifying the zero-based byte offset within the piece</li>
+<li class="tightenable top bottom">block: block of data, which is a subset of the piece specified by index.</li>
+</ul>
+</dd>
+</dl>
+<h4><b>cancel</b>: &lt;len=0013&gt;&lt;id=8&gt;&lt;index&gt;&lt;begin&gt;&lt;length&gt;</h4>
+<p class="tightenable">The <b>cancel</b> message is fixed length, and
+is used to cancel block requests. The payload is identical to that of
+the "request" message. It is typically used during "End Game" (see the
+Algorithms section below).</p>
+<h2>Algorithms</h2>
+<h3>Super Seeding</h3>
+<p class="tightenable"><i>(This was not part of the original specification)</i></p>
+<p class="tightenable"><i>The super-seed feature in S-5.5 and on is a new seeding algorithm designed to help
+a torrent initiator with limited bandwidth "pump up" a large torrent, reducing the
+amount of data it needs to upload in order to spawn new seeds in the torrent.</i></p>
+<p class="tightenable"><i>When a seeding client enters "super-seed mode", it will not act as a standard seed,
+but masquerades as a normal client with no data.  As clients connect, it will then
+inform them that it received a piece -- a piece that was never sent, or if all
+pieces were already sent, is very rare.  This will induce the client to attempt to
+download only that piece.</i></p>
+<p class="tightenable"><i>When the client has finished downloading the piece, the seed will not inform it of
+any other pieces until it has seen the piece it had sent previously present on at
+least one other client.  Until then, the client will not have access to any of the
+other pieces of the seed, and therefore will not waste the seed's bandwidth.</i></p>
+<p class="tightenable"><i>This method has resulted in much higher seeding efficiencies, by both inducing
+peers into taking only the rarest data, reducing the amount of redundant data sent,
+and limiting the amount of data sent to peers which do not contribute to the swarm.
+Prior to this, a seed might have to upload 150% to 200% of the total size of a
+torrent before other clients became seeds.  However, a large torrent seeded with a
+single client running in super-seed mode was able to do so after only uploading
+105% of the data.  This is 150-200% more efficient than when using a standard seed.</i></p>
+<p class="tightenable"><i>Super-seed mode is <b>NOT</b> recommended for general use.  While it does assist in the
+wider distribution of rare data, because it limits the selection of pieces a
+client can downlad, it also limits the ability of those clients to download data
+for pieces they have already partially retrieved.  Therefore, super-seed mode is
+only recommended for initial seeding servers.</i></p>
+<blockquote class="tightenable"><p class="tightenable top bottom"><i>Why not rename it to e.g. "Initial Seeding Mode" or "Releaser Mode" then?</i></p>
+</blockquote>
+<h3>Piece downloading strategy</h3>
+<p class="tightenable">Clients may choose to download pieces in random order.</p>
+<p class="tightenable"><i>A better strategy is to download pieces in <i><a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/Availability" class="named-wiki" title="Availability">rarest first</a></i> order.  The client can determine this by keeping the initial bitfield from each peer, and updating it with every <b>have</b> message.  Then, the client can download the pieces that appear least frequently in these peer bitfields.</i></p>
+<h3>End Game</h3>
+<p class="tightenable">When a download is almost complete, there's a
+tendency for the last few blocks to trickle in slowly. To speed this
+up, the client sends requests for all of its missing blocks to all of
+its peers. To keep this from becoming horribly inefficient, the client
+also sends a cancel to everyone else every time a block arrives.</p>
+<p class="tightenable"><i>There is no documented thresholds,
+recommended percentages, or block counts that could be used as a guide
+or Recommended Best Practice here.</i></p>
+<h3>Choking and Optimistic Unchoking</h3>
+<p class="tightenable">Choking is done for several reasons. TCP
+congestion control behaves very poorly when sending over many
+connections at once. Also, choking lets each peer use a tit-for-tat-ish
+algorithm to ensure that they get a consistent download rate.</p>
+<p class="tightenable">The choking algorithm described below is the
+currently deployed one. It is very important that all new algorithms
+work well both in a network consisting entirely of themselves and in a
+network consisting mostly of this one.</p>
+<p class="tightenable">There are several criteria a good choking
+algorithm should meet. It should cap the number of simultaneous uploads
+for good TCP performance. It should avoid choking and unchoking
+quickly, known as 'fibrillation'. It should reciprocate to peers who
+let it download. Finally, it should try out unused connections once in
+a while to find out if they might be better than the currently used
+ones, known as optimistic unchoking.</p>
+<p class="tightenable">The currently deployed choking algorithm avoids fibrillation by only changing choked peers once every ten seconds.</p>
+<p class="tightenable">Reciprocation and number of uploads capping is
+managed by unchoking the four peers which have the best upload rate and
+are interested. This maximizes the client's download rate. These four
+peers are referred to as <i>downloaders</i>, because they are interested in downloading from the client.</p>
+<p class="tightenable">Peers which have a better upload rate (as compared to the <i>downloaders</i>) but aren't interested get unchoked.  If they become interested, the <i>downloader</i>
+with the worst upload rate gets choked. If a client has a complete
+file, it uses its upload rate rather than its download rate to decide
+which peers to unchoke.</p>
+<p class="tightenable">For optimistic unchoking, at any one time there
+is a single peer which is unchoked regardless of it's upload rate (if
+interested, it counts as one of the four allowed <i>downloaders</i>).
+Which peer is optimistically unchoked rotates every 30 seconds. Newly
+connected peers are three times as likely to start as the current
+optimistic unchoke as anywhere else in the rotation. This gives them a
+decent chance of getting a complete piece to upload.</p>
+<h4>Anti-snubbing (extension not in the official protocol)</h4>
+<p class="tightenable top">Occasionally a <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrent" class="wiki">BitTorrent</a> peer will be choked by all
+peers which it was formerly downloading from. In
+such cases it will usually continue to get poor download
+rates until the optimistic unchoke finds better
+peers. To mitigate this problem, when over a minute
+goes by without getting a single piece from a particular
+peer, <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrent" class="wiki">BitTorrent</a> assumes it is "snubbed" by
+that peer and doesn't upload to it except as an optimistic
+unchoke. This frequently results in more than
+one concurrent optimistic unchoke, (an exception to
+the exactly one optimistic unchoke rule mentioned
+above), which causes download rates to recover much
+more quickly when they falter.</p>
+<h2>Change Log</h2>
+<p class="tightenable">Put your changes below this line, so that the
+most recent changes appear first. The change log should be purged from
+time to time. Please preserve the last month's worth of change logs.</p>
+<p class="tightenable"><span class="wikiunknown"><a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/AudioHub?action=create" title="Create: AudioHub" onmouseover='window.status="Create: AudioHub"; return true;' onmouseout="window.status='';return true;">?</a><u>AudioHub</u></span> - 2005-03-11 - piece size</p>
+<p class="tightenable bottom"><span class="wikiunknown"><a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/SexyBollocks?action=create" title="Create: SexyBollocks" onmouseover='window.status="Create: SexyBollocks"; return true;' onmouseout="window.status='';return true;">?</a><u>SexyBollocks</u></span> - 2005-02-05</p>
+<ul><li class="tightenable top bottom">Added Tracker info about the peer_id, no_peer_id, compact parts.</li>
+<li class="tightenable top">Added String information related to peer_id and info_hash.</li>
+</ul>
+<p class="tightenable bottom">uau - 2005-02-02</p>
+<ul><li class="tightenable top bottom">changed description of
+keepalive, removed "timeouts may be reduced when expecting data" -
+there is no context where it would make sense to use a shorter timeout
+for some data AND to accept a keepalive instead of said expected data.</li>
+<li class="tightenable top">fixed the description of the REQUEST
+packet, normal length is 16384 bytes instead of 32768 (the
+specification on bittorrent.com is still wrong at the moment even
+though it was changed in the sources years ago).</li>
+</ul>
+<p class="tightenable bottom">tyranix - 2005-01-02</p>
+<ul><li class="tightenable top bottom">Updated the descriptions to include missing details from the official specification.</li>
+<li class="tightenable top">I vote for keeping this as one single page
+for easy printing. I think we should move the unofficial extensions
+(according to the official specification) such as anti-snubbing and
+super seeding to a different page.</li>
+</ul>
+<p class="tightenable bottom">SpookyET - 2004-12-23</p>
+<ul><li class="tightenable top">Added the specification that all <b>character</b> string values are utf-8 encoded in the metainfo file.</li>
+</ul>
+<p class="tightenable bottom">frozen at wideopenwest dot com - 2004-10-22</p>
+<ul><li class="tightenable top bottom">Cleared up possible confusion
+regarding the "uploaded" and "downloaded" parameters sent to the
+tracker. The text originally did not indicate whether the values in
+these parameters reset on each new session with a tracker.</li>
+<li class="tightenable top"><i>dictionary with <b>has</b> the</i> =&gt; <i>dictionary with the</i></li>
+</ul>
+<p class="tightenable bottom">SpookyET - 2004-10-02</p>
+<ul><li class="tightenable top">Added "complete" and "incomplete" keys to the announce.</li>
+</ul>
+<p class="tightenable bottom">SpookyET - 2004-09-28</p>
+<ul><li class="tightenable top">Changed "piece-section" to "block", which is a more popular term.</li>
+</ul>
+<p class="tightenable bottom">WhitSlack (mwhitlock@whitsoftdev.com) -- 2004-09-20</p>
+<ul><li class="tightenable top bottom">Fixed a typo: <i>numwanted</i> =&gt; <i>numwant</i> in paragraph about announce interval.</li>
+<li class="tightenable top bottom">Added BitComet peer_id encoding style.</li>
+<li class="tightenable top bottom">Added reference in Tracker HTTP Protocol to peer_id description in Peer wire protocol.</li>
+<li class="tightenable top">Concur with deltab on breaking this page up.</li>
+</ul>
+<p class="tightenable bottom">deltab - 2004-09-06</p>
+<ul><li class="tightenable top">This page is rather large, so I'd like
+to see it split up into sections with their own pages; possibly
+bencoding, metadata file format, tracker/client protocol, peer/peer
+protocol, peer IDs, and algorithms/strategies. But it would be a big
+change, so I've not just gone ahead and done it. Any comments,
+objections?</li>
+</ul>
+<p class="tightenable bottom">Daniel Wang (support@btvampire.com) - 2004-08-09</p>
+<ul><li class="tightenable top">Added <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitBuddy" class="wiki">BitBuddy</a> client ID.</li>
+</ul>
+<p class="tightenable bottom">SpookyET - 2004-06-15</p>
+<ul><li class="tightenable top">Fixed the sorting of keys in dictionaries specification.</li>
+</ul>
+<p class="tightenable bottom">SpookyET - 2004-06-04</p>
+<ul><li class="tightenable top">Added anti-snubbing specification</li>
+</ul>
+<p class="tightenable bottom">Stormblade (stormblade@torrentstorm.com) - 2004-06-02</p>
+<ul><li class="tightenable top">Added new client ID for Brams client.</li>
+</ul>
+<p class="tightenable bottom">SpookyET - 2004-05-29</p>
+<ul><li class="tightenable top bottom">Removed "Stealth Seeding", because it was an incomplete specification to "super-seeding".</li>
+<li class="tightenable top">Added the full super-seeding specification.</li>
+</ul>
+<p class="tightenable bottom">webmaster@andreas-diem.at - 2004-05-08</p>
+<ul><li class="tightenable top bottom">Added BitTornado client ID.</li>
+<li class="tightenable top">Added UPnP NAT Bit Torrent Url</li>
+</ul>
+<p class="tightenable bottom">dan_f@blueyonder.co.uk - 2004-05-07</p>
+<ul><li class="tightenable top">Added new <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/XanTorrent" class="wiki">XanTorrent</a> client ID.</li>
+</ul>
+<p class="tightenable bottom">agthorr@barsoom.org - 2004-04-06</p>
+<ul><li class="tightenable top bottom">Described the NAT-checker's short handshake.</li>
+<li class="tightenable top">Added <span class="wikiunknown"><a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/SwarmScope?action=create" title="Create: SwarmScope" onmouseover='window.status="Create: SwarmScope"; return true;' onmouseout="window.status='';return true;">?</a><u>SwarmScope</u></span> client ID.</li>
+</ul>
+<p class="tightenable bottom">agthorr@barsoom.org - 2004-03-23</p>
+<ul><li class="tightenable top">Fixed description of pstrlen, which
+previously seemed to suggest that the value is encoded in ASCII. It's
+raw binary, not decimal.</li>
+</ul>
+<p class="tightenable bottom">amand@alrj.org - 2004-03-11</p>
+<ul><li class="tightenable top">Set length of "have" message to 5 instead of 2, since the piece index is an int, coded on 4 bytes.</li>
+</ul>
+<p class="tightenable bottom">flabdablet@yahoo.com - 2004-03-02</p>
+<ul><li class="tightenable top">s/delimeter/delimiter/g</li>
+</ul>
+<p class="tightenable bottom">Stormblade (stormblade@torrentstorm.com) - 2004-01-27</p>
+<ul><li class="tightenable top">Added Torrentstorm client ID.</li>
+</ul>
+<p class="tightenable bottom">Bram - 2004-01-10</p>
+<ul><li class="tightenable top bottom">Got rid of compression section, because it was unofficial, and a bad idea</li>
+<li class="tightenable top">removed link to specification two point zero page, since it was nothing of the sort</li>
+</ul>
+<p class="tightenable bottom">steveninweston@hotmail.com - 2004-01-01</p>
+<ul><li class="tightenable top">Added "Extensions" and "Compression"</li>
+</ul>
+<p class="tightenable bottom">dpmott@sep.com - 2003-12-30</p>
+<ul><li class="tightenable top bottom">Added "Related Documents" and "Change Log" section.</li>
+<li class="tightenable top bottom">Updated "Conventions" section to mention the change log.</li>
+<li class="tightenable top bottom">Added link to <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecificationTwoPointZero" class="wiki">BitTorrentSpecificationTwoPointZero</a></li>
+</ul>
+<hr>
+<p class="tightenable top bottom">Part of <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/CategoryBitTorrent" class="wiki">CategoryBitTorrent</a></p>
+</div>
+
+<div id="footer">  <hr class="printer" noshade="noshade">
+<p class="editdate">Last edited on March 14, 2005 12:52 am.</p>
+<hr class="toolbar" noshade="noshade">
+<div class="toolbar">
+
+<table summary="Toolbar 1: Page actions and user login." border="0" cellpadding="0" cellspacing="0" width="100%">
+<tbody><tr valign="baseline">
+  <td>
+  <div id="actionbuttons">
+    <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification?action=edit" class="wikiaction">Edit</a>        
+ | <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification?action=PageHistory" class="wikiaction">PageHistory</a>    
+ | <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification?action=diff" class="wikiaction">Diff</a> 
+    
+ | <a href="http://web.archive.org/web/20050315090729/http://wiki.theory.org/BitTorrentSpecification?action=PageInfo" class="wikiaction">PageInfo</a>  </div>
+  </td>
+  <td align="right" valign="top">
+    <div id="signin">  <form method="post" action="BitTorrentSpecification?action=browse" accept-charset="iso-8859-1" name="signin">
+  <input name="pagename" value="BitTorrentSpecification" type="hidden"><input name="action" value="browse" type="hidden">  <script type="text/javascript"> <!--
+    function SignIn(form) {
+            form.submit();
+    }
+    //-->
+    document.write('&nbsp;Sign in:');
+  </script>&nbsp;Sign in:
+  <input name="auth[userid]" size="12" maxlength="256" onchange="SignIn(this.form);" title="Enter your UserId to sign in" onmouseover='window.status="Enter your UserId to sign in"; return true;' onmouseout="window.status='';return true;" type="text">  <noscript>
+    <input type="submit" value="Sign In" name="auth[login]" class="wikiaction" />  </noscript>
+
+
+  </form>
+</div>
+  </td>
+</tr>
+</tbody></table>
+</div>
+</div>
+<!-- Add your Disclaimer here -->
+<!-- SOME LINK HREF'S ON THIS PAGE HAVE BEEN REWRITTEN BY THE WAYBACK MACHINE
+OF THE INTERNET ARCHIVE IN ORDER TO PRESERVE THE TEMPORAL INTEGRITY OF THE SESSION. -->
+
+
+<script language="Javascript">
+<!--
+
+// FILE ARCHIVED ON 20050315090729 AND RETRIEVED FROM THE
+// INTERNET ARCHIVE ON 20060810202223.
+// JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+// ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+// SECTION 108(a)(3)).
+
+   var sWayBackCGI = "http://web.archive.org/web/20050315090729/";
+
+   function xResolveUrl(url) {
+      var image = new Image();
+      image.src = url;
+      return image.src;
+   }
+   function xLateUrl(aCollection, sProp) {
+      var i = 0;
+      for(i = 0; i < aCollection.length; i++) {
+         if (typeof(aCollection[i][sProp]) == "string") { 
+          if (aCollection[i][sProp].indexOf("mailto:") == -1 &&
+             aCollection[i][sProp].indexOf("javascript:") == -1) {
+            if(aCollection[i][sProp].indexOf("http") == 0) {
+                aCollection[i][sProp] = sWayBackCGI + aCollection[i][sProp];
+            } else {
+                aCollection[i][sProp] = sWayBackCGI + xResolveUrl(aCollection[i][sProp]);
+            }
+         }
+         }
+      }
+   }
+
+   xLateUrl(document.getElementsByTagName("IMG"),"src");
+   xLateUrl(document.getElementsByTagName("A"),"href");
+   xLateUrl(document.getElementsByTagName("AREA"),"href");
+   xLateUrl(document.getElementsByTagName("OBJECT"),"codebase");
+   xLateUrl(document.getElementsByTagName("OBJECT"),"data");
+   xLateUrl(document.getElementsByTagName("APPLET"),"codebase");
+   xLateUrl(document.getElementsByTagName("APPLET"),"archive");
+   xLateUrl(document.getElementsByTagName("EMBED"),"src");
+   xLateUrl(document.getElementsByTagName("BODY"),"background");
+   var forms = document.getElementsByTagName("FORM");
+   if (forms) {
+       var j = 0;
+       for (j = 0; j < forms.length; j++) {
+              f = forms[j];
+              if (typeof(f.action)  == "string") {
+                 if(typeof(f.method)  == "string") {
+                     if(typeof(f.method) != "post") {
+                        f.action = sWayBackCGI + f.action;
+                     }
+                  }
+              }
+        }
+    }
+
+
+//-->
+</script>
+
+</body></html>
