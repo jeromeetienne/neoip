@@ -8,7 +8,7 @@
 - .selfsigned_cert/priv are the lident/rident file for the selfsigned
 - .authsigned_cert is the lident for the authsigned
 
-\par About --create_rootca command line option
+\par About --rootca_create command line option
 - this is just a kludge to create a rootca with the main application
 - it is a kludge as it is deemed to disapears and have a special tool
   to register name in case of authsigned identity.
@@ -122,8 +122,8 @@ router_err_t	router_apps_t::start()	throw()
 	/*************** handle the key creation option	***********************/
 	// if the arg_option contains the "register" key, call the proper cmdline_action function
 	if( arg_option.contain_key("register") )	return cmdline_action_register();
-	// if the arg_option contains the "create_rootca" key, call the proper cmdline_action function
-	if( arg_option.contain_key("create_rootca") )	return cmdline_action_create_rootca();
+	// if the arg_option contains the "rootca_create" key, call the proper cmdline_action function
+	if( arg_option.contain_key("rootca_create") )	return cmdline_action_rootca_create();
 	
 	/*************** handle all the info option	***********************/
 	// if the arg_option contains the "info" key, call the proper cmdline_action function
@@ -247,7 +247,7 @@ router_err_t	router_apps_t::cmdline_action_register()		throw()
 		std::string	reason = "dnsname " + dnsname.to_string() + " is invalid (only host-only and fully qualified are allowed)";
 		return router_err_t(router_err_t::ERROR, reason);
 	}
-KLOG_STDOUT("slota");
+
 	// if dnsname to register is_authsigned_ok(), get cert/priv for the domain authority 
 	if( dnsname.is_authsigned_ok() ){
 		// try to get the ca_cert/ca_privkey for this dnsname
@@ -258,9 +258,6 @@ KLOG_STDOUT("slota");
 		DBG_ASSERT( !ca_cert.is_null() );
 		DBG_ASSERT( !ca_privkey.is_null() );
 	}
-	
-KLOG_STDOUT("slota");
-KLOG_ERR("slotIIII");	
 
 	// log to debug
 	KLOG_ERR("dnsname="		<< dnsname);
@@ -272,7 +269,6 @@ KLOG_ERR("slotIIII");
 						, ca_cert, ca_privkey);
 	if( router_err.failed() )	return router_err;
 
-KLOG_STDOUT("slota");
 	// exit after a successfull action
 	KLOG_STDOUT("OK\n");
 
@@ -280,17 +276,17 @@ KLOG_STDOUT("slota");
 	return router_err_t(router_err_t::OK, "DONTLAUNCHAPPS");
 }
 
-/** \brief Handle the --create_rootca cmdline actions
+/** \brief Handle the --rootca_create cmdline actions
  */
-router_err_t	router_apps_t::cmdline_action_create_rootca()	throw()
+router_err_t	router_apps_t::cmdline_action_rootca_create()	throw()
 {
 	const strvar_db_t &	arg_option	= lib_session_get()->lib_apps()->arg_option();
 	file_path_t		config_path	= lib_session_get()->conf_rootdir() / "router";
-	router_name_t		domain_name	= router_name_t(arg_option.get_first_value("create_rootca"));
+	router_name_t		domain_name	= router_name_t(arg_option.get_first_value("rootca_create"));
 	router_err_t		router_err;
 
-	// sanity check - the arg_option MUST contain the "create_rootca" key
-	DBG_ASSERT( arg_option.contain_key("create_rootca") );
+	// sanity check - the arg_option MUST contain the "rootca_create" key
+	DBG_ASSERT( arg_option.contain_key("rootca_create") );
 
 	// if the domain_name IS NOT is_domain_only, return an error
 	if( !domain_name.is_domain_only() )
@@ -357,8 +353,8 @@ clineopt_arr_t	router_apps_t::clineopt_arr()	throw()
 				.help_string("To register the local identity peername");
 	clineopt.alias_name_db().append("r");
 	clineopt_arr	+= clineopt;
-	// add the --create_rootca cmdline option
-	clineopt	= clineopt_t("create_rootca", clineopt_mode_t::REQUIRED)
+	// add the --rootca_create cmdline option
+	clineopt	= clineopt_t("rootca_create", clineopt_mode_t::REQUIRED)
 				.option_mode(clineopt_mode_t::OPTIONAL)
 				.help_string("Create a router_rootca_t");
 	clineopt_arr	+= clineopt;

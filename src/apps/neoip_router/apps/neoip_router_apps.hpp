@@ -39,7 +39,7 @@ private:
 
 	/*************** Some cmdline actions	*******************************/
 	router_err_t	cmdline_action_register()	throw();
-	router_err_t	cmdline_action_create_rootca()	throw();
+	router_err_t	cmdline_action_rootca_create()	throw();
 	router_err_t	cmdline_action_info()		throw();
 public:
 	/*************** ctor/dtor	***************************************/
