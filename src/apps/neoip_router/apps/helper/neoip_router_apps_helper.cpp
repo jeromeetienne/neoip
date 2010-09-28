@@ -62,9 +62,6 @@ router_err_t	router_apps_helper_t::lident_create(const file_path_t &config_path
 	router_lident	= router_lident_t::generate(local_peerid, dnsname, key_len, ca_cert, ca_privkey);
 	DBG_ASSERT( !router_lident.is_null() );
 
-KLOG_ERR("router_lident=" << router_lident);
-KLOG_ERR("router_ authsigned=" << router_lident.is_authsigned());
-
 	// if router_lident.is_authsigned() or is_nonesigned(), write only *_priv and return
 	if( router_lident.is_authsigned() ){
 		DBG_ASSERT( dnsname.is_fully_qualified() );
@@ -219,6 +216,7 @@ router_err_t	router_apps_helper_t::rident_arr_load(const file_path_t &config_pat
 router_err_t	router_apps_helper_t::rootca_create(const file_path_t &config_path
 				,const router_name_t &domain_name, size_t key_len)	throw()
 {
+	file_path_t	dirname	= config_path / "rootca";	
 	file_path_t	file_path;
 	file_err_t	file_err;
 	crypto_err_t	crypto_err;
@@ -249,14 +247,14 @@ router_err_t	router_apps_helper_t::rootca_create(const file_path_t &config_path
 	std::string	basename	= domain_name.to_string().substr(2);
 
 	// save the router_rootca_t private key in a file - as a to_der_datum
-	file_path	= file_path_t(basename + ".rootca_priv");
+	file_path	= dirname / file_path_t(basename + ".rootca_priv");
 	file_err	= file_sio_t::writeall(file_path
 				, datum_t(base64_t::encode(rootca_privkey.to_der_datum()))
 				, file_perm_t::USR_RW_, file_mode_t::WPLUS);
 	if( file_err.failed() )	return router_err_from_file(file_err);
 
 	// save the router_rootca_t in a file as a canonical string
-	file_path	= file_path_t(basename + ".rootca_cert");
+	file_path	= dirname / file_path_t(basename + ".rootca_cert");
 	file_err	= file_sio_t::writeall(file_path
 				, datum_t(router_rootca.to_canonical_string())
 				, file_perm_t::USR_RW_, file_mode_t::WPLUS);
