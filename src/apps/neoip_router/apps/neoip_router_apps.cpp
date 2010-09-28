@@ -222,6 +222,14 @@ router_err_t	router_apps_t::start()	throw()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+
+/** \brief Handle the --lident_prepare cmdline actions
+ */
+router_err_t	router_apps_t::cmdline_action_lident_prepare()		throw()
+{
+	return router_err_t(router_err_t::ERROR, "not yet implemented");
+}
+
 /** \brief Handle the --lident_register cmdline actions
  */
 router_err_t	router_apps_t::cmdline_action_lident_register()		throw()
@@ -276,13 +284,6 @@ router_err_t	router_apps_t::cmdline_action_lident_register()		throw()
 
 	// return no error, but a specific reason to avoid launching the apps
 	return router_err_t(router_err_t::OK, "DONTLAUNCHAPPS");
-}
-
-/** \brief Handle the --lident_prepare cmdline actions
- */
-router_err_t	router_apps_t::cmdline_action_lident_prepare()		throw()
-{
-	return router_err_t(router_err_t::ERROR, "not yet implemented");
 }
 
 /** \brief Handle the --rootca_create cmdline actions
