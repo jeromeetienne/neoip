@@ -17,7 +17,7 @@ libnss_neoip_doinstall() {
 	echo "backup $ORIGIN_FNAME into $BACKUP_FNAME"
 	cp $ORIGIN_FNAME $BACKUP_FNAME
 	# modify ORIGIN_FNAME to add the 'neoip' in hosts:
-	echo "modify $ORIGIN_FNAME to add 'neoip' to the hosts: line"
+	echo "modify $ORIGIN_FNAME to add 'neoip' to the 'hosts:' line"
 	sed 's/\(^hosts:.*files\)\(.*\)/\1 neoip\2/' < $BACKUP_FNAME > $ORIGIN_FNAME
 }
 
