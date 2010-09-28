@@ -19,7 +19,7 @@ neoip_router_dfl_identity_doinstall() {
 	NONESIGNED_NAME=A0`dd if=/dev/urandom bs=1 count=19 2>/dev/null | od -t x1 -w19  | head -1| cut -d ' ' -f 2-| tr -d ' '`.unauthenticated
 	
 	# make neoip-router register it
-	/usr/lib/neoip_router/neoip-router-bin -r $NONESIGNED_NAME
+	/usr/lib/neoip_router/neoip-router-bin --lident_register $NONESIGNED_NAME
 }
 
 

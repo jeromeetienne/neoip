@@ -19,12 +19,12 @@
   - aka bad bad bouh :)
 
 \par Possible improvement - more regular cmdline option to handle identity
-- --create-selfsigned hostname-dnsname: to replace the current --register for
+- --create-selfsigned hostname-dnsname: to replace the current --lident_register for
   host-only-dnsname
 - --import-selfsigned filename: copy the filename into router/authorized_peer.d
 - --import-authsigned filename: copy the filename into router/local_identity/
   directory and make the router/current_identity.priv points to it
-- --create-authsigned fully-qualified-dnsname: to replace the current --register
+- --create-authsigned fully-qualified-dnsname: to replace the current --lident_register
   for fully-qualified-dnsname    
 
 */
@@ -120,8 +120,8 @@ router_err_t	router_apps_t::start()	throw()
 	ip_netaddr_arr	+= avail_netaddr_str.c_str();
 
 	/*************** handle the key creation option	***********************/
-	// if the arg_option contains the "register" key, call the proper cmdline_action function
-	if( arg_option.contain_key("register") )	return cmdline_action_register();
+	// if the arg_option contains the "lident_register" key, call the proper cmdline_action function
+	if( arg_option.contain_key("lident_register") )	return cmdline_action_lident_register();
 	// if the arg_option contains the "rootca_create" key, call the proper cmdline_action function
 	if( arg_option.contain_key("rootca_create") )	return cmdline_action_rootca_create();
 	
@@ -220,22 +220,22 @@ router_err_t	router_apps_t::start()	throw()
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-/** \brief Handle the --register cmdline actions
+/** \brief Handle the --lident_register cmdline actions
  */
-router_err_t	router_apps_t::cmdline_action_register()		throw()
+router_err_t	router_apps_t::cmdline_action_lident_register()		throw()
 {
 	lib_session_t *		lib_session	= lib_session_get();
 	lib_apps_t *		lib_apps	= lib_session->lib_apps();
 	const strvar_db_t &	arg_option	= lib_apps->arg_option();
 	file_path_t		config_path	= lib_session->conf_rootdir() / "router";
-	const std::string &	reg_param	= arg_option.get_first_value("register");
+	const std::string &	reg_param	= arg_option.get_first_value("lident_register");
 	router_name_t		dnsname		= router_name_t(dns_helper_t::idna_to_ascii(reg_param));
 	router_err_t		router_err;
 	file_err_t		file_err;
 	x509_cert_t		ca_cert;
 	x509_privkey_t		ca_privkey;
-	// sanity check - the arg_option MUST contain the "register" key
-	DBG_ASSERT( arg_option.contain_key("register") );
+	// sanity check - the arg_option MUST contain the "lident_register" key
+	DBG_ASSERT( arg_option.contain_key("lident_register") );
 	
 	KLOG_ERR("reg_param=" << reg_param);
 	// display some info for the user
@@ -347,8 +347,8 @@ clineopt_arr_t	router_apps_t::clineopt_arr()	throw()
 {
 	clineopt_arr_t	clineopt_arr;
 	clineopt_t	clineopt;
-	// add the --register cmdline option
-	clineopt	= clineopt_t("register", clineopt_mode_t::REQUIRED)
+	// add the -- cmdline option
+	clineopt	= clineopt_t("lident_register", clineopt_mode_t::REQUIRED)
 				.option_mode(clineopt_mode_t::OPTIONAL)
 				.help_string("To register the local identity peername");
 	clineopt.alias_name_db().append("r");

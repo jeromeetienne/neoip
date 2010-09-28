@@ -4,7 +4,7 @@
 neoip-router - provides IPv4 end-to-end, mobility and security
 .SH SYNOPSIS
 .B neoip-router
-[--config_dir dirname] [--help] [--version] [--register dnsname]
+[--config_dir dirname] [--help] [--version] [lident_register dnsname]
 [--create_rootca dnsname] [--info]
 .SH DESCRIPTION
 neoip-router is a deamon which espablishes secure IP tunnels on the fly.
@@ -73,7 +73,7 @@ john_smith.*
 
 
 To register a 
-neoip-router-bin --register john.*
+neoip-router-bin lident_register john.*
 
 
 .SH dnsname and internationnalization
@@ -89,7 +89,7 @@ set to "true". and now you can browse with idn hostname from neoip without issue
 
 .SH OPTIONS
 .TP
-.I "-r, --register dnsname"
+.I "-r, lident_register dnsname"
 Generate the local identity for the router. It MUST be done before establishing
 the first connection.
 .TP
@@ -138,7 +138,7 @@ display the version string
 
 .SH HOWTO create a new selfsigned identity
 1. register a local selfsigned identity, say johnsmith
-   $ sudo neoip-router-bin --register johnsmith.*
+   $ sudo neoip-router-bin lident_register johnsmith.*
 
    This will creates 2 files in /etc/neoip-router/router/local_identity. 
    johnsmith.selfsigned_priv which is the private file and johnsmith.selfsigned_cert
